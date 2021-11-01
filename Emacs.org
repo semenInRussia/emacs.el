@@ -1,0 +1,209 @@
+#+TITLE: Config of Emacs from semenInRussia
+
+* Hi!
+Hello, This is configuration of Emacs from semenInRussia!
+I create this configuration with help of [[https://github.com/daviwil/emacs-from-scratch/][this cool repo]].
+* Package Management - base 
+** use-package
+   I am use [[https://github.com/jwiegley/use-package][use-package]]:
+ #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+ (require 'package)
+
+ (setq package-archives 
+   '(("melpa-stable" . "http://stable.melpa.org/packages/")
+     ("melpa"        . "https://melpa.org/packages/")
+     ("org"          . "https://orgmode.org/elpa/")
+     ("elpa"         . "https://elpa.gnu.org/packages/")))
+
+ (package-initialize)
+ (unless package-archive-contents
+ (package-refresh-contents))
+ 
+ (unless (package-installed-p 'use-package)
+ (package-install 'use-package))
+
+ (require 'use-package)
+ #+END_SRC
+ 
+** Packages Not in MELPA/ELPA/ORG-ELPA
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   (add-to-list 'load-path "~/.emacs.d/lisp")
+#+END_SRC
+
+* Emacs Lisp
+I am use some packages for simple develop on Emacs Lisp
+** s
+   This is [[https://github.com/magnars/s.el][s]]:
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+(use-package s)
+#+END_SRC
+
+** f
+   This is [[https://github.com/rejeep/f.el][f]]:
+#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+(use-package f)
+#+END_SRC
+
+** Dash
+   This is [[https://github.com/magnars/dash.el][dash:]]
+#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+(use-package dash)
+#+END_SRC
+* Small Organize Tricks
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+(show-paren-mode 2)
+(setq make-backup-files         nil)
+(setq auto-save-list-file-name  nil)
+(toggle-truncate-lines t)
+(setq word-wrap t)
+(defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+
+* Organize Editing
+** Snippets
+I am use [[https://github.com/joaotavora/yasnippet][yasnippet]]:
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+ (use-package yasnippet-snippets
+   :init
+   (yas-global-mode 1)
+   :config
+   (setq yas-snippet-dirs '("~/.emacs.d/snippets")))
+#+END_SRC
+
+** Fast Navigation for Files, Packages and etc. 
+ 
+I am use [[https://github.com/emacs-helm/helm][HELM]]:
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+ (use-package helm
+    :ensure t
+    :config
+    (setq-default helm-M-x-fuzzy-match t)
+    :init
+    (helm-mode 1)
+    :bind
+    ("C-o" . helm-find-files))
+#+END_SRC
+ 
+** Search
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   (setq search-highlight        t)
+   (setq query-replace-highlight t)
+#+END_SRC
+** Autocomplete
+I am use [[http://company-mode.github.io][company-mode]]:
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   (use-package company
+       :ensure t
+       :init
+       (company-mode)
+       :hook (after-init-hook . company-mode))
+#+END_SRC
+
+** Main keymaps
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   (require 'xah-fly-keys)
+
+   (xah-fly-keys-set-layout "qwerty") 
+   (xah-fly-keys 1)
+#+END_SRC
+* Graphic User Interface
+** Hide ALL
+This is standard stuf
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode   -1)
+
+  (toggle-frame-fullscreen)
+#+END_SRC
+
+** Color Theme
+I am use [[https://github.com/hlissner/emacs-doom-themes][doom-themes]]:
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (use-package doom-themes
+    :ensure t
+    :config
+    (load-theme 'doom-molokai))
+#+END_SRC
+
+** Numbers of lines
+ #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (use-package linum
+     :config
+     (setq linum-format "  %d    ")
+     :init
+     (global-linum-mode 1)
+     )
+#+END_SRC
+
+** Mode line
+I am use [[https://github.com/seagle0128/doom-modeline][doom-modeline]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   (use-package doom-modeline
+     :ensure t
+     :config
+     (display-time-mode t)
+     (setq doom-modeline-icon nil)
+     (setq doom-modeline-workspace-name nil)
+     :init
+     (doom-modeline-mode 1))
+#+END_SRC
+
+** Fonts
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   (set-face-attribute 'default nil :font "Consolas" :height 200)
+   (set-frame-font "Consolas" nil t)
+#+END_SRC
+
+** Indent settings
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   (setq-default indent-tabs-mode nil)
+   (setq-default tab-width          4)
+   (setq-default c-basic-offset     4)
+   (setq-default standart-indent    4)
+   (setq-default lisp-body-indent   4)
+
+   (global-set-key (kbd "RET") 'newline-and-indent)
+   (setq lisp-indent-function  'common-lisp-indent-function)
+#+END_SRC
+
+** Highlight current line
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+(hl-line-mode 1)
+#+END_SRC
+
+* Developer Environment
+** Projectile
+   I am use [[https://github.com/bbatsov/projectile][projectile]]:
+
+#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+(defun get-project-name (project-root)
+    "Return name of project by path - `PROJECT-ROOT`."
+    (s-titleize (f-dirname project-root)))
+
+(require 'projectile)
+(setq projectile-project-search-path '("~/projects/"))
+(setq projectile-completion-system 'helm)
+(setq projectile-project-name-function 'get-project-name)
+(projectile-mode 1)
+#+END_SRC
+** Git
+   I am use super famous [[https://github.com/magit/magit][magit]]:
+#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+(use-package magit)
+#+END_SRC
+
+* Auto Tangle This File
+#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+  (defun if-Emacs-org-then-org-babel-tangle ()
+      (interactive)
+      (message buffer-file-name)
+      (when (s-equals? (f-filename buffer-file-name) "Emacs.org")
+          (org-babel-tangle)))
+
+  (add-hook 'after-save-hook 'if-Emacs-org-then-org-babel-tangle)
+
+#+END_SRC
+
