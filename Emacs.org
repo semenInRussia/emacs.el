@@ -35,33 +35,23 @@ I create this configuration with help of [[https://github.com/daviwil/emacs-from
 
 * Emacs Lisp
 I am use some packages for simple develop on Emacs Lisp
-** s
-   This is [[https://github.com/magnars/s.el][s]]:
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-(use-package s :ensure t)
-#+END_SRC
+** Libraries
+*** s
+    This is [[https://github.com/magnars/s.el][s]]:
+ #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+ (use-package s :ensure t)
+ #+END_SRC
+*** f
+    This is [[https://github.com/rejeep/f.el][f]]:
+ #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+ (use-package f)
+ #+END_SRC
 
-** f
-   This is [[https://github.com/rejeep/f.el][f]]:
-#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
-(use-package f)
-#+END_SRC
-
-** Dash
-   This is [[https://github.com/magnars/dash.el][dash:]]
-#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
-(use-package dash)
-#+END_SRC
-* Small Organize Tricks
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-(show-paren-mode 2)
-(setq make-backup-files         nil)
-(setq auto-save-list-file-name  nil)
-(toggle-truncate-lines t)
-(setq word-wrap t)
-(defalias 'yes-or-no-p 'y-or-n-p)
-#+END_SRC
-
+*** Dash
+    This is [[https://github.com/magnars/dash.el][dash:]]
+ #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+ (use-package dash)
+ #+END_SRC
 * Organize Editing
 ** Snippets
 I am use [[https://github.com/joaotavora/yasnippet][yasnippet]]:
@@ -74,20 +64,6 @@ I am use [[https://github.com/joaotavora/yasnippet][yasnippet]]:
    (setq yas-snippet-dirs '("~/.emacs.d/snippets")))
 #+END_SRC
 
-** Fast Navigation for Files, Packages and etc. 
- 
-I am use [[https://github.com/emacs-helm/helm][HELM]]:
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
- (use-package helm
-    :ensure t
-    :config
-    (setq-default helm-M-x-fuzzy-match t)
-    :init
-    (helm-mode 1)
-    :bind
-    ("C-o" . helm-find-files))
-#+END_SRC
- 
 ** Search
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
    (setq search-highlight        t)
@@ -98,18 +74,90 @@ I am use [[http://company-mode.github.io][company-mode]]:
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
    (use-package company
        :ensure t
-       :init
-       (company-mode)
-       :hook (after-init-hook . company-mode))
+       :config
+       (global-company-mode))
 #+END_SRC
 
 ** Main keymaps
-
+   I am use [[https://github.com/xahlee/xah-fly-keys][xah-fly-keys]], this as VIM:
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
    (require 'xah-fly-keys)
 
    (xah-fly-keys-set-layout "qwerty") 
    (xah-fly-keys 1)
+#+END_SRC
+** Multiple Cursors
+   I am use package of magnars [[https://github.com/magnars/multiple-cursors.el][multiple-cursors]]:
+#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+(defun if-selected-then-next-word-like-this (arg)
+    (interactive "p")
+    (when (use-region-p)
+        (mc/mark-next-like-this arg)))
+
+(use-package multiple-cursors
+    :ensure t
+    :bind (("<tab>" . if-selected-then-next-word-like-this)))
+
+#+END_SRC
+
+** Very Fast Jump
+   I am use [[https://github.com/abo-abo/avy][avy]]:
+#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+(use-package avy
+    :ensure t
+    :bind
+    ((:map xah-fly-command-map)
+     ("SPC \\" . avy-goto-char)))
+#+END_SRC
+
+** Smart Insert Parens
+   I am use [[https://github.com/Fuco1/smartparens/][smartparens]]:
+#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+(use-package smartparens
+    :ensure t
+    :config (smartparens-global-mode))
+#+END_SRC
+** Smart Select Text
+   I am use cool package [[https://github.com/magnars/expand-region.el/][expand-region]]:
+#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+(use-package expand-region
+    :ensure t
+    :bind
+    (:map xah-fly-command-map
+    ("1" . er/expand-region)))
+#+END_SRC
+
+* Small Organize Tricks
+** Very Small Tricks
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+(show-paren-mode 2)
+(setq make-backup-files         nil)
+(setq auto-save-list-file-name  nil)
+(toggle-truncate-lines t)
+(setq word-wrap t)
+(defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+** Helpful
+*** Which Key?
+    I am use [[https://github.com/justbur/emacs-which-key][which-key]]:
+#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+(use-package which-key
+    :ensure t
+    :config
+    (which-key-setup-side-window-bottom)
+    (which-key-mode))
+#+END_SRC
+** Framework for Incremental Completions and Narrowing Selections 
+   I am use [[https://github.com/emacs-helm/helm][HELM]]:
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+ (use-package helm
+    :ensure t
+    :config
+    (setq-default helm-M-x-fuzzy-match t)
+    :init
+    (helm-mode 1)
+    :bind
+    ("C-o" . helm-find-files))
 #+END_SRC
 * Graphic User Interface
 ** Hide ALL

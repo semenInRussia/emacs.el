@@ -23,6 +23,51 @@
 
 (use-package dash)
 
+(use-package yasnippet-snippets
+   :ensure t
+   :init
+   (yas-global-mode 1)
+   :config
+   (setq yas-snippet-dirs '("~/.emacs.d/snippets")))
+
+(setq search-highlight        t)
+(setq query-replace-highlight t)
+
+(use-package company
+    :ensure t
+    :config
+    (global-company-mode))
+
+(require 'xah-fly-keys)
+
+(xah-fly-keys-set-layout "qwerty") 
+(xah-fly-keys 1)
+
+(defun if-selected-then-next-word-like-this (arg)
+    (interactive "p")
+    (when (use-region-p)
+        (mc/mark-next-like-this arg)))
+
+(use-package multiple-cursors
+    :ensure t
+    :bind (("<tab>" . if-selected-then-next-word-like-this)))
+
+(use-package avy
+    :ensure t
+    :bind
+    ((:map xah-fly-command-map)
+     ("SPC \\" . avy-goto-char)))
+
+(use-package smartparens
+    :ensure t
+    :config (smartparens-global-mode))
+
+(use-package expand-region
+    :ensure t
+    :bind
+    (:map xah-fly-command-map
+    ("1" . er/expand-region)))
+
 (show-paren-mode 2)
 (setq make-backup-files         nil)
 (setq auto-save-list-file-name  nil)
@@ -30,12 +75,11 @@
 (setq word-wrap t)
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-(use-package yasnippet-snippets
-   :ensure t
-   :init
-   (yas-global-mode 1)
-   :config
-   (setq yas-snippet-dirs '("~/.emacs.d/snippets")))
+(use-package which-key
+    :ensure t
+    :config
+    (which-key-setup-side-window-bottom)
+    (which-key-mode))
 
 (use-package helm
    :ensure t
@@ -45,20 +89,6 @@
    (helm-mode 1)
    :bind
    ("C-o" . helm-find-files))
-
-(setq search-highlight        t)
-(setq query-replace-highlight t)
-
-(use-package company
-    :ensure t
-    :init
-    (company-mode)
-    :hook (after-init-hook . company-mode))
-
-(require 'xah-fly-keys)
-
-(xah-fly-keys-set-layout "qwerty") 
-(xah-fly-keys 1)
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
