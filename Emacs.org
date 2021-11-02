@@ -24,6 +24,9 @@ I create this configuration with help of [[https://github.com/daviwil/emacs-from
 
  (require 'use-package)
  #+END_SRC
+
+ #+RESULTS:
+ : use-package
  
 ** Packages Not in MELPA/ELPA/ORG-ELPA
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -35,7 +38,7 @@ I am use some packages for simple develop on Emacs Lisp
 ** s
    This is [[https://github.com/magnars/s.el][s]]:
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-(use-package s)
+(use-package s :ensure t)
 #+END_SRC
 
 ** f
@@ -63,7 +66,8 @@ I am use some packages for simple develop on Emacs Lisp
 ** Snippets
 I am use [[https://github.com/joaotavora/yasnippet][yasnippet]]:
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
- (use-package yasnippet-snippets
+(use-package yasnippet-snippets
+   :ensure t
    :init
    (yas-global-mode 1)
    :config
@@ -192,7 +196,7 @@ I am use [[https://github.com/seagle0128/doom-modeline][doom-modeline]]:
 ** Git
    I am use super famous [[https://github.com/magit/magit][magit]]:
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
-(use-package magit)
+(use-package magit :ensure t)
 #+END_SRC
 
 * Auto Tangle This File
@@ -206,4 +210,3 @@ I am use [[https://github.com/seagle0128/doom-modeline][doom-modeline]]:
   (add-hook 'after-save-hook 'if-Emacs-org-then-org-babel-tangle)
 
 #+END_SRC
-

@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: Insert BEGIN_SRC block
+# key: src
+# --
+
+#+BEGIN_SRC ${1:emacs-lisp} ${2: :tangle} ${3: ~/init.el}
+${4: body...}
+#+END_SRC

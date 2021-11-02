@@ -17,7 +17,7 @@
 
 (add-to-list 'load-path "~/.emacs.d/lisp")
 
-(use-package s)
+(use-package s :ensure t)
 
 (use-package f)
 
@@ -31,10 +31,11 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 (use-package yasnippet-snippets
-  :init
-  (yas-global-mode 1)
-  :config
-  (setq yas-snippet-dirs '("~/.emacs.d/snippets")))
+   :ensure t
+   :init
+   (yas-global-mode 1)
+   :config
+   (setq yas-snippet-dirs '("~/.emacs.d/snippets")))
 
 (use-package helm
    :ensure t
@@ -110,7 +111,7 @@
 (setq projectile-project-name-function 'get-project-name)
 (projectile-mode 1)
 
-(use-package magit)
+(use-package magit :ensure t)
 
 (defun if-Emacs-org-then-org-babel-tangle ()
     (interactive)
