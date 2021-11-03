@@ -30,11 +30,18 @@
    :config
    (setq yas-snippet-dirs '("~/.emacs.d/snippets")))
 
+(use-package yasnippet-classic-snippets :ensure t)
+
+(use-package flycheck
+    :config (global-flycheck-mode 1))
+
 (setq search-highlight        t)
 (setq query-replace-highlight t)
 
 (use-package company
     :ensure t
+    :init
+    (setq company-async-wait 0.4)
     :config
     (global-company-mode))
 
@@ -56,11 +63,20 @@
     :ensure t
     :bind
     ((:map xah-fly-command-map)
-     ("SPC \\" . avy-goto-char)))
+     ("SPC '" . avy-goto-char)))
 
 (use-package smartparens
     :ensure t
     :config (smartparens-global-mode))
+
+(defun delete-only-1-char ()
+    "Delete only 1 character before point."
+    (interactive)
+    (backward-char)
+    (delete-char 1)
+    )
+
+(define-key xah-fly-command-map (kbd "DEL") 'delete-only-1-char)
 
 (use-package expand-region
     :ensure t
@@ -68,12 +84,127 @@
     (:map xah-fly-command-map
     ("1" . er/expand-region)))
 
+(defun kmacro-start-or-end-macro ()
+    "If macro record have just started, then stop this record, otherwise start macro record."
+    (interactive)
+    (if defining-kbd-macro
+        (kmacro-end-macro 1)
+        (kmacro-start-macro 1)))
+
+(define-key xah-fly-command-map (kbd "\\") 'kmacro-start-or-end-macro)
+
+(defun kmacro-call-macro-or-apply-to-lines (arg &optional top bottom)
+    "If selected region, then apply last macro to selected lines, otherwise call last macro."
+    (interactive 
+     (list
+      1
+      (if (use-region-p) region-beginning nil)
+      (if (use-region-p) region-end nil)))
+
+    (if (use-region-p)
+        (apply-macro-to-region-lines top bottom)
+        (kmacro-call-macro arg)))
+
+(define-key xah-fly-command-map (kbd "=") 'kmacro-call-macro-or-apply-to-lines)
+
+(defun delete-and-edit-current-line ()
+    "Delete current line and instroduce to insert mode."
+    (interactive)
+    (beginning-of-line-text)
+    (kill-line)
+    (xah-fly-insert-mode-init)
+    )
+
+(define-key xah-fly-command-map (kbd "w") 'delete-and-edit-current-line)
+
+(defun select-current-or-next-word ()
+    "If word was selected, then select next word, otherwise select current word."
+    (interactive)
+    (if (use-region-p)
+        (forward-word)
+        (xah-extend-selection))
+    )
+
+(define-key xah-fly-command-map (kbd "8") 'select-current-or-next-word)
+
+(setq latex-documentclasses 
+    '("article" "reoport" "book" "proc" "minimal" "slides" "memoir" "letter" "beamer"))
+
+(setq latex-environment-names
+    '( "figure"
+       "table"
+       "description"
+       "enumerate"
+       "itemize"
+       "list"
+       "math"
+       "displaymath"
+       "split"
+       "array"
+       "eqnarray"
+       "equation"
+       "theorem"
+       "matrix"
+       "cases"
+       "align"
+       "center"
+       "flushleft"
+       "flushright"
+       "minipage"
+       "quotation"
+       "quote"
+       "verbatim" 
+       "verse"
+       "tabbing"
+       "tabular"
+       "thebibliography" 
+       "titlepage"
+       "document"))
+
+;; If this information is not actual, then here my python script and add `document`, 
+;; so all claims to this site https://latex.wikia.org/wiki/List_of_LaTeX_environments:
+
+;; import requests
+;; from bs4 import BeautifulSoup as Soup
+
+
+;; url = "https://latex.wikia.org/wiki/List_of_LaTeX_environments"
+
+;; def main():
+;;     request = requests.get(url)
+;;     soup = Soup(request.text, "html.parser")
+;;     elements = soup.select("h3 > span.mw-headline")
+;;     elements = list(filter(lambda el: "environment" in el.text, elements))
+;;     codes = list(map(lambda el: el.text.split()[0].lower(), elements))
+;;     print(codes)
+
+(defun org-mode-visual-fill ()
+  (interactive)
+  (setq visual-fill-column-width 90
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :ensure t
+  :hook (org-mode . org-mode-visual-fill))
+
 (show-paren-mode 2)
 (setq make-backup-files         nil)
 (setq auto-save-list-file-name  nil)
-(toggle-truncate-lines t)
-(setq word-wrap t)
 (defalias 'yes-or-no-p 'y-or-n-p)
+
+(setq dont-truncate-lines-modes '(org-mode))
+
+(defun truncate-or-not-truncate-words ()
+    "Truncate words or don't truncate words.
+If current `major-mode` don't need to truncate words, then don't truncate words,
+otherwise truncate words."
+    (interactive)
+    (if (-contains? dont-truncate-lines-modes major-mode)
+        (toggle-truncate-lines 0)
+        (toggle-truncate-lines 38)))
+
+(add-hook 'prog-mode-hook 'truncate-or-not-truncate-words)
 
 (use-package which-key
     :ensure t
@@ -96,17 +227,30 @@
 
 (toggle-frame-fullscreen)
 
-(use-package doom-themes
-  :ensure t
-  :config
-  (load-theme 'doom-molokai))
+(use-package doom-themes 
+    :ensure t
+    :config
+    (load-theme 'doom-1337 t))
 
-(use-package linum
-   :config
-   (setq linum-format "  %d    ")
-   :init
-   (global-linum-mode 1)
-   )
+(setq dont-display-lines-modes
+   '(org-mode
+     term-mode
+     shell-mode
+     treemacs-mode
+     eshell-mode
+     helm-mode))
+
+(defun display-or-not-display-numbers-of-lines ()
+    "Display numbers of lines OR don't display numbers of lines.
+If current `major-mode` need to display numbers of lines, then display
+numbers of lines, otherwise don't display."
+    (interactive)
+    (if (-contains? dont-display-lines-modes major-mode)
+        (display-line-numbers-mode 0)
+        (display-line-numbers-mode 38))
+    )
+
+(add-hook 'prog-mode-hook 'display-or-not-display-numbers-of-lines)
 
 (use-package doom-modeline
   :ensure t
@@ -144,8 +288,9 @@
 (use-package magit :ensure t)
 
 (defun if-Emacs-org-then-org-babel-tangle ()
+    "If current open file is Emacs.org, then `org-babel-tangle`."
     (interactive)
-    (message buffer-file-name)
+
     (when (s-equals? (f-filename buffer-file-name) "Emacs.org")
         (org-babel-tangle)))
 

@@ -1,8 +1,9 @@
 #+TITLE: Config of Emacs from semenInRussia
+#+AUTHOR: semenInRussia
 
 * Hi!
-Hello, This is configuration of Emacs from semenInRussia!
-I create this configuration with help of [[https://github.com/daviwil/emacs-from-scratch/][this cool repo]].
+  Hello, This is configuration of Emacs from semenInRussia!
+  I create this configuration with help of [[https://github.com/daviwil/emacs-from-scratch/][this cool repo]].
 * Package Management - base 
 ** use-package
    I am use [[https://github.com/jwiegley/use-package][use-package]]:
@@ -54,7 +55,8 @@ I am use some packages for simple develop on Emacs Lisp
  #+END_SRC
 * Organize Editing
 ** Snippets
-I am use [[https://github.com/joaotavora/yasnippet][yasnippet]]:
+   I am use [[https://github.com/joaotavora/yasnippet][yasnippet]]:
+
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 (use-package yasnippet-snippets
    :ensure t
@@ -64,22 +66,40 @@ I am use [[https://github.com/joaotavora/yasnippet][yasnippet]]:
    (setq yas-snippet-dirs '("~/.emacs.d/snippets")))
 #+END_SRC
 
+And [[https://github.com/emacsmirror/yasnippet-classic-snippets][yasnippet-classic-snippets]] for basic snippets' collection:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+(use-package yasnippet-classic-snippets :ensure t)
+#+END_SRC
+
+** Linters
+   I am use [[https://www.flycheck.org/en/latest/][flycheck]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+(use-package flycheck
+    :config (global-flycheck-mode 1))
+#+END_SRC
+
 ** Search
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
    (setq search-highlight        t)
    (setq query-replace-highlight t)
 #+END_SRC
+
 ** Autocomplete
-I am use [[http://company-mode.github.io][company-mode]]:
+   I am use [[http://company-mode.github.io][company-mode]], I am set delay beetween typing text and viewing hints to 0.4 seconds:
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
    (use-package company
        :ensure t
+       :init
+       (setq company-async-wait 0.4)
        :config
        (global-company-mode))
 #+END_SRC
 
 ** Main keymaps
    I am use [[https://github.com/xahlee/xah-fly-keys][xah-fly-keys]], this as VIM:
+
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
    (require 'xah-fly-keys)
 
@@ -107,16 +127,30 @@ I am use [[http://company-mode.github.io][company-mode]]:
     :ensure t
     :bind
     ((:map xah-fly-command-map)
-     ("SPC \\" . avy-goto-char)))
+     ("SPC '" . avy-goto-char)))
 #+END_SRC
 
 ** Smart Insert Parens
+*** Smartparens
    I am use [[https://github.com/Fuco1/smartparens/][smartparens]]:
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
 (use-package smartparens
     :ensure t
     :config (smartparens-global-mode))
 #+END_SRC
+
+*** Delete Only Parens without Inner Contents
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+(defun delete-only-1-char ()
+    "Delete only 1 character before point."
+    (interactive)
+    (backward-char)
+    (delete-char 1)
+    )
+
+(define-key xah-fly-command-map (kbd "DEL") 'delete-only-1-char)
+#+END_SRC
+
 ** Smart Select Text
    I am use cool package [[https://github.com/magnars/expand-region.el/][expand-region]]:
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
@@ -126,17 +160,176 @@ I am use [[http://company-mode.github.io][company-mode]]:
     (:map xah-fly-command-map
     ("1" . er/expand-region)))
 #+END_SRC
+** Macros
+   I am use =\= in command mode for start of record macro.
+   I am also use === for execute last macro or execute macro to lines:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+(defun kmacro-start-or-end-macro ()
+    "If macro record have just started, then stop this record, otherwise start macro record."
+    (interactive)
+    (if defining-kbd-macro
+        (kmacro-end-macro 1)
+        (kmacro-start-macro 1)))
+
+(define-key xah-fly-command-map (kbd "\\") 'kmacro-start-or-end-macro)
+
+(defun kmacro-call-macro-or-apply-to-lines (arg &optional top bottom)
+    "If selected region, then apply last macro to selected lines, otherwise call last macro."
+    (interactive 
+     (list
+      1
+      (if (use-region-p) region-beginning nil)
+      (if (use-region-p) region-end nil)))
+
+    (if (use-region-p)
+        (apply-macro-to-region-lines top bottom)
+        (kmacro-call-macro arg)))
+
+(define-key xah-fly-command-map (kbd "=") 'kmacro-call-macro-or-apply-to-lines)
+#+END_SRC
+
+** Custom Deleting Text
+   I am delete this line and edit this by press =w=:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+(defun delete-and-edit-current-line ()
+    "Delete current line and instroduce to insert mode."
+    (interactive)
+    (beginning-of-line-text)
+    (kill-line)
+    (xah-fly-insert-mode-init)
+    )
+
+(define-key xah-fly-command-map (kbd "w") 'delete-and-edit-current-line)
+#+END_SRC
+
+** Custom Selecting Text
+   I am press 2 times =8=, and select 2 words
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+(defun select-current-or-next-word ()
+    "If word was selected, then select next word, otherwise select current word."
+    (interactive)
+    (if (use-region-p)
+        (forward-word)
+        (xah-extend-selection))
+    )
+
+(define-key xah-fly-command-map (kbd "8") 'select-current-or-next-word)
+#+END_SRC
+
+* Support of Languages
+** LaTeX
+*** Vars
+    Variable `latex-documentclasses` is list of documentclasses in Emacs, each element
+of this list is name of documentclass in lower case. Defaults to:
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+(setq latex-documentclasses 
+    '("article" "reoport" "book" "proc" "minimal" "slides" "memoir" "letter" "beamer"))
+#+END_SRC
+Variable `latex-environment-names` is list of words which valid to `\begin` and `\end` 
+environments. Defaults to:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    (setq latex-environment-names
+      '( "figure"
+         "table"
+         "description"
+         "enumerate"
+         "itemize"
+         "list"
+         "math"
+         "displaymath"
+         "split"
+         "array"
+         "eqnarray"
+         "equation"
+         "theorem"
+         "matrix"
+         "cases"
+         "align"
+         "center"
+         "flushleft"
+         "flushright"
+         "minipage"
+         "quotation"
+         "quote"
+         "verbatim" 
+         "verse"
+         "tabbing"
+         "tabular"
+         "thebibliography" 
+         "titlepage"
+         "document"))
+
+  ;; If this information is not actual, then here my python script and add `document`, 
+  ;; so all claims to this site https://latex.wikia.org/wiki/List_of_LaTeX_environments:
+  
+  ;; import requests
+  ;; from bs4 import BeautifulSoup as Soup
+
+
+  ;; url = "https://latex.wikia.org/wiki/List_of_LaTeX_environments"
+
+  ;; def main():
+  ;;     request = requests.get(url)
+  ;;     soup = Soup(request.text, "html.parser")
+  ;;     elements = soup.select("h3 > span.mw-headline")
+  ;;     elements = list(filter(lambda el: "environment" in el.text, elements))
+  ;;     codes = list(map(lambda el: el.text.split()[0].lower(), elements))
+  ;;     print(codes)
+
+
+#+END_SRC
+
+* Org Mode
+  I am use [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] for centering content of org file:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+(defun org-mode-visual-fill ()
+  (interactive)
+  (setq visual-fill-column-width 90
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :ensure t
+  :hook (org-mode . org-mode-visual-fill))
+#+END_SRC
 
 * Small Organize Tricks
 ** Very Small Tricks
+
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-(show-paren-mode 2)
-(setq make-backup-files         nil)
-(setq auto-save-list-file-name  nil)
-(toggle-truncate-lines t)
-(setq word-wrap t)
-(defalias 'yes-or-no-p 'y-or-n-p)
+  (show-paren-mode 2)
+  (setq make-backup-files         nil)
+  (setq auto-save-list-file-name  nil)
+  (defalias 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
+
+** Truncate Lines
+   I am truncate lines in `prog-mode`-s, excluding `org-mode`:
+*** Vars
+    Var `dont-truncate-lines-modes` is list of modes for this modes, emacs want disable truncate words. Defaults to:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+(setq dont-truncate-lines-modes '(org-mode))
+#+END_SRC
+
+*** Disable and Enable
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (defun truncate-or-not-truncate-words ()
+      "Truncate words or don't truncate words.
+  If current `major-mode` don't need to truncate words, then don't truncate words,
+  otherwise truncate words."
+      (interactive)
+      (if (-contains? dont-truncate-lines-modes major-mode)
+          (toggle-truncate-lines 0)
+          (toggle-truncate-lines 38)))
+
+  (add-hook 'prog-mode-hook 'truncate-or-not-truncate-words)
+#+END_SRC
+
 ** Helpful
 *** Which Key?
     I am use [[https://github.com/justbur/emacs-which-key][which-key]]:
@@ -171,25 +364,48 @@ This is standard stuf
 #+END_SRC
 
 ** Color Theme
-I am use [[https://github.com/hlissner/emacs-doom-themes][doom-themes]]:
+   I am use [[https://github.com/hlissner/emacs-doom-themes][doom-themes]]:
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-  (use-package doom-themes
+(use-package doom-themes 
     :ensure t
     :config
-    (load-theme 'doom-molokai))
+    (load-theme 'doom-1337 t))
 #+END_SRC
 
 ** Numbers of lines
- #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-  (use-package linum
-     :config
-     (setq linum-format "  %d    ")
-     :init
-     (global-linum-mode 1)
-     )
+*** Vars 
+    Var `dont-display-lines-mode` is list of modes,
+for this modes willn't display numbers of lines. Defaults to:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+(setq dont-display-lines-modes
+   '(org-mode
+     term-mode
+     shell-mode
+     treemacs-mode
+     eshell-mode
+     helm-mode))
 #+END_SRC
 
-** Mode line
+*** Enable and Disable
+    I am display numbers of lines in each mode, excluding modes from
+`dont-display-lines-mode` list:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (defun display-or-not-display-numbers-of-lines ()
+      "Display numbers of lines OR don't display numbers of lines.
+  If current `major-mode` need to display numbers of lines, then display
+  numbers of lines, otherwise don't display."
+      (interactive)
+      (if (-contains? dont-display-lines-modes major-mode)
+          (display-line-numbers-mode 0)
+          (display-line-numbers-mode 38))
+      )
+
+  (add-hook 'prog-mode-hook 'display-or-not-display-numbers-of-lines)
+#+END_SRC
+
+** Modeline
 I am use [[https://github.com/seagle0128/doom-modeline][doom-modeline]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -250,11 +466,11 @@ I am use [[https://github.com/seagle0128/doom-modeline][doom-modeline]]:
 * Auto Tangle This File
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
   (defun if-Emacs-org-then-org-babel-tangle ()
+      "If current open file is Emacs.org, then `org-babel-tangle`."
       (interactive)
-      (message buffer-file-name)
+
       (when (s-equals? (f-filename buffer-file-name) "Emacs.org")
           (org-babel-tangle)))
 
   (add-hook 'after-save-hook 'if-Emacs-org-then-org-babel-tangle)
-
 #+END_SRC

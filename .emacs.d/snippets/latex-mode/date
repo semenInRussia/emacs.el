@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# contributor: semenInRussia
+# name: date
+# key: date
+# --
+\date{$1}
+$0

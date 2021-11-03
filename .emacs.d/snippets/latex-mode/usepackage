@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# contributor: semenInRussia
+# name: usepackage
+# key: pkg
+# --
+\usepackage{$1}
+$0

@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# contributor: semenInRussia
+# name: LaTeX Document Class
+# key: doc
+# --
+\documentclass${2:[${3:options}]}{${2:$$(yas-choose-value latex-documentclasses)}}
