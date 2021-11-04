@@ -1,3 +1,10 @@
+(setq user-full-name    "Semen Khramtsov"
+      user-mail-address "hrams205@gmail.com"
+      user-birthday     "2007-01-29")
+
+(if (s-equals? (format-time-string "%Y-%m-%d") user-birthday)
+    (animate-birthday-present))
+
 (require 'package)
 
 (setq package-archives 
@@ -47,8 +54,11 @@
 
 (require 'xah-fly-keys)
 
-(xah-fly-keys-set-layout "qwerty") 
+(xah-fly-keys-set-layout "qwerty")
 (xah-fly-keys 1)
+
+(define-key xah-fly-command-map (kbd "SPC l") nil)
+(define-key xah-fly-command-map (kbd "SPC j") nil)
 
 (defun if-selected-then-next-word-like-this (arg)
     (interactive "p")
@@ -127,6 +137,37 @@
 
 (define-key xah-fly-command-map (kbd "8") 'select-current-or-next-word)
 
+(defun *execute-def-or-insert-text* (def text)
+    "Execute `DEF` if user in `command-mode` of `xah-fly-keys`, otherwise insert `TEXT`."
+    (if xah-fly-insert-state-q
+        (insert text)
+        (funcall def))
+    )
+
+(defmacro add-nav-forward-block-keymap-for-language (language forward-block-function)
+    "Bind `FORWARD-BLOCK-FUNCTION` to `LANGUAGE`-map."
+
+    `(define-key
+        ,language
+        (kbd "SPC l")
+        (lambda () 
+            "If `command-mode`, then `forward-block`, otherwise nothing."
+            (interactive)
+            (*execute-def-or-insert-text* ',forward-block-function " l")))
+    )
+
+(defmacro add-nav-backward-block-keymap-for-language (language backward-block-function)
+    "Bind `BACKWARD-BLOCK-FUNCTION` to `LANGUAGE`-map."
+
+    `(define-key
+        ,language
+        (kbd "SPC j")
+        (lambda () 
+            "If `command-mode`, then `backward-block`, otherwise nothing."
+            (interactive)
+            (*execute-def-or-insert-text* ',backward-block-function " j")))
+    )
+
 (setq latex-documentclasses 
     '("article" "reoport" "book" "proc" "minimal" "slides" "memoir" "letter" "beamer"))
 
@@ -177,6 +218,9 @@
 ;;     elements = list(filter(lambda el: "environment" in el.text, elements))
 ;;     codes = list(map(lambda el: el.text.split()[0].lower(), elements))
 ;;     print(codes)
+
+(add-nav-forward-block-keymap-for-language python-mode-map python-nav-forward-block)
+(add-nav-backward-block-keymap-for-language python-mode-map python-nav-backward-block)
 
 (defun org-mode-visual-fill ()
   (interactive)
