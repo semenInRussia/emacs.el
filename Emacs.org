@@ -253,6 +253,24 @@ And [[https://github.com/emacsmirror/yasnippet-classic-snippets][yasnippet-class
 
 (define-key xah-fly-command-map (kbd "8") 'select-current-or-next-word)
 #+END_SRC
+
+    I am press =g=, for deleting current block, but if selected region, then I am cancel 
+this select:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (defun delete-current-text-block-or-cancel-selection ()
+      "If text is selected, then cancel selection, otherwise delete current block."
+      (interactive)
+      (if (use-region-p)
+          (deactivate-mark)
+          (xah-delete-current-text-block)))
+
+  (define-key xah-fly-command-map (kbd "g") nil)
+  (define-key xah-fly-command-map (kbd "g") 'delete-current-text-block-or-cancel-selection)
+
+#+END_SRC
+
 ** Indent Settings
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 

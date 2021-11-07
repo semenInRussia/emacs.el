@@ -144,6 +144,16 @@
 
 (define-key xah-fly-command-map (kbd "8") 'select-current-or-next-word)
 
+(defun delete-current-text-block-or-cancel-selection ()
+    "If text is selected, then cancel selection, otherwise delete current block."
+    (interactive)
+    (if (use-region-p)
+        (deactivate-mark)
+        (xah-delete-current-text-block)))
+
+(define-key xah-fly-command-map (kbd "g") nil)
+(define-key xah-fly-command-map (kbd "g") 'delete-current-text-block-or-cancel-selection)
+
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width          4)
 (setq-default c-basic-offset     4)
