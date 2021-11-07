@@ -4,18 +4,13 @@
 * Hi!
   Hello, This is configuration of Emacs from semenInRussia!
   I create this configuration with help of [[https://github.com/daviwil/emacs-from-scratch/][this cool repo]].
-* Info about me for Emacs
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-(setq user-full-name    "Semen Khramtsov"
-      user-mail-address "hrams205@gmail.com"
-      user-birthday     "2007-01-29")
-#+END_SRC
-
-** Congurlation me with my Birthday!
+  
+  My moto is "Good Luck!", so my homepage is "Good Luck":
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-  (if (s-equals? (format-time-string "%Y-%m-%d") user-birthday)
-      (animate-birthday-present))
+
+  (setq initial-buffer-choice "~/Start.org")
+  
 #+END_SRC
 
 * Package Management - base 
@@ -67,17 +62,38 @@ I am use some packages for simple develop on Emacs Lisp
  #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
  (use-package dash)
  #+END_SRC
+
+* Info about me for Emacs
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+(setq user-full-name    "Semen Khramtsov"
+      user-mail-address "hrams205@gmail.com"
+      user-birthday     "2007-01-29")
+#+END_SRC
+
+** Congurlation me with my Birthday!
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (if (s-equals? (format-time-string "%Y-%m-%d") user-birthday)
+      (animate-birthday-present))
+#+END_SRC
+
 * Organize Editing
 ** Snippets
    I am use [[https://github.com/joaotavora/yasnippet][yasnippet]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-(use-package yasnippet-snippets
+(use-package yasnippet
    :ensure t
    :init
    (yas-global-mode 1)
    :config
    (setq yas-snippet-dirs '("~/.emacs.d/snippets")))
+
+(use-package yasnippet-snippets
+    :ensure t
+    :config
+    (yasnippet-snippets-initialize))
 #+END_SRC
 
 And [[https://github.com/emacsmirror/yasnippet-classic-snippets][yasnippet-classic-snippets]] for basic snippets' collection:
@@ -101,12 +117,13 @@ And [[https://github.com/emacsmirror/yasnippet-classic-snippets][yasnippet-class
 #+END_SRC
 
 ** Autocomplete
-   I am use [[http://company-mode.github.io][company-mode]], I am set delay beetween typing text and viewing hints to 0.4 seconds:
+   I am use [[http://company-mode.github.io][company-mode]], I am set delay beetween typing text and viewing hints to
+0.8 seconds:
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
    (use-package company
        :ensure t
        :init
-       (setq company-async-wait 0.4)
+       (setq company-async-wait 0.8)
        :config
        (global-company-mode))
 #+END_SRC
@@ -236,42 +253,111 @@ And [[https://github.com/emacsmirror/yasnippet-classic-snippets][yasnippet-class
 
 (define-key xah-fly-command-map (kbd "8") 'select-current-or-next-word)
 #+END_SRC
+** Indent Settings
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width          4)
+  (setq-default c-basic-offset     4)
+  (setq-default standart-indent    4)
+  (setq-default lisp-body-indent   4)
+
+  (global-set-key (kbd "RET") 'newline-and-indent)
+  (setq lisp-indent-function  'common-lisp-indent-function)
+#+END_SRC
+** Custom Editing Text
+   I am use =s= for inserting new line:
+   
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (defun open-line-saving-indent ()
+      "Inserting new line, saving position and inserting new line."
+      (interactive)
+      (newline-and-indent)
+      (forward-line -1)
+      (end-of-line)
+      )
+
+  (define-key xah-fly-command-map (kbd "s") 'open-line-saving-indent)
+
+#+END_SRC
+
+And I am press =p= for inserting space, and if I am selected region,  for inserting space
+to beginning of each line:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (defun insert-space-before-line ()
+      "Saving position, insert space to beginning of current line."
+      (interactive)
+      (save-excursion (beginning-of-line-text)
+                      (xah-insert-space-before))
+      )
+
+  (defun insert-spaces-before-each-line-by-line-nums (start-line end-line)
+      "Insert space before each line in region (`START-LINE`; `END-LINE`)."
+      (unless (= 0 (- end-line start-line))
+          (goto-line start-line)
+          (insert-space-before-line)
+          (insert-spaces-before-each-line-by-line-nums (+ start-line 1) end-line))
+      )
+
+  (defun insert-spaces-before-each-line (beg end)
+      "Insert spaces before each selected line, selected line indentifier with `BEG` & `END`."
+      (interactive "r")
+      (save-excursion
+          (let (deactivate-mark)
+              (let ((begining-line-num (line-number-at-pos beg))
+                    (end-line-num (line-number-at-pos end)))
+                  (insert-spaces-before-each-line-by-line-nums begining-line-num end-line-num))))
+      )
+
+  (defun insert-spaces-before-or-to-beginning-of-each-line (beg end)
+      "Insert space, and if selected region, insert space to beginning of each line, text is should will indentifier with `BEG` & `END`."
+      (interactive (list (if (use-region-p) (region-beginning))
+                         (if (use-region-p) (region-end))))
+      (if (use-region-p)
+          (insert-spaces-before-each-line beg end)
+          (xah-insert-space-before))
+      )
+
+
+  (define-key xah-fly-command-map (kbd "p") nil)
+  (define-key xah-fly-command-map (kbd "p") 'insert-spaces-before-or-to-beginning-of-each-line)
+
+#+END_SRC
+
 * Support of Languages
 ** Functions for extending functional of language
    Function `add-nav-forward-block-keymap-for-language` defines key for 
-`forward-block` (examples in section =Supported Languages/Navigation=).
+`forward-block`.
+   And function `add-nav-backward-keymap-for-language` define key for
+`backward-block`.
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-  (defun *execute-def-or-insert-text* (def text)
-      "Execute `DEF` if user in `command-mode` of `xah-fly-keys`, otherwise insert `TEXT`."
-      (if xah-fly-insert-state-q
-          (insert text)
-          (funcall def))
-      )
-
   (defmacro add-nav-forward-block-keymap-for-language (language forward-block-function)
       "Bind `FORWARD-BLOCK-FUNCTION` to `LANGUAGE`-map."
-
-      `(define-key
-          ,language
-          (kbd "SPC l")
-          (lambda () 
-              "If `command-mode`, then `forward-block`, otherwise nothing."
-              (interactive)
-              (*execute-def-or-insert-text* ',forward-block-function " l")))
-      )
+      `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
+           (add-hook
+            language-hook
+            (lambda ()
+                (define-key
+                    xah-fly-command-map
+                    (kbd "SPC l")
+                    ',forward-block-function)))))
 
   (defmacro add-nav-backward-block-keymap-for-language (language backward-block-function)
       "Bind `BACKWARD-BLOCK-FUNCTION` to `LANGUAGE`-map."
-      
-      `(define-key
-          ,language
-          (kbd "SPC j")
-          (lambda () 
-              "If `command-mode`, then `backward-block`, otherwise nothing."
-              (interactive)
-              (*execute-def-or-insert-text* ',backward-block-function " j")))
-      )
+      `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
+           (message "%s" language-hook)
+           (add-hook
+            language-hook
+            (lambda ()
+                (define-key
+                    xah-fly-command-map
+                    (kbd "SPC j")
+                    ',backward-block-function)))))
+
 #+END_SRC
 
 ** Supported Languages
@@ -338,13 +424,14 @@ And [[https://github.com/emacsmirror/yasnippet-classic-snippets][yasnippet-class
 
  #+END_SRC
 *** Python
-**** Navigation
-     I am use internal in Emacs module - `python-mode`, And I am use
- from this module function for navigation, here my configuration for navigating:
 
+**** Linters
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-(add-nav-forward-block-keymap-for-language python-mode-map python-nav-forward-block)
-(add-nav-backward-block-keymap-for-language python-mode-map python-nav-backward-block)
+
+  (setq flycheck-python-pylint-executable "pylint")
+  (setq flycheck-python-flake8-executable "flake8")
+  (setq flycheck-python-mypy-executable "mypy")
+
 #+END_SRC
 
 * Org Mode
@@ -361,6 +448,36 @@ And [[https://github.com/emacsmirror/yasnippet-classic-snippets][yasnippet-class
   :ensure t
   :hook (org-mode . org-mode-visual-fill))
 #+END_SRC
+
+** Navigation
+   
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (defun org-forward-heading ()
+      "Forward heading in `org-mode`."
+      (interactive)
+      (let ((old-point (point)))
+          (org-forward-heading-same-level 1)
+          (if (= (point) old-point)
+              (org-forward-element)))
+      )
+
+  (defun org-backward-heading ()
+      "Backward heading in `org-mode`."
+      (interactive)
+      (let ((old-point (point)))
+          (org-backward-heading-same-level 1)
+          (if (= (point) old-point)
+              (org-backward-element)))
+      )
+
+  (add-nav-forward-block-keymap-for-language org-mode org-forward-heading)
+  (add-nav-backward-block-keymap-for-language org-mode org-backward-heading)
+
+#+END_SRC
+
+#+RESULTS:
+| er/add-org-mode-expansions | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes | #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | (lambda nil (define-key xah-fly-command-map (kbd SPC j) 'org-backward-heading)) | (lambda nil (define-key xah-fly-command-map (kbd SPC l) 'org-forward-heading)) | org-mode-visual-fill |
 
 * Small Organize Tricks
 ** Very Small Tricks
@@ -417,9 +534,27 @@ And [[https://github.com/emacsmirror/yasnippet-classic-snippets][yasnippet-class
     :bind
     ("C-o" . helm-find-files))
 #+END_SRC
+** Translate
+   I am use [[https://github.com/atykhonov/google-translate][google-translate]]:
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package google-translate
+      :ensure t
+      :bind
+      (:map xah-fly-command-map
+            ("SPC \\" . google-translate-at-point)))
+
+  (defun google-translate--search-tkk ()
+    "Search TKK. From https://github.com/atykhonov/google-translate/issues/137.
+  Thank you https://github.com/leuven65!"
+    (list 430675 2721866130))
+
+#+END_SRC
+
 * Graphic User Interface
 ** Hide ALL
-This is standard stuf
+   This is standard stuf
+
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
   (menu-bar-mode -1)
   (tool-bar-mode -1)
@@ -490,42 +625,47 @@ I am use [[https://github.com/seagle0128/doom-modeline][doom-modeline]]:
    (set-frame-font "Consolas" nil t)
 #+END_SRC
 
-** Indent settings
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-   (setq-default indent-tabs-mode nil)
-   (setq-default tab-width          4)
-   (setq-default c-basic-offset     4)
-   (setq-default standart-indent    4)
-   (setq-default lisp-body-indent   4)
+** Highlight Current Line
 
-   (global-set-key (kbd "RET") 'newline-and-indent)
-   (setq lisp-indent-function  'common-lisp-indent-function)
-#+END_SRC
-
-** Highlight current line
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 (hl-line-mode 1)
 #+END_SRC
 
 * Developer Environment
-** Projectile
+** Projects Management
    I am use [[https://github.com/bbatsov/projectile][projectile]]:
 
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
-(defun get-project-name (project-root)
-    "Return name of project by path - `PROJECT-ROOT`."
-    (s-titleize (f-dirname project-root)))
 
-(require 'projectile)
-(setq projectile-project-search-path '("~/projects/"))
-(setq projectile-completion-system 'helm)
-(setq projectile-project-name-function 'get-project-name)
-(projectile-mode 1)
+  (defun get-project-name (project-root)
+      "Return name of project by path - `PROJECT-ROOT`."
+      (s-titleize (f-dirname project-root)))
+
+  (require 'projectile)
+  (setq projectile-project-search-path '("~/projects/"))
+  (setq projectile-completion-system 'helm)
+  (setq projectile-project-name-function 'get-project-name)
+
+  (global-set-key (kbd "S-<f5>") 'projectile-test-project)
+
+  (projectile-mode 1)
+  
 #+END_SRC
+
 ** Git
    I am use super famous [[https://github.com/magit/magit][magit]]:
+
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
 (use-package magit :ensure t)
+#+END_SRC
+** View Directories
+   I am use inline in Emacs [[https://www.emacswiki.org/emacs/DiredMode][dired]]. And for minimalize design of dired,
+I am use [[https://github.com/emacsmirror/dired-details][dired-detail]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
+
 #+END_SRC
 
 * Auto Tangle This File
@@ -539,3 +679,4 @@ I am use [[https://github.com/seagle0128/doom-modeline][doom-modeline]]:
 
   (add-hook 'after-save-hook 'if-Emacs-org-then-org-babel-tangle)
 #+END_SRC
+

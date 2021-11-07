@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: buttercup-describe
+# key: describe
+# --
+
+(describe "$1"
+    (it "$2"
+        $0))
