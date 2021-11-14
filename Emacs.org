@@ -660,6 +660,15 @@ to beginning of each line:
 
 #+END_SRC
 
+** Whitespaces Mode
+   I am enable whitespaces mode on =prog-mode=:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (add-hook 'prog-mode-hook 'whitespace-mode)
+
+#+END_SRC
+
 * Graphic User Interface
 ** Hide ALL
    This is standard stuf

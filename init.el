@@ -395,6 +395,8 @@ Thank you https://github.com/leuven65!"
 (use-package command-log-mode
     :ensure t)
 
+(add-hook 'prog-mode-hook 'whitespace-mode)
+
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode   -1)
