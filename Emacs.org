@@ -138,6 +138,7 @@ And [[https://github.com/emacsmirror/yasnippet-classic-snippets][yasnippet-class
 ** Autocomplete
    I am use [[http://company-mode.github.io][company-mode]], I am set delay beetween typing text and viewing hints to
 0.8 seconds:
+
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
    (use-package company
        :ensure t
@@ -146,6 +147,24 @@ And [[https://github.com/emacsmirror/yasnippet-classic-snippets][yasnippet-class
        :config
        (global-company-mode))
 #+END_SRC
+
+And for =yasnippet= I am use code from [[https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names][this]] stackexchange:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (defvar company-mode/enable-yas t
+    "Enable yasnippet for all backends.")
+
+  (defun company-mode/backend-with-yas (backend)
+      (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
+          backend
+          (append (if (consp backend) backend (list backend))
+                  '(:with company-yasnippet))))
+
+  (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
+
+#+END_SRC
+
 
 ** Main keymaps
    I am use [[https://github.com/xahlee/xah-fly-keys][xah-fly-keys]], this as VIM:
@@ -204,6 +223,7 @@ use =-=, for navigating I am use `.` and `m`:
 #+END_SRC
 
 *** Delete Only Parens without Inner Contents
+
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 (defun delete-only-1-char ()
     "Delete only 1 character before point."
