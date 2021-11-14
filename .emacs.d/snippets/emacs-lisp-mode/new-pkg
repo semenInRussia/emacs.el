@@ -1,0 +1,32 @@
+# -*- mode: snippet -*-
+# name: new-pkg
+# key: !
+# --
+;;; ${1:$(s-dashed-words yas-text)} --- ${2: Package summary}
+
+;; Copyright (C) `(format-time-string "%Y")` Free Software Foundation, Inc.
+
+;; Author: `(or (ignore-errors user-name) "$6")` <`(or (ignore-errors user-mail-address) "$6")`>
+;; Version: ${3:0.0.1}
+;; Packages-Requires: $4
+
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
+;; $5
+
+;;; Code:
+$0
+(provide '$1)
+;;; `(buffer-name)` ends here

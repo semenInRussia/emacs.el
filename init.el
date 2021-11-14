@@ -19,7 +19,9 @@
 
 (add-to-list 'load-path "~/.emacs.d/lisp")
 
-(use-package s :ensure t)
+(add-to-list 'load-path "~/projects/fast-exec")
+
+(use-package s)
 
 (use-package f)
 
@@ -27,7 +29,9 @@
 
 (setq user-full-name    "Semen Khramtsov"
       user-mail-address "hrams205@gmail.com"
-      user-birthday     "2007-01-29")
+      user-birthday     "2007-01-29"
+      user-name         "semenInRussia"
+      )
 
 (if (s-equals? (format-time-string "%Y-%m-%d") user-birthday)
     (animate-birthday-present))
@@ -80,11 +84,16 @@
     :ensure t
     :bind
     ((:map xah-fly-command-map)
-     ("SPC '" . avy-goto-char)))
+     ("'" . avy-goto-char)))
 
 (use-package smartparens
     :ensure t
-    :config (smartparens-global-mode))
+    :init (smartparens-global-mode 1)
+    :bind (:map xah-fly-command-map
+                 ("]" . sp-forward-slurp-sexp)
+                 ("-" . sp-splice-sexp)
+                 ("m" . sp-backward-sexp)
+                 ("." . sp-forward-sexp)))
 
 (defun delete-only-1-char ()
     "Delete only 1 character before point."
@@ -122,7 +131,7 @@
         (apply-macro-to-region-lines top bottom)
         (kmacro-call-macro arg)))
 
-(define-key xah-fly-command-map (kbd "=") 'kmacro-call-macro-or-apply-to-lines)
+(define-key xah-fly-command-map (kbd "SPC RET") 'kmacro-call-macro-or-apply-to-lines)
 
 (defun delete-and-edit-current-line ()
     "Delete current line and instroduce to insert mode."
@@ -222,10 +231,10 @@
                   (kbd "SPC l")
                   ',forward-block-function)))))
 
+
 (defmacro add-nav-backward-block-keymap-for-language (language backward-block-function)
     "Bind `BACKWARD-BLOCK-FUNCTION` to `LANGUAGE`-map."
     `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
-         (message "%s" language-hook)
          (add-hook
           language-hook
           (lambda ()
@@ -233,6 +242,15 @@
                   xah-fly-command-map
                   (kbd "SPC j")
                   ',backward-block-function)))))
+
+(use-package visual-fill-column
+    :ensure t)
+
+(defun visual-fill ()
+    (interactive)
+    (setq visual-fill-column-width 90
+          visual-fill-column-center-text t)
+    (visual-fill-column-mode 38))
 
 (setq latex-documentclasses 
     '("article" "reoport" "book" "proc" "minimal" "slides" "memoir" "letter" "beamer"))
@@ -285,19 +303,17 @@
 ;;     codes = list(map(lambda el: el.text.split()[0].lower(), elements))
 ;;     print(codes)
 
+(use-package markdown-mode
+    :ensure t)
+
+(add-hook 'markdown-mode-hook 'visual-fill)
+
+(add-nav-forward-block-keymap-for-language python-mode python-nav-forward-block)
+(add-nav-forward-block-keymap-for-language python-mode python-nav-backward-block)
+
 (setq flycheck-python-pylint-executable "pylint")
 (setq flycheck-python-flake8-executable "flake8")
 (setq flycheck-python-mypy-executable "mypy")
-
-(defun org-mode-visual-fill ()
-  (interactive)
-  (setq visual-fill-column-width 90
-        visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
-
-(use-package visual-fill-column
-  :ensure t
-  :hook (org-mode . org-mode-visual-fill))
 
 (defun org-forward-heading ()
     "Forward heading in `org-mode`."
@@ -320,23 +336,13 @@
 (add-nav-forward-block-keymap-for-language org-mode org-forward-heading)
 (add-nav-backward-block-keymap-for-language org-mode org-backward-heading)
 
+(add-hook 'org-mode-hook 'visual-fill)
+
 (show-paren-mode 2)
 (setq make-backup-files         nil)
 (setq auto-save-list-file-name  nil)
 (defalias 'yes-or-no-p 'y-or-n-p)
-
-(setq dont-truncate-lines-modes '(org-mode))
-
-(defun truncate-or-not-truncate-words ()
-    "Truncate words or don't truncate words.
-If current `major-mode` don't need to truncate words, then don't truncate words,
-otherwise truncate words."
-    (interactive)
-    (if (-contains? dont-truncate-lines-modes major-mode)
-        (toggle-truncate-lines 0)
-        (toggle-truncate-lines 38)))
-
-(add-hook 'prog-mode-hook 'truncate-or-not-truncate-words)
+(toggle-truncate-lines 38)
 
 (use-package which-key
     :ensure t
@@ -353,6 +359,17 @@ otherwise truncate words."
    :bind
    ("C-o" . helm-find-files))
 
+(require 'fast-exec)
+
+(fast-exec/enable-some-builtin-supports
+ yasnippet
+ projectile
+ magit
+ flycheck)
+
+(fast-exec/initialize)
+(define-key xah-fly-command-map (kbd "=") 'fast-exec/exec)
+
 (use-package google-translate
     :ensure t
     :bind
@@ -363,6 +380,9 @@ otherwise truncate words."
   "Search TKK. From https://github.com/atykhonov/google-translate/issues/137.
 Thank you https://github.com/leuven65!"
   (list 430675 2721866130))
+
+(use-package command-log-mode
+    :ensure t)
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
@@ -376,12 +396,12 @@ Thank you https://github.com/leuven65!"
     (load-theme 'doom-1337 t))
 
 (setq dont-display-lines-modes
-   '(org-mode
-     term-mode
-     shell-mode
-     treemacs-mode
-     eshell-mode
-     helm-mode))
+      '(org-mode
+        term-mode
+        shell-mode
+        treemacs-mode
+        eshell-mode
+        helm-mode))
 
 (defun display-or-not-display-numbers-of-lines ()
     "Display numbers of lines OR don't display numbers of lines.
@@ -396,13 +416,16 @@ numbers of lines, otherwise don't display."
 (add-hook 'prog-mode-hook 'display-or-not-display-numbers-of-lines)
 
 (use-package doom-modeline
-  :ensure t
-  :config
-  (display-time-mode t)
-  (setq doom-modeline-icon nil)
-  (setq doom-modeline-workspace-name nil)
-  :init
-  (doom-modeline-mode 1))
+    :ensure t
+    :config
+    (display-time-mode t)
+    (column-number-mode)
+    (setq doom-modeline-icon nil)
+    (setq doom-modeline-workspace-name nil)
+    (setq doom-modeline-project-detection 'projectile)
+    (setq doom-modeline-enable-word-count t)
+    :init
+    (doom-modeline-mode 38))
 
 (set-face-attribute 'default nil :font "Consolas" :height 200)
 (set-frame-font "Consolas" nil t)

@@ -16,6 +16,7 @@
 * Package Management - base 
 ** use-package
    I am use [[https://github.com/jwiegley/use-package][use-package]]:
+   
  #+BEGIN_SRC emacs-lisp :tangle ~/init.el
  (require 'package)
 
@@ -35,12 +36,22 @@
  (require 'use-package)
  #+END_SRC
 
- #+RESULTS:
- : use-package
- 
 ** Packages Not in MELPA/ELPA/ORG-ELPA
+
+*** Stranger Packages
+
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-   (add-to-list 'load-path "~/.emacs.d/lisp")
+
+    (add-to-list 'load-path "~/.emacs.d/lisp")
+
+#+END_SRC
+
+*** My Packages
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (add-to-list 'load-path "~/projects/fast-exec")
+
 #+END_SRC
 
 * Emacs Lisp
@@ -49,14 +60,16 @@ I am use some packages for simple develop on Emacs Lisp
 *** s
     This is [[https://github.com/magnars/s.el][s]]:
  #+BEGIN_SRC emacs-lisp :tangle ~/init.el
- (use-package s :ensure t)
+ (use-package s)
  #+END_SRC
+ 
 *** f
     This is [[https://github.com/rejeep/f.el][f]]:
+    
  #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
  (use-package f)
  #+END_SRC
-
+ 
 *** Dash
     This is [[https://github.com/magnars/dash.el][dash:]]
  #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
@@ -66,16 +79,22 @@ I am use some packages for simple develop on Emacs Lisp
 * Info about me for Emacs
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-(setq user-full-name    "Semen Khramtsov"
-      user-mail-address "hrams205@gmail.com"
-      user-birthday     "2007-01-29")
+
+  (setq user-full-name    "Semen Khramtsov"
+        user-mail-address "hrams205@gmail.com"
+        user-birthday     "2007-01-29"
+        user-name         "semenInRussia"
+        )
+
 #+END_SRC
 
 ** Congurlation me with my Birthday!
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
   (if (s-equals? (format-time-string "%Y-%m-%d") user-birthday)
       (animate-birthday-present))
+      
 #+END_SRC
 
 * Organize Editing
@@ -157,21 +176,31 @@ And [[https://github.com/emacsmirror/yasnippet-classic-snippets][yasnippet-class
 
 ** Very Fast Jump
    I am use [[https://github.com/abo-abo/avy][avy]]:
+   
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
 (use-package avy
     :ensure t
     :bind
     ((:map xah-fly-command-map)
-     ("SPC '" . avy-goto-char)))
+     ("'" . avy-goto-char)))
 #+END_SRC
 
-** Smart Insert Parens
+** Smart Parens
 *** Smartparens
-   I am use [[https://github.com/Fuco1/smartparens/][smartparens]]:
+   I am use [[https://github.com/Fuco1/smartparens/][smartparens]], for slurp expresion I am use =]=, also for splice parens I am
+use =-=, for navigating I am use `.` and `m`:
+
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
-(use-package smartparens
-    :ensure t
-    :config (smartparens-global-mode))
+
+  (use-package smartparens
+      :ensure t
+      :init (smartparens-global-mode 1)
+      :bind (:map xah-fly-command-map
+                   ("]" . sp-forward-slurp-sexp)
+                   ("-" . sp-splice-sexp)
+                   ("m" . sp-backward-sexp)
+                   ("." . sp-forward-sexp)))
+
 #+END_SRC
 
 *** Delete Only Parens without Inner Contents
@@ -197,7 +226,7 @@ And [[https://github.com/emacsmirror/yasnippet-classic-snippets][yasnippet-class
 #+END_SRC
 ** Macros
    I am use =\= in command mode for start of record macro.
-   I am also use === for execute last macro or execute macro to lines:
+   I am also use =SPC RET= for execute last macro or execute macro to lines:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 (defun kmacro-start-or-end-macro ()
@@ -221,7 +250,8 @@ And [[https://github.com/emacsmirror/yasnippet-classic-snippets][yasnippet-class
         (apply-macro-to-region-lines top bottom)
         (kmacro-call-macro arg)))
 
-(define-key xah-fly-command-map (kbd "=") 'kmacro-call-macro-or-apply-to-lines)
+(define-key xah-fly-command-map (kbd "SPC RET") 'kmacro-call-macro-or-apply-to-lines)
+
 #+END_SRC
 
 ** Custom Deleting Text
@@ -347,6 +377,7 @@ to beginning of each line:
 
 * Support of Languages
 ** Functions for extending functional of language
+*** Functions for Navigating
    Function `add-nav-forward-block-keymap-for-language` defines key for 
 `forward-block`.
    And function `add-nav-backward-keymap-for-language` define key for
@@ -364,10 +395,10 @@ to beginning of each line:
                     (kbd "SPC l")
                     ',forward-block-function)))))
 
+                    
   (defmacro add-nav-backward-block-keymap-for-language (language backward-block-function)
       "Bind `BACKWARD-BLOCK-FUNCTION` to `LANGUAGE`-map."
       `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
-           (message "%s" language-hook)
            (add-hook
             language-hook
             (lambda ()
@@ -375,6 +406,21 @@ to beginning of each line:
                     xah-fly-command-map
                     (kbd "SPC j")
                     ',backward-block-function)))))
+
+#+END_SRC
+*** Functions for Pretty View
+  I am use [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] for centering content of org file:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package visual-fill-column
+      :ensure t)
+
+  (defun visual-fill ()
+      (interactive)
+      (setq visual-fill-column-width 90
+            visual-fill-column-center-text t)
+      (visual-fill-column-mode 38))
 
 #+END_SRC
 
@@ -441,9 +487,32 @@ to beginning of each line:
 
 
  #+END_SRC
+*** Markdown
+    I am use [[https://github.com/jrblevin/markdown-mode/][markdown-mode]] , and for its I am centering code:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package markdown-mode
+      :ensure t)
+
+  (add-hook 'markdown-mode-hook 'visual-fill)
+
+#+END_SRC
+
+#+RESULTS:
+
 *** Python
+**** Navigation
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (add-nav-forward-block-keymap-for-language python-mode python-nav-forward-block)
+  (add-nav-forward-block-keymap-for-language python-mode python-nav-backward-block)
+
+#+END_SRC
 
 **** Linters
+     
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (setq flycheck-python-pylint-executable "pylint")
@@ -453,20 +522,9 @@ to beginning of each line:
 #+END_SRC
 
 * Org Mode
-  I am use [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] for centering content of org file:
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-(defun org-mode-visual-fill ()
-  (interactive)
-  (setq visual-fill-column-width 90
-        visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
-
-(use-package visual-fill-column
-  :ensure t
-  :hook (org-mode . org-mode-visual-fill))
-#+END_SRC
-
+  :PROPERTIES:
+  :ID:       36f51766-c23b-4f03-8f75-8300e47e0ea6
+  :END:
 ** Navigation
    
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -493,41 +551,25 @@ to beginning of each line:
   (add-nav-backward-block-keymap-for-language org-mode org-backward-heading)
 
 #+END_SRC
+** Centering
 
-#+RESULTS:
-| er/add-org-mode-expansions | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes | #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | (lambda nil (define-key xah-fly-command-map (kbd SPC j) 'org-backward-heading)) | (lambda nil (define-key xah-fly-command-map (kbd SPC l) 'org-forward-heading)) | org-mode-visual-fill |
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (add-hook 'org-mode-hook 'visual-fill)
+
+#+END_SRC
 
 * Small Organize Tricks
 ** Very Small Tricks
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
   (show-paren-mode 2)
   (setq make-backup-files         nil)
   (setq auto-save-list-file-name  nil)
   (defalias 'yes-or-no-p 'y-or-n-p)
-#+END_SRC
+  (toggle-truncate-lines 38)
 
-** Truncate Lines
-   I am truncate lines in `prog-mode`-s, excluding `org-mode`:
-*** Vars
-    Var `dont-truncate-lines-modes` is list of modes for this modes, emacs want disable truncate words. Defaults to:
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-(setq dont-truncate-lines-modes '(org-mode))
-#+END_SRC
-
-*** Disable and Enable
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-  (defun truncate-or-not-truncate-words ()
-      "Truncate words or don't truncate words.
-  If current `major-mode` don't need to truncate words, then don't truncate words,
-  otherwise truncate words."
-      (interactive)
-      (if (-contains? dont-truncate-lines-modes major-mode)
-          (toggle-truncate-lines 0)
-          (toggle-truncate-lines 38)))
-
-  (add-hook 'prog-mode-hook 'truncate-or-not-truncate-words)
 #+END_SRC
 
 ** Helpful
@@ -552,8 +594,27 @@ to beginning of each line:
     :bind
     ("C-o" . helm-find-files))
 #+END_SRC
+** Fast Executing Command
+   I am use [[https://github.com/semenInRussia/fast-exec.el][fast-exec]]:
+   
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (require 'fast-exec)
+
+  (fast-exec/enable-some-builtin-supports
+   yasnippet
+   projectile
+   magit
+   flycheck)
+ 
+  (fast-exec/initialize)
+  (define-key xah-fly-command-map (kbd "=") 'fast-exec/exec)
+
+#+END_SRC
+
 ** Translate
    I am use [[https://github.com/atykhonov/google-translate][google-translate]]:
+   
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (use-package google-translate
@@ -566,6 +627,16 @@ to beginning of each line:
     "Search TKK. From https://github.com/atykhonov/google-translate/issues/137.
   Thank you https://github.com/leuven65!"
     (list 430675 2721866130))
+
+#+END_SRC
+
+** Command Log
+   I am use [[https://github.com/lewang/command-log-mode][command-log-mode]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package command-log-mode
+      :ensure t)
 
 #+END_SRC
 
@@ -596,13 +667,15 @@ to beginning of each line:
 for this modes willn't display numbers of lines. Defaults to:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-(setq dont-display-lines-modes
-   '(org-mode
-     term-mode
-     shell-mode
-     treemacs-mode
-     eshell-mode
-     helm-mode))
+
+  (setq dont-display-lines-modes
+        '(org-mode
+          term-mode
+          shell-mode
+          treemacs-mode
+          eshell-mode
+          helm-mode))
+
 #+END_SRC
 
 *** Enable and Disable
@@ -627,14 +700,19 @@ for this modes willn't display numbers of lines. Defaults to:
 I am use [[https://github.com/seagle0128/doom-modeline][doom-modeline]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-   (use-package doom-modeline
-     :ensure t
-     :config
-     (display-time-mode t)
-     (setq doom-modeline-icon nil)
-     (setq doom-modeline-workspace-name nil)
-     :init
-     (doom-modeline-mode 1))
+
+  (use-package doom-modeline
+      :ensure t
+      :config
+      (display-time-mode t)
+      (column-number-mode)
+      (setq doom-modeline-icon nil)
+      (setq doom-modeline-workspace-name nil)
+      (setq doom-modeline-project-detection 'projectile)
+      (setq doom-modeline-enable-word-count t)
+      :init
+      (doom-modeline-mode 38))
+
 #+END_SRC
 
 ** Fonts
