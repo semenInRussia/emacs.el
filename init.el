@@ -2,7 +2,7 @@
 
 (require 'package)
 
-(setq package-archives 
+(setq package-archives
   '(("melpa-stable" . "http://stable.melpa.org/packages/")
     ("melpa"        . "https://melpa.org/packages/")
     ("org"          . "https://orgmode.org/elpa/")
@@ -31,7 +31,16 @@
       user-mail-address "hrams205@gmail.com"
       user-birthday     "2007-01-29"
       user-name         "semenInRussia"
+      user-os           "Windows" ; "Windows" or "Linux"
       )
+
+
+(defun user-os-windows-p ()
+    "If user have os Windows, then return t.
+Info take from var `user-os`, user must set it."
+    (interactive)
+    (s-equals? user-os "Windows")
+    )
 
 (if (s-equals? (format-time-string "%Y-%m-%d") user-birthday)
     (animate-birthday-present))
@@ -82,6 +91,10 @@
 (define-key xah-fly-command-map (kbd "SPC l") nil)
 (define-key xah-fly-command-map (kbd "SPC j") nil)
 
+(setq imenu-auto-rescan t)
+(define-key xah-fly-command-map (kbd "SPC SPC") nil)
+(define-key xah-fly-command-map (kbd "SPC SPC SPC") 'imenu)
+
 (defun if-selected-then-next-word-like-this (arg)
     (interactive "p")
     (when (use-region-p)
@@ -122,7 +135,7 @@
     ("1" . er/expand-region)))
 
 (defun kmacro-start-or-end-macro ()
-    "If macro record have just started, then stop this record, otherwise start macro record."
+    "If macro record have just started, then stop this record, otherwise start."
     (interactive)
     (if defining-kbd-macro
         (kmacro-end-macro 1)
@@ -131,12 +144,12 @@
 (define-key xah-fly-command-map (kbd "\\") 'kmacro-start-or-end-macro)
 
 (defun kmacro-call-macro-or-apply-to-lines (arg &optional top bottom)
-    "If selected region, then apply last macro to selected lines, otherwise call last macro."
-    (interactive 
+ "If selected region, then apply macro to selected lines, otherwise call macro."
+    (interactive
      (list
       1
-      (if (use-region-p) region-beginning nil)
-      (if (use-region-p) region-end nil)))
+      (if (use-region-p) (region-beginning) nil)
+      (if (use-region-p) (region-end) nil)))
 
     (if (use-region-p)
         (apply-macro-to-region-lines top bottom)
@@ -153,6 +166,14 @@
     )
 
 (define-key xah-fly-command-map (kbd "w") 'delete-and-edit-current-line)
+
+(defun clear-current-line ()
+    "Clear content of current line (including whitespaces)."
+    (interactive)
+    (kill-region (line-beginning-position) (line-end-position))
+    )
+
+(define-key xah-fly-command-map (kbd "SPC w") 'clear-current-line)
 
 (defun select-current-or-next-word ()
     "If word was selected, then select next word, otherwise select current word."
@@ -174,15 +195,6 @@
 (define-key xah-fly-command-map (kbd "g") nil)
 (define-key xah-fly-command-map (kbd "g") 'delete-current-text-block-or-cancel-selection)
 
-(setq-default indent-tabs-mode nil)
-(setq-default tab-width          4)
-(setq-default c-basic-offset     4)
-(setq-default standart-indent    4)
-(setq-default lisp-body-indent   4)
-
-(global-set-key (kbd "RET") 'newline-and-indent)
-(setq lisp-indent-function  'common-lisp-indent-function)
-
 (defun open-line-saving-indent ()
     "Inserting new line, saving position and inserting new line."
     (interactive)
@@ -195,14 +207,14 @@
 
 (defun insert-space-before-line ()
     "Saving position, insert space to beginning of current line."
-    (interactive)
-    (save-excursion (beginning-of-line-text)
+     (interactive)
+     (save-excursion (beginning-of-line-text)
                     (xah-insert-space-before))
     )
 
 (defun insert-spaces-before-each-line-by-line-nums (start-line end-line)
     "Insert space before each line in region (`START-LINE`; `END-LINE`)."
-    (unless (= 0 (- end-line start-line))
+    (unless (= 0 (+ 1 (- end-line start-line)))
         (goto-line start-line)
         (insert-space-before-line)
         (insert-spaces-before-each-line-by-line-nums (+ start-line 1) end-line))
@@ -231,6 +243,37 @@
 (define-key xah-fly-command-map (kbd "p") nil)
 (define-key xah-fly-command-map (kbd "p") 'insert-spaces-before-or-to-beginning-of-each-line)
 
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width          4)
+(setq-default c-basic-offset     4)
+(setq-default standart-indent    4)
+(setq-default lisp-body-indent   4)
+
+
+(defun select-current-line ()
+    "Select as region current line."
+    (interactive)
+    (forward-line 0)
+    (set-mark (point))
+    (end-of-line)
+    )
+
+
+(defun indent-line-or-region ()
+    "If text selected, then indent it, otherwise indent current line."
+    (interactive)
+    (save-excursion
+        (unless (use-region-p)
+            (select-current-line)
+            )
+        (indent-region (region-beginning) (region-end))))
+
+
+(global-set-key (kbd "RET") 'newline-and-indent)
+(define-key xah-fly-command-map (kbd "[") 'indent-line-or-region)
+
+(setq lisp-indent-function  'common-lisp-indent-function)
+
 (defmacro add-nav-forward-block-keymap-for-language (language forward-block-function)
     "Bind `FORWARD-BLOCK-FUNCTION` to `LANGUAGE`-map."
     `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
@@ -254,6 +297,17 @@
                   (kbd "SPC j")
                   ',backward-block-function)))))
 
+(defmacro add-nav-to-imports-for-language (language to-imports-function)
+    "Bind `TO-IMPORTS-FUNCTION` to `LANGUAGE`-map."
+    `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
+         (add-hook
+          language-hook
+          (lambda ()
+              (define-key
+                  xah-fly-command-map
+                  (kbd "SPC SPC i")
+                  ',to-imports-function)))))
+
 (use-package visual-fill-column
     :ensure t)
 
@@ -262,6 +316,19 @@
     (setq visual-fill-column-width 90
           visual-fill-column-center-text t)
     (visual-fill-column-mode 38))
+
+(define-key xah-fly-command-map (kbd "SPC e") 'xah-fly-c-keymap)
+
+(defmacro add-import-keymap-for-language (language add-import-function)
+    "Bind `ADD-IMPORT-FUNCTION` to `LANGUAGE`-map."
+    `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
+         (add-hook
+          language-hook
+          (lambda ()
+              (define-key
+                  xah-fly-command-map
+                  (kbd "SPC i")
+                  ',add-import-function)))))
 
 (setq latex-documentclasses 
     '("article" "reoport" "book" "proc" "minimal" "slides" "memoir" "letter" "beamer"))
@@ -319,12 +386,83 @@
 
 (add-hook 'markdown-mode-hook 'visual-fill)
 
-(add-nav-forward-block-keymap-for-language python-mode python-nav-forward-block)
-(add-nav-forward-block-keymap-for-language python-mode python-nav-backward-block)
+(add-nav-forward-block-keymap-for-language
+ python-mode
+ python-nav-forward-block)
+
+(add-nav-backward-block-keymap-for-language
+ python-mode
+ python-nav-backward-block)
 
 (setq flycheck-python-pylint-executable "pylint")
 (setq flycheck-python-flake8-executable "flake8")
 (setq flycheck-python-mypy-executable "mypy")
+
+(use-package haskell-mode
+    :ensure t
+    :hook (haskell-mode . haskell-indent-mode))
+
+(add-import-keymap-for-language
+ haskell-mode
+ haskell-add-import)
+
+(add-nav-to-imports-for-language
+ haskell-mode
+ haskell-navigate-imports)
+
+(add-nav-forward-block-keymap-for-language
+ haskell-mode
+ haskell-ds-forward-decl)
+
+(add-nav-backward-block-keymap-for-language
+ haskell-mode
+ haskell-ds-backward-decl)
+
+(setq js/imports-regexp "import")
+
+(setq js/function-or-class-regexp "function \\|class ")
+
+(use-package js-comint
+    :ensure t)
+
+(if (user-os-windows-p)
+    (setq js-comint-program-command "C:/Program Files/nodejs/node.exe"))
+
+(use-package web-mode
+    :ensure t)
+
+(use-package js2-mode
+    :ensure t)
+
+(use-package json-mode
+    :ensure t)
+
+(add-to-list 'auto-mode-alist '("\\.jsx$" . js2-mode))
+(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+
+(defun js/nav-to-imports ()
+    "Navigate to imports in JS mode."
+    (interactive)
+    (push-mark)
+    (let ((old-pos (point)))
+        (goto-char (point-min))
+        (search-forward-regexp js/imports-regexp old-pos old-pos))
+    )
+
+(add-nav-to-imports-for-language
+ js2-mode
+ js/nav-to-imports)
+
+
+(defun js/nav-forward-function-or-class ()
+    "Navigate to next function or class in JS."
+    (interactive)
+    (search-forward-regexp js/function-or-class-regexp)
+    )
+
+(add-nav-forward-block-keymap-for-language
+ js2-mode
+ js/nav-forward-function-or-class)
 
 (defun org-forward-heading ()
     "Forward heading in `org-mode`."
@@ -397,6 +535,14 @@ Thank you https://github.com/leuven65!"
 
 (add-hook 'prog-mode-hook 'whitespace-mode)
 
+(defun open-scratch ()
+    "Open scratch."
+    (interactive)
+    (switch-to-buffer "*scratch*")
+    )
+
+(global-set-key (kbd "C-t") 'open-scratch)
+
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode   -1)
@@ -455,6 +601,7 @@ numbers of lines, otherwise don't display."
 (setq projectile-project-name-function 'get-project-name)
 
 (global-set-key (kbd "S-<f5>") 'projectile-test-project)
+(global-set-key (kbd "<f5>") 'projectile-run-project)
 
 (projectile-mode 1)
 

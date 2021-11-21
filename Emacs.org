@@ -10,7 +10,7 @@
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (setq initial-buffer-choice "~/Start.org")
-  
+
 #+END_SRC
 
 * Package Management - base 
@@ -20,7 +20,7 @@
  #+BEGIN_SRC emacs-lisp :tangle ~/init.el
  (require 'package)
 
- (setq package-archives 
+ (setq package-archives
    '(("melpa-stable" . "http://stable.melpa.org/packages/")
      ("melpa"        . "https://melpa.org/packages/")
      ("org"          . "https://orgmode.org/elpa/")
@@ -29,7 +29,7 @@
  (package-initialize)
  (unless package-archive-contents
  (package-refresh-contents))
- 
+
  (unless (package-installed-p 'use-package)
  (package-install 'use-package))
 
@@ -37,7 +37,6 @@
  #+END_SRC
 
 ** Packages Not in MELPA/ELPA/ORG-ELPA
-
 *** Stranger Packages
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -84,7 +83,16 @@ I am use some packages for simple develop on Emacs Lisp
         user-mail-address "hrams205@gmail.com"
         user-birthday     "2007-01-29"
         user-name         "semenInRussia"
+        user-os           "Windows" ; "Windows" or "Linux"
         )
+
+
+  (defun user-os-windows-p ()
+      "If user have os Windows, then return t.
+  Info take from var `user-os`, user must set it."
+      (interactive)
+      (s-equals? user-os "Windows")
+      )
 
 #+END_SRC
 
@@ -165,7 +173,6 @@ And for =yasnippet= I am use code from [[https://emacs.stackexchange.com/questio
 
 #+END_SRC
 
-
 ** Main keymaps
    I am use [[https://github.com/xahlee/xah-fly-keys][xah-fly-keys]], this as VIM:
 
@@ -177,6 +184,17 @@ And for =yasnippet= I am use code from [[https://emacs.stackexchange.com/questio
 
   (define-key xah-fly-command-map (kbd "SPC l") nil)
   (define-key xah-fly-command-map (kbd "SPC j") nil)
+#+END_SRC
+
+** View Functions/Classes/etc.
+   I am use ido with keymap =SPC SPC SPC=:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (setq imenu-auto-rescan t)
+  (define-key xah-fly-command-map (kbd "SPC SPC") nil)
+  (define-key xah-fly-command-map (kbd "SPC SPC SPC") 'imenu)
+
 #+END_SRC
 
 ** Multiple Cursors
@@ -249,44 +267,62 @@ use =-=, for navigating I am use `.` and `m`:
    I am also use =SPC RET= for execute last macro or execute macro to lines:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-(defun kmacro-start-or-end-macro ()
-    "If macro record have just started, then stop this record, otherwise start macro record."
-    (interactive)
-    (if defining-kbd-macro
-        (kmacro-end-macro 1)
-        (kmacro-start-macro 1)))
+  (defun kmacro-start-or-end-macro ()
+      "If macro record have just started, then stop this record, otherwise start."
+      (interactive)
+      (if defining-kbd-macro
+          (kmacro-end-macro 1)
+          (kmacro-start-macro 1)))
 
-(define-key xah-fly-command-map (kbd "\\") 'kmacro-start-or-end-macro)
+  (define-key xah-fly-command-map (kbd "\\") 'kmacro-start-or-end-macro)
 
-(defun kmacro-call-macro-or-apply-to-lines (arg &optional top bottom)
-    "If selected region, then apply last macro to selected lines, otherwise call last macro."
-    (interactive 
-     (list
-      1
-      (if (use-region-p) region-beginning nil)
-      (if (use-region-p) region-end nil)))
+  (defun kmacro-call-macro-or-apply-to-lines (arg &optional top bottom)
+   "If selected region, then apply macro to selected lines, otherwise call macro."
+      (interactive
+       (list
+        1
+        (if (use-region-p) (region-beginning) nil)
+        (if (use-region-p) (region-end) nil)))
 
-    (if (use-region-p)
-        (apply-macro-to-region-lines top bottom)
-        (kmacro-call-macro arg)))
+      (if (use-region-p)
+          (apply-macro-to-region-lines top bottom)
+          (kmacro-call-macro arg)))
 
-(define-key xah-fly-command-map (kbd "SPC RET") 'kmacro-call-macro-or-apply-to-lines)
+  (define-key xah-fly-command-map (kbd "SPC RET") 'kmacro-call-macro-or-apply-to-lines)
 
 #+END_SRC
+
+#+RESULTS:
+: kmacro-call-macro-or-apply-to-lines
 
 ** Custom Deleting Text
    I am delete this line and edit this by press =w=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-(defun delete-and-edit-current-line ()
-    "Delete current line and instroduce to insert mode."
-    (interactive)
-    (beginning-of-line-text)
-    (kill-line)
-    (xah-fly-insert-mode-init)
-    )
 
-(define-key xah-fly-command-map (kbd "w") 'delete-and-edit-current-line)
+  (defun delete-and-edit-current-line ()
+      "Delete current line and instroduce to insert mode."
+      (interactive)
+      (beginning-of-line-text)
+      (kill-line)
+      (xah-fly-insert-mode-init)
+      )
+
+  (define-key xah-fly-command-map (kbd "w") 'delete-and-edit-current-line)
+
+#+END_SRC
+
+    I am delete content of this line (including whitespaces) on press =SPC w=:
+    
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (defun clear-current-line ()
+      "Clear content of current line (including whitespaces)."
+      (interactive)
+      (kill-region (line-beginning-position) (line-end-position))
+      )
+
+  (define-key xah-fly-command-map (kbd "SPC w") 'clear-current-line)
 #+END_SRC
 
 ** Custom Selecting Text
@@ -321,18 +357,6 @@ this select:
 
 #+END_SRC
 
-** Indent Settings
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  (setq-default indent-tabs-mode nil)
-  (setq-default tab-width          4)
-  (setq-default c-basic-offset     4)
-  (setq-default standart-indent    4)
-  (setq-default lisp-body-indent   4)
-
-  (global-set-key (kbd "RET") 'newline-and-indent)
-  (setq lisp-indent-function  'common-lisp-indent-function)
-#+END_SRC
 ** Custom Editing Text
    I am use =s= for inserting new line:
    
@@ -357,14 +381,14 @@ to beginning of each line:
 
   (defun insert-space-before-line ()
       "Saving position, insert space to beginning of current line."
-      (interactive)
-      (save-excursion (beginning-of-line-text)
+       (interactive)
+       (save-excursion (beginning-of-line-text)
                       (xah-insert-space-before))
       )
 
   (defun insert-spaces-before-each-line-by-line-nums (start-line end-line)
       "Insert space before each line in region (`START-LINE`; `END-LINE`)."
-      (unless (= 0 (- end-line start-line))
+      (unless (= 0 (+ 1 (- end-line start-line)))
           (goto-line start-line)
           (insert-space-before-line)
           (insert-spaces-before-each-line-by-line-nums (+ start-line 1) end-line))
@@ -395,12 +419,47 @@ to beginning of each line:
 
 #+END_SRC
 
+** Indent Settings
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width          4)
+  (setq-default c-basic-offset     4)
+  (setq-default standart-indent    4)
+  (setq-default lisp-body-indent   4)
+
+
+  (defun select-current-line ()
+      "Select as region current line."
+      (interactive)
+      (forward-line 0)
+      (set-mark (point))
+      (end-of-line)
+      )
+
+
+  (defun indent-line-or-region ()
+      "If text selected, then indent it, otherwise indent current line."
+      (interactive)
+      (save-excursion
+          (unless (use-region-p)
+              (select-current-line)
+              )
+          (indent-region (region-beginning) (region-end))))
+
+
+  (global-set-key (kbd "RET") 'newline-and-indent)
+  (define-key xah-fly-command-map (kbd "[") 'indent-line-or-region)
+
+  (setq lisp-indent-function  'common-lisp-indent-function)
+
+#+END_SRC
 * Support of Languages
 ** Functions for extending functional of language
 *** Functions for Navigating
    Function `add-nav-forward-block-keymap-for-language` defines key for 
 `forward-block`.
-   And function `add-nav-backward-keymap-for-language` define key for
+   And function `add-nav-backward-block-keymap-for-language` define key for
 `backward-block`.
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -415,7 +474,7 @@ to beginning of each line:
                     (kbd "SPC l")
                     ',forward-block-function)))))
 
-                    
+
   (defmacro add-nav-backward-block-keymap-for-language (language backward-block-function)
       "Bind `BACKWARD-BLOCK-FUNCTION` to `LANGUAGE`-map."
       `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
@@ -428,6 +487,23 @@ to beginning of each line:
                     ',backward-block-function)))))
 
 #+END_SRC
+
+Function `add-nav-to-imports-for-language`, is define keys for go to imports:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (defmacro add-nav-to-imports-for-language (language to-imports-function)
+      "Bind `TO-IMPORTS-FUNCTION` to `LANGUAGE`-map."
+      `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
+           (add-hook
+            language-hook
+            (lambda ()
+                (define-key
+                    xah-fly-command-map
+                    (kbd "SPC SPC i")
+                    ',to-imports-function)))))
+
+#+END_SRC
+
 *** Functions for Pretty View
   I am use [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] for centering content of org file:
 
@@ -441,6 +517,24 @@ to beginning of each line:
       (setq visual-fill-column-width 90
             visual-fill-column-center-text t)
       (visual-fill-column-mode 38))
+
+#+END_SRC
+*** Functions for Import
+    Function `add-import-keymap-for-language` defines key for `add-import`.
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (define-key xah-fly-command-map (kbd "SPC e") 'xah-fly-c-keymap)
+
+  (defmacro add-import-keymap-for-language (language add-import-function)
+      "Bind `ADD-IMPORT-FUNCTION` to `LANGUAGE`-map."
+      `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
+           (add-hook
+            language-hook
+            (lambda ()
+                (define-key
+                    xah-fly-command-map
+                    (kbd "SPC i")
+                    ',add-import-function)))))
 
 #+END_SRC
 
@@ -526,8 +620,13 @@ to beginning of each line:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (add-nav-forward-block-keymap-for-language python-mode python-nav-forward-block)
-  (add-nav-forward-block-keymap-for-language python-mode python-nav-backward-block)
+  (add-nav-forward-block-keymap-for-language
+   python-mode
+   python-nav-forward-block)
+
+  (add-nav-backward-block-keymap-for-language
+   python-mode
+   python-nav-backward-block)
 
 #+END_SRC
 
@@ -541,10 +640,117 @@ to beginning of each line:
 
 #+END_SRC
 
+*** Haskell
+    I am use [[https://github.com/haskell/haskell-mode][haskell-mode]], and I love =indention-mode=:
+
+ #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+   (use-package haskell-mode
+       :ensure t
+       :hook (haskell-mode . haskell-indent-mode))
+
+   (add-import-keymap-for-language
+    haskell-mode
+    haskell-add-import)
+
+   (add-nav-to-imports-for-language
+    haskell-mode
+    haskell-navigate-imports)
+
+   (add-nav-forward-block-keymap-for-language
+    haskell-mode
+    haskell-ds-forward-decl)
+
+   (add-nav-backward-block-keymap-for-language
+    haskell-mode
+    haskell-ds-backward-decl)
+
+ #+END_SRC
+
+*** JavaScript (Node.js)
+**** Variables
+     Variable `js/imports-regexp` if regular expression for search imports in JS. 
+Defaults to:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (setq js/imports-regexp "import")
+
+#+END_SRC
+
+Variable `js/function-or-class-regexp` if regular expression for search imports in JS. 
+Defaults to:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (setq js/function-or-class-regexp "function \\|class ")
+
+#+END_SRC
+
+**** Repl
+     I am use [[https://github.com/redguardtoo/js-comint][js-comint]] for run my JS' code:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package js-comint
+      :ensure t)
+
+  (if (user-os-windows-p)
+      (setq js-comint-program-command "C:/Program Files/nodejs/node.exe"))
+
+#+END_SRC
+
+**** Linters
+     I am use some packages which you can see on [[http://codewinds.com/blog/2015-04-02-emacs-flycheck-eslint-jsx.html#summary][this]] page:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package web-mode
+      :ensure t)
+
+  (use-package js2-mode
+      :ensure t)
+
+  (use-package json-mode
+      :ensure t)
+
+  (add-to-list 'auto-mode-alist '("\\.jsx$" . js2-mode))
+  (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+
+#+END_SRC
+
+
+**** Navigation
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (defun js/nav-to-imports ()
+      "Navigate to imports in JS mode."
+      (interactive)
+      (push-mark)
+      (let ((old-pos (point)))
+          (goto-char (point-min))
+          (search-forward-regexp js/imports-regexp old-pos old-pos))
+      )
+
+  (add-nav-to-imports-for-language
+   js2-mode
+   js/nav-to-imports)
+
+
+  (defun js/nav-forward-function-or-class ()
+      "Navigate to next function or class in JS."
+      (interactive)
+      (search-forward-regexp js/function-or-class-regexp)
+      )
+
+  (add-nav-forward-block-keymap-for-language
+   js2-mode
+   js/nav-forward-function-or-class)
+
+#+END_SRC
+
 * Org Mode
-  :PROPERTIES:
-  :ID:       36f51766-c23b-4f03-8f75-8300e47e0ea6
-  :END:
 ** Navigation
    
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -669,6 +875,21 @@ to beginning of each line:
 
 #+END_SRC
 
+** Scratches
+   I am press =C-t= for opening scratch:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (defun open-scratch ()
+      "Open scratch."
+      (interactive)
+      (switch-to-buffer "*scratch*")
+      )
+
+  (global-set-key (kbd "C-t") 'open-scratch)
+
+#+END_SRC
+
 * Graphic User Interface
 ** Hide ALL
    This is standard stuf
@@ -772,9 +993,10 @@ I am use [[https://github.com/seagle0128/doom-modeline][doom-modeline]]:
   (setq projectile-project-name-function 'get-project-name)
 
   (global-set-key (kbd "S-<f5>") 'projectile-test-project)
+  (global-set-key (kbd "<f5>") 'projectile-run-project)
 
   (projectile-mode 1)
-  
+
 #+END_SRC
 
 ** Git
@@ -794,6 +1016,7 @@ I am use [[https://github.com/emacsmirror/dired-details][dired-detail]]:
 #+END_SRC
 
 * Auto Tangle This File
+
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
   (defun if-Emacs-org-then-org-babel-tangle ()
       "If current open file is Emacs.org, then `org-babel-tangle`."
