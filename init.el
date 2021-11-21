@@ -21,11 +21,11 @@
 
 (add-to-list 'load-path "~/projects/fast-exec")
 
-(use-package s)
+(use-package s :ensure t)
 
-(use-package f)
+(use-package f :ensure t)
 
-(use-package dash)
+(use-package dash :ensure t)
 
 (setq user-full-name    "Semen Khramtsov"
       user-mail-address "hrams205@gmail.com"
@@ -60,6 +60,7 @@ Info take from var `user-os`, user must set it."
 (use-package yasnippet-classic-snippets :ensure t)
 
 (use-package flycheck
+    :ensure t
     :config (global-flycheck-mode 1))
 
 (setq search-highlight        t)
@@ -110,14 +111,37 @@ Info take from var `user-os`, user must set it."
     ((:map xah-fly-command-map)
      ("'" . avy-goto-char)))
 
+(defun forward-slurp-sexp ()
+    "My version of `sp-slurp-sexp`."
+    (interactive)
+    (save-excursion
+        (backward-char)
+        (sp-forward-slurp-sexp))
+    )
+
+
+(defun splice-sexp ()
+    "My version of `sp-splice-sexp`."
+    (interactive)
+    (save-excursion
+        (backward-char)
+        (sp-splice-sexp))
+    )
+
 (use-package smartparens
     :ensure t
     :init (smartparens-global-mode 1)
     :bind (:map xah-fly-command-map
-                 ("]" . sp-forward-slurp-sexp)
-                 ("-" . sp-splice-sexp)
+                (("]" . forward-slurp-sexp)
+                 ("-" . splice-sexp)
+                 ("SPC -" . sp-rewrap-sexp)
                  ("m" . sp-backward-sexp)
-                 ("." . sp-forward-sexp)))
+                 ("." . sp-forward-sexp)
+                 ("SPC 1" . sp-join-sexp)
+                 ("SPC SPC 1" . sp-split-sexp)
+                 ("SPC 9" . sp-change-inner)
+                 ("SPC SPC g" . sp-kill-hybrid-sexp)
+                 )))
 
 (defun delete-only-1-char ()
     "Delete only 1 character before point."

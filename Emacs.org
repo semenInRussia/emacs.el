@@ -59,20 +59,20 @@ I am use some packages for simple develop on Emacs Lisp
 *** s
     This is [[https://github.com/magnars/s.el][s]]:
  #+BEGIN_SRC emacs-lisp :tangle ~/init.el
- (use-package s)
+ (use-package s :ensure t)
  #+END_SRC
  
 *** f
     This is [[https://github.com/rejeep/f.el][f]]:
     
  #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
- (use-package f)
+ (use-package f :ensure t)
  #+END_SRC
  
 *** Dash
     This is [[https://github.com/magnars/dash.el][dash:]]
  #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
- (use-package dash)
+ (use-package dash :ensure t)
  #+END_SRC
 
 * Info about me for Emacs
@@ -133,8 +133,11 @@ And [[https://github.com/emacsmirror/yasnippet-classic-snippets][yasnippet-class
    I am use [[https://www.flycheck.org/en/latest/][flycheck]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-(use-package flycheck
-    :config (global-flycheck-mode 1))
+
+  (use-package flycheck
+      :ensure t
+      :config (global-flycheck-mode 1))
+
 #+END_SRC
 
 ** Search
@@ -229,14 +232,37 @@ use =-=, for navigating I am use `.` and `m`:
 
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
 
+  (defun forward-slurp-sexp ()
+      "My version of `sp-slurp-sexp`."
+      (interactive)
+      (save-excursion
+          (backward-char)
+          (sp-forward-slurp-sexp))
+      )
+
+
+  (defun splice-sexp ()
+      "My version of `sp-splice-sexp`."
+      (interactive)
+      (save-excursion
+          (backward-char)
+          (sp-splice-sexp))
+      )
+
   (use-package smartparens
       :ensure t
       :init (smartparens-global-mode 1)
       :bind (:map xah-fly-command-map
-                   ("]" . sp-forward-slurp-sexp)
-                   ("-" . sp-splice-sexp)
+                  (("]" . forward-slurp-sexp)
+                   ("-" . splice-sexp)
+                   ("SPC -" . sp-rewrap-sexp)
                    ("m" . sp-backward-sexp)
-                   ("." . sp-forward-sexp)))
+                   ("." . sp-forward-sexp)
+                   ("SPC 1" . sp-join-sexp)
+                   ("SPC SPC 1" . sp-split-sexp)
+                   ("SPC 9" . sp-change-inner)
+                   ("SPC SPC g" . sp-kill-hybrid-sexp)
+                   )))
 
 #+END_SRC
 
@@ -294,7 +320,6 @@ use =-=, for navigating I am use `.` and `m`:
 
 #+RESULTS:
 : kmacro-call-macro-or-apply-to-lines
-
 ** Custom Deleting Text
    I am delete this line and edit this by press =w=:
 
