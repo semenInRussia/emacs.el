@@ -20,6 +20,7 @@
 (add-to-list 'load-path "~/.emacs.d/lisp")
 
 (add-to-list 'load-path "~/projects/fast-exec")
+(add-to-list 'load-path "~/projects/porth-mode")
 
 (use-package s :ensure t)
 
@@ -63,9 +64,6 @@ Info take from var `user-os`, user must set it."
     :ensure t
     :config (global-flycheck-mode 1))
 
-(setq search-highlight        t)
-(setq query-replace-highlight t)
-
 (use-package company
     :ensure t
     :init
@@ -92,6 +90,11 @@ Info take from var `user-os`, user must set it."
 (define-key xah-fly-command-map (kbd "SPC l") nil)
 (define-key xah-fly-command-map (kbd "SPC j") nil)
 
+(setq search-highlight        t)
+(setq query-replace-highlight t)
+
+(define-key xah-fly-command-map (kbd "'") 'isearch-forward)
+
 (setq imenu-auto-rescan t)
 (define-key xah-fly-command-map (kbd "SPC SPC") nil)
 (define-key xah-fly-command-map (kbd "SPC SPC SPC") 'imenu)
@@ -109,7 +112,7 @@ Info take from var `user-os`, user must set it."
     :ensure t
     :bind
     ((:map xah-fly-command-map)
-     ("'" . avy-goto-char)))
+     ("n" . avy-goto-char)))
 
 (defun forward-slurp-sexp ()
     "My version of `sp-slurp-sexp`."
@@ -128,6 +131,7 @@ Info take from var `user-os`, user must set it."
         (sp-splice-sexp))
     )
 
+
 (use-package smartparens
     :ensure t
     :init (smartparens-global-mode 1)
@@ -139,7 +143,7 @@ Info take from var `user-os`, user must set it."
                  ("." . sp-forward-sexp)
                  ("SPC 1" . sp-join-sexp)
                  ("SPC SPC 1" . sp-split-sexp)
-                 ("SPC 9" . sp-change-inner)
+                 ("SPC 9" . sp-change-enclosing)
                  ("SPC SPC g" . sp-kill-hybrid-sexp)
                  )))
 
@@ -152,11 +156,24 @@ Info take from var `user-os`, user must set it."
 
 (define-key xah-fly-command-map (kbd "DEL") 'delete-only-1-char)
 
+(defun mark-inner-or-expand-region ()
+    "If text is selected, expand region, otherwise then mark inner of brackets."
+    (interactive)
+    (if (use-region-p)
+        (call-interactively 'er/expand-region)
+        (progn
+            (-when-let (ok (sp-get-sexp))
+                (sp-get ok
+                    (set-mark :beg-in)
+                    (goto-char :end-in))))))
+
 (use-package expand-region
     :ensure t
     :bind
     (:map xah-fly-command-map
-    ("1" . er/expand-region)))
+          ("1" . er/expand-region)
+          ("9" . mark-inner-or-expand-region)
+          ("m" . sp-backward-up-sexp)))
 
 (defun kmacro-start-or-end-macro ()
     "If macro record have just started, then stop this record, otherwise start."
@@ -294,7 +311,8 @@ Info take from var `user-os`, user must set it."
 
 
 (global-set-key (kbd "RET") 'newline-and-indent)
-(define-key xah-fly-command-map (kbd "[") 'indent-line-or-region)
+(define-key xah-fly-command-map (kbd "q") 'indent-line-or-region)
+(define-key xah-fly-command-map (kbd "SPC q") 'join-line)
 
 (setq lisp-indent-function  'common-lisp-indent-function)
 
@@ -410,17 +428,36 @@ Info take from var `user-os`, user must set it."
 
 (add-hook 'markdown-mode-hook 'visual-fill)
 
+(setq py/imports-regexp "import\\|from")
+
+(setq python-shell-interpreter "python")
+
 (add-nav-forward-block-keymap-for-language
  python-mode
  python-nav-forward-block)
+
 
 (add-nav-backward-block-keymap-for-language
  python-mode
  python-nav-backward-block)
 
-(setq flycheck-python-pylint-executable "pylint")
-(setq flycheck-python-flake8-executable "flake8")
-(setq flycheck-python-mypy-executable "mypy")
+
+(defun py-nav-to-imports ()
+    "Navigate to imports in Python mode."
+    (interactive)
+    (push-mark)
+    (let ((old-pos (point)))
+        (goto-char (point-min))
+        (search-forward-regexp py/imports-regexp old-pos old-pos))
+    )
+
+(add-nav-to-imports-for-language
+ python-mode
+ py-nav-to-imports)
+
+(setq flycheck-python-flake8-executable "python -m flake8")
+(setq flycheck-python-mypy-executable "python -m mypy")
+(setq flycheck-python-pylint-executable "python -m pylint")
 
 (use-package haskell-mode
     :ensure t
@@ -488,6 +525,24 @@ Info take from var `user-os`, user must set it."
  js2-mode
  js/nav-forward-function-or-class)
 
+(defun yas-minor-mode-off ()
+    "Turn off yasnippets."
+    (interactive)
+    (yas-minor-mode 0)
+    )
+
+
+(use-package web-mode
+    :ensure t
+    :hook (web-mode . yas-minor-mode-off))
+
+
+(use-package emmet-mode
+    :ensure t
+    :hook web-mode
+    :custom
+    (emmet-move-cursor-between-quotes t))
+
 (defun org-forward-heading ()
     "Forward heading in `org-mode`."
     (interactive)
@@ -530,7 +585,9 @@ Info take from var `user-os`, user must set it."
    :init
    (helm-mode 1)
    :bind
-   ("C-o" . helm-find-files))
+   ("C-o" . helm-find-files)
+   (:map xah-fly-command-map
+         ("SPC SPC f" . helm-find-files)))
 
 (require 'fast-exec)
 
@@ -538,7 +595,8 @@ Info take from var `user-os`, user must set it."
  yasnippet
  projectile
  magit
- flycheck)
+ flycheck
+ haskell-mode)
 
 (fast-exec/initialize)
 (define-key xah-fly-command-map (kbd "=") 'fast-exec/exec)
@@ -573,10 +631,19 @@ Thank you https://github.com/leuven65!"
 
 (toggle-frame-fullscreen)
 
-(use-package doom-themes 
+(require 'gruber-darker-theme)
+
+(use-package gruber-darker-theme
     :ensure t
-    :config
-    (load-theme 'doom-1337 t))
+    :init
+    (load-theme 'gruber-darker t)
+    )
+
+
+;; (use-package doom-themes
+;;     :ensure t
+;;     :config
+;;     )
 
 (setq dont-display-lines-modes
       '(org-mode
@@ -613,7 +680,7 @@ numbers of lines, otherwise don't display."
 (set-face-attribute 'default nil :font "Consolas" :height 200)
 (set-frame-font "Consolas" nil t)
 
-(hl-line-mode 1)
+(global-hl-line-mode 1)
 
 (defun get-project-name (project-root)
     "Return name of project by path - `PROJECT-ROOT`."

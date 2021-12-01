@@ -50,6 +50,7 @@
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (add-to-list 'load-path "~/projects/fast-exec")
+  (add-to-list 'load-path "~/projects/porth-mode")
 
 #+END_SRC
 
@@ -140,12 +141,6 @@ And [[https://github.com/emacsmirror/yasnippet-classic-snippets][yasnippet-class
 
 #+END_SRC
 
-** Search
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-   (setq search-highlight        t)
-   (setq query-replace-highlight t)
-#+END_SRC
-
 ** Autocomplete
    I am use [[http://company-mode.github.io][company-mode]], I am set delay beetween typing text and viewing hints to
 0.8 seconds:
@@ -188,6 +183,17 @@ And for =yasnippet= I am use code from [[https://emacs.stackexchange.com/questio
   (define-key xah-fly-command-map (kbd "SPC l") nil)
   (define-key xah-fly-command-map (kbd "SPC j") nil)
 #+END_SRC
+** Search
+   I am press ='= for search word:
+   
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (setq search-highlight        t)
+  (setq query-replace-highlight t)
+
+  (define-key xah-fly-command-map (kbd "'") 'isearch-forward)
+  
+#+END_SRC
 
 ** View Functions/Classes/etc.
    I am use ido with keymap =SPC SPC SPC=:
@@ -222,7 +228,7 @@ And for =yasnippet= I am use code from [[https://emacs.stackexchange.com/questio
     :ensure t
     :bind
     ((:map xah-fly-command-map)
-     ("'" . avy-goto-char)))
+     ("n" . avy-goto-char)))
 #+END_SRC
 
 ** Smart Parens
@@ -249,6 +255,7 @@ use =-=, for navigating I am use `.` and `m`:
           (sp-splice-sexp))
       )
 
+
   (use-package smartparens
       :ensure t
       :init (smartparens-global-mode 1)
@@ -260,7 +267,7 @@ use =-=, for navigating I am use `.` and `m`:
                    ("." . sp-forward-sexp)
                    ("SPC 1" . sp-join-sexp)
                    ("SPC SPC 1" . sp-split-sexp)
-                   ("SPC 9" . sp-change-inner)
+                   ("SPC 9" . sp-change-enclosing)
                    ("SPC SPC g" . sp-kill-hybrid-sexp)
                    )))
 
@@ -282,11 +289,25 @@ use =-=, for navigating I am use `.` and `m`:
 ** Smart Select Text
    I am use cool package [[https://github.com/magnars/expand-region.el/][expand-region]]:
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
-(use-package expand-region
-    :ensure t
-    :bind
-    (:map xah-fly-command-map
-    ("1" . er/expand-region)))
+  (defun mark-inner-or-expand-region ()
+      "If text is selected, expand region, otherwise then mark inner of brackets."
+      (interactive)
+      (if (use-region-p)
+          (call-interactively 'er/expand-region)
+          (progn
+              (-when-let (ok (sp-get-sexp))
+                  (sp-get ok
+                      (set-mark :beg-in)
+                      (goto-char :end-in))))))
+
+  (use-package expand-region
+      :ensure t
+      :bind
+      (:map xah-fly-command-map
+            ("1" . er/expand-region)
+            ("9" . mark-inner-or-expand-region)
+            ("m" . sp-backward-up-sexp)))
+
 #+END_SRC
 ** Macros
    I am use =\= in command mode for start of record macro.
@@ -445,6 +466,7 @@ to beginning of each line:
 #+END_SRC
 
 ** Indent Settings
+   
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (setq-default indent-tabs-mode nil)
@@ -474,7 +496,8 @@ to beginning of each line:
 
 
   (global-set-key (kbd "RET") 'newline-and-indent)
-  (define-key xah-fly-command-map (kbd "[") 'indent-line-or-region)
+  (define-key xah-fly-command-map (kbd "q") 'indent-line-or-region)
+  (define-key xah-fly-command-map (kbd "SPC q") 'join-line)
 
   (setq lisp-indent-function  'common-lisp-indent-function)
 
@@ -541,7 +564,7 @@ Function `add-nav-to-imports-for-language`, is define keys for go to imports:
       (interactive)
       (setq visual-fill-column-width 90
             visual-fill-column-center-text t)
-      (visual-fill-column-mode 38))
+      (visual-fill-column-mode 38))
 
 #+END_SRC
 *** Functions for Import
@@ -641,6 +664,23 @@ Function `add-nav-to-imports-for-language`, is define keys for go to imports:
 #+RESULTS:
 
 *** Python
+**** Vars
+     Var =py/imports-regexp= is regexp of import statements in python:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (setq py/imports-regexp "import\\|from")
+
+#+END_SRC
+
+Var =python-shell-interpreter= is builtin Emacs var, see docs in Emacs:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (setq python-shell-interpreter "python")
+
+#+END_SRC
+
 **** Navigation
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -649,9 +689,24 @@ Function `add-nav-to-imports-for-language`, is define keys for go to imports:
    python-mode
    python-nav-forward-block)
 
+
   (add-nav-backward-block-keymap-for-language
    python-mode
    python-nav-backward-block)
+
+
+  (defun py-nav-to-imports ()
+      "Navigate to imports in Python mode."
+      (interactive)
+      (push-mark)
+      (let ((old-pos (point)))
+          (goto-char (point-min))
+          (search-forward-regexp py/imports-regexp old-pos old-pos))
+      )
+
+  (add-nav-to-imports-for-language
+   python-mode
+   py-nav-to-imports)
 
 #+END_SRC
 
@@ -659,9 +714,9 @@ Function `add-nav-to-imports-for-language`, is define keys for go to imports:
      
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (setq flycheck-python-pylint-executable "pylint")
-  (setq flycheck-python-flake8-executable "flake8")
-  (setq flycheck-python-mypy-executable "mypy")
+  (setq flycheck-python-flake8-executable "python -m flake8")
+  (setq flycheck-python-mypy-executable "python -m mypy")
+  (setq flycheck-python-pylint-executable "python -m pylint")
 
 #+END_SRC
 
@@ -744,7 +799,6 @@ Defaults to:
 
 #+END_SRC
 
-
 **** Navigation
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -772,6 +826,31 @@ Defaults to:
   (add-nav-forward-block-keymap-for-language
    js2-mode
    js/nav-forward-function-or-class)
+
+#+END_SRC
+
+*** HTML
+    I am use [[https://web-mode.org][web-mode]] and [[https://github.com/smihica/emmet-mode][emmet]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (defun yas-minor-mode-off ()
+      "Turn off yasnippets."
+      (interactive)
+      (yas-minor-mode 0)
+      )
+
+
+  (use-package web-mode
+      :ensure t
+      :hook (web-mode . yas-minor-mode-off))
+
+
+  (use-package emmet-mode
+      :ensure t
+      :hook web-mode
+      :custom
+      (emmet-move-cursor-between-quotes t))
 
 #+END_SRC
 
@@ -835,31 +914,35 @@ Defaults to:
 #+END_SRC
 ** Framework for Incremental Completions and Narrowing Selections 
    I am use [[https://github.com/emacs-helm/helm][HELM]]:
+   
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
- (use-package helm
-    :ensure t
-    :config
-    (setq-default helm-M-x-fuzzy-match t)
-    :init
-    (helm-mode 1)
-    :bind
-    ("C-o" . helm-find-files))
+  (use-package helm
+     :ensure t
+     :config
+     (setq-default helm-M-x-fuzzy-match t)
+     :init
+     (helm-mode 1)
+     :bind
+     ("C-o" . helm-find-files)
+     (:map xah-fly-command-map
+           ("SPC SPC f" . helm-find-files)))
 #+END_SRC
 ** Fast Executing Command
    I am use [[https://github.com/semenInRussia/fast-exec.el][fast-exec]]:
    
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (require 'fast-exec)
+    (require 'fast-exec)
 
-  (fast-exec/enable-some-builtin-supports
-   yasnippet
-   projectile
-   magit
-   flycheck)
- 
-  (fast-exec/initialize)
-  (define-key xah-fly-command-map (kbd "=") 'fast-exec/exec)
+    (fast-exec/enable-some-builtin-supports
+     yasnippet
+     projectile
+     magit
+     flycheck
+     haskell-mode)
+
+    (fast-exec/initialize)
+    (define-key xah-fly-command-map (kbd "=") 'fast-exec/exec)
 
 #+END_SRC
 
@@ -929,11 +1012,23 @@ Defaults to:
 
 ** Color Theme
    I am use [[https://github.com/hlissner/emacs-doom-themes][doom-themes]]:
+
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-(use-package doom-themes 
-    :ensure t
-    :config
-    (load-theme 'doom-1337 t))
+
+  (require 'gruber-darker-theme)
+
+  (use-package gruber-darker-theme
+      :ensure t
+      :init
+      (load-theme 'gruber-darker t)
+      )
+
+
+  ;; (use-package doom-themes
+  ;;     :ensure t
+  ;;     :config
+  ;;     )
+
 #+END_SRC
 
 ** Numbers of lines
@@ -999,7 +1094,9 @@ I am use [[https://github.com/seagle0128/doom-modeline][doom-modeline]]:
 ** Highlight Current Line
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-(hl-line-mode 1)
+
+(global-hl-line-mode 1)
+
 #+END_SRC
 
 * Developer Environment
