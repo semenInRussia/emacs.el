@@ -403,6 +403,17 @@ this select:
 
 #+END_SRC
 
+I am press =SPC t= for enable =rectangle-mark-mode=, and =f= when =rectangle-mark-mode=
+is enabled for replace rectangle:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (define-key xah-fly-command-map (kbd "SPC t") 'rectangle-mark-mode)
+  (define-key rectangle-mark-mode-map (kbd "f") 'replace-rectangle)
+
+#+END_SRC
+
+
 ** Custom Editing Text
    I am use =s= for inserting new line:
    
@@ -539,10 +550,11 @@ to beginning of each line:
 Function `add-nav-to-imports-for-language`, is define keys for go to imports:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-  (defmacro add-nav-to-imports-for-language (language to-imports-function)
-      "Bind `TO-IMPORTS-FUNCTION` to `LANGUAGE`-map."
+
+(defmacro add-nav-to-imports-for-language (language to-imports-function)
+  "Bind `TO-IMPORTS-FUNCTION` to `LANGUAGE`-map."
       `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
-           (add-hook
+          (add-hook
             language-hook
             (lambda ()
                 (define-key
@@ -564,7 +576,8 @@ Function `add-nav-to-imports-for-language`, is define keys for go to imports:
       (interactive)
       (setq visual-fill-column-width 90
             visual-fill-column-center-text t)
-      (visual-fill-column-mode 38))
+      (set-face-attribute 'default nil :font "Consolas" :height 250)
+      (visual-fill-column-mode 1))
 
 #+END_SRC
 *** Functions for Import
@@ -904,7 +917,9 @@ Defaults to:
 
 ** Helpful
 *** Which Key?
+    
     I am use [[https://github.com/justbur/emacs-which-key][which-key]]:
+    
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
 (use-package which-key
     :ensure t
@@ -1087,7 +1102,7 @@ I am use [[https://github.com/seagle0128/doom-modeline][doom-modeline]]:
 
 ** Fonts
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-   (set-face-attribute 'default nil :font "Consolas" :height 200)
+   (set-face-attribute 'default nil :font "Consolas" :height 250)
    (set-frame-font "Consolas" nil t)
 #+END_SRC
 

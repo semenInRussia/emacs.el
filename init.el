@@ -236,6 +236,9 @@ Info take from var `user-os`, user must set it."
 (define-key xah-fly-command-map (kbd "g") nil)
 (define-key xah-fly-command-map (kbd "g") 'delete-current-text-block-or-cancel-selection)
 
+(define-key xah-fly-command-map (kbd "SPC t") 'rectangle-mark-mode)
+(define-key rectangle-mark-mode-map (kbd "f") 'replace-rectangle)
+
 (defun open-line-saving-indent ()
     "Inserting new line, saving position and inserting new line."
     (interactive)
@@ -340,15 +343,15 @@ Info take from var `user-os`, user must set it."
                   ',backward-block-function)))))
 
 (defmacro add-nav-to-imports-for-language (language to-imports-function)
-    "Bind `TO-IMPORTS-FUNCTION` to `LANGUAGE`-map."
-    `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
-         (add-hook
-          language-hook
-          (lambda ()
-              (define-key
-                  xah-fly-command-map
-                  (kbd "SPC SPC i")
-                  ',to-imports-function)))))
+  "Bind `TO-IMPORTS-FUNCTION` to `LANGUAGE`-map."
+      `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
+          (add-hook
+            language-hook
+            (lambda ()
+                (define-key
+                    xah-fly-command-map
+                    (kbd "SPC SPC i")
+                    ',to-imports-function)))))
 
 (use-package visual-fill-column
     :ensure t)
@@ -357,7 +360,8 @@ Info take from var `user-os`, user must set it."
     (interactive)
     (setq visual-fill-column-width 90
           visual-fill-column-center-text t)
-    (visual-fill-column-mode 38))
+    (set-face-attribute 'default nil :font "Consolas" :height 250)
+    (visual-fill-column-mode 1))
 
 (define-key xah-fly-command-map (kbd "SPC e") 'xah-fly-c-keymap)
 
@@ -677,7 +681,7 @@ numbers of lines, otherwise don't display."
     :init
     (doom-modeline-mode 38))
 
-(set-face-attribute 'default nil :font "Consolas" :height 200)
+(set-face-attribute 'default nil :font "Consolas" :height 250)
 (set-frame-font "Consolas" nil t)
 
 (global-hl-line-mode 1)
