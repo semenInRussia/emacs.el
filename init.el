@@ -198,6 +198,74 @@ Info take from var `user-os`, user must set it."
 
 (define-key xah-fly-command-map (kbd "SPC RET") 'kmacro-call-macro-or-apply-to-lines)
 
+(require 'rect)
+
+(define-key xah-fly-command-map (kbd "SPC t") 'rectangle-mark-mode)
+(define-key xah-fly-command-map (kbd "SPC v") 'yank-rectangle)
+
+
+(defun keymap-to-list (keymap)
+    "Convert `KEYMAP` to list."
+    (--filter (ignore-errors '((cat it) (cdr it))) (-drop 1 keymap))
+    )
+
+
+(defun function-of-key (keymap key)
+    "Get function bound on `KEY` in `KEYMAP`."
+    (let* ((list-keymap (keymap-to-list keymap))
+	   (kbd-key (kbd key))
+	   (key-chars (string-to-list kbd-key))
+	   (head-key-char (-first-item key-chars))
+	   (tail-key-chars (-drop 1 key-chars))
+	   (object-on-key (--filter (ignore-errors
+					(eq head-key-char (-first-item it)))
+				    list-keymap))
+	   )
+	(cond
+	  (tail-key-chars
+	   (function-of-key object-on-key
+			    (chars-to-string tail-key-chars)))
+	  (t (cdr (-first-item object-on-key)))))
+    )
+
+
+(defun chars-to-string (chars)
+    "Convert list of `CHARS` to string."
+    (--reduce-from (s-concat acc (char-to-string it)) "" chars)
+    )
+
+
+(defmacro define-key-when (keymap key def condition)
+    "Macro for define keymaps for `rectangle-mode` in `xah-fly-command-mode`"
+    `(define-key ,keymap (kbd ,key)
+	 (lambda ()
+	     (interactive)
+	     (if (funcall ,condition)
+		 (call-interactively ,def)
+		 (call-interactively ',(function-of-key (eval keymap) key)))))
+    )
+
+(define-key-when xah-fly-command-map "c" 'copy-rectangle-as-kill
+		 (lambda () rectangle-mark-mode))
+
+(define-key-when xah-fly-command-map "d" 'kill-rectangle
+		 (lambda () rectangle-mark-mode))
+
+(define-key-when xah-fly-command-map "x" 'kill-rectangle
+		 (lambda () rectangle-mark-mode))
+
+(define-key-when xah-fly-command-map "f" 'replace-rectangle
+		 (lambda () rectangle-mark-mode))
+
+(define-key-when xah-fly-command-map "q" 'delimit-columns-rectangle
+		 (lambda () rectangle-mark-mode))
+
+(define-key-when xah-fly-command-map "s" 'open-rectangle
+		(lambda () rectangle-mark-mode))
+
+(define-key-when xah-fly-command-map "-" 'rectangle-exchange-point-and-mark
+		(lambda () rectangle-mark-mode))
+
 (defun delete-and-edit-current-line ()
     "Delete current line and instroduce to insert mode."
     (interactive)
@@ -236,8 +304,7 @@ Info take from var `user-os`, user must set it."
 (define-key xah-fly-command-map (kbd "g") nil)
 (define-key xah-fly-command-map (kbd "g") 'delete-current-text-block-or-cancel-selection)
 
-(define-key xah-fly-command-map (kbd "SPC t") 'rectangle-mark-mode)
-(define-key rectangle-mark-mode-map (kbd "f") 'replace-rectangle)
+(define-key-when xah-fly-command-map "-" 'exchange-point-and-mark 'use-region-p)
 
 (defun open-line-saving-indent ()
     "Inserting new line, saving position and inserting new line."
@@ -360,7 +427,7 @@ Info take from var `user-os`, user must set it."
     (interactive)
     (setq visual-fill-column-width 90
           visual-fill-column-center-text t)
-    (set-face-attribute 'default nil :font "Consolas" :height 250)
+    (set-face-attribute ault nil :font "Consolas" :height 250)
     (visual-fill-column-mode 1))
 
 (define-key xah-fly-command-map (kbd "SPC e") 'xah-fly-c-keymap)
@@ -570,6 +637,19 @@ Info take from var `user-os`, user must set it."
 
 (add-hook 'org-mode-hook 'visual-fill)
 
+(setq disable-xah-fly-keys-mode-hooks '(calc-start-hook
+                                        calendar-mode-hook))
+
+(defun add-hooks-for-disable-xah-fly-keys-mode ()
+    "Add hoks to `disable-xah-fly-keys-mode-hooks`."
+    (interactive)
+    (--map (add-hook it (lambda () (xah-fly-keys 0)))
+           disable-xah-fly-keys-mode-hooks)
+    (add-hook 'change-major-mode-hook (lambda ()
+                                          (xah-fly-keys 38))))
+
+(add-hooks-for-disable-xah-fly-keys-mode)
+
 (show-paren-mode 2)
 (setq make-backup-files         nil)
 (setq auto-save-list-file-name  nil)
@@ -642,12 +722,6 @@ Thank you https://github.com/leuven65!"
     :init
     (load-theme 'gruber-darker t)
     )
-
-
-;; (use-package doom-themes
-;;     :ensure t
-;;     :config
-;;     )
 
 (setq dont-display-lines-modes
       '(org-mode
