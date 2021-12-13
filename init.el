@@ -19,8 +19,8 @@
 
 (add-to-list 'load-path "~/.emacs.d/lisp")
 
-(add-to-list 'load-path "~/projects/fast-exec")
-(add-to-list 'load-path "~/projects/porth-mode")
+(add-to-list 'load-path "~/projects/fast-exec.el")
+;; (add-to-list 'load-path "~/projects/porth-mode")
 
 (use-package s :ensure t)
 
@@ -66,21 +66,31 @@ Info take from var `user-os`, user must set it."
 
 (use-package company
     :ensure t
-    :init
-    (setq company-async-wait 0.8)
+    :custom
+    (company-idle-delay                 0.3)
+    (company-minimum-prefix-length      2)
+    (company-show-numbers               t)
+    (company-tooltip-limit              15)
+    (company-tooltip-align-annotations  t)
+    (company-tooltip-flip-when-above    t)
     :config
-    (global-company-mode))
+    (global-company-mode 1)
+    (add-to-list 'company-backends 'company-css)
+    (add-to-list 'company-backends 'company-css-html-tags)
+    (add-to-list 'company-backends 'company-keywords))
 
 (defvar company-mode/enable-yas t
   "Enable yasnippet for all backends.")
 
 (defun company-mode/backend-with-yas (backend)
-    (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
+    (if (or (not company-mode/enable-yas)
+            (and (listp backend) (member 'company-yasnippet backend)))
         backend
         (append (if (consp backend) backend (list backend))
                 '(:with company-yasnippet))))
 
-(setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
+(setq company-backends
+      (mapcar #'company-mode/backend-with-yas company-backends))
 
 (require 'xah-fly-keys)
 
@@ -89,6 +99,47 @@ Info take from var `user-os`, user must set it."
 
 (define-key xah-fly-command-map (kbd "SPC l") nil)
 (define-key xah-fly-command-map (kbd "SPC j") nil)
+
+(defun keymap-to-list (keymap)
+    "Convert `KEYMAP` to list."
+    (--filter (ignore-errors '((cat it) (cdr it))) (-drop 1 keymap))
+    )
+
+
+(defun function-of-key (keymap key)
+    "Get function bound on `KEY` in `KEYMAP`."
+    (let* ((list-keymap (keymap-to-list keymap))
+           (kbd-key (kbd key))
+           (key-chars (string-to-list kbd-key))
+           (head-key-char (-first-item key-chars))
+           (tail-key-chars (-drop 1 key-chars))
+           (object-on-key (--filter (ignore-errors
+                                        (eq head-key-char (-first-item it)))
+                                    list-keymap))
+           )
+        (cond
+          (tail-key-chars
+           (function-of-key object-on-key
+                            (chars-to-string tail-key-chars)))
+          (t (cdr (-first-item object-on-key)))))
+    )
+
+
+(defun chars-to-string (chars)
+    "Convert list of `CHARS` to string."
+    (--reduce-from (s-concat acc (char-to-string it)) "" chars)
+    )
+
+
+(defmacro define-key-when (keymap key def condition)
+    "Macro for define keymaps for `rectangle-mode` in `xah-fly-command-mode`"
+    `(define-key ,keymap (kbd ,key)
+         (lambda ()
+             (interactive)
+             (if (funcall ,condition)
+                 (call-interactively ,def)
+                 (call-interactively ',(function-of-key (eval keymap) key)))))
+    )
 
 (setq search-highlight        t)
 (setq query-replace-highlight t)
@@ -106,7 +157,9 @@ Info take from var `user-os`, user must set it."
 
 (use-package multiple-cursors
     :ensure t
-    :bind (("<tab>" . if-selected-then-next-word-like-this)))
+    :bind
+    (:map xah-fly-command-map
+          ("SPC SPC t" . mc/edit-beginnings-of-lines)))
 
 (use-package avy
     :ensure t
@@ -198,73 +251,8 @@ Info take from var `user-os`, user must set it."
 
 (define-key xah-fly-command-map (kbd "SPC RET") 'kmacro-call-macro-or-apply-to-lines)
 
-(require 'rect)
-
-(define-key xah-fly-command-map (kbd "SPC t") 'rectangle-mark-mode)
-(define-key xah-fly-command-map (kbd "SPC v") 'yank-rectangle)
-
-
-(defun keymap-to-list (keymap)
-    "Convert `KEYMAP` to list."
-    (--filter (ignore-errors '((cat it) (cdr it))) (-drop 1 keymap))
-    )
-
-
-(defun function-of-key (keymap key)
-    "Get function bound on `KEY` in `KEYMAP`."
-    (let* ((list-keymap (keymap-to-list keymap))
-	   (kbd-key (kbd key))
-	   (key-chars (string-to-list kbd-key))
-	   (head-key-char (-first-item key-chars))
-	   (tail-key-chars (-drop 1 key-chars))
-	   (object-on-key (--filter (ignore-errors
-					(eq head-key-char (-first-item it)))
-				    list-keymap))
-	   )
-	(cond
-	  (tail-key-chars
-	   (function-of-key object-on-key
-			    (chars-to-string tail-key-chars)))
-	  (t (cdr (-first-item object-on-key)))))
-    )
-
-
-(defun chars-to-string (chars)
-    "Convert list of `CHARS` to string."
-    (--reduce-from (s-concat acc (char-to-string it)) "" chars)
-    )
-
-
-(defmacro define-key-when (keymap key def condition)
-    "Macro for define keymaps for `rectangle-mode` in `xah-fly-command-mode`"
-    `(define-key ,keymap (kbd ,key)
-	 (lambda ()
-	     (interactive)
-	     (if (funcall ,condition)
-		 (call-interactively ,def)
-		 (call-interactively ',(function-of-key (eval keymap) key)))))
-    )
-
-(define-key-when xah-fly-command-map "c" 'copy-rectangle-as-kill
-		 (lambda () rectangle-mark-mode))
-
-(define-key-when xah-fly-command-map "d" 'kill-rectangle
-		 (lambda () rectangle-mark-mode))
-
-(define-key-when xah-fly-command-map "x" 'kill-rectangle
-		 (lambda () rectangle-mark-mode))
-
-(define-key-when xah-fly-command-map "f" 'replace-rectangle
-		 (lambda () rectangle-mark-mode))
-
-(define-key-when xah-fly-command-map "q" 'delimit-columns-rectangle
-		 (lambda () rectangle-mark-mode))
-
-(define-key-when xah-fly-command-map "s" 'open-rectangle
-		(lambda () rectangle-mark-mode))
-
-(define-key-when xah-fly-command-map "-" 'rectangle-exchange-point-and-mark
-		(lambda () rectangle-mark-mode))
+(define-key-when xah-fly-command-map "n" 'avy-transpose-lines-in-region
+                 'use-region-p)
 
 (defun delete-and-edit-current-line ()
     "Delete current line and instroduce to insert mode."
@@ -354,6 +342,32 @@ Info take from var `user-os`, user must set it."
 (define-key xah-fly-command-map (kbd "p") nil)
 (define-key xah-fly-command-map (kbd "p") 'insert-spaces-before-or-to-beginning-of-each-line)
 
+(require 'rect)
+
+(define-key xah-fly-command-map (kbd "SPC t") 'rectangle-mark-mode)
+(define-key xah-fly-command-map (kbd "SPC v") 'yank-rectangle)
+
+(define-key-when xah-fly-command-map "c" 'copy-rectangle-as-kill
+         (lambda () rectangle-mark-mode))
+
+(define-key-when xah-fly-command-map "d" 'kill-rectangle
+         (lambda () rectangle-mark-mode))
+
+(define-key-when xah-fly-command-map "x" 'kill-rectangle
+         (lambda () rectangle-mark-mode))
+
+(define-key-when xah-fly-command-map "f" 'replace-rectangle
+         (lambda () rectangle-mark-mode))
+
+(define-key-when xah-fly-command-map "q" 'delimit-columns-rectangle
+         (lambda () rectangle-mark-mode))
+
+(define-key-when xah-fly-command-map "s" 'open-rectangle
+        (lambda () rectangle-mark-mode))
+
+(define-key-when xah-fly-command-map "-" 'rectangle-exchange-point-and-mark
+        (lambda () rectangle-mark-mode))
+
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width          4)
 (setq-default c-basic-offset     4)
@@ -420,14 +434,16 @@ Info take from var `user-os`, user must set it."
                     (kbd "SPC SPC i")
                     ',to-imports-function)))))
 
+(require 'face-remap)
+
 (use-package visual-fill-column
     :ensure t)
 
-(defun visual-fill ()
-    (interactive)
-    (setq visual-fill-column-width 90
+(defun visual-fill (width)
+    (interactive (list 100))
+    (setq visual-fill-column-width width
           visual-fill-column-center-text t)
-    (set-face-attribute ault nil :font "Consolas" :height 250)
+    (text-scale-mode 0)
     (visual-fill-column-mode 1))
 
 (define-key xah-fly-command-map (kbd "SPC e") 'xah-fly-c-keymap)
@@ -526,9 +542,57 @@ Info take from var `user-os`, user must set it."
  python-mode
  py-nav-to-imports)
 
-(setq flycheck-python-flake8-executable "python -m flake8")
+(setq flycheck-python-flake8-command "python -m flake8")
 (setq flycheck-python-mypy-executable "python -m mypy")
 (setq flycheck-python-pylint-executable "python -m pylint")
+
+(flycheck-define-checker my-python-flake8
+  "A Python syntax and style checker using Flake8.
+
+Requires Flake8 3.0 or newer. See URL
+`https://flake8.readthedocs.io/'."
+  ;; Not calling flake8 directly makes it easier to switch between different
+  ;; Python versions; see https://github.com/flycheck/flycheck/issues/1055.
+  :command ("python -m flake8"
+            (config-file "--append-config" flycheck-flake8rc)
+            (option "--max-complexity" flycheck-flake8-maximum-complexity nil
+                    flycheck-option-int)
+            (option "--max-line-length" flycheck-flake8-maximum-line-length nil
+                    flycheck-option-int)
+            (eval (when buffer-file-name
+                    (concat "--stdin-display-name=" buffer-file-name)))
+            "-")
+  :standard-input t
+  :working-directory flycheck-python-find-project-root
+  :error-filter (lambda (errors)
+                  (let ((errors (flycheck-sanitize-errors errors)))
+                    (seq-map #'flycheck-flake8-fix-error-level errors)))
+  :error-patterns
+  ((warning line-start
+            (file-name) ":" line ":" (optional column ":") " "
+            (id (one-or-more (any alpha)) (one-or-more digit)) " "
+            (message (one-or-more not-newline))
+            line-end))
+  :enabled (lambda ()
+             (or (not (flycheck-python-needs-module-p 'python-flake8))))
+  :verify (lambda (_) (flycheck-python-verify-module 'python-flake8 "flake8"))
+  :modes python-mode
+  :next-checkers ((warning . python-pylint)
+                  (warning . python-mypy)))
+
+(use-package pydoc
+    :ensure t)
+
+(add-to-list 'company-backends 'python-backen)
+
+(company-other-backend)
+
+(use-package go-mode
+    :ensure t)
+
+(use-package go-eldoc
+    :ensure t
+    :hook (go-mode-hook . 'go-eldoc-setup))
 
 (use-package haskell-mode
     :ensure t
@@ -635,7 +699,7 @@ Info take from var `user-os`, user must set it."
 (add-nav-forward-block-keymap-for-language org-mode org-forward-heading)
 (add-nav-backward-block-keymap-for-language org-mode org-backward-heading)
 
-(add-hook 'org-mode-hook 'visual-fill)
+(add-hook 'org-mode-hook (lambda () (visual-fill 80)))
 
 (setq disable-xah-fly-keys-mode-hooks '(calc-start-hook
                                         calendar-mode-hook))
@@ -701,6 +765,11 @@ Thank you https://github.com/leuven65!"
 
 (add-hook 'prog-mode-hook 'whitespace-mode)
 
+(add-hook 'change-major-mode-hook (lambda ()
+                                      (interactive)
+                                      (auto-fill-mode 1)
+                                      ))
+
 (defun open-scratch ()
     "Open scratch."
     (interactive)
@@ -745,14 +814,20 @@ numbers of lines, otherwise don't display."
 
 (use-package doom-modeline
     :ensure t
-    :config
+    :custom
+    (doom-modeline-icon nil)
+    (doom-modeline-modal-icon nil)
+    (doom-modeline-buffer-file-name-style 'auto)
+    (doom-modeline-workspace-name nil)
+    (doom-modeline-project-detection 'projectile)
+    (doom-modeline-buffer-enconding 'projectile)
+    (doom-modeline-enable-word-count t)
+    (doom-modeline-height 24)
+    :init
     (display-time-mode t)
     (column-number-mode)
-    (setq doom-modeline-icon nil)
-    (setq doom-modeline-workspace-name nil)
-    (setq doom-modeline-project-detection 'projectile)
-    (setq doom-modeline-enable-word-count t)
-    :init
+    :config
+    (doom-modeline-mode 0)
     (doom-modeline-mode 38))
 
 (set-face-attribute 'default nil :font "Consolas" :height 250)

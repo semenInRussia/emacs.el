@@ -49,7 +49,7 @@
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (add-to-list 'load-path "~/projects/fast-exec")
+  (add-to-list 'load-path "~/projects/fast-exec.el")
   (add-to-list 'load-path "~/projects/porth-mode")
 
 #+END_SRC
@@ -146,12 +146,22 @@ And [[https://github.com/emacsmirror/yasnippet-classic-snippets][yasnippet-class
 0.8 seconds:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-   (use-package company
-       :ensure t
-       :init
-       (setq company-async-wait 0.8)
-       :config
-       (global-company-mode))
+
+  (use-package company
+      :ensure t
+      :custom
+      (company-idle-delay                 0.3)
+      (company-minimum-prefix-length      2)
+      (company-show-numbers               t)
+      (company-tooltip-limit              15)
+      (company-tooltip-align-annotations  t)
+      (company-tooltip-flip-when-above    t)
+      :config
+      (global-company-mode 1)
+      (add-to-list 'company-backends 'company-css)
+      (add-to-list 'company-backends 'company-css-html-tags)
+      (add-to-list 'company-backends 'company-keywords))
+
 #+END_SRC
 
 And for =yasnippet= I am use code from [[https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names][this]] stackexchange:
@@ -162,12 +172,14 @@ And for =yasnippet= I am use code from [[https://emacs.stackexchange.com/questio
     "Enable yasnippet for all backends.")
 
   (defun company-mode/backend-with-yas (backend)
-      (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
+      (if (or (not company-mode/enable-yas)
+              (and (listp backend) (member 'company-yasnippet backend)))
           backend
           (append (if (consp backend) backend (list backend))
                   '(:with company-yasnippet))))
 
-  (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
+  (setq company-backends
+        (mapcar #'company-mode/backend-with-yas company-backends))
 
 #+END_SRC
 
@@ -183,6 +195,56 @@ And for =yasnippet= I am use code from [[https://emacs.stackexchange.com/questio
   (define-key xah-fly-command-map (kbd "SPC l") nil)
   (define-key xah-fly-command-map (kbd "SPC j") nil)
 #+END_SRC
+** Functions for Define Keys
+
+   Function =define-key-when= is wrap on =define-key=, but function DEF will call when
+will pressed KEY in KEYMAP and when CONDITION will true:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (defun keymap-to-list (keymap)
+      "Convert `KEYMAP` to list."
+      (--filter (ignore-errors '((cat it) (cdr it))) (-drop 1 keymap))
+      )
+
+
+  (defun function-of-key (keymap key)
+      "Get function bound on `KEY` in `KEYMAP`."
+      (let* ((list-keymap (keymap-to-list keymap))
+             (kbd-key (kbd key))
+             (key-chars (string-to-list kbd-key))
+             (head-key-char (-first-item key-chars))
+             (tail-key-chars (-drop 1 key-chars))
+             (object-on-key (--filter (ignore-errors
+                                          (eq head-key-char (-first-item it)))
+                                      list-keymap))
+             )
+          (cond
+            (tail-key-chars
+             (function-of-key object-on-key
+                              (chars-to-string tail-key-chars)))
+            (t (cdr (-first-item object-on-key)))))
+      )
+
+
+  (defun chars-to-string (chars)
+      "Convert list of `CHARS` to string."
+      (--reduce-from (s-concat acc (char-to-string it)) "" chars)
+      )
+
+
+  (defmacro define-key-when (keymap key def condition)
+      "Macro for define keymaps for `rectangle-mode` in `xah-fly-command-mode`"
+      `(define-key ,keymap (kbd ,key)
+           (lambda ()
+               (interactive)
+               (if (funcall ,condition)
+                   (call-interactively ,def)
+                   (call-interactively ',(function-of-key (eval keymap) key)))))
+      )
+
+#+END_SRC
+
 ** Search
    I am press ='= for search word:
    
@@ -208,15 +270,18 @@ And for =yasnippet= I am use code from [[https://emacs.stackexchange.com/questio
 
 ** Multiple Cursors
    I am use package of magnars [[https://github.com/magnars/multiple-cursors.el][multiple-cursors]]:
-#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
-(defun if-selected-then-next-word-like-this (arg)
-    (interactive "p")
-    (when (use-region-p)
-        (mc/mark-next-like-this arg)))
 
-(use-package multiple-cursors
-    :ensure t
-    :bind (("<tab>" . if-selected-then-next-word-like-this)))
+#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+  (defun if-selected-then-next-word-like-this (arg)
+      (interactive "p")
+      (when (use-region-p)
+          (mc/mark-next-like-this arg)))
+
+  (use-package multiple-cursors
+      :ensure t
+      :bind
+      (:map xah-fly-command-map
+            ("SPC SPC t" . mc/edit-beginnings-of-lines)))
 
 #+END_SRC
 
@@ -341,79 +406,13 @@ use =-=, for navigating I am use `.` and `m`:
 
 #+RESULTS:
 : kmacro-call-macro-or-apply-to-lines
-** Rectangles
-
-I am press =SPC t= for enable =rectangle-mark-mode=, and =f= when =rectangle-mark-mode=
-is enabled for replace rectangle:
+** Transpose
+   I am press =n=, when select text for transpose lines in region:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-  (require 'rect)
 
-  (define-key xah-fly-command-map (kbd "SPC t") 'rectangle-mark-mode)
-  (define-key xah-fly-command-map (kbd "SPC v") 'yank-rectangle)
-
-
-  (defun keymap-to-list (keymap)
-      "Convert `KEYMAP` to list."
-      (--filter (ignore-errors '((cat it) (cdr it))) (-drop 1 keymap))
-      )
-
-
-  (defun function-of-key (keymap key)
-      "Get function bound on `KEY` in `KEYMAP`."
-      (let* ((list-keymap (keymap-to-list keymap))
-	     (kbd-key (kbd key))
-	     (key-chars (string-to-list kbd-key))
-	     (head-key-char (-first-item key-chars))
-	     (tail-key-chars (-drop 1 key-chars))
-	     (object-on-key (--filter (ignore-errors
-					  (eq head-key-char (-first-item it)))
-				      list-keymap))
-	     )
-	  (cond
-	    (tail-key-chars
-	     (function-of-key object-on-key
-			      (chars-to-string tail-key-chars)))
-	    (t (cdr (-first-item object-on-key)))))
-      )
-
-
-  (defun chars-to-string (chars)
-      "Convert list of `CHARS` to string."
-      (--reduce-from (s-concat acc (char-to-string it)) "" chars)
-      )
-
-
-  (defmacro define-key-when (keymap key def condition)
-      "Macro for define keymaps for `rectangle-mode` in `xah-fly-command-mode`"
-      `(define-key ,keymap (kbd ,key)
-	   (lambda ()
-	       (interactive)
-	       (if (funcall ,condition)
-		   (call-interactively ,def)
-		   (call-interactively ',(function-of-key (eval keymap) key)))))
-      )
-
-  (define-key-when xah-fly-command-map "c" 'copy-rectangle-as-kill
-		   (lambda () rectangle-mark-mode))
-
-  (define-key-when xah-fly-command-map "d" 'kill-rectangle
-		   (lambda () rectangle-mark-mode))
-
-  (define-key-when xah-fly-command-map "x" 'kill-rectangle
-		   (lambda () rectangle-mark-mode))
-
-  (define-key-when xah-fly-command-map "f" 'replace-rectangle
-		   (lambda () rectangle-mark-mode))
-
-  (define-key-when xah-fly-command-map "q" 'delimit-columns-rectangle
-		   (lambda () rectangle-mark-mode))
-
-  (define-key-when xah-fly-command-map "s" 'open-rectangle
-		  (lambda () rectangle-mark-mode))
-
-  (define-key-when xah-fly-command-map "-" 'rectangle-exchange-point-and-mark
-		  (lambda () rectangle-mark-mode))
+  (define-key-when xah-fly-command-map "n" 'avy-transpose-lines-in-region
+                   'use-region-p)
 
 #+END_SRC
 
@@ -549,6 +548,40 @@ to beginning of each line:
 
 #+END_SRC
 
+** Rectangles
+
+I am press =SPC t= for enable =rectangle-mark-mode=, and =f= when =rectangle-mark-mode=
+is enabled for replace rectangle:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (require 'rect)
+
+  (define-key xah-fly-command-map (kbd "SPC t") 'rectangle-mark-mode)
+  (define-key xah-fly-command-map (kbd "SPC v") 'yank-rectangle)
+
+  (define-key-when xah-fly-command-map "c" 'copy-rectangle-as-kill
+           (lambda () rectangle-mark-mode))
+
+  (define-key-when xah-fly-command-map "d" 'kill-rectangle
+           (lambda () rectangle-mark-mode))
+
+  (define-key-when xah-fly-command-map "x" 'kill-rectangle
+           (lambda () rectangle-mark-mode))
+
+  (define-key-when xah-fly-command-map "f" 'replace-rectangle
+           (lambda () rectangle-mark-mode))
+
+  (define-key-when xah-fly-command-map "q" 'delimit-columns-rectangle
+           (lambda () rectangle-mark-mode))
+
+  (define-key-when xah-fly-command-map "s" 'open-rectangle
+          (lambda () rectangle-mark-mode))
+
+  (define-key-when xah-fly-command-map "-" 'rectangle-exchange-point-and-mark
+          (lambda () rectangle-mark-mode))
+
+#+END_SRC
+
 ** Indent Settings
    
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -641,18 +674,19 @@ Function `add-nav-to-imports-for-language`, is define keys for go to imports:
   I am use [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] for centering content of org file:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (require 'face-remap)
 
   (use-package visual-fill-column
       :ensure t)
 
-  (defun visual-fill ()
-      (interactive)
-      (setq visual-fill-column-width 90
+  (defun visual-fill (width)
+      (interactive (list 100))
+      (setq visual-fill-column-width width
             visual-fill-column-center-text t)
-      (set-face-attribute ault nil :font "Consolas" :height 250)
+      (text-scale-mode 0)
       (visual-fill-column-mode 1))
-
 #+END_SRC
+
 *** Functions for Import
     Function `add-import-keymap-for-language` defines key for `add-import`.
 
@@ -800,9 +834,78 @@ Var =python-shell-interpreter= is builtin Emacs var, see docs in Emacs:
      
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (setq flycheck-python-flake8-executable "python -m flake8")
+  (setq flycheck-python-flake8-command "python -m flake8")
   (setq flycheck-python-mypy-executable "python -m mypy")
   (setq flycheck-python-pylint-executable "python -m pylint")
+
+  (flycheck-define-checker my-python-flake8
+    "A Python syntax and style checker using Flake8.
+
+  Requires Flake8 3.0 or newer. See URL
+  `https://flake8.readthedocs.io/'."
+    ;; Not calling flake8 directly makes it easier to switch between different
+    ;; Python versions; see https://github.com/flycheck/flycheck/issues/1055.
+    :command ("python -m flake8"
+              (config-file "--append-config" flycheck-flake8rc)
+              (option "--max-complexity" flycheck-flake8-maximum-complexity nil
+                      flycheck-option-int)
+              (option "--max-line-length" flycheck-flake8-maximum-line-length nil
+                      flycheck-option-int)
+              (eval (when buffer-file-name
+                      (concat "--stdin-display-name=" buffer-file-name)))
+              "-")
+    :standard-input t
+    :working-directory flycheck-python-find-project-root
+    :error-filter (lambda (errors)
+                    (let ((errors (flycheck-sanitize-errors errors)))
+                      (seq-map #'flycheck-flake8-fix-error-level errors)))
+    :error-patterns
+    ((warning line-start
+              (file-name) ":" line ":" (optional column ":") " "
+              (id (one-or-more (any alpha)) (one-or-more digit)) " "
+              (message (one-or-more not-newline))
+              line-end))
+    :enabled (lambda ()
+               (or (not (flycheck-python-needs-module-p 'python-flake8))))
+    :verify (lambda (_) (flycheck-python-verify-module 'python-flake8 "flake8"))
+    :modes python-mode
+    :next-checkers ((warning . python-pylint)
+                    (warning . python-mypy)))
+
+#+END_SRC
+
+**** Helping info
+     I am use [[https://www.emacswiki.org/emacs/pydoc-info.el][pydoc-info]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package pydoc
+      :ensure t)
+
+#+END_SRC
+
+**** Completing
+     I am use company:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (add-to-list 'company-backends 'python-backen)
+
+  (company-other-backend)
+
+#+END_SRC
+
+*** Go lang
+    I am use [[https://github.com/dominikh/go-mode.el][go-mode]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package go-mode
+      :ensure t)
+
+  (use-package go-eldoc
+      :ensure t
+      :hook (go-mode-hook . 'go-eldoc-setup))
 
 #+END_SRC
 
@@ -971,7 +1074,7 @@ Defaults to:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (add-hook 'org-mode-hook 'visual-fill)
+  (add-hook 'org-mode-hook (lambda () (visual-fill 80)))
 
 #+END_SRC
 
@@ -1099,6 +1202,19 @@ hooks which need to disable =xah-fly-keys=:
 
 #+END_SRC
 
+** Auto Fill Mode
+   I am enable =auto-fill-mode= mode when start emacs:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (add-hook 'change-major-mode-hook (lambda ()
+                                        (interactive)
+                                        (auto-fill-mode 1)
+                                        ))
+
+#+END_SRC
+
+
 ** Scratches
    I am press =C-t= for opening scratch:
 
@@ -1186,14 +1302,20 @@ I am use [[https://github.com/seagle0128/doom-modeline][doom-modeline]]:
 
   (use-package doom-modeline
       :ensure t
-      :config
+      :custom
+      (doom-modeline-icon nil)
+      (doom-modeline-modal-icon nil)
+      (doom-modeline-buffer-file-name-style 'auto)
+      (doom-modeline-workspace-name nil)
+      (doom-modeline-project-detection 'projectile)
+      (doom-modeline-buffer-enconding 'projectile)
+      (doom-modeline-enable-word-count t)
+      (doom-modeline-height 24)
+      :init
       (display-time-mode t)
       (column-number-mode)
-      (setq doom-modeline-icon nil)
-      (setq doom-modeline-workspace-name nil)
-      (setq doom-modeline-project-detection 'projectile)
-      (setq doom-modeline-enable-word-count t)
-      :init
+      :config
+      (doom-modeline-mode 0)
       (doom-modeline-mode 38))
 
 #+END_SRC
@@ -1217,6 +1339,10 @@ I am use [[https://github.com/seagle0128/doom-modeline][doom-modeline]]:
 (global-hl-line-mode 1)
 
 #+END_SRC
+
+** Centering
+
+I
 
 * Developer Environment
 ** Projects Management
