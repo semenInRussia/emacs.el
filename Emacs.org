@@ -194,8 +194,9 @@
   (define-key xah-fly-command-map (kbd "SPC l") nil)
   (define-key xah-fly-command-map (kbd "SPC j") nil)
 
-  (add-hook 'after-change-major-mode-hook 'xah-fly-insert-mode-activate)
-    (require 'xah-fly-keys)
+  (add-hook 'prog-mode-hook 'xah-fly-command-mode-activate)
+  (add-hook 'special-mode-hook 'xah-fly-insert-mode-activate)
+
 #+END_SRC
 ** Functions for Define Keys
 
@@ -1068,62 +1069,23 @@ Defaults to:
       (add-hook hook 'emmet-mode)
       )
 #+END_SRC
+* Support of Some Special Modes
+** Calc
+   I am use built-in emacs =calc=, and I need to activate =insert-mode= of =xah-fly-keys=, when mode is =calc=:
 
-* Org Mode
-** Navigation
-   
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defun org-forward-heading ()
-      "Forward heading in `org-mode`."
+  (defun activate-insert-mode-when-calc ()
+      "When current buffer is *Calc*, activate insert mode of `xah-fly-keys'."
       (interactive)
-      (let ((old-point (point)))
-          (org-forward-heading-same-level 1)
-          (if (= (point) old-point)
-              (org-forward-element)))
+      (when (s-equals-p (buffer-name) "*Calculator*")
+          (xah-fly-insert-mode-activate))
       )
 
-  (defun org-backward-heading ()
-      "Backward heading in `org-mode`."
-      (interactive)
-      (let ((old-point (point)))
-          (org-backward-heading-same-level 1)
-          (if (= (point) old-point)
-              (org-backward-element)))
-      )
-
-  (add-nav-forward-block-keymap-for-language org-mode org-forward-heading)
-  (add-nav-backward-block-keymap-for-language org-mode org-backward-heading)
-
-#+END_SRC
-** Centering
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  (add-hook 'org-mode-hook (lambda () (visual-fill 70)))
+  (add-hook 'xah-fly-command-mode-activate-hook 'activate-insert-mode-when-calc)
 
 #+END_SRC
 
-hooks which need to disable =xah-fly-keys=:
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  (setq disable-xah-fly-keys-mode-hooks '(calc-start-hook
-                                          calendar-mode-hook))
-
-#+END_SRC
-
-  (defun add-hooks-for-disable-xah-fly-keys-mode ()
-      "Add hoks to `disable-xah-fly-keys-mode-hooks`."
-      (interactive)
-      (--map (add-hook it (lambda () (xah-fly-keys 0)))
-             disable-xah-fly-keys-mode-hooks)
-      (add-hook 'change-major-mode-hook (lambda ()
-                                            (xah-fly-keys 38))))
-
-  (add-hooks-for-disable-xah-fly-keys-mode)
-
-#+END_SRC
 * Small Organize Tricks
 ** Very Small Tricks
 

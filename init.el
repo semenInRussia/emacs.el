@@ -99,8 +99,8 @@ Info take from var `user-os`, user must set it."
 (define-key xah-fly-command-map (kbd "SPC l") nil)
 (define-key xah-fly-command-map (kbd "SPC j") nil)
 
-(add-hook 'after-change-major-mode-hook 'xah-fly-insert-mode-activate)
-  (require 'xah-fly-keys)
+(add-hook 'prog-mode-hook 'xah-fly-command-mode-activate)
+(add-hook 'special-mode-hook 'xah-fly-insert-mode-activate)
 
 (defun keymap-to-list (keymap)
     "Convert `KEYMAP` to list."
@@ -687,31 +687,14 @@ Requires Flake8 3.0 or newer. See URL
     (add-hook hook 'emmet-mode)
     )
 
-(defun org-forward-heading ()
-    "Forward heading in `org-mode`."
+(defun activate-insert-mode-when-calc ()
+    "When current buffer is *Calc*, activate insert mode of `xah-fly-keys'."
     (interactive)
-    (let ((old-point (point)))
-        (org-forward-heading-same-level 1)
-        (if (= (point) old-point)
-            (org-forward-element)))
+    (when (s-equals-p (buffer-name) "*Calculator*")
+        (xah-fly-insert-mode-activate))
     )
 
-(defun org-backward-heading ()
-    "Backward heading in `org-mode`."
-    (interactive)
-    (let ((old-point (point)))
-        (org-backward-heading-same-level 1)
-        (if (= (point) old-point)
-            (org-backward-element)))
-    )
-
-(add-nav-forward-block-keymap-for-language org-mode org-forward-heading)
-(add-nav-backward-block-keymap-for-language org-mode org-backward-heading)
-
-(add-hook 'org-mode-hook (lambda () (visual-fill 70)))
-
-(setq disable-xah-fly-keys-mode-hooks '(calc-start-hook
-                                        calendar-mode-hook))
+(add-hook 'xah-fly-command-mode-activate-hook 'activate-insert-mode-when-calc)
 
 (show-paren-mode 2)
 (setq make-backup-files         nil)
