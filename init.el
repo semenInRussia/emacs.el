@@ -3,24 +3,24 @@
 (require 'package)
 
 (setq package-archives
-  '(("melpa-stable" . "http://stable.melpa.org/packages/")
-    ("melpa"        . "https://melpa.org/packages/")
-    ("org"          . "https://orgmode.org/elpa/")
-    ("elpa"         . "https://elpa.gnu.org/packages/")))
+      '(("melpa-stable" . "http://stable.melpa.org/packages/")
+        ("melpa"        . "https://melpa.org/packages/")
+        ("org"          . "https://orgmode.org/elpa/")
+        ("elpa"         . "https://elpa.gnu.org/packages/")))
 
 (package-initialize)
 (unless package-archive-contents
-(package-refresh-contents))
+    (package-refresh-contents))
 
 (unless (package-installed-p 'use-package)
-(package-install 'use-package))
+    (package-install 'use-package))
 
 (require 'use-package)
 
 (add-to-list 'load-path "~/.emacs.d/lisp")
 
 (add-to-list 'load-path "~/projects/fast-exec.el")
-;; (add-to-list 'load-path "~/projects/porth-mode")
+(add-to-list 'load-path "~/projects/porth-mode")
 
 (use-package s :ensure t)
 
@@ -47,11 +47,11 @@ Info take from var `user-os`, user must set it."
     (animate-birthday-present))
 
 (use-package yasnippet
-   :ensure t
-   :init
-   (yas-global-mode 1)
-   :config
-   (setq yas-snippet-dirs '("~/.emacs.d/snippets")))
+    :ensure t
+    :init
+    (yas-global-mode 1)
+    :config
+    (setq yas-snippet-dirs '("~/.emacs.d/snippets")))
 
 (use-package yasnippet-snippets
     :ensure t
@@ -73,11 +73,10 @@ Info take from var `user-os`, user must set it."
     (company-tooltip-limit              15)
     (company-tooltip-align-annotations  t)
     (company-tooltip-flip-when-above    t)
+    (company-dabbrev-ignore-case        nil)
     :config
-    (global-company-mode 1)
-    (add-to-list 'company-backends 'company-css)
-    (add-to-list 'company-backends 'company-css-html-tags)
-    (add-to-list 'company-backends 'company-keywords))
+    (add-to-list 'company-backends 'company-keywords)
+    (global-company-mode 1))
 
 (defvar company-mode/enable-yas t
   "Enable yasnippet for all backends.")
@@ -99,6 +98,9 @@ Info take from var `user-os`, user must set it."
 
 (define-key xah-fly-command-map (kbd "SPC l") nil)
 (define-key xah-fly-command-map (kbd "SPC j") nil)
+
+(add-hook 'after-change-major-mode-hook 'xah-fly-insert-mode-activate)
+  (require 'xah-fly-keys)
 
 (defun keymap-to-list (keymap)
     "Convert `KEYMAP` to list."
@@ -441,8 +443,8 @@ Info take from var `user-os`, user must set it."
 
 (defun visual-fill (width)
     (interactive (list 100))
-    (setq visual-fill-column-width width
-          visual-fill-column-center-text t)
+    (setq-default visual-fill-column-width width
+                  visual-fill-column-center-text t)
     (text-scale-mode 0)
     (visual-fill-column-mode 1))
 
@@ -510,10 +512,19 @@ Info take from var `user-os`, user must set it."
 ;;     codes = list(map(lambda el: el.text.split()[0].lower(), elements))
 ;;     print(codes)
 
+(dolist (mode (list 'TeX-mode-hook
+                    'tex-mode-hook
+                    'latex-mode-hook
+                    'LaTeX-mode-hook))
+    (add-hook mode (lambda () (visual-fill 70))))
+
+(use-package auctex
+    :ensure t)
+
 (use-package markdown-mode
     :ensure t)
 
-(add-hook 'markdown-mode-hook 'visual-fill)
+(add-hook 'markdown-mode-hook (lambda () (visual-fill 70)))
 
 (setq py/imports-regexp "import\\|from")
 
@@ -594,6 +605,9 @@ Requires Flake8 3.0 or newer. See URL
     :ensure t
     :hook (go-mode-hook . 'go-eldoc-setup))
 
+(add-import-keymap-for-language go-mode
+                                go-import-add)
+
 (use-package haskell-mode
     :ensure t
     :hook (haskell-mode . haskell-indent-mode))
@@ -660,13 +674,6 @@ Requires Flake8 3.0 or newer. See URL
  js2-mode
  js/nav-forward-function-or-class)
 
-(defun yas-minor-mode-off ()
-    "Turn off yasnippets."
-    (interactive)
-    (yas-minor-mode 0)
-    )
-
-
 (use-package web-mode
     :ensure t
     :hook (web-mode . yas-minor-mode-off))
@@ -674,9 +681,11 @@ Requires Flake8 3.0 or newer. See URL
 
 (use-package emmet-mode
     :ensure t
-    :hook web-mode
-    :custom
-    (emmet-move-cursor-between-quotes t))
+    :custom (emmet-move-cursor-between-quotes t))
+
+(dolist (hook '(web-mode-hook css-mode-hook))
+    (add-hook hook 'emmet-mode)
+    )
 
 (defun org-forward-heading ()
     "Forward heading in `org-mode`."
@@ -699,20 +708,10 @@ Requires Flake8 3.0 or newer. See URL
 (add-nav-forward-block-keymap-for-language org-mode org-forward-heading)
 (add-nav-backward-block-keymap-for-language org-mode org-backward-heading)
 
-(add-hook 'org-mode-hook (lambda () (visual-fill 80)))
+(add-hook 'org-mode-hook (lambda () (visual-fill 70)))
 
 (setq disable-xah-fly-keys-mode-hooks '(calc-start-hook
                                         calendar-mode-hook))
-
-(defun add-hooks-for-disable-xah-fly-keys-mode ()
-    "Add hoks to `disable-xah-fly-keys-mode-hooks`."
-    (interactive)
-    (--map (add-hook it (lambda () (xah-fly-keys 0)))
-           disable-xah-fly-keys-mode-hooks)
-    (add-hook 'change-major-mode-hook (lambda ()
-                                          (xah-fly-keys 38))))
-
-(add-hooks-for-disable-xah-fly-keys-mode)
 
 (show-paren-mode 2)
 (setq make-backup-files         nil)
@@ -764,6 +763,8 @@ Thank you https://github.com/leuven65!"
     :ensure t)
 
 (add-hook 'prog-mode-hook 'whitespace-mode)
+
+(add-hook 'change-major-mode-hook 'visual-line-mode)
 
 (add-hook 'change-major-mode-hook (lambda ()
                                       (interactive)

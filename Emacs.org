@@ -7,181 +7,180 @@
   
   My moto is "Good Luck!", so my homepage is "Good Luck":
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (setq initial-buffer-choice "~/Start.org")
+    (setq initial-buffer-choice "~/Start.org")
 
-#+END_SRC
+    #+END_SRC
 
 * Package Management - base 
 ** use-package
    I am use [[https://github.com/jwiegley/use-package][use-package]]:
    
- #+BEGIN_SRC emacs-lisp :tangle ~/init.el
- (require 'package)
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     (require 'package)
 
- (setq package-archives
-   '(("melpa-stable" . "http://stable.melpa.org/packages/")
-     ("melpa"        . "https://melpa.org/packages/")
-     ("org"          . "https://orgmode.org/elpa/")
-     ("elpa"         . "https://elpa.gnu.org/packages/")))
+     (setq package-archives
+           '(("melpa-stable" . "http://stable.melpa.org/packages/")
+             ("melpa"        . "https://melpa.org/packages/")
+             ("org"          . "https://orgmode.org/elpa/")
+             ("elpa"         . "https://elpa.gnu.org/packages/")))
 
- (package-initialize)
- (unless package-archive-contents
- (package-refresh-contents))
+     (package-initialize)
+     (unless package-archive-contents
+         (package-refresh-contents))
 
- (unless (package-installed-p 'use-package)
- (package-install 'use-package))
+     (unless (package-installed-p 'use-package)
+         (package-install 'use-package))
 
- (require 'use-package)
- #+END_SRC
+     (require 'use-package)
+     #+END_SRC
 
 ** Packages Not in MELPA/ELPA/ORG-ELPA
 *** Stranger Packages
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-    (add-to-list 'load-path "~/.emacs.d/lisp")
+      (add-to-list 'load-path "~/.emacs.d/lisp")
 
-#+END_SRC
+      #+END_SRC
 
 *** My Packages
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (add-to-list 'load-path "~/projects/fast-exec.el")
-  (add-to-list 'load-path "~/projects/porth-mode")
+      (add-to-list 'load-path "~/projects/fast-exec.el")
+      (add-to-list 'load-path "~/projects/porth-mode")
 
-#+END_SRC
+      #+END_SRC
 
 * Emacs Lisp
-I am use some packages for simple develop on Emacs Lisp
+  I am use some packages for simple develop on Emacs Lisp
 ** Libraries
 *** s
     This is [[https://github.com/magnars/s.el][s]]:
- #+BEGIN_SRC emacs-lisp :tangle ~/init.el
- (use-package s :ensure t)
- #+END_SRC
- 
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+      (use-package s :ensure t)
+      #+END_SRC
+      
 *** f
     This is [[https://github.com/rejeep/f.el][f]]:
     
- #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
- (use-package f :ensure t)
- #+END_SRC
- 
+    #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+      (use-package f :ensure t)
+      #+END_SRC
+      
 *** Dash
     This is [[https://github.com/magnars/dash.el][dash:]]
- #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
- (use-package dash :ensure t)
- #+END_SRC
+    #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+      (use-package dash :ensure t)
+      #+END_SRC
 
 * Info about me for Emacs
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (setq user-full-name    "Semen Khramtsov"
-        user-mail-address "hrams205@gmail.com"
-        user-birthday     "2007-01-29"
-        user-name         "semenInRussia"
-        user-os           "Windows" ; "Windows" or "Linux"
+    (setq user-full-name    "Semen Khramtsov"
+          user-mail-address "hrams205@gmail.com"
+          user-birthday     "2007-01-29"
+          user-name         "semenInRussia"
+          user-os           "Windows" ; "Windows" or "Linux"
+          )
+
+
+    (defun user-os-windows-p ()
+        "If user have os Windows, then return t.
+    Info take from var `user-os`, user must set it."
+        (interactive)
+        (s-equals? user-os "Windows")
         )
 
-
-  (defun user-os-windows-p ()
-      "If user have os Windows, then return t.
-  Info take from var `user-os`, user must set it."
-      (interactive)
-      (s-equals? user-os "Windows")
-      )
-
-#+END_SRC
+        #+END_SRC
 
 ** Congurlation me with my Birthday!
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (if (s-equals? (format-time-string "%Y-%m-%d") user-birthday)
-      (animate-birthday-present))
-      
-#+END_SRC
+     (if (s-equals? (format-time-string "%Y-%m-%d") user-birthday)
+         (animate-birthday-present))
+
+         #+END_SRC
 
 * Organize Editing
 ** Snippets
    I am use [[https://github.com/joaotavora/yasnippet][yasnippet]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-(use-package yasnippet
-   :ensure t
-   :init
-   (yas-global-mode 1)
-   :config
-   (setq yas-snippet-dirs '("~/.emacs.d/snippets")))
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     (use-package yasnippet
+         :ensure t
+         :init
+         (yas-global-mode 1)
+         :config
+         (setq yas-snippet-dirs '("~/.emacs.d/snippets")))
 
-(use-package yasnippet-snippets
-    :ensure t
-    :config
-    (yasnippet-snippets-initialize))
-#+END_SRC
+     (use-package yasnippet-snippets
+         :ensure t
+         :config
+         (yasnippet-snippets-initialize))
+         #+END_SRC
 
-And [[https://github.com/emacsmirror/yasnippet-classic-snippets][yasnippet-classic-snippets]] for basic snippets' collection:
+   And [[https://github.com/emacsmirror/yasnippet-classic-snippets][yasnippet-classic-snippets]] for basic snippets' collection:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-(use-package yasnippet-classic-snippets :ensure t)
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     (use-package yasnippet-classic-snippets :ensure t)
+     #+END_SRC
 
 ** Linters
    I am use [[https://www.flycheck.org/en/latest/][flycheck]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package flycheck
-      :ensure t
-      :config (global-flycheck-mode 1))
+     (use-package flycheck
+         :ensure t
+         :config (global-flycheck-mode 1))
 
-#+END_SRC
+         #+END_SRC
 
 ** Autocomplete
    I am use [[http://company-mode.github.io][company-mode]], I am set delay beetween typing text and viewing hints to
-0.8 seconds:
+   0.8 seconds:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package company
-      :ensure t
-      :custom
-      (company-idle-delay                 0.3)
-      (company-minimum-prefix-length      2)
-      (company-show-numbers               t)
-      (company-tooltip-limit              15)
-      (company-tooltip-align-annotations  t)
-      (company-tooltip-flip-when-above    t)
-      :config
-      (global-company-mode 1)
-      (add-to-list 'company-backends 'company-css)
-      (add-to-list 'company-backends 'company-css-html-tags)
-      (add-to-list 'company-backends 'company-keywords))
+     (use-package company
+         :ensure t
+         :custom
+         (company-idle-delay                 0.3)
+         (company-minimum-prefix-length      2)
+         (company-show-numbers               t)
+         (company-tooltip-limit              15)
+         (company-tooltip-align-annotations  t)
+         (company-tooltip-flip-when-above    t)
+         (company-dabbrev-ignore-case        nil)
+         :config
+         (add-to-list 'company-backends 'company-keywords)
+         (global-company-mode 1))
 
-#+END_SRC
+         #+END_SRC
 
-And for =yasnippet= I am use code from [[https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names][this]] stackexchange:
+   And for =yasnippet= I am use code from [[https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names][this]] stackexchange:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defvar company-mode/enable-yas t
-    "Enable yasnippet for all backends.")
+     (defvar company-mode/enable-yas t
+       "Enable yasnippet for all backends.")
 
-  (defun company-mode/backend-with-yas (backend)
-      (if (or (not company-mode/enable-yas)
-              (and (listp backend) (member 'company-yasnippet backend)))
-          backend
-          (append (if (consp backend) backend (list backend))
-                  '(:with company-yasnippet))))
+     (defun company-mode/backend-with-yas (backend)
+         (if (or (not company-mode/enable-yas)
+                 (and (listp backend) (member 'company-yasnippet backend)))
+             backend
+             (append (if (consp backend) backend (list backend))
+                     '(:with company-yasnippet))))
 
-  (setq company-backends
-        (mapcar #'company-mode/backend-with-yas company-backends))
+     (setq company-backends
+           (mapcar #'company-mode/backend-with-yas company-backends))
 
-#+END_SRC
+           #+END_SRC
 
 ** Main keymaps
    I am use [[https://github.com/xahlee/xah-fly-keys][xah-fly-keys]], this as VIM:
@@ -194,6 +193,9 @@ And for =yasnippet= I am use code from [[https://emacs.stackexchange.com/questio
 
   (define-key xah-fly-command-map (kbd "SPC l") nil)
   (define-key xah-fly-command-map (kbd "SPC j") nil)
+
+  (add-hook 'after-change-major-mode-hook 'xah-fly-insert-mode-activate)
+    (require 'xah-fly-keys)
 #+END_SRC
 ** Functions for Define Keys
 
@@ -202,46 +204,46 @@ will pressed KEY in KEYMAP and when CONDITION will true:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defun keymap-to-list (keymap)
-      "Convert `KEYMAP` to list."
-      (--filter (ignore-errors '((cat it) (cdr it))) (-drop 1 keymap))
-      )
+     (defun keymap-to-list (keymap)
+         "Convert `KEYMAP` to list."
+         (--filter (ignore-errors '((cat it) (cdr it))) (-drop 1 keymap))
+         )
 
 
-  (defun function-of-key (keymap key)
-      "Get function bound on `KEY` in `KEYMAP`."
-      (let* ((list-keymap (keymap-to-list keymap))
-             (kbd-key (kbd key))
-             (key-chars (string-to-list kbd-key))
-             (head-key-char (-first-item key-chars))
-             (tail-key-chars (-drop 1 key-chars))
-             (object-on-key (--filter (ignore-errors
-                                          (eq head-key-char (-first-item it)))
-                                      list-keymap))
-             )
-          (cond
-            (tail-key-chars
-             (function-of-key object-on-key
-                              (chars-to-string tail-key-chars)))
-            (t (cdr (-first-item object-on-key)))))
-      )
+     (defun function-of-key (keymap key)
+         "Get function bound on `KEY` in `KEYMAP`."
+         (let* ((list-keymap (keymap-to-list keymap))
+                (kbd-key (kbd key))
+                (key-chars (string-to-list kbd-key))
+                (head-key-char (-first-item key-chars))
+                (tail-key-chars (-drop 1 key-chars))
+                (object-on-key (--filter (ignore-errors
+                                             (eq head-key-char (-first-item it)))
+                                         list-keymap))
+                )
+             (cond
+               (tail-key-chars
+                (function-of-key object-on-key
+                                 (chars-to-string tail-key-chars)))
+               (t (cdr (-first-item object-on-key)))))
+         )
 
 
-  (defun chars-to-string (chars)
-      "Convert list of `CHARS` to string."
-      (--reduce-from (s-concat acc (char-to-string it)) "" chars)
-      )
+     (defun chars-to-string (chars)
+         "Convert list of `CHARS` to string."
+         (--reduce-from (s-concat acc (char-to-string it)) "" chars)
+         )
 
 
-  (defmacro define-key-when (keymap key def condition)
-      "Macro for define keymaps for `rectangle-mode` in `xah-fly-command-mode`"
-      `(define-key ,keymap (kbd ,key)
-           (lambda ()
-               (interactive)
-               (if (funcall ,condition)
-                   (call-interactively ,def)
-                   (call-interactively ',(function-of-key (eval keymap) key)))))
-      )
+     (defmacro define-key-when (keymap key def condition)
+         "Macro for define keymaps for `rectangle-mode` in `xah-fly-command-mode`"
+         `(define-key ,keymap (kbd ,key)
+              (lambda ()
+                  (interactive)
+                  (if (funcall ,condition)
+                      (call-interactively ,def)
+                      (call-interactively ',(function-of-key (eval keymap) key)))))
+         )
 
 #+END_SRC
 
@@ -681,8 +683,8 @@ Function `add-nav-to-imports-for-language`, is define keys for go to imports:
 
   (defun visual-fill (width)
       (interactive (list 100))
-      (setq visual-fill-column-width width
-            visual-fill-column-center-text t)
+      (setq-default visual-fill-column-width width
+                    visual-fill-column-center-text t)
       (text-scale-mode 0)
       (visual-fill-column-mode 1))
 #+END_SRC
@@ -769,6 +771,27 @@ Function `add-nav-to-imports-for-language`, is define keys for go to imports:
 
 
  #+END_SRC
+**** Visual Fill
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (dolist (mode (list 'TeX-mode-hook
+                      'tex-mode-hook
+                      'latex-mode-hook
+                      'LaTeX-mode-hook))
+      (add-hook mode (lambda () (visual-fill 70))))
+
+
+#+END_SRC
+**** Preview
+     I am use [[https://github.com/emacsmirror/auctex][auctex]]:
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package auctex
+      :ensure t)
+
+#+END_SRC
+
 *** Markdown
     I am use [[https://github.com/jrblevin/markdown-mode/][markdown-mode]] , and for its I am centering code:
 
@@ -777,7 +800,7 @@ Function `add-nav-to-imports-for-language`, is define keys for go to imports:
   (use-package markdown-mode
       :ensure t)
 
-  (add-hook 'markdown-mode-hook 'visual-fill)
+  (add-hook 'markdown-mode-hook (lambda () (visual-fill 70)))
 
 #+END_SRC
 
@@ -909,6 +932,16 @@ Var =python-shell-interpreter= is builtin Emacs var, see docs in Emacs:
 
 #+END_SRC
 
+**** Add Import
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (add-import-keymap-for-language go-mode
+                                  go-import-add)
+
+#+END_SRC
+
+
 *** Haskell
     I am use [[https://github.com/haskell/haskell-mode][haskell-mode]], and I love =indention-mode=:
 
@@ -1022,14 +1055,6 @@ Defaults to:
     I am use [[https://web-mode.org][web-mode]] and [[https://github.com/smihica/emmet-mode][emmet]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  (defun yas-minor-mode-off ()
-      "Turn off yasnippets."
-      (interactive)
-      (yas-minor-mode 0)
-      )
-
-
   (use-package web-mode
       :ensure t
       :hook (web-mode . yas-minor-mode-off))
@@ -1037,10 +1062,11 @@ Defaults to:
 
   (use-package emmet-mode
       :ensure t
-      :hook web-mode
-      :custom
-      (emmet-move-cursor-between-quotes t))
+      :custom (emmet-move-cursor-between-quotes t))
 
+  (dolist (hook '(web-mode-hook css-mode-hook))
+      (add-hook hook 'emmet-mode)
+      )
 #+END_SRC
 
 * Org Mode
@@ -1074,13 +1100,10 @@ Defaults to:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (add-hook 'org-mode-hook (lambda () (visual-fill 80)))
+  (add-hook 'org-mode-hook (lambda () (visual-fill 70)))
 
 #+END_SRC
 
-* Support of Special Major Modes
-** Variables
-   Variable =disable-xah-fly-keys-mode-hooks= is list of =major-mode=
 hooks which need to disable =xah-fly-keys=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -1089,10 +1112,6 @@ hooks which need to disable =xah-fly-keys=:
                                           calendar-mode-hook))
 
 #+END_SRC
-
-** Usage
-*** Disable xah-fly-keys
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (defun add-hooks-for-disable-xah-fly-keys-mode ()
       "Add hoks to `disable-xah-fly-keys-mode-hooks`."
@@ -1105,7 +1124,6 @@ hooks which need to disable =xah-fly-keys=:
   (add-hooks-for-disable-xah-fly-keys-mode)
 
 #+END_SRC
-
 * Small Organize Tricks
 ** Very Small Tricks
 
@@ -1199,6 +1217,15 @@ hooks which need to disable =xah-fly-keys=:
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (add-hook 'prog-mode-hook 'whitespace-mode)
+
+#+END_SRC
+
+** Visual Fill Line Mode
+   I am ussally use =visual-fill-line-mode=:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (add-hook 'change-major-mode-hook 'visual-line-mode)
 
 #+END_SRC
 
