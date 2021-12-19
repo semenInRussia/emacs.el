@@ -99,9 +99,6 @@ Info take from var `user-os`, user must set it."
 (define-key xah-fly-command-map (kbd "SPC l") nil)
 (define-key xah-fly-command-map (kbd "SPC j") nil)
 
-(add-hook 'prog-mode-hook 'xah-fly-command-mode-activate)
-(add-hook 'special-mode-hook 'xah-fly-insert-mode-activate)
-
 (defun keymap-to-list (keymap)
     "Convert `KEYMAP` to list."
     (--filter (ignore-errors '((cat it) (cdr it))) (-drop 1 keymap))
@@ -687,14 +684,7 @@ Requires Flake8 3.0 or newer. See URL
     (add-hook hook 'emmet-mode)
     )
 
-(defun activate-insert-mode-when-calc ()
-    "When current buffer is *Calc*, activate insert mode of `xah-fly-keys'."
-    (interactive)
-    (when (s-equals-p (buffer-name) "*Calculator*")
-        (xah-fly-insert-mode-activate))
-    )
 
-(add-hook 'xah-fly-command-mode-activate-hook 'activate-insert-mode-when-calc)
 
 (show-paren-mode 2)
 (setq make-backup-files         nil)

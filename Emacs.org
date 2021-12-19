@@ -186,6 +186,7 @@
    I am use [[https://github.com/xahlee/xah-fly-keys][xah-fly-keys]], this as VIM:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
   (require 'xah-fly-keys)
 
   (xah-fly-keys-set-layout "qwerty")
@@ -193,9 +194,6 @@
 
   (define-key xah-fly-command-map (kbd "SPC l") nil)
   (define-key xah-fly-command-map (kbd "SPC j") nil)
-
-  (add-hook 'prog-mode-hook 'xah-fly-command-mode-activate)
-  (add-hook 'special-mode-hook 'xah-fly-insert-mode-activate)
 
 #+END_SRC
 ** Functions for Define Keys
@@ -919,7 +917,7 @@ Var =python-shell-interpreter= is builtin Emacs var, see docs in Emacs:
 
 #+END_SRC
 
-*** Go lang
+*** Go Lang
     I am use [[https://github.com/dominikh/go-mode.el][go-mode]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -941,7 +939,6 @@ Var =python-shell-interpreter= is builtin Emacs var, see docs in Emacs:
                                   go-import-add)
 
 #+END_SRC
-
 
 *** Haskell
     I am use [[https://github.com/haskell/haskell-mode][haskell-mode]], and I love =indention-mode=:
@@ -1071,18 +1068,9 @@ Defaults to:
 #+END_SRC
 * Support of Some Special Modes
 ** Calc
-   I am use built-in emacs =calc=, and I need to activate =insert-mode= of =xah-fly-keys=, when mode is =calc=:
+   I am use built-in emacs =calc=, I disable =xah-fly-keys= when run calc:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  (defun activate-insert-mode-when-calc ()
-      "When current buffer is *Calc*, activate insert mode of `xah-fly-keys'."
-      (interactive)
-      (when (s-equals-p (buffer-name) "*Calculator*")
-          (xah-fly-insert-mode-activate))
-      )
-
-  (add-hook 'xah-fly-command-mode-activate-hook 'activate-insert-mode-when-calc)
 
 #+END_SRC
 
@@ -1218,9 +1206,6 @@ Defaults to:
   (global-set-key (kbd "C-t") 'open-scratch)
 
 #+END_SRC
-
-
-  (add-hook 'calc-mode-hook (lambda () (xah-fly-keys 0)))
 
 * Graphic User Interface
 ** Hide ALL
