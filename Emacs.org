@@ -856,13 +856,14 @@ Function `add-nav-to-imports-for-language`, is define keys for go to imports:
       (-when-let (file-path (buffer-file-name))
           (when (-contains-p TeX-modes major-mode)
               (list
-               (list :display "Convert to PDF, with `pdflatex`"
+               (list :display "Convert to PDF, with `pdflatex`, ignore errors"
                      :command-name "pdflatex"
-                     :command-line (format
-                                    "pdflatex \"%s\" --output-directory=\"%s\""
-                                    file-path
-                                    (f-dirname file-path)
-                                    )))))
+                     :command-line
+                     (format
+                      "pdflatex \"%s\" --output-directory=\"%s\""
+                      file-path
+                      (f-dirname file-path)
+                      )))))
       )
 
   (add-to-list 'run-command-recipes 'run-command-recipe-latex)
