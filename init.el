@@ -53,11 +53,6 @@ Info take from var `user-os`, user must set it."
     :config
     (setq yas-snippet-dirs '("~/.emacs.d/snippets")))
 
-(use-package yasnippet-snippets
-    :ensure t
-    :config
-    (yasnippet-snippets-initialize))
-
 (use-package yasnippet-classic-snippets :ensure t)
 
 (use-package flycheck
@@ -272,7 +267,7 @@ Info take from var `user-os`, user must set it."
 (define-key xah-fly-command-map (kbd "SPC w") 'clear-current-line)
 
 (defun select-current-or-next-word ()
-    "If word was selected, then select next word, otherwise select current word."
+    "If word was selected, then move to next word, otherwise select word."
     (interactive)
     (if (use-region-p)
         (forward-word)
@@ -341,6 +336,9 @@ Info take from var `user-os`, user must set it."
 (define-key xah-fly-command-map (kbd "p") nil)
 (define-key xah-fly-command-map (kbd "p") 'insert-spaces-before-or-to-beginning-of-each-line)
 
+(define-key xah-fly-command-map (kbd "m") 'backward-sexp)
+(define-key xah-fly-command-map (kbd ".") 'forward-sexp)
+
 (require 'rect)
 
 (define-key xah-fly-command-map (kbd "SPC t") 'rectangle-mark-mode)
@@ -387,10 +385,11 @@ Info take from var `user-os`, user must set it."
     "If text selected, then indent it, otherwise indent current line."
     (interactive)
     (save-excursion
-        (unless (use-region-p)
-            (select-current-line)
-            )
-        (indent-region (region-beginning) (region-end))))
+        (if (use-region-p)
+            (indent-region (region-beginning) (region-end))
+            (funcall indent-line-function)
+            ))
+    )
 
 
 (global-set-key (kbd "RET") 'newline-and-indent)
@@ -398,6 +397,8 @@ Info take from var `user-os`, user must set it."
 (define-key xah-fly-command-map (kbd "SPC q") 'join-line)
 
 (setq lisp-indent-function  'common-lisp-indent-function)
+
+(define-key xah-fly-command-map (kbd "SPC .") 'xref-find-definitions)
 
 (defmacro add-nav-forward-block-keymap-for-language (language forward-block-function)
     "Bind `FORWARD-BLOCK-FUNCTION` to `LANGUAGE`-map."
@@ -439,7 +440,7 @@ Info take from var `user-os`, user must set it."
     :ensure t)
 
 (defun visual-fill (width)
-    (interactive (list 100))
+    (interactive (list 70))
     (setq-default visual-fill-column-width width
                   visual-fill-column-center-text t)
     (text-scale-mode 0)
@@ -458,70 +459,122 @@ Info take from var `user-os`, user must set it."
                   (kbd "SPC i")
                   ',add-import-function)))))
 
+(defcustom pandoc-input-format-major-modes
+  nil
+  "List of pair from mode, one of input formats of Pandoc and pandoc codes
+See this https://pandoc.org
+Examples of codes (latex, markdown)"
+  )
+
+(add-to-list 'TeX-modes 'LaTeX-mode)
+
 (setq latex-documentclasses 
     '("article" "reoport" "book" "proc" "minimal" "slides" "memoir" "letter" "beamer"))
-
-(setq latex-environment-names
-    '( "figure"
-       "table"
-       "description"
-       "enumerate"
-       "itemize"
-       "list"
-       "math"
-       "displaymath"
-       "split"
-       "array"
-       "eqnarray"
-       "equation"
-       "theorem"
-       "matrix"
-       "cases"
-       "align"
-       "center"
-       "flushleft"
-       "flushright"
-       "minipage"
-       "quotation"
-       "quote"
-       "verbatim" 
-       "verse"
-       "tabbing"
-       "tabular"
-       "thebibliography" 
-       "titlepage"
-       "document"))
-
-;; If this information is not actual, then here my python script and add `document`, 
-;; so all claims to this site https://latex.wikia.org/wiki/List_of_LaTeX_environments:
-
-;; import requests
-;; from bs4 import BeautifulSoup as Soup
-
-
-;; url = "https://latex.wikia.org/wiki/List_of_LaTeX_environments"
-
-;; def main():
-;;     request = requests.get(url)
-;;     soup = Soup(request.text, "html.parser")
-;;     elements = soup.select("h3 > span.mw-headline")
-;;     elements = list(filter(lambda el: "environment" in el.text, elements))
-;;     codes = list(map(lambda el: el.text.split()[0].lower(), elements))
-;;     print(codes)
 
 (dolist (mode (list 'TeX-mode-hook
                     'tex-mode-hook
                     'latex-mode-hook
                     'LaTeX-mode-hook))
-    (add-hook mode (lambda () (visual-fill 70))))
+    (add-hook mode (lambda () (call-interactively 'visual-fill))))
 
 (use-package auctex
+    :ensure t)
+
+(defun latex-wrap-text (command)
+    "If regions select, wrap region with COMMAND, otherwise wrap word."
+    (unless (use-region-p)
+        (set-mark (point))
+        (forward-word)
+        (exchange-point-and-mark)
+        (backward-word))
+
+    (goto-char (region-beginning))
+    (insert (s-lex-format "\\${command}{"))
+    (goto-char (region-end))
+    (insert "}")
+    )
+
+
+(defun latex-make-text-italic ()
+    "If regions select, wrap region with `emph`, otherwise make word."
+    (interactive)
+    (latex-wrap-text "emph")
+    )
+
+
+(defun latex-make-text-bold ()
+    "If regions select, wrap region with `textbf`, otherwise make word."
+    (interactive)
+    (latex-wrap-text "emph")
+    )
+
+(defun latex-make-text-formula ()
+    "If regions select, make region formula, otherwise make line formula."
+    (interactive)
+    (unless (use-region-p)
+        (end-of-line)
+        (set-mark (point-at-bol))
+        )
+    (let ((text-beg (region-beginning))
+          (text-end (region-end)))
+        (deactivate-mark)
+        (goto-char text-beg)
+        (insert "\\[")
+
+        (goto-char (+ text-end 2))
+        (insert "\\]"))
+    )
+
+
+(--each '(tex-mode-hook latex-mode-hook LaTeX-mode-hook)
+    (add-hook it (lambda ()
+                     (define-key xah-fly-command-map (kbd "SPC *")
+                         'latex-make-text-formula)
+                     (define-key xah-fly-command-map (kbd "SPC e")
+                         'latex-make-text-italic)
+                     (define-key xah-fly-command-map (kbd "SPC b")
+                         'latex-make-text-italic))
+              ))
+
+(--each TeX-modes
+    (add-to-list 'pandoc-input-format-major-modes (list it "latex")))
+
+
+(defun run-command-recipe-latex ()
+    "Recipe for LaTeX `run-command'.
+see https://github.com/bard/emacs-run-command#examples."
+    (-when-let (file-path (buffer-file-name))
+        (when (-contains-p TeX-modes major-mode)
+            (list
+             (list :display "Convert to PDF, with `pdflatex`"
+                   :command-name "pdflatex"
+                   :command-line (format
+                                  "pdflatex \"%s\" --output-directory=\"%s\""
+                                  file-path
+                                  (f-dirname file-path)
+                                  )))))
+    )
+
+(add-to-list 'run-command-recipes 'run-command-recipe-latex)
+
+(add-hook 'org-mode-hook (lambda () (call-interactively 'visual-fill)))
+
+(add-to-list 'pandoc-input-format-major-modes
+             '(org-mode "org"))
+
+(use-package elisp-format
     :ensure t)
 
 (use-package markdown-mode
     :ensure t)
 
-(add-hook 'markdown-mode-hook (lambda () (visual-fill 70)))
+(add-hook 'markdown-mode-hook (lambda () (call-interactively 'visual-fill)))
+
+(add-to-list 'pandoc-input-format-major-modes
+             '(markdown-mode "markdown"))
+
+(add-to-list 'pandoc-input-format-major-(message "message" format-args)odes
+             '(gfm-mode "markdown"))
 
 (setq py/imports-regexp "import\\|from")
 
@@ -554,46 +607,17 @@ Info take from var `user-os`, user must set it."
 (setq flycheck-python-mypy-executable "python -m mypy")
 (setq flycheck-python-pylint-executable "python -m pylint")
 
-(flycheck-define-checker my-python-flake8
-  "A Python syntax and style checker using Flake8.
-
-Requires Flake8 3.0 or newer. See URL
-`https://flake8.readthedocs.io/'."
-  ;; Not calling flake8 directly makes it easier to switch between different
-  ;; Python versions; see https://github.com/flycheck/flycheck/issues/1055.
-  :command ("python -m flake8"
-            (config-file "--append-config" flycheck-flake8rc)
-            (option "--max-complexity" flycheck-flake8-maximum-complexity nil
-                    flycheck-option-int)
-            (option "--max-line-length" flycheck-flake8-maximum-line-length nil
-                    flycheck-option-int)
-            (eval (when buffer-file-name
-                    (concat "--stdin-display-name=" buffer-file-name)))
-            "-")
-  :standard-input t
-  :working-directory flycheck-python-find-project-root
-  :error-filter (lambda (errors)
-                  (let ((errors (flycheck-sanitize-errors errors)))
-                    (seq-map #'flycheck-flake8-fix-error-level errors)))
-  :error-patterns
-  ((warning line-start
-            (file-name) ":" line ":" (optional column ":") " "
-            (id (one-or-more (any alpha)) (one-or-more digit)) " "
-            (message (one-or-more not-newline))
-            line-end))
-  :enabled (lambda ()
-             (or (not (flycheck-python-needs-module-p 'python-flake8))))
-  :verify (lambda (_) (flycheck-python-verify-module 'python-flake8 "flake8"))
-  :modes python-mode
-  :next-checkers ((warning . python-pylint)
-                  (warning . python-mypy)))
-
 (use-package pydoc
     :ensure t)
 
-(add-to-list 'company-backends 'python-backen)
+(defun enable-dabbrev-company-backend ()
+    "Add `company-dabbrev' backend to `company-backends' for local major mode."
+    (interactive)
+    (setq-local company-backends (cons 'company-dabbrev company-backends))
+    )
 
-(company-other-backend)
+
+(add-hook 'python-mode-hook 'enable-dabbrev-company-backend)
 
 (use-package go-mode
     :ensure t)
@@ -673,18 +697,42 @@ Requires Flake8 3.0 or newer. See URL
 
 (use-package web-mode
     :ensure t
-    :hook (web-mode . yas-minor-mode-off))
+    :hook (web-mode . yas-minor-mode-off)
+    :custom
+    (web-mode-script-padding 1)
+    (web-mode-block-padding 0)
+    )
+
+
+(use-package auto-rename-tag
+    :ensure t
+    :config
+    :hook
+    (web-mode . (lambda () (auto-rename-tag-mode 38))))
 
 
 (use-package emmet-mode
     :ensure t
-    :custom (emmet-move-cursor-between-quotes t))
+    :custom (emmet-move-cursor-between-quotes t)
+    :hook
+    (web-mode . emmet-mode)
+    (css-mode . emmet-mode))
 
-(dolist (hook '(web-mode-hook css-mode-hook))
-    (add-hook hook 'emmet-mode)
+(defcustom html-modes '(web-mode html-mode) "List of `html` major modes.")
+
+(--each html-modes
+    (add-to-list 'pandoc-input-format-major-modes (list it "html")))
+
+(use-package css-eldoc
+    :ensure t
+    :init
+    (dolist (hook (list 'web-mode-hook 'css-mode-hook))
+        (add-hook hook 'css-eldoc-enable)
+        )
     )
 
-
+(add-hook 'calc-mode-hook (lambda () (interactive) (xah-fly-keys 0)))
+(add-hook 'calc-end-hook (lambda () (interactive) (xah-fly-keys 38)))
 
 (show-paren-mode 2)
 (setq make-backup-files         nil)
@@ -752,6 +800,21 @@ Thank you https://github.com/leuven65!"
 
 (global-set-key (kbd "C-t") 'open-scratch)
 
+(global-subword-mode)
+
+(use-package syntax-subword
+    :ensure t
+    :custom
+    (syntax-subword-skip-spaces t)
+    :config
+    (global-syntax-subword-mode)
+    )
+
+(use-package super-save
+    :ensure t
+    :config
+    (super-save-mode 38))
+
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode   -1)
@@ -807,6 +870,17 @@ numbers of lines, otherwise don't display."
 (set-face-attribute 'default nil :font "Consolas" :height 250)
 (set-frame-font "Consolas" nil t)
 
+(use-package origami
+    :ensure t
+    :bind (:map xah-fly-command-map
+                ("SPC ]" . origami-open-node)
+                ("SPC [" . origami-close-node)
+                ("SPC SPC ]" . origami-open-all-nodes)
+                ("SPC SPC [" . origami-close-all-nodes))
+    :hook (org-mode-hook . origami-mode)
+    :config
+    (global-origami-mode 38))
+
 (global-hl-line-mode 1)
 
 (defun get-project-name (project-root)
@@ -827,6 +901,122 @@ numbers of lines, otherwise don't display."
 
 (add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
 
+(use-package run-command
+    :ensure t
+    :init
+    :bind (:map xah-fly-command-map
+                ("SPC , c" . run-command)))
+
+(defcustom pandoc-output-formats '("asciidoc"
+                                   "beamer"
+                                   "bibtex"
+                                   "biblatex"
+                                   "commonmark"
+                                   "commonmark"
+                                   "context"
+                                   "csljson"
+                                   "docbook"
+                                   "docbook5"
+                                   "docx"
+                                   "dokuwiki"
+                                   "epub"
+                                   "epub2"
+                                   "fb2"
+                                   "gfm"
+                                   "haddock"
+                                   "html"
+                                   "html4"
+                                   "icml"
+                                   "ipynb"
+                                   "jats"
+                                   "jats"
+                                   "jats"
+                                   "jats"
+                                   "jira"
+                                   "json"
+                                   "latex"
+                                   "man"
+                                   "markdown"
+                                   "markdown"
+                                   "markdown"
+                                   "markdown"
+                                   "mediawiki"
+                                   "ms"
+                                   "muse"
+                                   "native"
+                                   "odt"
+                                   "opml"
+                                   "opendocument"
+                                   "org"
+                                   "pdf"
+                                   "plain"
+                                   "pptx"
+                                   "rst"
+                                   "rtf"
+                                   "texinfo"
+                                   "textile"
+                                   "slideous"
+                                   "slidy"
+                                   "dzslides"
+                                   "revealjs"
+                                   "s5"
+                                   "tei"
+                                   "xwiki"
+                                   "zimwiki")
+  "This is list of pandoc's formats valid to pandoc's output.
+See https://pandoc.org")
+
+(defcustom pandoc-codes-and-extensions
+  (make-hash-table :test 'equal)
+  "This is map of pandoc's format code and extension of file.
+If your pandoc's code have extensions, which equal to pandoc's code
+(for example: org = .(org)), then just don't put pair to this variable.")
+
+(puthash "markdown" "md" pandoc-codes-and-extensions)
+(puthash "latex" "tex" pandoc-codes-and-extensions)
+
+(defun pandoc-change-format-of-file (filename new-format)
+    "Change FILENAME with pandoc's format to filename with pandoc's NEW-FORMAT."
+    (let ((new-ext (or (gethash new-format pandoc-codes-and-extensions)
+                       new-format)))
+        (f-swap-ext filename new-ext))
+    )
+
+(defun pandoc-code-for-major-mode (major-mode)
+    "Return non-nil value when MAJOR-MODE is one of Pandoc input formats.
+See pandoc input formats: https://pandoc.org"
+    (-when-let (el (--find (eq major-mode (-first-item it))
+                           pandoc-input-format-major-modes))
+        (-second-item el))
+    )
+
+(defun run-command-recipe-pandoc ()
+    "Pandoc `run-command` recipe, for transform to other formats.
+See `run-command-recipes`:
+https://github.com/bard/emacs-run-command#examples"
+    (-when-let (source (buffer-file-name))
+        (-when-let (source-code (pandoc-code-for-major-mode major-mode))
+            (--map (list
+                    :command-name (format
+                                   "pandoc-%s-to-%s"
+                                   source-code it)
+                    :display (format
+                              "Convert %s to %s with Pandoc"
+                              (s-upcase source-code)
+                              (s-upcase it))
+                    :command-line
+                    (format
+                     "pandoc -t %s -f %s -o \"%s\" \"%s\""
+                     it source-code
+                     (pandoc-change-format-of-file source it)
+                     source
+                     )
+                    )
+                   pandoc-output-formats)))
+    )
+
+(add-to-list 'run-command-recipes 'run-command-recipe-pandoc)
+
 (defun if-Emacs-org-then-org-babel-tangle ()
     "If current open file is Emacs.org, then `org-babel-tangle`."
     (interactive)
@@ -835,3 +1025,5 @@ numbers of lines, otherwise don't display."
         (org-babel-tangle)))
 
 (add-hook 'after-save-hook 'if-Emacs-org-then-org-babel-tangle)
+
+\|print(name)
