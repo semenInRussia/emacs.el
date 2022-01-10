@@ -51,6 +51,7 @@
 
       (add-to-list 'load-path "~/projects/fast-exec.el")
       (add-to-list 'load-path "~/projects/porth-mode")
+      (add-to-list 'load-path "~/projects/emacs-run-command-recipes")
 
       #+END_SRC
 
@@ -124,7 +125,7 @@
 
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
      (use-package yasnippet-classic-snippets :ensure t)
-     #+END_SRC
+   #+END_SRC
 
 ** Linters
    I am use [[https://www.flycheck.org/en/latest/][flycheck]]:
@@ -177,6 +178,28 @@
            (mapcar #'company-mode/backend-with-yas company-backends))
 
            #+END_SRC
+
+** Autocompletion by Initials
+   For autocompletion by initials I am use [[https://github.com/baohaojun/bbyac][bbyac]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package browse-kill-ring
+      :ensure t)
+
+  (defcustom bbyac-major-modes-maps (list emacs-lisp-mode-map)
+    "List of maps of `major-modes` which support `bbyac`.")
+
+  (use-package bbyac
+      :ensure t
+      :init
+      (--each bbyac-major-modes-maps
+          (define-key it (kbd "C-j") 'bbyac-expand-symbols)
+          ))
+
+
+#+END_SRC
+
 
 ** Main keymaps
    I am use [[https://github.com/xahlee/xah-fly-keys][xah-fly-keys]], this as VIM, but keymaps created for keyboard (in VIM keymaps created for easy remember):
@@ -332,6 +355,21 @@ use =-=, for navigating I am use `.` and `m`:
                    ("SPC 9" . sp-change-enclosing)
                    ("SPC SPC g" . sp-kill-hybrid-sexp)
                    )))
+
+#+END_SRC
+*** Special Configuration for Major Modes
+    For enable builtin smartparens configuration for major modes, add require statement to =.emacs.el=, with name of major mode and smartparens prefix:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (require 'smartparens-latex)
+  (require 'smartparens-javascript)
+  (require 'smartparens-html)
+  (require 'smartparens-markdown)
+  (require 'smartparens-org)
+  (require 'smartparens-python)
+  (require 'smartparens-rust)
+  (require 'smartparens-haskell)
 
 #+END_SRC
 
@@ -841,34 +879,6 @@ Function `add-nav-to-imports-for-language`, is define keys for go to imports:
 
 
 #+END_SRC
-**** Complie
-     I am use [[https://github.com/bard/emacs-run-command][run-command]], for run command, for latex I am have some commands (pdflatex (TEX -> PDF), pandoc (TEX -> ...)):
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  (--each TeX-modes
-      (add-to-list 'pandoc-input-format-major-modes (list it "latex")))
-
-
-  (defun run-command-recipe-latex ()
-      "Recipe for LaTeX `run-command'.
-  see https://github.com/bard/emacs-run-command#examples."
-      (-when-let (file-path (buffer-file-name))
-          (when (-contains-p TeX-modes major-mode)
-              (list
-               (list :display "Convert to PDF, with `pdflatex`, ignore errors"
-                     :command-name "pdflatex"
-                     :command-line
-                     (format
-                      "pdflatex \"%s\" --output-directory=\"%s\""
-                      file-path
-                      (f-dirname file-path)
-                      )))))
-      )
-
-  (add-to-list 'run-command-recipes 'run-command-recipe-latex)
-
-#+END_SRC
 
 *** Org
     
@@ -922,7 +932,7 @@ I am use [[https://www.emacswiki.org/emacs/ElispFormat][ElispFormat]]:
   (add-to-list 'pandoc-input-format-major-modes
                '(markdown-mode "markdown"))
 
-  (add-to-list 'pandoc-input-format-major-(message "message" format-args)odes
+  (add-to-list 'pandoc-input-format-major-modes
                '(gfm-mode "markdown"))
 
 #+END_SRC
@@ -1179,18 +1189,23 @@ Defaults to:
 
 #+END_SRC
 
-
-**** Complie
-     I am use [[https://github.com/bard/emacs-run-command][run-command]], and [[https://pandoc.org][pandoc]] to complie to special formats:
+**** =Paredit= for HTML
+     I am use [[https://github.com/magnars/tagedit][tagedit]] of =magnars=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (--each html-modes
-      (add-to-list 'pandoc-input-format-major-modes (list it "html")))
+  (use-package tagedit
+      :ensure t
+      :bind (:map xah-fly-command-map
+                  ("SPC SPC 1" . tagedit-split-tag)
+                  ("SPC 1" . tagedit-join-tags)
+                  ("]" . tagedit-raise-tag))
+      :init
+      (add-hook 'web-mode (lambda () (tagedit-mode +1))))
 
 #+END_SRC
 
-     
+
 *** CSS
     I am use =css-eldoc= from =Elpa=:
 
@@ -1242,6 +1257,24 @@ Defaults to:
     (which-key-setup-side-window-bottom)
     (which-key-mode))
 #+END_SRC
+*** Helpful Package
+    I am use [[https://github.com/Wilfred/helpful][helpful]], for pretty help info about lisp functions and major modes:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package helpful
+      :ensure t
+      :init
+      (global-set-key (kbd "C-h f") #'helpful-callable)
+      (global-set-key (kbd "C-h v") #'helpful-variable)
+      (global-set-key (kbd "C-h k") #'helpful-key)
+      (global-set-key (kbd "C-c C-d") #'helpful-at-point)
+      (global-set-key (kbd "C-h F") #'helpful-function)
+      (global-set-key (kbd "C-h C") #'helpful-command))
+
+#+END_SRC
+
+    
 ** Framework for Incremental Completions and Narrowing Selections 
    I am use [[https://github.com/emacs-helm/helm][HELM]]:
    
@@ -1262,17 +1295,17 @@ Defaults to:
    
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-    (require 'fast-exec)
+  (require 'fast-exec)
 
-    (fast-exec/enable-some-builtin-supports
-     yasnippet
-     projectile
-     magit
-     flycheck
-     haskell-mode)
+  (fast-exec/enable-some-builtin-supports haskell-mode
+                                          flycheck
+                                          magit
+                                          projectile
+                                          skeletor
+                                          yasnippet)
 
-    (fast-exec/initialize)
-    (define-key xah-fly-command-map (kbd "=") 'fast-exec/exec)
+  (fast-exec/initialize)
+  (define-key xah-fly-command-map (kbd "=") 'fast-exec/exec)
 
 #+END_SRC
 
@@ -1377,7 +1410,6 @@ Defaults to:
       )
 
 #+END_SRC
-
 
 ** Auto Save
    I am use [[https://github.com/bbatsov/super-save][super-save]]:
@@ -1539,6 +1571,17 @@ I
   (projectile-mode 1)
 
 #+END_SRC
+*** Projectile with Helm
+    I am use offical [[https://github.com/bbatsov/helm-projectile][helm-projectile]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package helm-projectile
+      :ensure t
+      )
+
+#+END_SRC
+
 
 ** Git
    I am use super famous [[https://github.com/magit/magit][magit]]:
@@ -1562,139 +1605,30 @@ I am use [[https://github.com/emacsmirror/dired-details][dired-detail]]:
 
   (use-package run-command
       :ensure t
-      :init
       :bind (:map xah-fly-command-map
                   ("SPC , c" . run-command)))
 
 #+END_SRC
-
-*** Pandoc
-    I am use [[https://pandoc.org][pandoc]], for this I am have var =pandoc-output-formats=, which is list of pandoc's formats valid to pandoc output (see [[https://pandoc.org][this]]):
+*** Recipes
+    I am use [[https://github.com/semenInRussia/emacs-run-command-recipes/][run-command-recipes]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defcustom pandoc-output-formats '("asciidoc"
-                                     "beamer"
-                                     "bibtex"
-                                     "biblatex"
-                                     "commonmark"
-                                     "commonmark"
-                                     "context"
-                                     "csljson"
-                                     "docbook"
-                                     "docbook5"
-                                     "docx"
-                                     "dokuwiki"
-                                     "epub"
-                                     "epub2"
-                                     "fb2"
-                                     "gfm"
-                                     "haddock"
-                                     "html"
-                                     "html4"
-                                     "icml"
-                                     "ipynb"
-                                     "jats"
-                                     "jats"
-                                     "jats"
-                                     "jats"
-                                     "jira"
-                                     "json"
-                                     "latex"
-                                     "man"
-                                     "markdown"
-                                     "markdown"
-                                     "markdown"
-                                     "markdown"
-                                     "mediawiki"
-                                     "ms"
-                                     "muse"
-                                     "native"
-                                     "odt"
-                                     "opml"
-                                     "opendocument"
-                                     "org"
-                                     "pdf"
-                                     "plain"
-                                     "pptx"
-                                     "rst"
-                                     "rtf"
-                                     "texinfo"
-                                     "textile"
-                                     "slideous"
-                                     "slidy"
-                                     "dzslides"
-                                     "revealjs"
-                                     "s5"
-                                     "tei"
-                                     "xwiki"
-                                     "zimwiki")
-    "This is list of pandoc's formats valid to pandoc's output.
-  See https://pandoc.org")
+  (require 'run-command-recipes)
+
+  (run-command-recipes-use-all)
 
 #+END_SRC
-
-This function take pandoc code and file name with format one, return this file in format with pandoc code. So I have variable =pandoc-codes-and-extensions=:
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  (defcustom pandoc-codes-and-extensions
-    (make-hash-table :test 'equal)
-    "This is map of pandoc's format code and extension of file.
-  If your pandoc's code have extensions, which equal to pandoc's code
-  (for example: org = .(org)), then just don't put pair to this variable.")
-
-  (puthash "markdown" "md" pandoc-codes-and-extensions)
-  (puthash "latex" "tex" pandoc-codes-and-extensions)
-
-  (defun pandoc-change-format-of-file (filename new-format)
-      "Change FILENAME with pandoc's format to filename with pandoc's NEW-FORMAT."
-      (let ((new-ext (or (gethash new-format pandoc-codes-and-extensions)
-                         new-format)))
-          (f-swap-ext filename new-ext))
-      )
-
-#+END_SRC
-
-
-This is recipe for [[https://github.com/bard/emacs-run-command][run-command]]:
+** Skeletor
+   I am use [[https://github.com/chrisbarrett/skeletor.el][skeletor]] for creating new projects by temlate:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defun pandoc-code-for-major-mode (major-mode)
-      "Return non-nil value when MAJOR-MODE is one of Pandoc input formats.
-  See pandoc input formats: https://pandoc.org"
-      (-when-let (el (--find (eq major-mode (-first-item it))
-                             pandoc-input-format-major-modes))
-          (-second-item el))
-      )
-
-  (defun run-command-recipe-pandoc ()
-      "Pandoc `run-command` recipe, for transform to other formats.
-  See `run-command-recipes`:
-  https://github.com/bard/emacs-run-command#examples"
-      (-when-let (source (buffer-file-name))
-          (-when-let (source-code (pandoc-code-for-major-mode major-mode))
-              (--map (list
-                      :command-name (format
-                                     "pandoc-%s-to-%s"
-                                     source-code it)
-                      :display (format
-                                "Convert %s to %s with Pandoc"
-                                (s-upcase source-code)
-                                (s-upcase it))
-                      :command-line
-                      (format
-                       "pandoc -t %s -f %s -o \"%s\" \"%s\""
-                       it source-code
-                       (pandoc-change-format-of-file source it)
-                       source
-                       )
-                      )
-                     pandoc-output-formats)))
-      )
-
-  (add-to-list 'run-command-recipes 'run-command-recipe-pandoc)
+  (use-package skeletor
+      :ensure t
+      :custom
+      (skeletor-project-directory "~/projects")
+      (skeletor-completing-read-function completing-read-function))
 
 #+END_SRC
 
