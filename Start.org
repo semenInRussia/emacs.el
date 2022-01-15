@@ -1,12 +1,20 @@
-   _____                       _     _                       _      _ 
-  / ____|                     | |   | |                     | |    | |
- | |  __    ___     ___     __| |   | |       _   _    ___  | | __ | |
- | | |_ |  / _ \   / _ \   / _` |   | |      | | | |  / __| | |/ / | |
- | |__| | | (_) | | (_) | | (_| |   | |____  | |_| | | (__  |   <  |_|
-  \_____|  \___/   \___/  \_____|   |______| |_____| \____| |__|\| |_|
-
-[[elisp:(dired "~/projects/aoc-2021")][Advent of Code 2021]]
-[[elisp:(dired "~/projects")][Open Projects Dir]]
-[[file:Emacs.org][Open Emacs.org]]
+              _____                       _    
+             / ____|                     | |   
+           | |    __    ___     ___     __| |   
+           | | |  _ |  / _ \   / _ \   / _` |   
+           | | __| | | (_) | | (_) | | (_| |   
+              \_____|  \___/   \___/  \_____|
+           
+           | |                      | |    | |       
+           | |         _   _    ___  | | __ | |  
+          | |       | | | |   / __| | |/ / | |  
+          | |  ____  | |_| | | (__  |   <  |_|  
+          |  ______| |_____| \____| |__|\| |_|  
+           
+             
+[[elisp:(projectile-switch-project)][Open Project]]
+[[elisp:(dired "~/projects")][Open Directory of Projects]]
+[[file:~/Emacs.org][Open Emacs.org]]
+[[elisp:(call-interactively 'helm-find-files)][Open File]]
 [[file+emacs:(xah-new-empty-buffer)][New File]]
-[[elisp:(let* ((link-on-github (read-string "Enter Link on Github: ")) (repository-name (-last-item (-last-item (s-match-strings-all "/\\(.*\\).git$" link-on-github)))) (project-name (read-string "Enter project's name: " repository-name))) (cd "~/projects/") (shell-command (s-concat "git clone " link-on-github)) (rename-file (s-concat "~/projects/" repository-name) project-name) (projectile-add-known-project (s-concat "~/projects" project-name)) (projectile-switch-project-by-name project-name))][New Project]] 
+[[elisp:(let* ((link-on-github (read-string "Enter Link on Github: ")) (repository-name (-last-item (-last-item (s-match-strings-all "/\\(.*\\).git$" link-on-github)))) (project-name (read-string "Enter project's name: " repository-name))) (cd "~/projects/") (shell-command (s-concat "git clone " link-on-github)) (rename-file (s-concat "~/projects/" repository-name) project-name) (projectile-add-known-project (s-concat "~/projects" project-name)) (projectile-switch-project-by-name project-name))][New Project]]

@@ -100,6 +100,10 @@ Info take from var `user-os`, user must set it."
         (define-key it (kbd "C-j") 'bbyac-expand-symbols)
         ))
 
+(use-package format-all
+    :ensure t
+    )
+
 (require 'xah-fly-keys)
 
 (xah-fly-keys-set-layout "qwerty")
@@ -158,6 +162,19 @@ Info take from var `user-os`, user must set it."
 (define-key xah-fly-command-map (kbd "SPC SPC") nil)
 (define-key xah-fly-command-map (kbd "SPC SPC SPC") 'imenu)
 
+(use-package rg
+    :ensure t
+    )
+
+(use-package dumb-jump
+    :ensure t
+    :custom
+    (dumb-jump-force-searcher 'rg)
+    (dumb-jump-prefer-searcher 'rg)
+    :init
+    (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+    )
+
 (defun if-selected-then-next-word-like-this (arg)
     (interactive "p")
     (when (use-region-p)
@@ -169,11 +186,81 @@ Info take from var `user-os`, user must set it."
     (:map xah-fly-command-map
           ("SPC SPC t" . mc/edit-beginnings-of-lines)))
 
+(defun avy-goto-word-1-with-action (char action &optional arg beg end symbol)
+  "Jump to the currently visible CHAR at a word start.
+The window scope is determined by `avy-all-windows'.
+When ARG is non-nil, do the opposite of `avy-all-windows'.
+BEG and END narrow the scope where candidates are searched.
+When SYMBOL is non-nil, jump to symbol start instead of word start.
+Do action of `avy' ACTION.'"
+  (interactive (list (read-char "char: " t)
+                     current-prefix-arg))
+  (avy-with avy-goto-word-1
+    (let* ((str (string char))
+           (regex (cond ((string= str ".")
+                         "\\.")
+                        ((and avy-word-punc-regexp
+                              (string-match avy-word-punc-regexp str))
+                         (regexp-quote str))
+                        ((<= char 26)
+                         str)
+                        (t
+                         (concat
+                          (if symbol "\\_<" "\\b")
+                          str)))))
+      (avy-jump regex
+                :window-flip arg
+                :beg beg
+                :end end
+                :action action))))
+
+
+(defun avy-teleport-word (char &optional arg)
+    "Teleport word searched by `arg' with CHAR.
+Pass ARG to `avy-jump'."
+    (interactive "cchar:\nP")
+    (avy-goto-word-1-with-action char 'avy-action-teleport)
+    )
+
+
+(defun avy-copy-word (char &optional arg)
+    "Copy word searched by `arg' with CHAR.
+Pass ARG to `avy-jump'."
+    (interactive "cchar:\nP")
+    (avy-goto-word-1-with-action char 'avy-action-copy)
+    )
+
+
+(defun avy-yank-word (char &optional arg)
+    "Paste word searched by `arg' with CHAR.
+Pass ARG to `avy-jump'."
+    (interactive "cchar:\nP")
+    (avy-goto-word-1-with-action char 'avy-action-yank)
+    )
+
+
+(defun avy-kill-word (char &optional arg)
+    "Paste word searched by `arg' with CHAR.
+Pass ARG to `avy-jump'."
+    (interactive "cchar:\nP")
+    (avy-goto-word-1-with-action char 'avy-action-kill-stay)
+    )
+
+
 (use-package avy
     :ensure t
+    :custom (avy-background t)
     :bind
     ((:map xah-fly-command-map)
-     ("n" . avy-goto-char)))
+     ("n"           . avy-goto-char)
+     ("SPC SPC v"   . avy-yank-word)
+     ("SPC SPC x"   . avy-teleport-word)
+     ("SPC SPC c"   . avy-copy-word)
+     ("SPC SPC d"   . avy-kill-word)
+     ("SPC SPC l c" . avy-copy-line)
+     ("SPC SPC l x" . avy-move-line)
+     ("SPC SPC l d" . avy-kill-whole-line))
+    )
 
 (defun forward-slurp-sexp ()
     "My version of `sp-slurp-sexp`."
@@ -267,6 +354,12 @@ Info take from var `user-os`, user must set it."
         (kmacro-call-macro arg)))
 
 (define-key xah-fly-command-map (kbd "SPC RET") 'kmacro-call-macro-or-apply-to-lines)
+
+(use-package poporg
+    :ensure t
+    :bind (:map xah-fly-command-map
+                ("`" . poporg-dwim))
+    )
 
 (define-key-when xah-fly-command-map "n" 'avy-transpose-lines-in-region
                  'use-region-p)
@@ -564,8 +657,37 @@ Examples of codes (latex, markdown)"
 (add-to-list 'pandoc-input-format-major-modes
              '(org-mode "org"))
 
-(use-package elisp-format
-    :ensure t)
+(use-package wikinforg
+  :ensure t)
+
+(use-package org-download
+    :ensure t
+    :hook
+    (dired-mode-hook . org-download-enable)
+    )
+
+(use-package package-lint
+    :ensure t
+    )
+
+(use-package flycheck-package
+    :ensure t
+    :init
+    (flycheck-package-setup)
+    )
+
+(use-package emr
+    :ensure t
+    :bind (:map xah-fly-command-map
+                ("SPC /" . emr-show-refactor-menu)))
+
+(use-package cask-mode
+    :ensure t
+    )
+
+(use-package suggest
+    :ensure t
+    )
 
 (use-package markdown-mode
     :ensure t)
@@ -651,6 +773,11 @@ Examples of codes (latex, markdown)"
  haskell-mode
  haskell-ds-backward-decl)
 
+(require 'shm)
+(add-hook 'haskell-mode-hook 'structured-haskell-mode)
+(add-hook 'haskell-mode-hook (lambda ()
+                                 (haskell-indentation-mode 0)))
+
 (setq js/imports-regexp "import")
 
 (setq js/function-or-class-regexp "function \\|class ")
@@ -722,15 +849,6 @@ Examples of codes (latex, markdown)"
 
 (defcustom html-modes '(web-mode html-mode) "List of `html` major modes.")
 
-(use-package tagedit
-    :ensure t
-    :bind (:map xah-fly-command-map
-                ("SPC SPC 1" . tagedit-split-tag)
-                ("SPC 1" . tagedit-join-tags)
-                ("]" . tagedit-raise-tag))
-    :init
-    (add-hook 'web-mode (lambda () (tagedit-mode +1))))
-
 (use-package css-eldoc
     :ensure t
     :init
@@ -782,9 +900,14 @@ Examples of codes (latex, markdown)"
                                         magit
                                         projectile
                                         skeletor
-                                        yasnippet)
+                                        yasnippet
+                                        format-all
+                                        wikinforg
+                                        suggest
+                                        devdocs)
 
 (fast-exec/initialize)
+
 (define-key xah-fly-command-map (kbd "=") 'fast-exec/exec)
 
 (use-package google-translate
@@ -810,13 +933,10 @@ Thank you https://github.com/leuven65!"
                                       (auto-fill-mode 1)
                                       ))
 
-(defun open-scratch ()
-    "Open scratch."
-    (interactive)
-    (switch-to-buffer "*scratch*")
+(use-package scratch
+    :ensure t
+    :bind (("C-t" . scratch))
     )
-
-(global-set-key (kbd "C-t") 'open-scratch)
 
 (global-subword-mode)
 
@@ -832,6 +952,26 @@ Thank you https://github.com/leuven65!"
     :ensure t
     :config
     (super-save-mode 38))
+
+(use-package devdocs
+    :ensure t
+    :hook (python-mode . (lambda ()
+                              (setq-local devdocs-current-docs
+                                          '("python~3.9"))))
+    )
+
+(use-package pomidor
+    :ensure t
+    :bind (("<f12>" . pomidor))
+    :custom
+    (pomidor-sound-tick . nil)
+    (pomidor-sound-tack . nil)
+    :hook
+    (pomidor-mode . (lambda ()
+                        (display-line-numbers-mode -1)
+                        (setq left-fringe-width 0 right-fringe-width 0)
+                        (setq left-margin-width 2 right-margin-width 0)
+                        (set-window-buffer nil (current-buffer)))))
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
@@ -919,7 +1059,25 @@ numbers of lines, otherwise don't display."
     :ensure t
     )
 
+(use-package regex-tool
+    :ensure t
+    :init
+    (add-hook 'regex-tool-mode-hook (lambda () (toggle-frame-maximized))))
+
 (use-package magit :ensure t)
+
+(use-package blamer
+    :ensure t
+    :defer 20
+    :custom
+    (blamer-idle-time 0.3)
+    (blamer-min-offset 70)
+    :custom-face
+    (blamer-face ((t :foreground "#7a88cf"
+                     :background nil
+                     :height 140
+                     :italic t)))
+    )
 
 (add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
 

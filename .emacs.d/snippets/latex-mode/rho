@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: rho
+# key: R
+# type: command
+# --
+(LaTeX-math-rho nil)

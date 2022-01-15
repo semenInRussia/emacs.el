@@ -132,7 +132,6 @@
 
 (require 'dired) ; in emacs
 (require 'dired-x) ; in emacs
-(require 'ido) ; in emacs
 
 ;; HHH___________________________________________________________________
 
@@ -140,19 +139,31 @@
   "Ergonomic modal keybinding minor mode."
   :group 'keyboard)
 
-(defvar xah-fly-command-mode-activate-hook nil "Hook for `xah-fly-command-mode-activate'")
-(defvar xah-fly-insert-mode-activate-hook nil "Hook for `xah-fly-insert-mode-activate'")
+
+(defvar xah-fly-command-mode-activate-hook nil
+  "Hook for `xah-fly-command-mode-activate'")
+
+
+(defvar xah-fly-insert-mode-activate-hook nil
+  "Hook for `xah-fly-insert-mode-activate'")
+
 
 (defcustom xah-fly-use-control-key t
-  "If nil, do not bind any control key. When t, standard keys for open, close, paste, are bound."
+  "If nil, do not bind any control key.
+When t, standard keys for open, close, paste, are bound."
   :type 'boolean
   :group 'xah-fly-keys)
+
+
 (defcustom xah-fly-use-meta-key t
   "If nil, do not bind any meta key."
   :type 'boolean
   :group 'xah-fly-keys)
+
+
 (defcustom xah-fly-use-isearch-arrows t
-  "If nil, no change to any key in isearch (`isearch-forward'). Otherwise, arrow keys are for moving between occurrences, and C-v is paste."
+  "If nil, no change to any key in isearch (`isearch-forward').
+Otherwise, arrow keys are for moving between occurrences, and C-v is paste."
   :type 'boolean
   :group 'xah-fly-keys)
 
@@ -599,7 +610,7 @@ For example, change all parenthesis () to square brackets [].
 Works on current block or selection.
 
 When called in lisp program, FromChars or ToChars is a string of bracket pair. eg \"(paren)\",  \"[bracket]\", etc.
-The first and last characters are used. (the middle is for convenience in ido selection.)
+The first and last characters are used. (the middle is for convenience in selection.)
 If the string contains “,2”, then the first 2 chars and last 2 chars are used, for example  \"[[bracket,2]]\".
 If ToChars is equal to string “none”, the brackets are deleted.
 
@@ -652,8 +663,8 @@ Version 2020-11-01 2021-08-15"
             "none"
             )))
      (list
-      (ido-completing-read "Replace this:" $brackets )
-      (ido-completing-read "To:" $brackets ))))
+      (completing-read "Replace this:" $brackets )
+      (completing-read "To:" $brackets ))))
   (let ( $p1 $p2 )
     (let (($bds (xah-get-bounds-of-block-or-region))) (setq $p1 (car $bds) $p2 (cdr $bds)))
     (save-excursion
@@ -1268,8 +1279,8 @@ Version 2020-06-26 2021-07-21 2021-08-15 2021-09-15"
             "none"
             "other"
             )) $bktChoice $sep $sepChoice $quoteL $quoteR)
-     (setq $bktChoice (ido-completing-read "Quote to use:" $brackets))
-     (setq $sepChoice (ido-completing-read "line separator:" '("," ";" "none" "other")))
+     (setq $bktChoice (completing-read "Quote to use:" $brackets))
+     (setq $sepChoice (completing-read "line separator:" '("," ";" "none" "other")))
      (cond
       ((string-equal $bktChoice "none")
        (setq $quoteL "" $quoteR ""))
@@ -1540,7 +1551,7 @@ version 2020-09-07"
          (if current-prefix-arg
              (string-to-number
               (substring
-               (ido-completing-read
+               (completing-read
                 "Style:"
                 '(
                   "1 → 2018-04-12 Thursday"
@@ -1759,7 +1770,7 @@ Version 2019-03-07"
         (beginning-of-line)
         (forward-char $colpos)))))
 
-(defvar xah-unicode-list nil "Associative list of Unicode symbols. First element is a Unicode character, second element is a string used as key shortcut in `ido-completing-read'")
+(defvar xah-unicode-list nil "Associative list of Unicode symbols. First element is a Unicode character, second element is a string used as key shortcut in `completing-read'")
 (setq xah-unicode-list
       '(
         ;; format: (str . nameOrFastKey)
@@ -1789,7 +1800,7 @@ Version 2021-01-05"
   (interactive)
   (let (
         ($str
-         (ido-completing-read
+         (completing-read
           "Insert:" (mapcar
                      (lambda (x)
                        (format "%s %s" (car x) (cdr x))) xah-unicode-list))))
@@ -2111,7 +2122,7 @@ Prompt for a choice.
 URL `http://ergoemacs.org/emacs/elisp_close_buffer_open_last_closed.html'
 Version 2016-06-19"
   (interactive)
-  (find-file (ido-completing-read "open:" (mapcar (lambda (f) (cdr f)) xah-recently-closed-buffers))))
+  (find-file (completing-read "open:" (mapcar (lambda (f) (cdr f)) xah-recently-closed-buffers))))
 
 (defun xah-list-recently-closed ()
   "List recently closed file.
@@ -2130,14 +2141,14 @@ Version 2016-06-19"
 
 (defun xah-open-file-fast ()
   "Prompt to open a file from bookmark `bookmark-bmenu-list'.
-This command is similar to `bookmark-jump', but use `ido-mode' interface, and ignore cursor position in bookmark.
+This command is similar to `bookmark-jump', but use `mode' interface, and ignore cursor position in bookmark.
 
 URL `http://ergoemacs.org/emacs/emacs_hotkey_open_file_fast.html'
 Version 2019-02-26"
   (interactive)
   (require 'bookmark)
   (bookmark-maybe-load-default-file)
-  (let (($thisBookmark (ido-completing-read "Open bookmark:" (mapcar (lambda ($x) (car $x)) bookmark-alist))))
+  (let (($thisBookmark (completing-read "Open bookmark:" (mapcar (lambda ($x) (car $x)) bookmark-alist))))
     (find-file (bookmark-get-filename $thisBookmark))))
 
 (defvar xah-open-file-at-cursor-pre-hook nil "Hook for `xah-open-file-at-cursor'. Functions in the hook will be called in order, each given the path as arg. The first return non-nil, its value is given to `xah-open-file-at-cursor' as input. This is useful for transforming certain url into file path (your website url), so instead of opening in browser, it opens in emacs as file.")
@@ -4372,7 +4383,6 @@ Version 2017-07-07"
 
 (define-minor-mode xah-fly-keys
   "A modal keybinding set, like vim, but based on ergonomic principles, like Dvorak layout.
-
 URL `http://ergoemacs.org/misc/ergoemacs_vi_mode.html'"
   :group 'xah-fly-keys
   :global t

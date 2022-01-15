@@ -2,7 +2,7 @@
 # contributor: semenInRussia
 # name: environment
 # key: env
+# type: command
 # --
-\begin{${1:$$(yas-choose-value latex-environment-names)}}
-$0
-\end{$1}
+(latex-insert-block)
+

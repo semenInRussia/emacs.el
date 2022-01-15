@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: read-char
+# key: rc
+# --
+(read-char ${0:prompt})

@@ -11,7 +11,7 @@
 
     (setq initial-buffer-choice "~/Start.org")
 
-    #+END_SRC
+  #+END_SRC
 
 * Package Management - base 
 ** use-package
@@ -39,11 +39,11 @@
 ** Packages Not in MELPA/ELPA/ORG-ELPA
 *** Stranger Packages
 
-    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-      (add-to-list 'load-path "~/.emacs.d/lisp")
+(add-to-list 'load-path "~/.emacs.d/lisp")
 
-      #+END_SRC
+#+END_SRC
 
 *** My Packages
 
@@ -200,6 +200,16 @@
 
 #+END_SRC
 
+** Format All Code
+   Each programmer need to format code for this I am use [[https://github.com/lassik/emacs-format-all-the-code][format-all]], its support 65 languages:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package format-all
+      :ensure t
+      )
+
+#+END_SRC
 
 ** Main keymaps
    I am use [[https://github.com/xahlee/xah-fly-keys][xah-fly-keys]], this as VIM, but keymaps created for keyboard (in VIM keymaps created for easy remember):
@@ -277,7 +287,7 @@ will pressed KEY in KEYMAP and when CONDITION will true:
   
 #+END_SRC
 
-** View Functions/Classes/etc.
+** Navigation beetween Functions/Classes/etc.
    I am use ido with keymap =SPC SPC SPC=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -285,6 +295,26 @@ will pressed KEY in KEYMAP and when CONDITION will true:
   (setq imenu-auto-rescan t)
   (define-key xah-fly-command-map (kbd "SPC SPC") nil)
   (define-key xah-fly-command-map (kbd "SPC SPC SPC") 'imenu)
+
+#+END_SRC
+
+** Jump to Defnition
+   I am use [[https://github.com/jacktasia/dumb-jump][cool package dumb-jump]] for jump to defnition in 50+ languages:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package rg
+      :ensure t
+      )
+
+  (use-package dumb-jump
+      :ensure t
+      :custom
+      (dumb-jump-force-searcher 'rg)
+      (dumb-jump-prefer-searcher 'rg)
+      :init
+      (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+      )
 
 #+END_SRC
 
@@ -309,11 +339,83 @@ will pressed KEY in KEYMAP and when CONDITION will true:
    I am use [[https://github.com/abo-abo/avy][avy]]:
    
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
-(use-package avy
-    :ensure t
-    :bind
-    ((:map xah-fly-command-map)
-     ("n" . avy-goto-char)))
+
+  (defun avy-goto-word-1-with-action (char action &optional arg beg end symbol)
+    "Jump to the currently visible CHAR at a word start.
+  The window scope is determined by `avy-all-windows'.
+  When ARG is non-nil, do the opposite of `avy-all-windows'.
+  BEG and END narrow the scope where candidates are searched.
+  When SYMBOL is non-nil, jump to symbol start instead of word start.
+  Do action of `avy' ACTION.'"
+    (interactive (list (read-char "char: " t)
+                       current-prefix-arg))
+    (avy-with avy-goto-word-1
+      (let* ((str (string char))
+             (regex (cond ((string= str ".")
+                           "\\.")
+                          ((and avy-word-punc-regexp
+                                (string-match avy-word-punc-regexp str))
+                           (regexp-quote str))
+                          ((<= char 26)
+                           str)
+                          (t
+                           (concat
+                            (if symbol "\\_<" "\\b")
+                            str)))))
+        (avy-jump regex
+                  :window-flip arg
+                  :beg beg
+                  :end end
+                  :action action))))
+
+
+  (defun avy-teleport-word (char &optional arg)
+      "Teleport word searched by `arg' with CHAR.
+  Pass ARG to `avy-jump'."
+      (interactive "cchar:\nP")
+      (avy-goto-word-1-with-action char 'avy-action-teleport)
+      )
+
+
+  (defun avy-copy-word (char &optional arg)
+      "Copy word searched by `arg' with CHAR.
+  Pass ARG to `avy-jump'."
+      (interactive "cchar:\nP")
+      (avy-goto-word-1-with-action char 'avy-action-copy)
+      )
+
+
+  (defun avy-yank-word (char &optional arg)
+      "Paste word searched by `arg' with CHAR.
+  Pass ARG to `avy-jump'."
+      (interactive "cchar:\nP")
+      (avy-goto-word-1-with-action char 'avy-action-yank)
+      )
+
+
+  (defun avy-kill-word (char &optional arg)
+      "Paste word searched by `arg' with CHAR.
+  Pass ARG to `avy-jump'."
+      (interactive "cchar:\nP")
+      (avy-goto-word-1-with-action char 'avy-action-kill-stay)
+      )
+
+
+  (use-package avy
+      :ensure t
+      :custom (avy-background t)
+      :bind
+      ((:map xah-fly-command-map)
+       ("n"           . avy-goto-char)
+       ("SPC SPC v"   . avy-yank-word)
+       ("SPC SPC x"   . avy-teleport-word)
+       ("SPC SPC c"   . avy-copy-word)
+       ("SPC SPC d"   . avy-kill-word)
+       ("SPC SPC l c" . avy-copy-line)
+       ("SPC SPC l x" . avy-move-line)
+       ("SPC SPC l d" . avy-kill-whole-line))
+      )
+
 #+END_SRC
 
 ** Smart Parens
@@ -441,6 +543,19 @@ use =-=, for navigating I am use `.` and `m`:
 
 #+RESULTS:
 : kmacro-call-macro-or-apply-to-lines
+** Special Strings as Seperated Buffers
+   I am use [[https://github.com/QBobWatson/poporg][poporg]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package poporg
+      :ensure t
+      :bind (:map xah-fly-command-map
+                  ("`" . poporg-dwim))
+      )
+
+#+END_SRC
+
 ** Transpose
    I am press =n=, when select text for transpose lines in region:
 
@@ -881,7 +996,6 @@ Function `add-nav-to-imports-for-language`, is define keys for go to imports:
 #+END_SRC
 
 *** Org
-    
 **** Centering 
      I am centering text, when enable =org-mode=:
 
@@ -901,16 +1015,99 @@ Function `add-nav-to-imports-for-language`, is define keys for go to imports:
 
 #+END_SRC
 
-*** Elisp
-    Emacs has cool built-in support of Elisp, but this is not include =elisp-format=, so
-I am use [[https://www.emacswiki.org/emacs/ElispFormat][ElispFormat]]:
+**** Load from Wiki
+     I am use [[https://github.com/progfolio/wikinforg][wikinforg]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package elisp-format
-      :ensure t)
+  (use-package wikinforg
+    :ensure t)
 
 #+END_SRC
+
+**** Drag and Drop Images
+     I am use [[https://github.com/abo-abo/org-download][org-download]] for this:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package org-download
+      :ensure t
+      :hook
+      (dired-mode-hook . org-download-enable)
+      )
+
+#+END_SRC
+
+
+*** Elisp
+**** Special Linters
+***** Package Linter
+      I am use [[https://github.com/purcell/package-lint][package-lint]] for lint my packages for Melpa for view I am use [[https://github.com/purcell/flycheck-package][flycheck-package]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package package-lint
+      :ensure t
+      )
+
+  (use-package flycheck-package
+      :ensure t
+      :init
+      (flycheck-package-setup)
+      )
+
+#+END_SRC
+
+# ***** ELSA (Static Analyzer)
+#       I am use [[https://github.com/emacs-elsa/Elsa#how-do-i-run-it][ELSA]] and [[https://github.com/emacs-elsa/flycheck-elsa][flycheck-elsa]]:
+
+# #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+#   (use-package elsa
+#       :ensure t)
+
+#   (use-package flycheck-elsa
+#       :ensure t
+#       :init
+#       (add-hook 'emacs-lisp-mode-hook #'flycheck-elsa-setup)
+#       ;; (add-to-list 'flycheck-checkers 'flyc))
+#       )
+
+# #+END_SRC
+
+**** Refactoring
+     I am use [[https://github.com/Wilfred/emacs-refactor][emacs-refactor]] for refactor not only in =emacs-lisp=:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package emr
+      :ensure t
+      :bind (:map xah-fly-command-map
+                  ("SPC /" . emr-show-refactor-menu)))
+#+END_SRC
+
+**** Package Manager
+     I am use [[https://github.com/cask/cask/][Cask]] for manage packages of =elisp=:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package cask-mode
+      :ensure t
+      )
+
+#+END_SRC
+
+**** Modern Documentation
+     I am use [[https://github.com/Wilfred/suggest.el][suggest]], I am just type print input and excepted output and see suggesting examples as this do:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package suggest
+      :ensure t
+      )
+
+#+END_SRC
+
 
 *** Markdown
     I am use [[https://github.com/jrblevin/markdown-mode/][markdown-mode]] , and for its I am centering code:
@@ -1069,6 +1266,18 @@ Var =python-shell-interpreter= is builtin Emacs var, see docs in Emacs:
 
  #+END_SRC
 
+**** Local "Paredit"
+     I am use [[https://github.com/projectional-haskell/structured-haskell-mode][structured-haskell-mode]] as =paredit= for =Haskell=:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (require 'shm)
+  (add-hook 'haskell-mode-hook 'structured-haskell-mode)
+  (add-hook 'haskell-mode-hook (lambda ()
+                                   (haskell-indentation-mode 0)))
+
+#+END_SRC
+
 *** JavaScript (Node.js)
 **** Variables
      Variable `js/imports-regexp` if regular expression for search imports in JS. 
@@ -1189,22 +1398,21 @@ Defaults to:
 
 #+END_SRC
 
-**** =Paredit= for HTML
-     I am use [[https://github.com/magnars/tagedit][tagedit]] of =magnars=:
+# **** =Paredit= for HTML
+#      I am use [[https://github.com/magnars/tagedit][tagedit]] of =magnars=:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+# #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package tagedit
-      :ensure t
-      :bind (:map xah-fly-command-map
-                  ("SPC SPC 1" . tagedit-split-tag)
-                  ("SPC 1" . tagedit-join-tags)
-                  ("]" . tagedit-raise-tag))
-      :init
-      (add-hook 'web-mode (lambda () (tagedit-mode +1))))
+#   (use-package tagedit
+#       :ensure t
+#       :bind (:map xah-fly-command-map
+#                   ("SPC SPC 1" . tagedit-split-tag)
+#                   ("SPC 1" . tagedit-join-tags)
+#                   ("]" . tagedit-raise-tag))
+#       :init
+#       (add-hook 'web-mode (lambda () (tagedit-mode +1))))
 
-#+END_SRC
-
+# #+END_SRC
 
 *** CSS
     I am use =css-eldoc= from =Elpa=:
@@ -1274,7 +1482,6 @@ Defaults to:
 
 #+END_SRC
 
-    
 ** Framework for Incremental Completions and Narrowing Selections 
    I am use [[https://github.com/emacs-helm/helm][HELM]]:
    
@@ -1302,9 +1509,14 @@ Defaults to:
                                           magit
                                           projectile
                                           skeletor
-                                          yasnippet)
+                                          yasnippet
+                                          format-all
+                                          wikinforg
+                                          suggest
+                                          devdocs)
 
   (fast-exec/initialize)
+
   (define-key xah-fly-command-map (kbd "=") 'fast-exec/exec)
 
 #+END_SRC
@@ -1368,17 +1580,14 @@ Defaults to:
 #+END_SRC
 
 ** Scratches
-   I am press =C-t= for opening scratch:
+   I am press =C-t= for opening scratch for this I am use [[https://github.com/ieure/scratch-el][scratch-el]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defun open-scratch ()
-      "Open scratch."
-      (interactive)
-      (switch-to-buffer "*scratch*")
+  (use-package scratch
+      :ensure t
+      :bind (("C-t" . scratch))
       )
-
-  (global-set-key (kbd "C-t") 'open-scratch)
 
 #+END_SRC
 
@@ -1419,6 +1628,40 @@ Defaults to:
       :ensure t
       :config
       (super-save-mode 38))
+
+#+END_SRC
+
+** Read Documentation for Developers
+   I am use [[https://github.com/astoff/devdocs.el][devdocs]] for see documentation from [[https://devdocs.io][DevDocs]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package devdocs
+      :ensure t
+      :hook (python-mode . (lambda ()
+                                (setq-local devdocs-current-docs
+                                            '("python~3.9"))))
+      )
+
+#+END_SRC
+
+** Pomidor
+   For pomidor I am use [[https://github.com/TatriX/pomidor][pomidor]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package pomidor
+      :ensure t
+      :bind (("<f12>" . pomidor))
+      :custom
+      (pomidor-sound-tick . nil)
+      (pomidor-sound-tack . nil)
+      :hook
+      (pomidor-mode . (lambda ()
+                          (display-line-numbers-mode -1)
+                          (setq left-fringe-width 0 right-fringe-width 0)
+                          (setq left-margin-width 2 right-margin-width 0)
+                          (set-window-buffer nil (current-buffer)))))
 
 #+END_SRC
 
@@ -1550,6 +1793,8 @@ I am use [[https://github.com/seagle0128/doom-modeline][doom-modeline]]:
 
 I
 
+** 
+
 * Developer Environment
 ** Projects Management
    I am use [[https://github.com/bbatsov/projectile][projectile]]:
@@ -1581,14 +1826,47 @@ I
       )
 
 #+END_SRC
+** Regexp IDE
+   I am use [[https://github.com/jwiegley/regex-tool][regex-tool]] for testing regexp in Emacs
 
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package regex-tool
+      :ensure t
+      :init
+      (add-hook 'regex-tool-mode-hook (lambda () (toggle-frame-maximized))))
+
+#+END_SRC
 
 ** Git
    I am use super famous [[https://github.com/magit/magit][magit]]:
 
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
-(use-package magit :ensure t)
+
+  (use-package magit :ensure t)
+
 #+END_SRC
+
+*** Fly View Authors of Changes
+    For this I am use [[https://github.com/Artawower/blamer.el][blamer]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package blamer
+      :ensure t
+      :defer 20
+      :custom
+      (blamer-idle-time 0.3)
+      (blamer-min-offset 70)
+      :custom-face
+      (blamer-face ((t :foreground "#7a88cf"
+                       :background nil
+                       :height 140
+                       :italic t)))
+      )
+
+#+END_SRC
+
 ** View Directories
    I am use inline in Emacs [[https://www.emacswiki.org/emacs/DiredMode][dired]]. And for minimalize design of dired,
 I am use [[https://github.com/emacsmirror/dired-details][dired-detail]]:
@@ -1644,4 +1922,5 @@ I am use [[https://github.com/emacsmirror/dired-details][dired-detail]]:
 
   (add-hook 'after-save-hook 'if-Emacs-org-then-org-babel-tangle)
 #+END_SRC
+
 
