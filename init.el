@@ -272,8 +272,7 @@ Pass ARG to `avy-jump'."
     (interactive)
     (save-excursion
         (backward-char)
-        (sp-forward-slurp-sexp))
-    )
+        (sp-forward-slurp-sexp)))
 
 
 (defun splice-sexp ()
@@ -281,8 +280,7 @@ Pass ARG to `avy-jump'."
     (interactive)
     (save-excursion
         (backward-char)
-        (sp-splice-sexp))
-    )
+        (sp-splice-sexp)))
 
 
 (use-package smartparens
@@ -299,17 +297,10 @@ Pass ARG to `avy-jump'."
                  ("SPC SPC 1" . sp-split-sexp)
                  ("SPC 9" . sp-change-enclosing)
                  ("SPC SPC g" . sp-kill-hybrid-sexp)
+                 ("SPC =" . sp-raise-sexp)
                  )))
 
 (require 'smartparens-config)
-(require 'smartparens-latex)
-(require 'smartparens-javascript)
-(require 'smartparens-html)
-(require 'smartparens-markdown)
-(require 'smartparens-org)
-(require 'smartparens-python)
-(require 'smartparens-rust)
-(require 'smartparens-haskell)
 
 (defun delete-only-1-char ()
     "Delete only 1 character before point."
@@ -859,8 +850,10 @@ Examples of codes (latex, markdown)"
 (use-package auto-rename-tag
     :ensure t
     :config
-    :hook
-    (web-mode . (lambda () (auto-rename-tag-mode 38))))
+    :init
+    (--each html-modes
+        (add-hook (intern (s-append "-hook" (symbol-name it)))
+                  (lambda () (auto-rename-tag-mode 38)))))
 
 
 (use-package emmet-mode
@@ -868,6 +861,7 @@ Examples of codes (latex, markdown)"
     :custom (emmet-move-cursor-between-quotes t)
     :hook
     (web-mode . emmet-mode)
+    (mhtml-mode . emmet-mode)
     (css-mode . emmet-mode)
     (html-mode . emmet-mode))
 
@@ -882,7 +876,24 @@ Examples of codes (latex, markdown)"
     (fast-exec/register-keymap-func 'fast-exec-helm-emmet-keys)
     (fast-exec/reload-functions-chain))
 
-(defcustom html-modes '(web-mode html-mode) "List of `html` major modes.")
+(defcustom html-modes '(web-mode html-mode mhtml-mode)
+  "List of `html` major modes.")
+
+(use-package tagedit
+    :ensure t
+    :init
+    (--each html-modes
+        (let ((map (eval (intern (s-append "-map" (symbol-name it))))))
+            (define-key map
+                [remap sp-kill-hybrid-sexp] 'tagedit-kill)
+            (define-key map
+                [remap sp-join-sexp] 'tagedit-join-tags)
+            (define-key map
+                [remap sp-raise-sexp] 'tagedit-raise-tag)
+            (define-key map
+                [remap splice-sexp] 'tagedit-splice-tag)
+            (define-key map
+                [remap sp-change-enclosing] 'tagedit-kill-attribute))))
 
 (use-package css-eldoc
     :ensure t

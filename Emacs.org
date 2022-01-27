@@ -450,8 +450,7 @@ use =-=, for navigating I am use `.` and `m`:
       (interactive)
       (save-excursion
           (backward-char)
-          (sp-forward-slurp-sexp))
-      )
+          (sp-forward-slurp-sexp)))
 
 
   (defun splice-sexp ()
@@ -459,8 +458,7 @@ use =-=, for navigating I am use `.` and `m`:
       (interactive)
       (save-excursion
           (backward-char)
-          (sp-splice-sexp))
-      )
+          (sp-splice-sexp)))
 
 
   (use-package smartparens
@@ -477,6 +475,7 @@ use =-=, for navigating I am use `.` and `m`:
                    ("SPC SPC 1" . sp-split-sexp)
                    ("SPC 9" . sp-change-enclosing)
                    ("SPC SPC g" . sp-kill-hybrid-sexp)
+                   ("SPC =" . sp-raise-sexp)
                    )))
 
 #+END_SRC
@@ -486,14 +485,6 @@ use =-=, for navigating I am use `.` and `m`:
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (require 'smartparens-config)
-  (require 'smartparens-latex)
-  (require 'smartparens-javascript)
-  (require 'smartparens-html)
-  (require 'smartparens-markdown)
-  (require 'smartparens-org)
-  (require 'smartparens-python)
-  (require 'smartparens-rust)
-  (require 'smartparens-haskell)
 
 #+END_SRC
 
@@ -1427,8 +1418,10 @@ Defaults to:
   (use-package auto-rename-tag
       :ensure t
       :config
-      :hook
-      (web-mode . (lambda () (auto-rename-tag-mode 38))))
+      :init
+      (--each html-modes
+          (add-hook (intern (s-append "-hook" (symbol-name it)))
+                    (lambda () (auto-rename-tag-mode 38)))))
 
 
   (use-package emmet-mode
@@ -1436,6 +1429,7 @@ Defaults to:
       :custom (emmet-move-cursor-between-quotes t)
       :hook
       (web-mode . emmet-mode)
+      (mhtml-mode . emmet-mode)
       (css-mode . emmet-mode)
       (html-mode . emmet-mode))
 
@@ -1457,25 +1451,32 @@ Defaults to:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defcustom html-modes '(web-mode html-mode) "List of `html` major modes.")
+  (defcustom html-modes '(web-mode html-mode mhtml-mode)
+    "List of `html` major modes.")
 
 #+END_SRC
 
-# **** =Paredit= for HTML
-#      I am use [[https://github.com/magnars/tagedit][tagedit]] of =magnars=:
+**** =Paredit= for HTML
+     I am use [[https://github.com/magnars/tagedit][tagedit]] of =magnars=:
 
-# #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (use-package tagedit
+      :ensure t
+      :init
+      (--each html-modes
+          (let ((map (eval (intern (s-append "-map" (symbol-name it))))))
+              (define-key map
+                  [remap sp-kill-hybrid-sexp] 'tagedit-kill)
+              (define-key map
+                  [remap sp-join-sexp] 'tagedit-join-tags)
+              (define-key map
+                  [remap sp-raise-sexp] 'tagedit-raise-tag)
+              (define-key map
+                  [remap splice-sexp] 'tagedit-splice-tag)
+              (define-key map
+                  [remap sp-change-enclosing] 'tagedit-kill-attribute))))
 
-#   (use-package tagedit
-#       :ensure t
-#       :bind (:map xah-fly-command-map
-#                   ("SPC SPC 1" . tagedit-split-tag)
-#                   ("SPC 1" . tagedit-join-tags)
-#                   ("]" . tagedit-raise-tag))
-#       :init
-#       (add-hook 'web-mode (lambda () (tagedit-mode +1))))
-
-# #+END_SRC
+#+END_SRC
 
 *** CSS
     I am use =css-eldoc= from =Elpa=:
