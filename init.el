@@ -22,6 +22,7 @@
 (add-to-list 'load-path "~/projects/fast-exec.el")
 (add-to-list 'load-path "~/projects/porth-mode")
 (add-to-list 'load-path "~/projects/emacs-run-command-recipes")
+(add-to-list 'load-path "~/projects/simple-indention")
 
 (use-package s :ensure t)
 
@@ -55,6 +56,9 @@ Info take from var `user-os`, user must set it."
     (setq yas-snippet-dirs '("~/.emacs.d/snippets")))
 
 (use-package yasnippet-classic-snippets :ensure t)
+
+(use-package auto-yasnippet
+    :ensure t)
 
 (use-package flycheck
     :ensure t
@@ -153,14 +157,20 @@ Info take from var `user-os`, user must set it."
                  (call-interactively ',(function-of-key (eval keymap) key)))))
     )
 
-(setq search-highlight        t)
-(setq query-replace-highlight t)
-
-(define-key xah-fly-command-map (kbd "'") 'isearch-forward)
+(use-package swiper-helm
+    :ensure t
+    :bind (:map xah-fly-command-map
+                ("'" . swiper-helm))
+    )
 
 (setq imenu-auto-rescan t)
 (define-key xah-fly-command-map (kbd "SPC SPC") nil)
 (define-key xah-fly-command-map (kbd "SPC SPC SPC") 'imenu)
+
+(use-package imenu-anywhere
+    :ensure t
+    :bind (:map xah-fly-command-map
+                ("SPC SPC n" . imenu-anywhere)))
 
 (use-package rg
     :ensure t
@@ -175,16 +185,27 @@ Info take from var `user-os`, user must set it."
     (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
     )
 
-(defun if-selected-then-next-word-like-this (arg)
-    (interactive "p")
-    (when (use-region-p)
-        (mc/mark-next-like-this arg)))
-
 (use-package multiple-cursors
     :ensure t
     :bind
     (:map xah-fly-command-map
-          ("SPC SPC t" . mc/edit-beginnings-of-lines)))
+          ("7" . mc/mark-next-like-this-word)
+          ("SPC 7" . 'mc/mark-previous-like-this-word)
+          ("SPC SPC 7" . mc/edit-beginnings-of-lines)))
+
+(use-package avy
+    :ensure t
+    :custom (avy-background t)
+    :bind ((:map xah-fly-command-map)
+           ("n"           . avy-goto-char)
+           ("SPC SPC v"   . avy-yank-word)
+           ("SPC SPC x"   . avy-teleport-word)
+           ("SPC SPC c"   . avy-copy-word)
+           ("SPC SPC d"   . avy-kill-word)
+           ("SPC SPC l c" . avy-copy-line)
+           ("SPC SPC l x" . avy-move-line)
+           ("SPC SPC l d" . avy-kill-whole-line)))
+
 
 (defun avy-goto-word-1-with-action (char action &optional arg beg end symbol)
   "Jump to the currently visible CHAR at a word start.
@@ -246,22 +267,6 @@ Pass ARG to `avy-jump'."
     (avy-goto-word-1-with-action char 'avy-action-kill-stay)
     )
 
-
-(use-package avy
-    :ensure t
-    :custom (avy-background t)
-    :bind
-    ((:map xah-fly-command-map)
-     ("n"           . avy-goto-char)
-     ("SPC SPC v"   . avy-yank-word)
-     ("SPC SPC x"   . avy-teleport-word)
-     ("SPC SPC c"   . avy-copy-word)
-     ("SPC SPC d"   . avy-kill-word)
-     ("SPC SPC l c" . avy-copy-line)
-     ("SPC SPC l x" . avy-move-line)
-     ("SPC SPC l d" . avy-kill-whole-line))
-    )
-
 (defun forward-slurp-sexp ()
     "My version of `sp-slurp-sexp`."
     (interactive)
@@ -282,7 +287,8 @@ Pass ARG to `avy-jump'."
 
 (use-package smartparens
     :ensure t
-    :init (smartparens-global-mode 1)
+    :init
+    (smartparens-global-mode 1)
     :bind (:map xah-fly-command-map
                 (("]" . forward-slurp-sexp)
                  ("-" . splice-sexp)
@@ -295,6 +301,7 @@ Pass ARG to `avy-jump'."
                  ("SPC SPC g" . sp-kill-hybrid-sexp)
                  )))
 
+(require 'smartparens-config)
 (require 'smartparens-latex)
 (require 'smartparens-javascript)
 (require 'smartparens-html)
@@ -666,6 +673,11 @@ Examples of codes (latex, markdown)"
     (dired-mode-hook . org-download-enable)
     )
 
+(use-package helm-org
+    :ensure t
+    :bind (:map org-mode-map
+                ([remap imenu] . helm-org-in-buffer-headings)))
+
 (use-package package-lint
     :ensure t
     )
@@ -693,6 +705,18 @@ Examples of codes (latex, markdown)"
     :ensure t)
 
 (add-hook 'markdown-mode-hook (lambda () (call-interactively 'visual-fill)))
+
+(use-package markdown-toc
+    :ensure t
+    :init
+    (defun fast-exec-define-markdown-toc-keys ()
+        "Bind `markdown-toc' and `fast-exec'."
+        (fast-exec/some-commands
+         ("Make Table of Contents in Markdown"
+          'markdown-toc-generate-or-refresh-toc))
+        )
+    (fast-exec/register-keymap-func 'fast-exec-define-markdown-toc-keys)
+    (fast-exec/reload-functions-chain))
 
 (add-to-list 'pandoc-input-format-major-modes
              '(markdown-mode "markdown"))
@@ -753,6 +777,10 @@ Examples of codes (latex, markdown)"
 (add-import-keymap-for-language go-mode
                                 go-import-add)
 
+(use-package pdf-tools
+    :ensure t
+    )
+
 (use-package haskell-mode
     :ensure t
     :hook (haskell-mode . haskell-indent-mode))
@@ -772,11 +800,6 @@ Examples of codes (latex, markdown)"
 (add-nav-backward-block-keymap-for-language
  haskell-mode
  haskell-ds-backward-decl)
-
-(require 'shm)
-(add-hook 'haskell-mode-hook 'structured-haskell-mode)
-(add-hook 'haskell-mode-hook (lambda ()
-                                 (haskell-indentation-mode 0)))
 
 (setq js/imports-regexp "import")
 
@@ -845,7 +868,19 @@ Examples of codes (latex, markdown)"
     :custom (emmet-move-cursor-between-quotes t)
     :hook
     (web-mode . emmet-mode)
-    (css-mode . emmet-mode))
+    (css-mode . emmet-mode)
+    (html-mode . emmet-mode))
+
+
+(use-package helm-emmet
+    :ensure t
+    :init
+    (defun fast-exec-helm-emmet-keys ()
+        "Keymaps for `helm-emmet'."
+        (fast-exec/some-commands
+         ("View Emmet Cheat" 'helm-emmet)))
+    (fast-exec/register-keymap-func 'fast-exec-helm-emmet-keys)
+    (fast-exec/reload-functions-chain))
 
 (defcustom html-modes '(web-mode html-mode) "List of `html` major modes.")
 
@@ -853,9 +888,7 @@ Examples of codes (latex, markdown)"
     :ensure t
     :init
     (dolist (hook (list 'web-mode-hook 'css-mode-hook))
-        (add-hook hook 'css-eldoc-enable)
-        )
-    )
+        (add-hook hook 'css-eldoc-enable)))
 
 (add-hook 'calc-mode-hook (lambda () (interactive) (xah-fly-keys 0)))
 (add-hook 'calc-end-hook (lambda () (interactive) (xah-fly-keys 38)))
@@ -865,6 +898,21 @@ Examples of codes (latex, markdown)"
 (setq auto-save-list-file-name  nil)
 (defalias 'yes-or-no-p 'y-or-n-p)
 (toggle-truncate-lines 38)
+
+(use-package git-gutter
+    :ensure t
+    :hook
+    (prog-mode . git-gutter-mode))
+
+(use-package helm-tail
+    :ensure t
+    :init
+    (defun fast-exec-define-helm-tail-keys ()
+        "This is bind `fast-exec' with `helm-tail'."
+        (fast-exec/some-commands
+         ("Open Tail" 'helm-tail)))
+    (fast-exec/register-keymap-func 'fast-exec-define-helm-tail-keys)
+    (fast-exec/reload-functions-chain))
 
 (use-package which-key
     :ensure t
@@ -884,14 +932,10 @@ Examples of codes (latex, markdown)"
 
 (use-package helm
    :ensure t
-   :config
-   (setq-default helm-M-x-fuzzy-match t)
-   :init
-   (helm-mode 1)
-   :bind
-   ("C-o" . helm-find-files)
-   (:map xah-fly-command-map
-         ("SPC SPC f" . helm-find-files)))
+   :config (setq-default helm-M-x-fuzzy-match t)
+   :init (helm-mode 1)
+   :bind (:map xah-fly-command-map
+               ("SPC SPC f" . helm-find-files)))
 
 (require 'fast-exec)
 
@@ -904,7 +948,8 @@ Examples of codes (latex, markdown)"
                                         format-all
                                         wikinforg
                                         suggest
-                                        devdocs)
+                                        devdocs
+                                        helm-wikipedia)
 
 (fast-exec/initialize)
 
@@ -948,9 +993,12 @@ Thank you https://github.com/leuven65!"
     (global-syntax-subword-mode)
     )
 
+(add-to-list 'load-path "~/projects/super-save/")
+
 (use-package super-save
-    :ensure t
     :config
+    (setq super-save-exclude '("Emacs.org"))
+    (setq auto-save-default nil)
     (super-save-mode 38))
 
 (use-package devdocs
@@ -972,6 +1020,56 @@ Thank you https://github.com/leuven65!"
                         (setq left-fringe-width 0 right-fringe-width 0)
                         (setq left-margin-width 2 right-margin-width 0)
                         (set-window-buffer nil (current-buffer)))))
+
+(use-package pacmacs
+    :ensure t
+    :init
+    (defun fast-exec-define-pacmacs-keys ()
+        "Bind `fast-exec' and `pacmacs'."
+        (fast-exec/some-commands
+         ("Play to Pacmacs" 'pacmacs-start))
+        )
+    (fast-exec/register-keymap-func 'fast-exec-define-pacmacs-keys)
+    (fast-exec/reload-functions-chain))
+
+(use-package helm-wikipedia
+    :ensure t)
+
+(use-package helm-spotify-plus
+    :ensure t)
+
+(use-package helm-github-stars
+    :ensure t
+    :custom
+    (helm-github-stars-username "semeninrussia")
+    :init
+    (defun fast-exec-define-helm-github-stars ()
+        "Bind `helm-github-stars' and `fast-exec'."
+        (fast-exec/some-commands
+         ("View Github Stars" 'helm-github-stars))
+        )
+    (fast-exec/register-keymap-func 'fast-exec-define-helm-github-stars)
+    (fast-exec/reload-functions-chain))
+
+;; (use-package helm-gitignore
+;;     :ensure t
+;;     :init
+;;     (defun fast-exec-define-helm-gitignore-keys ()
+;;         "Bind `fast-exec' and `helm-gitignore'."
+;;         (fast-exec/some-commands
+;;          ("Generate Gitignore" 'helm-gitignore)))
+;;     (fast-exec/register-keymap-func 'fast-exec-define-helm-gitignore-keys)
+;;     (fast-exec/reload-functions-chain)))
+
+(use-package helm-google
+    :ensure t
+    :init
+    (defun fast-exec-helm-google-define-keys ()
+        "Keymaps for `helm-google' and `fast-exec'."
+        (fast-exec/some-commands
+         ("Search in Google" 'helm-google)))
+    (fast-exec/register-keymap-func 'fast-exec-helm-google-define-keys)
+    (fast-exec/reload-functions-chain))
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
@@ -1041,6 +1139,11 @@ numbers of lines, otherwise don't display."
 
 (global-hl-line-mode 1)
 
+(use-package page-break-lines
+    :ensure t
+    :init
+    (global-page-break-lines-mode 38))
+
 (defun get-project-name (project-root)
     "Return name of project by path - `PROJECT-ROOT`."
     (s-titleize (f-dirname project-root)))
@@ -1056,8 +1159,7 @@ numbers of lines, otherwise don't display."
 (projectile-mode 1)
 
 (use-package helm-projectile
-    :ensure t
-    )
+    :ensure t)
 
 (use-package regex-tool
     :ensure t

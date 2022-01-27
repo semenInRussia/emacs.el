@@ -52,6 +52,7 @@
       (add-to-list 'load-path "~/projects/fast-exec.el")
       (add-to-list 'load-path "~/projects/porth-mode")
       (add-to-list 'load-path "~/projects/emacs-run-command-recipes")
+      (add-to-list 'load-path "~/projects/simple-indention")
 
       #+END_SRC
 
@@ -119,13 +120,23 @@
          :config
          (setq yas-snippet-dirs '("~/.emacs.d/snippets")))
 
-         #+END_SRC
-
+   #+END_SRC
+         
    And [[https://github.com/emacsmirror/yasnippet-classic-snippets][yasnippet-classic-snippets]] for basic snippets' collection:
 
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
      (use-package yasnippet-classic-snippets :ensure t)
    #+END_SRC
+
+*** More Simple Snippet Syntax
+    I am use [[https://github.com/abo-abo/auto-yasnippet#auto-yasnippet][auto-yasnippet]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package auto-yasnippet
+      :ensure t)
+
+#+END_SRC
 
 ** Linters
    I am use [[https://www.flycheck.org/en/latest/][flycheck]]:
@@ -136,7 +147,7 @@
          :ensure t
          :config (global-flycheck-mode 1))
 
-         #+END_SRC
+   #+END_SRC
 
 ** Autocomplete
    I am use [[http://company-mode.github.io][company-mode]], I am set delay beetween typing text and viewing hints to
@@ -280,15 +291,16 @@ will pressed KEY in KEYMAP and when CONDITION will true:
    
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (setq search-highlight        t)
-  (setq query-replace-highlight t)
+  (use-package swiper-helm
+      :ensure t
+      :bind (:map xah-fly-command-map
+                  ("'" . swiper-helm))
+      )
 
-  (define-key xah-fly-command-map (kbd "'") 'isearch-forward)
-  
 #+END_SRC
 
 ** Navigation beetween Functions/Classes/etc.
-   I am use ido with keymap =SPC SPC SPC=:
+   I am use =imenu= with keymap =SPC SPC SPC=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
@@ -297,6 +309,19 @@ will pressed KEY in KEYMAP and when CONDITION will true:
   (define-key xah-fly-command-map (kbd "SPC SPC SPC") 'imenu)
 
 #+END_SRC
+
+*** In Project
+    For Imenu In Project I am use [[https://github.com/vspinu/imenu-anywhere][imenu-anywhere]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package imenu-anywhere
+      :ensure t
+      :bind (:map xah-fly-command-map
+                  ("SPC SPC n" . imenu-anywhere)))
+
+#+END_SRC
+
 
 ** Jump to Defnition
    I am use [[https://github.com/jacktasia/dumb-jump][cool package dumb-jump]] for jump to defnition in 50+ languages:
@@ -322,16 +347,13 @@ will pressed KEY in KEYMAP and when CONDITION will true:
    I am use package of magnars [[https://github.com/magnars/multiple-cursors.el][multiple-cursors]]:
 
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
-  (defun if-selected-then-next-word-like-this (arg)
-      (interactive "p")
-      (when (use-region-p)
-          (mc/mark-next-like-this arg)))
-
   (use-package multiple-cursors
       :ensure t
       :bind
       (:map xah-fly-command-map
-            ("SPC SPC t" . mc/edit-beginnings-of-lines)))
+            ("7" . mc/mark-next-like-this-word)
+            ("SPC 7" . 'mc/mark-previous-like-this-word)
+            ("SPC SPC 7" . mc/edit-beginnings-of-lines)))
 
 #+END_SRC
 
@@ -339,6 +361,19 @@ will pressed KEY in KEYMAP and when CONDITION will true:
    I am use [[https://github.com/abo-abo/avy][avy]]:
    
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+  (use-package avy
+      :ensure t
+      :custom (avy-background t)
+      :bind ((:map xah-fly-command-map)
+             ("n"           . avy-goto-char)
+             ("SPC SPC v"   . avy-yank-word)
+             ("SPC SPC x"   . avy-teleport-word)
+             ("SPC SPC c"   . avy-copy-word)
+             ("SPC SPC d"   . avy-kill-word)
+             ("SPC SPC l c" . avy-copy-line)
+             ("SPC SPC l x" . avy-move-line)
+             ("SPC SPC l d" . avy-kill-whole-line)))
+
 
   (defun avy-goto-word-1-with-action (char action &optional arg beg end symbol)
     "Jump to the currently visible CHAR at a word start.
@@ -401,21 +436,6 @@ will pressed KEY in KEYMAP and when CONDITION will true:
       )
 
 
-  (use-package avy
-      :ensure t
-      :custom (avy-background t)
-      :bind
-      ((:map xah-fly-command-map)
-       ("n"           . avy-goto-char)
-       ("SPC SPC v"   . avy-yank-word)
-       ("SPC SPC x"   . avy-teleport-word)
-       ("SPC SPC c"   . avy-copy-word)
-       ("SPC SPC d"   . avy-kill-word)
-       ("SPC SPC l c" . avy-copy-line)
-       ("SPC SPC l x" . avy-move-line)
-       ("SPC SPC l d" . avy-kill-whole-line))
-      )
-
 #+END_SRC
 
 ** Smart Parens
@@ -445,7 +465,8 @@ use =-=, for navigating I am use `.` and `m`:
 
   (use-package smartparens
       :ensure t
-      :init (smartparens-global-mode 1)
+      :init
+      (smartparens-global-mode 1)
       :bind (:map xah-fly-command-map
                   (("]" . forward-slurp-sexp)
                    ("-" . splice-sexp)
@@ -464,6 +485,7 @@ use =-=, for navigating I am use `.` and `m`:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
+  (require 'smartparens-config)
   (require 'smartparens-latex)
   (require 'smartparens-javascript)
   (require 'smartparens-html)
@@ -1038,6 +1060,17 @@ Function `add-nav-to-imports-for-language`, is define keys for go to imports:
 
 #+END_SRC
 
+**** Navigation
+     I am use [[https://github.com/emacs-helm/helm-org][helm-org]] for navigation in Org Mode:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package helm-org
+      :ensure t
+      :bind (:map org-mode-map
+                  ([remap imenu] . helm-org-in-buffer-headings)))
+
+#+END_SRC
 
 *** Elisp
 **** Special Linters
@@ -1108,7 +1141,6 @@ Function `add-nav-to-imports-for-language`, is define keys for go to imports:
 
 #+END_SRC
 
-
 *** Markdown
     I am use [[https://github.com/jrblevin/markdown-mode/][markdown-mode]] , and for its I am centering code:
 
@@ -1120,6 +1152,26 @@ Function `add-nav-to-imports-for-language`, is define keys for go to imports:
   (add-hook 'markdown-mode-hook (lambda () (call-interactively 'visual-fill)))
 
 #+END_SRC
+
+**** Create Table of Contents
+     I am use [[https://github.com/ardumont/markdown-toc][markdown-toc]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package markdown-toc
+      :ensure t
+      :init
+      (defun fast-exec-define-markdown-toc-keys ()
+          "Bind `markdown-toc' and `fast-exec'."
+          (fast-exec/some-commands
+           ("Make Table of Contents in Markdown"
+            'markdown-toc-generate-or-refresh-toc))
+          )
+      (fast-exec/register-keymap-func 'fast-exec-define-markdown-toc-keys)
+      (fast-exec/reload-functions-chain))
+
+#+END_SRC
+
 
 **** Complie
      I am use [[https://github.com/bard/emacs-run-command][run-command]], and [[https://pandoc.org][pandoc]] to complie to special formats:
@@ -1239,6 +1291,17 @@ Var =python-shell-interpreter= is builtin Emacs var, see docs in Emacs:
 
 #+END_SRC
 
+*** PDF
+    I am use [[https://github.com/vedang/pdf-tools][pdf-tools]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package pdf-tools
+      :ensure t
+      )
+
+#+END_SRC
+
 *** Haskell
     I am use [[https://github.com/haskell/haskell-mode][haskell-mode]], and I love =indention-mode=:
 
@@ -1265,18 +1328,6 @@ Var =python-shell-interpreter= is builtin Emacs var, see docs in Emacs:
     haskell-ds-backward-decl)
 
  #+END_SRC
-
-**** Local "Paredit"
-     I am use [[https://github.com/projectional-haskell/structured-haskell-mode][structured-haskell-mode]] as =paredit= for =Haskell=:
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  (require 'shm)
-  (add-hook 'haskell-mode-hook 'structured-haskell-mode)
-  (add-hook 'haskell-mode-hook (lambda ()
-                                   (haskell-indentation-mode 0)))
-
-#+END_SRC
 
 *** JavaScript (Node.js)
 **** Variables
@@ -1385,7 +1436,19 @@ Defaults to:
       :custom (emmet-move-cursor-between-quotes t)
       :hook
       (web-mode . emmet-mode)
-      (css-mode . emmet-mode))
+      (css-mode . emmet-mode)
+      (html-mode . emmet-mode))
+
+
+  (use-package helm-emmet
+      :ensure t
+      :init
+      (defun fast-exec-helm-emmet-keys ()
+          "Keymaps for `helm-emmet'."
+          (fast-exec/some-commands
+           ("View Emmet Cheat" 'helm-emmet)))
+      (fast-exec/register-keymap-func 'fast-exec-helm-emmet-keys)
+      (fast-exec/reload-functions-chain))
 
 #+END_SRC
 
@@ -1423,9 +1486,7 @@ Defaults to:
       :ensure t
       :init
       (dolist (hook (list 'web-mode-hook 'css-mode-hook))
-          (add-hook hook 'css-eldoc-enable)
-          )
-      )
+          (add-hook hook 'css-eldoc-enable)))
 
 #+END_SRC
 
@@ -1450,6 +1511,33 @@ Defaults to:
   (setq auto-save-list-file-name  nil)
   (defalias 'yes-or-no-p 'y-or-n-p)
   (toggle-truncate-lines 38)
+
+#+END_SRC
+** Highlight Git Changes
+   I am use [[https://github.com/emacsorphanage/git-gutter][git-gutter]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package git-gutter
+      :ensure t
+      :hook
+      (prog-mode . git-gutter-mode))
+
+#+END_SRC
+** See Emacs [Lisp] Errors, Messages
+   I am use [[https://github.com/akirak/helm-tail][helm-tail]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package helm-tail
+      :ensure t
+      :init
+      (defun fast-exec-define-helm-tail-keys ()
+          "This is bind `fast-exec' with `helm-tail'."
+          (fast-exec/some-commands
+           ("Open Tail" 'helm-tail)))
+      (fast-exec/register-keymap-func 'fast-exec-define-helm-tail-keys)
+      (fast-exec/reload-functions-chain))
 
 #+END_SRC
 
@@ -1486,38 +1574,38 @@ Defaults to:
    I am use [[https://github.com/emacs-helm/helm][HELM]]:
    
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
   (use-package helm
      :ensure t
-     :config
-     (setq-default helm-M-x-fuzzy-match t)
-     :init
-     (helm-mode 1)
-     :bind
-     ("C-o" . helm-find-files)
-     (:map xah-fly-command-map
-           ("SPC SPC f" . helm-find-files)))
+     :config (setq-default helm-M-x-fuzzy-match t)
+     :init (helm-mode 1)
+     :bind (:map xah-fly-command-map
+                 ("SPC SPC f" . helm-find-files)))
+
+
 #+END_SRC
 ** Fast Executing Command
    I am use [[https://github.com/semenInRussia/fast-exec.el][fast-exec]]:
    
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (require 'fast-exec)
+      (require 'fast-exec)
 
-  (fast-exec/enable-some-builtin-supports haskell-mode
-                                          flycheck
-                                          magit
-                                          projectile
-                                          skeletor
-                                          yasnippet
-                                          format-all
-                                          wikinforg
-                                          suggest
-                                          devdocs)
+      (fast-exec/enable-some-builtin-supports haskell-mode
+                                              flycheck
+                                              magit
+                                              projectile
+                                              skeletor
+                                              yasnippet
+                                              format-all
+                                              wikinforg
+                                              suggest
+                                              devdocs
+                                              helm-wikipedia)
 
-  (fast-exec/initialize)
+      (fast-exec/initialize)
 
-  (define-key xah-fly-command-map (kbd "=") 'fast-exec/exec)
+      (define-key xah-fly-command-map (kbd "=") 'fast-exec/exec)
 
 #+END_SRC
 
@@ -1624,9 +1712,12 @@ Defaults to:
    I am use [[https://github.com/bbatsov/super-save][super-save]]:
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
+  (add-to-list 'load-path "~/projects/super-save/")
+
   (use-package super-save
-      :ensure t
       :config
+      (setq super-save-exclude '("Emacs.org"))
+      (setq auto-save-default nil)
       (super-save-mode 38))
 
 #+END_SRC
@@ -1662,6 +1753,97 @@ Defaults to:
                           (setq left-fringe-width 0 right-fringe-width 0)
                           (setq left-margin-width 2 right-margin-width 0)
                           (set-window-buffer nil (current-buffer)))))
+
+#+END_SRC
+
+** Pacman
+   I am use [[https://github.com/semenInRussia?tab=stars][pacmacs]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package pacmacs
+      :ensure t
+      :init
+      (defun fast-exec-define-pacmacs-keys ()
+          "Bind `fast-exec' and `pacmacs'."
+          (fast-exec/some-commands
+           ("Play to Pacmacs" 'pacmacs-start))
+          )
+      (fast-exec/register-keymap-func 'fast-exec-define-pacmacs-keys)
+      (fast-exec/reload-functions-chain))
+
+#+END_SRC
+
+
+** Wikipedia
+   I am use [[https://github.com/emacs-helm/helm-wikipedia][helm-wikipedia]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package helm-wikipedia
+      :ensure t)
+
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package helm-spotify-plus
+      :ensure t)
+
+#+END_SRC
+
+** View Github Stars
+   I am use [[https://github.com/Sliim/helm-github-stars][helm-github-stars]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package helm-github-stars
+      :ensure t
+      :custom
+      (helm-github-stars-username "semeninrussia")
+      :init
+      (defun fast-exec-define-helm-github-stars ()
+          "Bind `helm-github-stars' and `fast-exec'."
+          (fast-exec/some-commands
+           ("View Github Stars" 'helm-github-stars))
+          )
+      (fast-exec/register-keymap-func 'fast-exec-define-helm-github-stars)
+      (fast-exec/reload-functions-chain))
+
+#+END_SRC
+
+** Easy Generate .gitignore
+   I am use [[https://github.com/jupl/helm-gitignore][helm-gitignore]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  ;; (use-package helm-gitignore
+  ;;     :ensure t
+  ;;     :init
+  ;;     (defun fast-exec-define-helm-gitignore-keys ()
+  ;;         "Bind `fast-exec' and `helm-gitignore'."
+  ;;         (fast-exec/some-commands
+  ;;          ("Generate Gitignore" 'helm-gitignore)))
+  ;;     (fast-exec/register-keymap-func 'fast-exec-define-helm-gitignore-keys)
+  ;;     (fast-exec/reload-functions-chain)))
+
+#+END_SRC
+
+** Google
+   I am use [[https://github.com/cwhatley/helm-google][helm-google]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package helm-google
+      :ensure t
+      :init
+      (defun fast-exec-helm-google-define-keys ()
+          "Keymaps for `helm-google' and `fast-exec'."
+          (fast-exec/some-commands
+           ("Search in Google" 'helm-google)))
+      (fast-exec/register-keymap-func 'fast-exec-helm-google-define-keys)
+      (fast-exec/reload-functions-chain))
 
 #+END_SRC
 
@@ -1793,7 +1975,17 @@ I am use [[https://github.com/seagle0128/doom-modeline][doom-modeline]]:
 
 I
 
-** 
+** View Break Page Lines
+   I am use [[https://github.com/purcell/page-break-lines][page-break-lines]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package page-break-lines
+      :ensure t
+      :init
+      (global-page-break-lines-mode 38))
+
+#+END_SRC
 
 * Developer Environment
 ** Projects Management
@@ -1822,8 +2014,7 @@ I
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (use-package helm-projectile
-      :ensure t
-      )
+      :ensure t)
 
 #+END_SRC
 ** Regexp IDE
@@ -1922,5 +2113,4 @@ I am use [[https://github.com/emacsmirror/dired-details][dired-detail]]:
 
   (add-hook 'after-save-hook 'if-Emacs-org-then-org-babel-tangle)
 #+END_SRC
-
 

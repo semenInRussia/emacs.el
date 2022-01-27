@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: should
+# key: sh
+# --
+(should ${1:(eq $2)})
