@@ -90,6 +90,10 @@ Info take from var `user-os`, user must set it."
 (setq company-backends
       (mapcar #'company-mode/backend-with-yas company-backends))
 
+(use-package company-box
+    :ensure t
+    :hook (company-mode . company-box-mode))
+
 (use-package browse-kill-ring
     :ensure t)
 
@@ -794,6 +798,13 @@ Examples of codes (latex, markdown)"
  haskell-mode
  haskell-ds-backward-decl)
 
+(use-package company-ghci
+    :ensure t
+    :init
+    (push 'company-ghci company-backends)
+    (add-hook 'haskell-mode-hook 'company-mode)
+    (add-hook 'haskell-interactive-mode-hook 'company-mode))
+
 (setq js/imports-regexp "import")
 
 (setq js/function-or-class-regexp "function \\|class ")
@@ -896,6 +907,15 @@ Examples of codes (latex, markdown)"
                 [remap splice-sexp] 'tagedit-splice-tag)
             (define-key map
                 [remap sp-change-enclosing] 'tagedit-kill-attribute))))
+
+(use-package company-web
+    :ensure t
+    :init
+    (add-hook 'web-mode-hook
+              (lambda ()
+                  (set (make-local-variable 'company-backends)
+                       '(company-web-html))
+                  (company-mode t))))
 
 (use-package css-eldoc
     :ensure t
@@ -1222,5 +1242,3 @@ numbers of lines, otherwise don't display."
         (org-babel-tangle)))
 
 (add-hook 'after-save-hook 'if-Emacs-org-then-org-babel-tangle)
-
-\|print(name)

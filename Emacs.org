@@ -168,7 +168,7 @@
          (add-to-list 'company-backends 'company-keywords)
          (global-company-mode 1))
 
-         #+END_SRC
+   #+END_SRC
 
    And for =yasnippet= I am use code from [[https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names][this]] stackexchange:
 
@@ -187,7 +187,19 @@
      (setq company-backends
            (mapcar #'company-mode/backend-with-yas company-backends))
 
-           #+END_SRC
+    #+END_SRC
+
+*** More Pretty Auto Complete
+    I am use popular [[https://github.com/sebastiencs/company-box][company-box]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package company-box
+      :ensure t
+      :hook (company-mode . company-box-mode))
+
+#+END_SRC
+
 
 ** Autocompletion by Initials
    For autocompletion by initials I am use [[https://github.com/baohaojun/bbyac][bbyac]]:
@@ -1329,6 +1341,19 @@ Var =python-shell-interpreter= is builtin Emacs var, see docs in Emacs:
     haskell-ds-backward-decl)
 
  #+END_SRC
+**** Auto Completion for Haskell
+     I am use [[https://github.com/horellana/company-ghci][company-ghci]]:
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package company-ghci
+      :ensure t
+      :init
+      (push 'company-ghci company-backends)
+      (add-hook 'haskell-mode-hook 'company-mode)
+      (add-hook 'haskell-interactive-mode-hook 'company-mode))
+
+#+END_SRC
+     
 
 *** JavaScript (Node.js)
 **** Variables
@@ -1485,6 +1510,22 @@ Defaults to:
                   [remap splice-sexp] 'tagedit-splice-tag)
               (define-key map
                   [remap sp-change-enclosing] 'tagedit-kill-attribute))))
+
+#+END_SRC
+
+**** Auto Complete for HTML
+     I am use [[https://github.com/osv/company-web][company-web]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package company-web
+      :ensure t
+      :init
+      (add-hook 'web-mode-hook
+                (lambda ()
+                    (set (make-local-variable 'company-backends)
+                         '(company-web-html))
+                    (company-mode t))))
 
 #+END_SRC
 
@@ -1701,7 +1742,7 @@ Defaults to:
 ** Syntax Subword Mode
    I am use [[https://melpa.org/#/syntax-subword][syntax-subword]], for example if I am in current situation:
 
-#+BEGIN_SRC shell :tangle ~/init.el
+#+BEGIN_SRC shell
    \|print(name)
 #+END_SRC
 
