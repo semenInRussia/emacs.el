@@ -51,8 +51,7 @@
 
       (add-to-list 'load-path "~/projects/fast-exec.el")
       (add-to-list 'load-path "~/projects/porth-mode")
-      (add-to-list 'load-path "~/projects/emacs-run-command-recipes")
-      (add-to-list 'load-path "~/projects/simple-indention")
+      (add-to-list 'load-path "~/projects/simple-indention.el")
 
       #+END_SRC
 
@@ -234,6 +233,7 @@
 
   (define-key xah-fly-command-map (kbd "SPC l") nil)
   (define-key xah-fly-command-map (kbd "SPC j") nil)
+  (define-key xah-fly-command-map (kbd "SPC SPC") nil)
 
 #+END_SRC
 ** Functions for Define Keys
@@ -298,6 +298,16 @@ will pressed KEY in KEYMAP and when CONDITION will true:
       )
 
 #+END_SRC
+
+** Search and Replace
+   I am use =SPC r= for replace word in buffer, and =SPC SPC r= for replace word in project:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (define-key xah-fly-command-map (kbd "SPC SPC r") 'projectile-replace)
+
+#+END_SRC
+
 
 ** Navigation beetween Functions/Classes/etc.
    I am use =imenu= with keymap =SPC SPC SPC=:
@@ -1807,8 +1817,7 @@ Defaults to:
       (defun fast-exec-define-helm-github-stars ()
           "Bind `helm-github-stars' and `fast-exec'."
           (fast-exec/some-commands
-           ("View Github Stars" 'helm-github-stars))
-          )
+           ("View Github Stars" 'helm-github-stars-fetch)))
       (fast-exec/register-keymap-func 'fast-exec-define-helm-github-stars)
       (fast-exec/reload-functions-chain))
 
@@ -2010,14 +2019,17 @@ I
 
 #+END_SRC
 *** Projectile with Helm
-    I am use offical [[https://github.com/bbatsov/helm-projectile][helm-projectile]]:
+    I am use offical [[https://github.com/bbatsov/helm-projectile][helm-projectile]] I am press =SPC j= and find file in current project:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (use-package helm-projectile
-      :ensure t)
+      :ensure t
+      :bind (:map xah-fly-command-map
+                  ("SPC j" . 'helm-projectile-find-file)))
 
 #+END_SRC
+
 ** Regexp IDE
    I am use [[https://github.com/jwiegley/regex-tool][regex-tool]] for testing regexp in Emacs
 
@@ -2084,9 +2096,11 @@ I am use [[https://github.com/emacsmirror/dired-details][dired-detail]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (require 'run-command-recipes)
-
-  (run-command-recipes-use-all)
+  (use-package run-command-recipes
+      :ensure t
+      :after (run-command)
+      :init
+      (run-command-recipes-use-all))
 
 #+END_SRC
 ** Skeletor
@@ -2101,7 +2115,6 @@ I am use [[https://github.com/emacsmirror/dired-details][dired-detail]]:
       (skeletor-completing-read-function completing-read-function))
 
 #+END_SRC
-
 * Auto Tangle This File
 
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el

@@ -21,8 +21,7 @@
 
 (add-to-list 'load-path "~/projects/fast-exec.el")
 (add-to-list 'load-path "~/projects/porth-mode")
-(add-to-list 'load-path "~/projects/emacs-run-command-recipes")
-(add-to-list 'load-path "~/projects/simple-indention")
+(add-to-list 'load-path "~/projects/simple-indention.el")
 
 (use-package s :ensure t)
 
@@ -115,6 +114,7 @@ Info take from var `user-os`, user must set it."
 
 (define-key xah-fly-command-map (kbd "SPC l") nil)
 (define-key xah-fly-command-map (kbd "SPC j") nil)
+(define-key xah-fly-command-map (kbd "SPC SPC") nil)
 
 (defun keymap-to-list (keymap)
     "Convert `KEYMAP` to list."
@@ -162,6 +162,8 @@ Info take from var `user-os`, user must set it."
     :bind (:map xah-fly-command-map
                 ("'" . swiper-helm))
     )
+
+(define-key xah-fly-command-map (kbd "SPC SPC r") 'projectile-replace)
 
 (setq imenu-auto-rescan t)
 (define-key xah-fly-command-map (kbd "SPC SPC") nil)
@@ -1057,8 +1059,7 @@ Thank you https://github.com/leuven65!"
     (defun fast-exec-define-helm-github-stars ()
         "Bind `helm-github-stars' and `fast-exec'."
         (fast-exec/some-commands
-         ("View Github Stars" 'helm-github-stars))
-        )
+         ("View Github Stars" 'helm-github-stars-fetch)))
     (fast-exec/register-keymap-func 'fast-exec-define-helm-github-stars)
     (fast-exec/reload-functions-chain))
 
@@ -1170,7 +1171,9 @@ numbers of lines, otherwise don't display."
 (projectile-mode 1)
 
 (use-package helm-projectile
-    :ensure t)
+    :ensure t
+    :bind (:map xah-fly-command-map
+                ("SPC j" . 'helm-projectile-find-file)))
 
 (use-package regex-tool
     :ensure t
@@ -1199,9 +1202,11 @@ numbers of lines, otherwise don't display."
     :bind (:map xah-fly-command-map
                 ("SPC , c" . run-command)))
 
-(require 'run-command-recipes)
-
-(run-command-recipes-use-all)
+(use-package run-command-recipes
+    :ensure t
+    :after (run-command)
+    :init
+    (run-command-recipes-use-all))
 
 (use-package skeletor
     :ensure t
