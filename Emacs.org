@@ -35,6 +35,63 @@
 
      (require 'use-package)
      #+END_SRC
+*** Simple Create Local Major Maps
+    I am use =use-package=, so I am create keyword =:local-major-map= for simple create local major maps, I am have variable =my-local-major-map-prefix=. This varible is prefix of my local major mode map. Defaults to =SPC l=:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (defvar my-local-major-map-prefix "SPC l"
+    "Prefix to local `major-mode' map prefx.")
+
+#+END_SRC
+
+**** Setup for =:local-major-map=
+
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+       (add-to-list 'use-package-keywords :local-major-map)
+
+     #+END_SRC
+
+**** Normalizer for =:local-major-map=
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (defun use-package-normalize/:local-major-map (name-symbol keyword args)
+      "Normalizer of `use-package' `:local-major-map' keyword."
+      (use-package-only-one (symbol-name keyword) args
+          (lambda (label arg)
+              (cond
+                ((eq nil arg) name-symbol)
+                ((listp arg) arg)
+                ((symbolp arg) (list arg))
+                ((stringp arg) (list (intern arg)))))))
+
+#+END_SRC
+
+**** =local-major-map='s Handler
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (defun use-package-handler/:local-major-map (name-symbol keyword
+                                               modes rest state)
+      (let ((body (use-package-process-keywords name-symbol rest state))
+            (modes-hooks (--map (intern (s-append "-hook" (symbol-name it)))
+                                modes))
+            (map (intern (s-concat "my-"
+                                   (symbol-name name-symbol)
+                                   "-local-map"))))
+          (if (null modes)
+              body
+              (use-package-concat
+               body
+               `((define-prefix-command ',map)
+                 (--each ',modes-hooks
+                     (add-hook it (lambda ()
+                                      (define-key
+                                          xah-fly-command-map
+                                          (kbd my-local-major-map-prefix)
+                                          ,map)))))))))
+
+#+END_SRC
 
 ** Packages Not in MELPA/ELPA/ORG-ELPA
 *** Stranger Packages
@@ -200,7 +257,6 @@
 
 #+END_SRC
 
-
 ** Autocompletion by Initials
    For autocompletion by initials I am use [[https://github.com/baohaojun/bbyac][bbyac]]:
 
@@ -246,6 +302,7 @@
   (define-key xah-fly-command-map (kbd "SPC l") nil)
   (define-key xah-fly-command-map (kbd "SPC j") nil)
   (define-key xah-fly-command-map (kbd "SPC SPC") nil)
+  (define-key xah-fly-command-map "`" nil) ; This is my local mode map
 
 #+END_SRC
 ** Functions for Define Keys
@@ -320,7 +377,6 @@ will pressed KEY in KEYMAP and when CONDITION will true:
 
 #+END_SRC
 
-
 ** Navigation beetween Functions/Classes/etc.
    I am use =imenu= with keymap =SPC SPC SPC=:
 
@@ -341,6 +397,18 @@ will pressed KEY in KEYMAP and when CONDITION will true:
       :ensure t
       :bind (:map xah-fly-command-map
                   ("SPC SPC n" . imenu-anywhere)))
+
+#+END_SRC
+
+** Smart Comment/Uncomment
+   I am use [[https://github.com/remyferre/comment-dwim-2][comment-dwim-2]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package comment-dwim-2
+      :ensure t
+      :bind (:map xah-fly-command-map
+                  ("z" . comment-dwim-2)))
 
 #+END_SRC
 
@@ -579,15 +647,14 @@ use =-=, for navigating I am use `.` and `m`:
 #+RESULTS:
 : kmacro-call-macro-or-apply-to-lines
 ** Special Strings as Seperated Buffers
-   I am use [[https://github.com/QBobWatson/poporg][poporg]]:
+   I am use [[https://github.com/magnars/string-edit.el][string-edit]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package poporg
+  (use-package string-edit
       :ensure t
       :bind (:map xah-fly-command-map
-                  ("`" . poporg-dwim))
-      )
+                  ("SPC `" . string-edit-at-point)))
 
 #+END_SRC
 
@@ -1029,6 +1096,27 @@ Function `add-nav-to-imports-for-language`, is define keys for go to imports:
 
 
 #+END_SRC
+**** Auto Complete for LaTeX
+     I am use [[https://github.com/vspinu/company-math][company-math]] and [[https://github.com/alexeyr/company-auctex][company-auctex]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package company-math
+      :ensure t
+      :init
+      (defun my-company-math-setup ()
+          "Setup for `company-math'."
+          (add-to-list 'company-backends 'company-math-symbols-latex)
+          (add-to-list 'company-backends 'company-latex-commands))
+      (add-hook 'LaTeX-mode 'my-company-math-setup))
+
+
+  (use-package company-auctex
+      :ensure t
+      :config
+      (company-auctex-init))
+
+#+END_SRC
 
 *** Org
 **** Centering 
@@ -1151,6 +1239,25 @@ Function `add-nav-to-imports-for-language`, is define keys for go to imports:
   (use-package suggest
       :ensure t
       )
+
+#+END_SRC
+
+**** Elisp Docstrings Mode
+     I am use [[https://github.com/Fuco1/elisp-docstring-mode][elisp-docstring-mode]] with [[https://github.com/Fuco1/elisp-docstring-mode][string-edit]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+(defun my-edit-elisp-docstring ()
+    "Edit `elisp' docstring via `string-edit' and `elisp-docstring-mode'."
+    (interactive)
+    (string-edit-at-point)
+    (elisp-docstring-mode))
+
+(use-package elisp-docstring-mode
+    :ensure t
+    :bind (:map emacs-lisp-mode-map
+                ([remap string-edit-at-point] . my-edit-elisp-docstring)))
+
 
 #+END_SRC
 
@@ -1354,7 +1461,6 @@ Var =python-shell-interpreter= is builtin Emacs var, see docs in Emacs:
 
 #+END_SRC
      
-
 *** JavaScript (Node.js)
 **** Variables
      Variable `js/imports-regexp` if regular expression for search imports in JS. 
@@ -1436,6 +1542,35 @@ Defaults to:
    js/nav-forward-function-or-class)
 
 #+END_SRC
+
+*** JSON
+    I am use [[https://github.com/Sterlingg/json-snatcher][json-snatcher]] for copy JSON "path" to current node:
+For this I am press =` c=:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (use-package json-mode
+      :local-major-map json-mode)
+
+
+  (use-package json-snatcher
+      :ensure t
+      :bind
+      (:map
+       my-json-mode-local-map
+       ("c" . jsons-print-path)
+       ("j" . what-line)))
+
+  (defun my-json-setup ()
+      "My `json' setup."
+      (interactive)
+      (define-prefix-command 'my-json-leader-map)
+      (define-key my-json-leader-map (kbd "c") 'jsons-print-path)
+      (define-key xah-fly-command-map "`" my-json-leader-map))
+
+#+END_SRC
+
+#+RESULTS:
+: my-json-setup
 
 *** HTML
     I am use [[https://web-mode.org][web-mode]] and [[https://github.com/smihica/emmet-mode][emmet]] and [[https://github.com/jcs-elpa/auto-rename-tag][auto-rename-tag]]:
@@ -1530,6 +1665,7 @@ Defaults to:
 #+END_SRC
 
 *** CSS
+**** Fly Documentation
     I am use =css-eldoc= from =Elpa=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -1539,6 +1675,23 @@ Defaults to:
       :init
       (dolist (hook (list 'web-mode-hook 'css-mode-hook))
           (add-hook hook 'css-eldoc-enable)))
+
+#+END_SRC
+
+**** First Navigation by CSS Selectors
+     I am use [[https://github.com/emacsorphanage/helm-css-scss][helm-css-scss]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package helm-css-scss
+      :ensure t
+      :init
+      (setq helm-css-scss-insert-close-comment-depth 2)
+      (setq helm-css-scss-split-with-multiple-windows nil)
+      (setq helm-css-scss-split-direction 'split-window-vertically)
+
+      (dolist (map (list css-mode-map))
+          (define-key map [remap imenu] 'helm-css-scss-from-isearch)))
 
 #+END_SRC
 
@@ -2112,15 +2265,55 @@ I
 
 #+END_SRC
 
-** View Directories
-   I am use inline in Emacs [[https://www.emacswiki.org/emacs/DiredMode][dired]]. And for minimalize design of dired,
-I am use [[https://github.com/emacsmirror/dired-details][dired-detail]]:
+*** Undo with Git
+    I am use [[https://github.com/jwiegley/git-undo-el][git-undo]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
+  (use-package git-undo
+      :init
+      (defun fast-exec-define-git-undo-keymaps ()
+          "Bind `git-undo' and `fast-exec'."
+          (fast-exec/some-commands
+           ("Undo via Git" 'git-undo)))
+      (fast-exec/register-keymap-func 'fast-exec-define-git-undo-keymaps)
+      (fast-exec/reload-functions-chain))
 
 #+END_SRC
+
+*** Git Major Modes
+    As major modes of (.github, gitconfig) I am use [[https://github.com/magit/git-modes][git-modes]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package git-modes
+      :ensure t)
+
+#+END_SRC
+
+*** Genreate .gitignore
+    I am use [[https://github.com/jupl/helm-gitignore][helm-gitignore]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package helm-gitignore
+      :init
+      (defun fast-exec-helm-gitignore-keys ()
+          "Bind of `helm-gitignore' and `fast-exec'."
+          (fast-exec/some-commands
+           ("Generate Gitignore" 'helm-gitignore)))
+      (fast-exec/register-keymap-func 'fast-exec-helm-gitignore-keys)
+      (fast-exec/reload-functions-chain))
+
+#+END_SRC
+
+** View Directories
+   I am use =dired=:
+   
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+(add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
+#+END_SRC
+
 ** Run Command
    I am use [[https://github.com/bard/emacs-run-command][run-command]] for run special commands for special files:
 
@@ -2132,15 +2325,15 @@ I am use [[https://github.com/emacsmirror/dired-details][dired-detail]]:
                   ("SPC , c" . run-command)))
 
 #+END_SRC
-*** Recipes
+
+*** Run Command Recipes
     I am use [[https://github.com/semenInRussia/emacs-run-command-recipes/][run-command-recipes]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (use-package run-command-recipes
       :ensure t
-      :after (run-command)
-      :init
+      :config
       (run-command-recipes-use-all))
 
 #+END_SRC
@@ -2156,9 +2349,44 @@ I am use [[https://github.com/emacsmirror/dired-details][dired-detail]]:
       (skeletor-completing-read-function completing-read-function))
 
 #+END_SRC
+** Snitch
+   I am use [[https://github.com/tsoding/snitch][snitch]] for managing TODOs
+
+*** Highlight TODOs
+    I am use [[https://github.com/tarsius/hl-todo][hl-todo]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package hl-todo
+      :ensure t
+      :config (global-hl-todo-mode))
+
+#+END_SRC
+*** Run Snitch Commands
+    I am use =run-command= (see in this config) for run command:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (defun run-command-recipe-snitch ()
+      "Recipes of `run-command' for snitch."
+      (when (f-directory-p (f-join (projectile-acquire-root)
+                                               ".git"))
+          (list
+           (list :command-name "sntich-list"
+                 :display "See List of TODOs from via Snitch"
+                 :command-line "snitch list")
+           (list :command-name "sntich-report"
+                 :display "Report to VC TODOs of Project via Snitch"
+                 :command-line "snitch list"))))
+
+  (add-to-list 'run-command-recipes 'run-command-recipe-snitch)
+
+#+END_SRC
+
 * Auto Tangle This File
 
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+
   (defun if-Emacs-org-then-org-babel-tangle ()
       "If current open file is Emacs.org, then `org-babel-tangle`."
       (interactive)
@@ -2166,6 +2394,8 @@ I am use [[https://github.com/emacsmirror/dired-details][dired-detail]]:
       (when (s-equals? (f-filename buffer-file-name) "Emacs.org")
           (org-babel-tangle)))
 
+
   (add-hook 'after-save-hook 'if-Emacs-org-then-org-babel-tangle)
+
 #+END_SRC
 

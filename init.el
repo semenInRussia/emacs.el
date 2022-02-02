@@ -17,6 +17,41 @@
 
 (require 'use-package)
 
+(defvar my-local-major-map-prefix "SPC l"
+  "Prefix to local `major-mode' map prefx.")
+
+(add-to-list 'use-package-keywords :local-major-map)
+
+(defun use-package-normalize/:local-major-map (name-symbol keyword args)
+    "Normalizer of `use-package' `:local-major-map' keyword."
+    (use-package-only-one (symbol-name keyword) args
+        (lambda (label arg)
+            (cond
+              ((eq nil arg) name-symbol)
+              ((listp arg) arg)
+              ((symbolp arg) (list arg))
+              ((stringp arg) (list (intern arg)))))))
+
+(defun use-package-handler/:local-major-map (name-symbol keyword
+                                             modes rest state)
+    (let ((body (use-package-process-keywords name-symbol rest state))
+          (modes-hooks (--map (intern (s-append "-hook" (symbol-name it)))
+                              modes))
+          (map (intern (s-concat "my-"
+                                 (symbol-name name-symbol)
+                                 "-local-map"))))
+        (if (null modes)
+            body
+            (use-package-concat
+             body
+             `((define-prefix-command ',map)
+               (--each ',modes-hooks
+                   (add-hook it (lambda ()
+                                    (define-key
+                                        xah-fly-command-map
+                                        (kbd my-local-major-map-prefix)
+                                        ,map)))))))))
+
 (add-to-list 'load-path "~/.emacs.d/lisp")
 
 (add-to-list 'load-path "~/projects/fast-exec.el")
@@ -119,6 +154,7 @@ Info take from var `user-os`, user must set it."
 (define-key xah-fly-command-map (kbd "SPC l") nil)
 (define-key xah-fly-command-map (kbd "SPC j") nil)
 (define-key xah-fly-command-map (kbd "SPC SPC") nil)
+(define-key xah-fly-command-map "`" nil) ; This is my local mode map
 
 (defun keymap-to-list (keymap)
     "Convert `KEYMAP` to list."
@@ -177,6 +213,11 @@ Info take from var `user-os`, user must set it."
     :ensure t
     :bind (:map xah-fly-command-map
                 ("SPC SPC n" . imenu-anywhere)))
+
+(use-package comment-dwim-2
+    :ensure t
+    :bind (:map xah-fly-command-map
+                ("z" . comment-dwim-2)))
 
 (use-package rg
     :ensure t
@@ -359,11 +400,10 @@ Pass ARG to `avy-jump'."
 
 (define-key xah-fly-command-map (kbd "SPC RET") 'kmacro-call-macro-or-apply-to-lines)
 
-(use-package poporg
+(use-package string-edit
     :ensure t
     :bind (:map xah-fly-command-map
-                ("`" . poporg-dwim))
-    )
+                ("SPC `" . string-edit-at-point)))
 
 (define-key-when xah-fly-command-map "n" 'avy-transpose-lines-in-region
                  'use-region-p)
@@ -656,6 +696,21 @@ Examples of codes (latex, markdown)"
                          'latex-make-text-italic))
               ))
 
+(use-package company-math
+    :ensure t
+    :init
+    (defun my-company-math-setup ()
+        "Setup for `company-math'."
+        (add-to-list 'company-backends 'company-math-symbols-latex)
+        (add-to-list 'company-backends 'company-latex-commands))
+    (add-hook 'LaTeX-mode 'my-company-math-setup))
+
+
+(use-package company-auctex
+    :ensure t
+    :config
+    (company-auctex-init))
+
 (add-hook 'org-mode-hook (lambda () (call-interactively 'visual-fill)))
 
 (add-to-list 'pandoc-input-format-major-modes
@@ -697,6 +752,17 @@ Examples of codes (latex, markdown)"
 (use-package suggest
     :ensure t
     )
+
+(defun my-edit-elisp-docstring ()
+    "Edit `elisp' docstring via `string-edit' and `elisp-docstring-mode'."
+    (interactive)
+    (string-edit-at-point)
+    (elisp-docstring-mode))
+
+(use-package elisp-docstring-mode
+    :ensure t
+    :bind (:map emacs-lisp-mode-map
+                ([remap string-edit-at-point] . my-edit-elisp-docstring)))
 
 (use-package markdown-mode
     :ensure t)
@@ -851,6 +917,25 @@ Examples of codes (latex, markdown)"
  js2-mode
  js/nav-forward-function-or-class)
 
+(use-package json-mode
+    :local-major-map json-mode)
+
+
+(use-package json-snatcher
+    :ensure t
+    :bind
+    (:map
+     my-json-mode-local-map
+     ("c" . jsons-print-path)
+     ("j" . what-line)))
+
+(defun my-json-setup ()
+    "My `json' setup."
+    (interactive)
+    (define-prefix-command 'my-json-leader-map)
+    (define-key my-json-leader-map (kbd "c") 'jsons-print-path)
+    (define-key xah-fly-command-map "`" my-json-leader-map))
+
 (use-package web-mode
     :ensure t
     :hook (web-mode . yas-minor-mode-off)
@@ -922,6 +1007,16 @@ Examples of codes (latex, markdown)"
     :init
     (dolist (hook (list 'web-mode-hook 'css-mode-hook))
         (add-hook hook 'css-eldoc-enable)))
+
+(use-package helm-css-scss
+    :ensure t
+    :init
+    (setq helm-css-scss-insert-close-comment-depth 2)
+    (setq helm-css-scss-split-with-multiple-windows nil)
+    (setq helm-css-scss-split-direction 'split-window-vertically)
+
+    (dolist (map (list css-mode-map))
+        (define-key map [remap imenu] 'helm-css-scss-from-isearch)))
 
 (add-hook 'calc-mode-hook (lambda () (interactive) (xah-fly-keys 0)))
 (add-hook 'calc-end-hook (lambda () (interactive) (xah-fly-keys 38)))
@@ -1215,6 +1310,27 @@ numbers of lines, otherwise don't display."
                      :italic t)))
     )
 
+(use-package git-undo
+    :init
+    (defun fast-exec-define-git-undo-keymaps ()
+        "Bind `git-undo' and `fast-exec'."
+        (fast-exec/some-commands
+         ("Undo via Git" 'git-undo)))
+    (fast-exec/register-keymap-func 'fast-exec-define-git-undo-keymaps)
+    (fast-exec/reload-functions-chain))
+
+(use-package git-modes
+    :ensure t)
+
+(use-package helm-gitignore
+    :init
+    (defun fast-exec-helm-gitignore-keys ()
+        "Bind of `helm-gitignore' and `fast-exec'."
+        (fast-exec/some-commands
+         ("Generate Gitignore" 'helm-gitignore)))
+    (fast-exec/register-keymap-func 'fast-exec-helm-gitignore-keys)
+    (fast-exec/reload-functions-chain))
+
 (add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
 
 (use-package run-command
@@ -1224,8 +1340,7 @@ numbers of lines, otherwise don't display."
 
 (use-package run-command-recipes
     :ensure t
-    :after (run-command)
-    :init
+    :config
     (run-command-recipes-use-all))
 
 (use-package skeletor
@@ -1234,11 +1349,30 @@ numbers of lines, otherwise don't display."
     (skeletor-project-directory "~/projects")
     (skeletor-completing-read-function completing-read-function))
 
+(use-package hl-todo
+    :ensure t
+    :config (global-hl-todo-mode))
+
+(defun run-command-recipe-snitch ()
+    "Recipes of `run-command' for snitch."
+    (when (f-directory-p (f-join (projectile-acquire-root)
+                                             ".git"))
+        (list
+         (list :command-name "sntich-list"
+               :display "See List of TODOs from via Snitch"
+               :command-line "snitch list")
+         (list :command-name "sntich-report"
+               :display "Report to VC TODOs of Project via Snitch"
+               :command-line "snitch list"))))
+
+(add-to-list 'run-command-recipes 'run-command-recipe-snitch)
+
 (defun if-Emacs-org-then-org-babel-tangle ()
     "If current open file is Emacs.org, then `org-babel-tangle`."
     (interactive)
 
     (when (s-equals? (f-filename buffer-file-name) "Emacs.org")
         (org-babel-tangle)))
+
 
 (add-hook 'after-save-hook 'if-Emacs-org-then-org-babel-tangle)
