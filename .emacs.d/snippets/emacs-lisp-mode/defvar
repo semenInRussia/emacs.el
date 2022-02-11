@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: defvar
+# key: defv
+# --
+(defvar ${1:symbol} ${2:default}
+    ${3:doc})

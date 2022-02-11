@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: forward-line
+# key: fl
+# --
+(forward-line $0)

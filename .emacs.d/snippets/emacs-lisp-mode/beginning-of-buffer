@@ -1,5 +1,5 @@
 # -*- mode: snippet -*-
-# name: beginning-of-buffer
-# key: bol
+# name: bob
+# key: bob
 # --
-(beginning-of-buffer)$0
+(beginning-of-buffer)

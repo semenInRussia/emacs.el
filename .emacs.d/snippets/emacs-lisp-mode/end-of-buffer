@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: end-of-buffer
+# key: eob
+# --
+(end-of-buffer)
