@@ -331,6 +331,7 @@ EOB - is `end-of-buffer'"
            ("SPC SPC 5"   . avy-zap)
            ("SPC SPC c"   . avy-copy-word)
            ("SPC SPC d"   . avy-kill-word-stay)
+           ("SPC SPC TAB" . avy-transpose-words)
            ("SPC SPC -"   . avy-sp-splice-sexp-in-word)
            ("SPC SPC 8"   . avy-kill-word-move)
            ("SPC SPC o"   . avy-change-word)
@@ -504,7 +505,22 @@ Pass ARG to `avy-jump'."
     "Saving excursion navigate to word at point PT and change its."
     (save-excursion
         (avy-action-kill-move pt)
-        (insert (read-string "new word, please: "))))
+        (insert (read-string "new word, please: " (current-kill 1)))))
+
+(defun avy-transpose-words (char)
+    "Goto CHAR via `avy' and transpose at point word to word at prev point."
+    (interactive "cchar: ")
+    (avy-goto-word-1-with-action char 'avy-action-transpose-words))
+
+
+(defun avy-action-transpose-words (second-pt)
+    "Goto SECOND-PT via `avy' and transpose at point to word at point ago."
+    (backward-sexp)
+    (avy-action-yank second-pt)
+    (kill-sexp)
+    (goto-char second-pt)
+    (yank)
+    (kill-sexp))
 
 (use-package smartparens
     :ensure t
@@ -698,16 +714,62 @@ Pass ARG to `avy-jump'."
     (indent-for-tab-command))
 
 (defun duplicate-current-line-or-region (arg)
-    "Duplicates the current line or region ARG times.
+  "Duplicates the current line or region ARG times.
 If there's no region, the current line will be duplicated."
-    (interactive "p")
-    (if (region-active-p)
-        (let ((beg (region-beginning))
-              (end (region-end)))
-            (duplicate-region arg beg end)
-            (one-shot-keybinding "d" (λ (duplicate-region 1 beg end))))
-        (duplicate-current-line arg)
-        (one-shot-keybinding "d" 'duplicate-current-line)))
+  (interactive "p")
+  (if (region-active-p)
+      (let ((beg (region-beginning))
+            (end (region-end)))
+        (duplicate-region arg beg end)
+        (one-shot-keybinding "d" (λ (duplicate-region 1 beg end))))
+    (duplicate-current-line arg)
+    (one-shot-keybinding "d" 'duplicate-current-line)))
+
+(defun one-shot-keybinding (key command)
+  (set-temporary-overlay-map
+   (let ((map (make-sparse-keymap)))
+     (define-key map (kbd key) command)
+     map) t))
+
+(defun replace-region-by (fn)
+  (let* ((beg (region-beginning))
+         (end (region-end))
+         (contents (buffer-substring beg end)))
+    (delete-region beg end)
+    (insert (funcall fn contents))))
+
+(defun duplicate-region (&optional num start end)
+  "Duplicates the region bounded by START and END NUM times.
+If no START and END is provided, the current region-beginning and
+region-end is used."
+  (interactive "p")
+  (save-excursion
+    (let* ((start (or start (region-beginning)))
+           (end (or end (region-end)))
+           (region (buffer-substring start end)))
+      (goto-char end)
+      (dotimes (i num)
+        (insert region)))))
+
+(defun paredit-duplicate-current-line ()
+  (back-to-indentation)
+  (let (kill-ring kill-ring-yank-pointer)
+    (paredit-kill)
+    (yank)
+    (newline-and-indent)
+    (yank)))
+
+(defun duplicate-current-line (&optional num)
+  "Duplicate the current line NUM times."
+  (interactive "p")
+  (if (bound-and-true-p paredit-mode)
+      (paredit-duplicate-current-line)
+    (save-excursion
+      (when (eq (point-at-eol) (point-max))
+        (goto-char (point-max))
+        (newline)
+        (forward-char -1))
+      (duplicate-region num (point-at-bol) (1+ (point-at-eol))))))
 
 (defvar yank-indent-modes '(prog-mode
                             sgml-mode
@@ -972,6 +1034,7 @@ With prefix arg don't indent."
            my-org-local-map
            ("'"   . org-edit-special)
            ("l"   . org-insert-link)
+           ("t"   . org-babel-tangle)
            ("RET" . org-open-at-point)))
 
 (add-hook 'org-mode-hook (lambda () (call-interactively 'visual-fill)))
@@ -1009,6 +1072,14 @@ With prefix arg don't indent."
 (use-package cask-mode
     :ensure t
     )
+
+(defun my-mayby-elfmt-buffer ()
+    "If current mode need, then use `elfmt'."
+    (interactive)
+    (when (eq major-mode 'emacs-lisp-mode) (elfmt)))
+
+(use-package elfmt
+    :hook (after-save-hook . #'my-mayby-elfmt-buffer))
 
 (use-package suggest
     :ensure t
@@ -1249,3 +1320,396 @@ With prefix arg don't indent."
          ("View Emmet Cheat" 'helm-emmet)))
     (fast-exec/register-keymap-func 'fast-exec-helm-emmet-keys)
     (fast-exec/reload-functions-chain))
+
+(use-package tagedit
+    :ensure t
+    :init
+    (--each html-modes
+        (let ((map-symbol (intern (s-append "-map" (symbol-name it))))
+              map)
+            (when (boundp map-symbol)
+                (setq map (eval map-symbol))
+                (define-key
+                    map
+                    [remap sp-kill-hybrid-sexp]
+                    'tagedit-kill)
+                (define-key
+                    map
+                    [remap sp-join-sexp]
+                    'tagedit-join-tags)
+                (define-key
+                    map
+                    [remap sp-raise-sexp]
+                    'tagedit-raise-tag)
+                (define-key
+                    map
+                    [remap sp-splice-sexp]
+                    'tagedit-splice-tag)
+                (define-key
+                    map
+                    [remap sp-change-enclosing]
+                    'tagedit-kill-attribute)))))
+
+(use-package company-web
+    :ensure t
+    :init
+    (add-hook 'web-mode-hook
+              (lambda ()
+                  (set (make-local-variable 'company-backends)
+                       '(company-web-html))
+                  (company-mode t))))
+
+(use-package css-mode)
+
+(use-package css-eldoc
+    :ensure t
+    :init
+    (dolist (hook (list 'web-mode-hook 'css-mode-hook))
+        (add-hook hook 'css-eldoc-enable)))
+
+(add-hook 'calc-mode-hook (lambda () (interactive) (xah-fly-keys 0)))
+(add-hook 'calc-end-hook (lambda () (interactive) (xah-fly-keys 38)))
+
+(show-paren-mode 2)
+(setq make-backup-files         nil)
+(setq auto-save-list-file-name  nil)
+(defalias 'yes-or-no-p 'y-or-n-p)
+(toggle-truncate-lines 38)
+
+(use-package git-gutter
+    :ensure t
+    :hook
+    (prog-mode . git-gutter-mode))
+
+(use-package helm-tail
+    :ensure t
+    :init
+    (defun fast-exec-define-helm-tail-keys ()
+        "This is bind `fast-exec' with `helm-tail'."
+        (fast-exec/some-commands
+         ("Open Tail" 'helm-tail)))
+    (fast-exec/register-keymap-func 'fast-exec-define-helm-tail-keys)
+    (fast-exec/reload-functions-chain))
+
+(use-package which-key
+    :ensure t
+    :config
+    (which-key-setup-side-window-bottom)
+    (which-key-mode))
+
+(use-package helpful
+    :ensure t
+    :init
+    (global-set-key (kbd "C-h f") #'helpful-callable)
+    (global-set-key (kbd "C-h v") #'helpful-variable)
+    (global-set-key (kbd "C-h k") #'helpful-key)
+    (global-set-key (kbd "C-c C-d") #'helpful-at-point)
+    (global-set-key (kbd "C-h F") #'helpful-function)
+    (global-set-key (kbd "C-h C") #'helpful-command))
+
+(use-package helm
+    :ensure t
+    :custom (helm-M-x-fuzzy-match t)
+    :init (helm-autoresize-mode 1) (helm-mode 1)
+    :bind (:map
+           xah-fly-command-map
+           ("SPC SPC f" . helm-find-files)))
+
+(use-package google-translate
+    :ensure t
+    :bind
+    (:map xah-fly-command-map
+          ("SPC \\" . google-translate-at-point)))
+
+(defun google-translate--search-tkk ()
+  "Search TKK. From https://github.com/atykhonov/google-translate/issues/137.
+Thank you https://github.com/leuven65!"
+  (list 430675 2721866130))
+
+(use-package command-log-mode
+    :ensure t)
+
+(add-hook 'prog-mode-hook 'whitespace-mode)
+
+(add-hook 'change-major-mode-hook 'visual-line-mode)
+
+(add-hook 'change-major-mode-hook (lambda ()
+                                      (interactive)
+                                      (auto-fill-mode 1)
+                                      ))
+
+(use-package scratch
+    :ensure t
+    :bind (("C-t" . scratch))
+    )
+
+(global-subword-mode)
+
+(use-package syntax-subword
+    :ensure t
+    :custom
+    (syntax-subword-skip-spaces t)
+    :config
+    (global-syntax-subword-mode)
+    )
+
+(use-package cowsay
+    :ensure t
+    :custom
+    (cowsay-directories '("~/.emacs.d/cows"))
+    :config
+    (defun fast-exec-define-cowsay-keymaps ()
+        "Some useful keymaps for `cowsay'/`fast-exec'."
+        (fast-exec/some-commands
+         ("Cow Say String..."  'cowsay-string)
+         ("Cow Say Region..."  'cowsay-region)
+         ("Cow Say and Insert" 'cowsay-replace-region)
+         ("Cow Say Load Cows"  'cowsay-load-cows)))
+    (fast-exec/register-keymap-func 'fast-exec-define-cowsay-keymaps)
+    (fast-exec/reload-functions-chain))
+
+(add-to-list 'load-path "~/projects/super-save/")
+
+(use-package super-save
+    :config
+    (setq super-save-exclude '("Emacs.org"))
+    (setq auto-save-default nil)
+    (super-save-mode 38))
+
+(use-package devdocs
+    :ensure t
+    :hook (python-mode . (lambda ()
+                              (setq-local devdocs-current-docs
+                                          '("python~3.9"))))
+    )
+
+(use-package pomidor
+    :ensure t
+    :bind (("<f12>" . pomidor))
+    :custom
+    (pomidor-sound-tick . nil)
+    (pomidor-sound-tack . nil)
+    :hook
+    (pomidor-mode . (lambda ()
+                        (display-line-numbers-mode -1)
+                        (setq left-fringe-width 0 right-fringe-width 0)
+                        (setq left-margin-width 2 right-margin-width 0)
+                        (set-window-buffer nil (current-buffer)))))
+
+(use-package pacmacs
+    :ensure t
+    :init
+    (defun fast-exec-define-pacmacs-keys ()
+        "Bind `fast-exec' and `pacmacs'."
+        (fast-exec/some-commands
+         ("Play to Pacmacs" 'pacmacs-start))
+        )
+    (fast-exec/register-keymap-func 'fast-exec-define-pacmacs-keys)
+    (fast-exec/reload-functions-chain))
+
+(use-package helm-wikipedia
+    :ensure t)
+
+(use-package helm-spotify-plus
+    :ensure t)
+
+(use-package helm-github-stars
+    :ensure t
+    :custom
+    (helm-github-stars-username "semeninrussia")
+    :init
+    (defun fast-exec-define-helm-github-stars ()
+        "Bind `helm-github-stars' and `fast-exec'."
+        (fast-exec/some-commands
+         ("View Github Stars" 'helm-github-stars-fetch)))
+    (fast-exec/register-keymap-func 'fast-exec-define-helm-github-stars)
+    (fast-exec/reload-functions-chain))
+
+;; (use-package helm-gitignore
+;;     :ensure t
+;;     :init
+;;     (defun fast-exec-define-helm-gitignore-keys ()
+;;         "Bind `fast-exec' and `helm-gitignore'."
+;;         (fast-exec/some-commands
+;;          ("Generate Gitignore" 'helm-gitignore)))
+;;     (fast-exec/register-keymap-func 'fast-exec-define-helm-gitignore-keys)
+;;     (fast-exec/reload-functions-chain)))
+
+(use-package helm-google
+    :ensure t
+    :init
+    (defun fast-exec-helm-google-define-keys ()
+        "Keymaps for `helm-google' and `fast-exec'."
+        (fast-exec/some-commands
+         ("Search in Google" 'helm-google)))
+    (fast-exec/register-keymap-func 'fast-exec-helm-google-define-keys)
+    (fast-exec/reload-functions-chain))
+
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode   -1)
+
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+(add-hook 'emacs-startup-hook 'toggle-frame-fullscreen)
+
+(require 'gruber-darker-theme)
+
+(use-package gruber-darker-theme
+    :ensure t
+    :init
+    (load-theme 'gruber-darker t)
+    )
+
+(setq dont-display-lines-modes
+      '(org-mode
+        term-mode
+        shell-mode
+        treemacs-mode
+        eshell-mode
+        helm-mode))
+
+(defun display-or-not-display-numbers-of-lines ()
+    "Display numbers of lines OR don't display numbers of lines.
+If current `major-mode` need to display numbers of lines, then display
+numbers of lines, otherwise don't display."
+    (interactive)
+    (if (-contains? dont-display-lines-modes major-mode)
+        (display-line-numbers-mode 0)
+        (display-line-numbers-mode 38))
+    )
+
+(add-hook 'prog-mode-hook 'display-or-not-display-numbers-of-lines)
+
+(use-package doom-modeline
+    :ensure t
+    :custom
+    (doom-modeline-icon nil)
+    (doom-modeline-modal-icon nil)
+    (doom-modeline-buffer-file-name-style 'auto)
+    (doom-modeline-workspace-name nil)
+    (doom-modeline-project-detection 'projectile)
+    (doom-modeline-buffer-enconding 'projectile)
+    (doom-modeline-enable-word-count t)
+    (doom-modeline-height 24)
+    :init
+    (display-time-mode t)
+    (column-number-mode)
+    :config
+    (doom-modeline-mode 0)
+    (doom-modeline-mode 38))
+
+(set-face-attribute 'default nil :font "Consolas" :height 250)
+(set-frame-font "Consolas" nil t)
+
+(global-hl-line-mode 1)
+
+(use-package page-break-lines
+    :ensure t
+    :init
+    (global-page-break-lines-mode 38))
+
+(use-package projectile
+    :custom
+    (projectile-project-search-path '("~/projects/"))
+    (projectile-completion-system 'helm)
+    :init (projectile-mode 1)
+    :bind
+    (("S-<f5>" . projectile-test-project)
+     ("<f5>"   . projectile-run-project)))
+
+(projectile-mode 1)
+
+(use-package helm-projectile
+    :ensure t
+    :bind (:map xah-fly-command-map
+                ("SPC j" . 'helm-projectile-find-file)))
+
+(use-package regex-tool
+    :ensure t
+    :init
+    (add-hook 'regex-tool-mode-hook (lambda () (toggle-frame-maximized))))
+
+(use-package magit :ensure t)
+
+(use-package blamer
+    :ensure t
+    :defer 20
+    :custom
+    (blamer-idle-time 0.3)
+    (blamer-min-offset 70)
+    :custom-face
+    (blamer-face ((t :foreground "#7a88cf"
+                     :background nil
+                     :height 140
+                     :italic t)))
+    )
+
+(use-package git-undo
+    :init
+    (defun fast-exec-define-git-undo-keymaps ()
+        "Bind `git-undo' and `fast-exec'."
+        (fast-exec/some-commands
+         ("Undo via Git" 'git-undo)))
+    (fast-exec/register-keymap-func 'fast-exec-define-git-undo-keymaps)
+    (fast-exec/reload-functions-chain))
+
+(use-package git-modes
+    :ensure t)
+
+(use-package helm-gitignore
+    :init
+    (defun fast-exec-helm-gitignore-keys ()
+        "Bind of `helm-gitignore' and `fast-exec'."
+        (fast-exec/some-commands
+         ("Generate Gitignore" 'helm-gitignore)))
+    (fast-exec/register-keymap-func 'fast-exec-helm-gitignore-keys)
+    (fast-exec/reload-functions-chain))
+
+(add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
+
+(use-package run-command
+    :ensure t
+    :custom
+    (run-command-completion-method 'helm)
+    :bind (:map xah-fly-command-map
+                ("SPC , c" . run-command)))
+
+(use-package run-command-recipes
+    :ensure t
+    :config
+    (run-command-recipes-use-all))
+
+(use-package skeletor
+    :ensure t
+    :custom
+    (skeletor-init-with-git nil)
+    (skeletor-project-directory "~/projects")
+    (skeletor-completing-read-function completing-read-function))
+
+(use-package hl-todo
+    :ensure t
+    :config (global-hl-todo-mode))
+
+(defun run-command-recipe-snitch ()
+    "Recipes of `run-command' for snitch."
+    (when (f-directory-p (f-join (projectile-acquire-root)
+                                             ".git"))
+        (list
+         (list :command-name "sntich-list"
+               :display "See List of TODOs from via Snitch"
+               :command-line "snitch list")
+         (list :command-name "sntich-report"
+               :display "Report to VC TODOs of Project via Snitch"
+               :command-line "snitch list"))))
+
+(add-to-list 'run-command-recipes 'run-command-recipe-snitch)
+
+(defun if-Emacs-org-then-org-babel-tangle ()
+    "If current open file is Emacs.org, then `org-babel-tangle`."
+    (interactive)
+
+    (when (s-equals? (f-filename buffer-file-name) "Emacs.org")
+        (org-babel-tangle)))
+
+
+(add-hook 'after-save-hook 'if-Emacs-org-then-org-babel-tangle)

@@ -550,6 +550,7 @@ will pressed KEY in KEYMAP and when CONDITION will true:
              ("SPC SPC 5"   . avy-zap)
              ("SPC SPC c"   . avy-copy-word)
              ("SPC SPC d"   . avy-kill-word-stay)
+             ("SPC SPC TAB" . avy-transpose-words)
              ("SPC SPC -"   . avy-sp-splice-sexp-in-word)
              ("SPC SPC 8"   . avy-kill-word-move)
              ("SPC SPC o"   . avy-change-word)
@@ -723,7 +724,22 @@ will pressed KEY in KEYMAP and when CONDITION will true:
       "Saving excursion navigate to word at point PT and change its."
       (save-excursion
           (avy-action-kill-move pt)
-          (insert (read-string "new word, please: "))))
+          (insert (read-string "new word, please: " (current-kill 1)))))
+
+  (defun avy-transpose-words (char)
+      "Goto CHAR via `avy' and transpose at point word to word at prev point."
+      (interactive "cchar: ")
+      (avy-goto-word-1-with-action char 'avy-action-transpose-words))
+
+
+  (defun avy-action-transpose-words (second-pt)
+      "Goto SECOND-PT via `avy' and transpose at point to word at point ago."
+      (backward-sexp)
+      (avy-action-yank second-pt)
+      (kill-sexp)
+      (goto-char second-pt)
+      (yank)
+      (kill-sexp))
 
 #+END_SRC
 
@@ -1008,16 +1024,62 @@ And =SPC s= for new line below and =SPC SPC s= for new line above:
       (indent-for-tab-command))
 
   (defun duplicate-current-line-or-region (arg)
-      "Duplicates the current line or region ARG times.
+    "Duplicates the current line or region ARG times.
   If there's no region, the current line will be duplicated."
-      (interactive "p")
-      (if (region-active-p)
-          (let ((beg (region-beginning))
-                (end (region-end)))
-              (duplicate-region arg beg end)
-              (one-shot-keybinding "d" (λ (duplicate-region 1 beg end))))
-          (duplicate-current-line arg)
-          (one-shot-keybinding "d" 'duplicate-current-line)))
+    (interactive "p")
+    (if (region-active-p)
+        (let ((beg (region-beginning))
+              (end (region-end)))
+          (duplicate-region arg beg end)
+          (one-shot-keybinding "d" (λ (duplicate-region 1 beg end))))
+      (duplicate-current-line arg)
+      (one-shot-keybinding "d" 'duplicate-current-line)))
+
+  (defun one-shot-keybinding (key command)
+    (set-temporary-overlay-map
+     (let ((map (make-sparse-keymap)))
+       (define-key map (kbd key) command)
+       map) t))
+
+  (defun replace-region-by (fn)
+    (let* ((beg (region-beginning))
+           (end (region-end))
+           (contents (buffer-substring beg end)))
+      (delete-region beg end)
+      (insert (funcall fn contents))))
+
+  (defun duplicate-region (&optional num start end)
+    "Duplicates the region bounded by START and END NUM times.
+  If no START and END is provided, the current region-beginning and
+  region-end is used."
+    (interactive "p")
+    (save-excursion
+      (let* ((start (or start (region-beginning)))
+             (end (or end (region-end)))
+             (region (buffer-substring start end)))
+        (goto-char end)
+        (dotimes (i num)
+          (insert region)))))
+
+  (defun paredit-duplicate-current-line ()
+    (back-to-indentation)
+    (let (kill-ring kill-ring-yank-pointer)
+      (paredit-kill)
+      (yank)
+      (newline-and-indent)
+      (yank)))
+
+  (defun duplicate-current-line (&optional num)
+    "Duplicate the current line NUM times."
+    (interactive "p")
+    (if (bound-and-true-p paredit-mode)
+        (paredit-duplicate-current-line)
+      (save-excursion
+        (when (eq (point-at-eol) (point-max))
+          (goto-char (point-max))
+          (newline)
+          (forward-char -1))
+        (duplicate-region num (point-at-bol) (1+ (point-at-eol))))))
 
   (defvar yank-indent-modes '(prog-mode
                               sgml-mode
@@ -1375,6 +1437,7 @@ I am press =SPC , ,= for go to defnition:
              my-org-local-map
              ("'"   . org-edit-special)
              ("l"   . org-insert-link)
+             ("t"   . org-babel-tangle)
              ("RET" . org-open-at-point)))
 
 #+END_SRC
@@ -1481,6 +1544,22 @@ I am press =SPC , ,= for go to defnition:
       )
 
 #+END_SRC
+
+**** Elisp Format Code
+     I am use [[https://github.com/riscy/elfmt][elfmt]] of =Riscky=:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (defun my-mayby-elfmt-buffer ()
+      "If current mode need, then use `elfmt'."
+      (interactive)
+      (when (eq major-mode 'emacs-lisp-mode) (elfmt)))
+
+  (use-package elfmt
+      :hook (after-save-hook . #'my-mayby-elfmt-buffer))
+
+#+END_SRC
+
 
 **** Modern Documentation
      I am use [[https://github.com/Wilfred/suggest.el][suggest]], I am just type print input and excepted output and see suggesting examples as this do:
@@ -2068,39 +2147,10 @@ For this I am press =SPC l c=:
   (use-package helm
       :ensure t
       :custom (helm-M-x-fuzzy-match t)
-      :init
-      (defun helm-buffer--show-details (buf-name prefix help-echo
-                                        size mode dir face1 face2
-                                        proc details type)
-          "No code of `semenInRusia'!."
-          (append
-           (list
-            (concat prefix
-                    (let* ((buf-fname (buffer-file-name (get-buffer buf-name)))
-                           (ext
-                            (if buf-fname
-                                (helm-file-name-extension buf-fname) ""))
-                           (buf-name (propertize buf-name 'face face1
-                                                 'help-echo help-echo
-                                                 'type type)))
-                        (message "buf-name is %s" buf-name)
-                        buf-name)))
-           (and details
-                (list mode
-                      (propertize
-                       (if proc
-                           (format "(%s %s in `%s')"
-                                   (process-name proc)
-                                   (process-status proc) dir)
-                           (format "(in `%s')" dir))
-                       'face face2)))))
-
-      (helm-autoresize-mode 1)
-      (helm-mode 1)
+      :init (helm-autoresize-mode 1) (helm-mode 1)
       :bind (:map
              xah-fly-command-map
-             ("SPC SPC f" . helm-find-files)
-             ("SPC f" . helm-buffers-list)))
+             ("SPC SPC f" . helm-find-files)))
 
 
 #+END_SRC
