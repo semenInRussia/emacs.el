@@ -21,13 +21,14 @@
 
 (add-to-list 'load-path "~/projects/fast-exec.el")
 (add-to-list 'load-path "~/projects/porth-mode")
+(add-to-list 'load-path "~/projects/emacs-run-command")
 (add-to-list 'load-path "~/projects/simple-indention.el")
 
 (use-package s :ensure t)
 
 (use-package f :ensure t)
 
-(use-package dash :ensure t)
+(use-package dash :ensure t :init (global-dash-fontify-mode 1))
 
 (setq user-full-name    "Semen Khramtsov"
       user-mail-address "hrams205@gmail.com"
@@ -312,12 +313,13 @@ EOB - is `end-of-buffer'"
                  'my-mc-mark-like-this-or-edit-lines)
     :bind
     (:map xah-fly-command-map
-          ("7" . my-mc-mark-like-this-or-edit-lines)
-          ("SPC 7" . mc/mark-previous-like-this-word)
+          ("7"         . my-mc-mark-like-this-or-edit-lines)
+          ("SPC 7"     . mc/mark-previous-like-this-word)
           ("SPC TAB 7" . mc/reverse-regions)
-          ("SPC h" . my-bob-or-mc-align)
-          ("SPC n" . my-eob-or-mc-align-with-space)
-          ("SPC a" . my-mark-all)))
+          ("SPC d 7"   . mc/unmark-next-like-this)
+          ("SPC h"     . my-bob-or-mc-align)
+          ("SPC n"     . my-eob-or-mc-align-with-space)
+          ("SPC a"     . my-mark-all)))
 
 (use-package avy
     :ensure t
@@ -505,7 +507,7 @@ Pass ARG to `avy-jump'."
     "Saving excursion navigate to word at point PT and change its."
     (save-excursion
         (avy-action-kill-move pt)
-        (insert (read-string "new word, please: " (current-kill 1)))))
+        (insert (read-string "new word, please: " (current-kill 0)))))
 
 (defun avy-transpose-words (char)
     "Goto CHAR via `avy' and transpose at point word to word at prev point."
@@ -526,20 +528,25 @@ Pass ARG to `avy-jump'."
     :ensure t
     :init
     (smartparens-global-mode 1)
-    :bind (:map xah-fly-command-map
-                (("]" . sp-forward-slurp-sexp)
-                 ("[" . sp-backward-slurp-sexp)
-                 ("-" . sp-splice-sexp)
-                 ("SPC -" . sp-rewrap-sexp)
-                 ("m" . sp-backward-sexp)
-                 ("." . sp-forward-sexp)
-                 ("SPC 1" . sp-join-sexp)
-                 ("SPC SPC 1" . sp-split-sexp)
-                 ("SPC 9" . sp-change-enclosing)
-                 ("SPC SPC g" . sp-kill-hybrid-sexp)
-                 ("SPC =" . sp-raise-sexp)
-                 ("M-(" . sp-wrap-round)
-                 ("M-{" . sp-wrap-curly))))
+    :bind (("RET"       . sp-newline)
+           :map
+           xah-fly-command-map
+           (("]"         . sp-forward-slurp-sexp)
+            ("M-("       . sp-wrap-round)
+            ("M-["       . sp-wrap-square)
+            ("M-{"       . sp-wrap-curly)
+            ("["         . sp-backward-slurp-sexp)
+            ("-"         . sp-splice-sexp)
+            ("SPC -"     . sp-rewrap-sexp)
+            ("m"         . sp-backward-sexp)
+            ("."         . sp-forward-sexp)
+            ("SPC 1"     . sp-join-sexp)
+            ("SPC SPC 1" . sp-split-sexp)
+            ("SPC 9"     . sp-change-enclosing)
+            ("SPC SPC g" . sp-kill-hybrid-sexp)
+            ("SPC ="     . sp-raise-sexp)
+            ("M-("       . sp-wrap-round)
+            ("M-{"       . sp-wrap-curly))))
 
 (require 'smartparens-config)
 
@@ -940,8 +947,6 @@ With prefix arg don't indent."
     (text-scale-mode 0)
     (visual-fill-column-mode 1))
 
-(define-key xah-fly-command-map (kbd "SPC e") 'xah-fly-c-keymap)
-
 (defmacro add-import-keymap-for-language (language add-import-function)
     "Bind `ADD-IMPORT-FUNCTION` to `LANGUAGE`-map."
     `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
@@ -1073,13 +1078,9 @@ With prefix arg don't indent."
     :ensure t
     )
 
-(defun my-mayby-elfmt-buffer ()
-    "If current mode need, then use `elfmt'."
-    (interactive)
-    (when (eq major-mode 'emacs-lisp-mode) (elfmt)))
-
 (use-package elfmt
-    :hook (after-save-hook . #'my-mayby-elfmt-buffer))
+    :config
+    (elfmt-global-mode 1))
 
 (use-package suggest
     :ensure t
@@ -1433,10 +1434,10 @@ Thank you https://github.com/leuven65!"
 
 (add-hook 'change-major-mode-hook 'visual-line-mode)
 
-(add-hook 'change-major-mode-hook (lambda ()
-                                      (interactive)
-                                      (auto-fill-mode 1)
-                                      ))
+(use-package aggressive-fill-paragraph
+    :ensure t
+    :config
+    (afp-setup-recommended-hooks))
 
 (use-package scratch
     :ensure t
@@ -1582,21 +1583,29 @@ numbers of lines, otherwise don't display."
 
 (use-package doom-modeline
     :ensure t
-    :custom
-    (doom-modeline-icon nil)
-    (doom-modeline-modal-icon nil)
-    (doom-modeline-buffer-file-name-style 'auto)
-    (doom-modeline-workspace-name nil)
-    (doom-modeline-project-detection 'projectile)
-    (doom-modeline-buffer-enconding 'projectile)
-    (doom-modeline-enable-word-count t)
-    (doom-modeline-height 24)
-    :init
-    (display-time-mode t)
-    (column-number-mode)
+    :defer 0.1
     :config
-    (doom-modeline-mode 0)
-    (doom-modeline-mode 38))
+    (doom-modeline-def-modeline 'main
+        '(bar
+          matches
+          buffer-info
+          word-count
+          selection-info)
+        '(objed-state
+          persp-name
+          grip
+          irc
+          gnus
+          github
+          debug
+          repl
+          input-method
+          indent-info
+          buffer-encoding
+          major-mode
+          process
+          vcs
+          checker)))
 
 (set-face-attribute 'default nil :font "Consolas" :height 250)
 (set-frame-font "Consolas" nil t)
@@ -1703,6 +1712,67 @@ numbers of lines, otherwise don't display."
                :command-line "snitch list"))))
 
 (add-to-list 'run-command-recipes 'run-command-recipe-snitch)
+
+(defcustom my-mipt-homwork-dir "c:/Users/hrams/Documents/mfti-solutions"
+  "Path to directory of MIPT solutions."
+  :type 'string)
+
+(defcustom my-mipt-current-class-number 8
+  "My current class."
+  :type 'number)
+
+(defcustom my-mipt-lessons-types
+  '("m")
+  "My current class."
+  :type '(repeat string))
+
+(defun my-new-mipt-solution ()
+    "Make .tex file for solution of mipt's homework."
+    (interactive)
+    (let* ((mipt-lesson
+            (completing-read "Print lesson's type: "
+                             my-mipt-lessons-types))
+           (mipt-last-solution
+            (with-temp-buffer
+                (-map 'insert (f-files my-mipt-homwork-dir))
+                (sort-lines t (point-min) (point-max))
+                (delete-non-matching-lines mipt-lesson)
+                (goto-char (point-min))
+                (f-filename (s-trim (thing-at-point 'line t)))))
+           mipt-number
+           last-mipt-number
+           mipt-section-number
+           last-mipt-class-num
+           last-mipt-section-num)
+        (-setq
+            (_ last-mipt-class-num _ last-mipt-section-num last-mipt-number)
+            (s-match
+             "\\(.\\)-\\(.\\)-\\(.\\)-\\(.\\)\\.tex" mipt-last-solution))
+        (setq last-mipt-number (string-to-number last-mipt-number))
+        (setq mipt-number (1+ last-mipt-number))
+        (setq mipt-section-number (read-number "Section, Please: "
+                                               (string-to-number
+                                                last-mipt-section-num)))
+        (message "mipt-number is %s" mipt-number)
+        (message "last-mipt-number is %s" last-mipt-number)
+        (message "mipt-section-number is %s" mipt-section-number)
+        (message "last-mipt-class-num is %s" last-mipt-class-num)
+        (message "last-mipt-section-num is %s" last-mipt-section-num)
+        (find-file (f-join
+                    my-mipt-homwork-dir
+                    (format "%s-%s-%s-%s.tex"
+                            last-mipt-class-num
+                            mipt-lesson
+                            mipt-section-number
+                            mipt-number)))))
+
+(defun fast-exec-define-mipt-keymaps ()
+    "MIPT + `fast-exec'."
+    (fast-exec/some-commands
+     ("New MIPT Solution" 'my-new-mipt-solution)))
+
+(fast-exec/register-keymap-func 'fast-exec-define-mipt-keymaps)
+(fast-exec/reload-functions-chain)
 
 (defun if-Emacs-org-then-org-babel-tangle ()
     "If current open file is Emacs.org, then `org-babel-tangle`."
