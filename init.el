@@ -1581,14 +1581,66 @@ numbers of lines, otherwise don't display."
 
 (add-hook 'prog-mode-hook 'display-or-not-display-numbers-of-lines)
 
+(defcustom my-modeline-time-segment-format-string " [%H-%M]"
+  "By this format string will draw time in `doom-modeline'.
+See `format-time-string' for see what format string"
+  :type 'string)
+
+(doom-modeline-def-segment time
+    (let* ((hour (string-to-number (format-time-string "%H"))))
+        (propertize
+         (format-time-string my-modeline-time-segment-format-string)
+         'face
+         (if (> 4 hour 19)
+             'outline-1
+             'hi-red-b))))
+
+(doom-modeline-def-segment pomidor
+    ()
+    "Return header."
+    (let* ((state (pomidor--current-state))
+           (break (pomidor--break-duration state))
+           (overwork (pomidor--overwork-duration state))
+           (work (pomidor--work-duration state))
+           (face (cond
+                   (break 'pomidor-break-face)
+                   (overwork 'pomidor-overwork-face)
+                   (work 'pomidor-work-face)))
+           (pomidor-time-format " Pom %-Mm")
+           (time (-first 'identity (list break work overwork))))
+        (propertize (pomidor--format-time time) 'face face)))
+
+(defvar durand-buffer-name-max 20
+  "The maximal length of the buffer name in modeline.")
+
+(doom-modeline-def-segment buffer-info-durand
+    ()
+    (declare (pure t) (side-effect-free t))
+    (let* ((buffer-info
+            (format-mode-line
+             (s-truncate
+              durand-buffer-name-max
+              (doom-modeline-segment--buffer-info)))))
+        (concat
+         (s-truncate
+          durand-buffer-name-max
+          buffer-info))))
+
+(defvar my-modeline-ignored-modes '(company-mode))
+
 (use-package doom-modeline
     :ensure t
     :defer 0.1
+    :custom
+    (doom-modeline-buffer-file-name-style 'buffer-name)
     :config
-    (doom-modeline-def-modeline 'main
+    (display-time-mode t)
+    (doom-modeline-def-modeline 'my
         '(bar
           matches
-          buffer-info
+          buffer-info-durand
+          time
+          pomidor
           word-count
           selection-info)
         '(objed-state
@@ -1605,7 +1657,12 @@ numbers of lines, otherwise don't display."
           major-mode
           process
           vcs
-          checker)))
+          checker))
+    (doom-modeline-set-modeline 'my t)
+    (add-hook 'after-change-major-mode-hook
+              (lambda ()
+                  (unless (-contains-p my-modeline-ignored-modes major-mode)
+                      (doom-modeline-mode t)))))
 
 (set-face-attribute 'default nil :font "Consolas" :height 250)
 (set-frame-font "Consolas" nil t)
