@@ -10,10 +10,10 @@
 
 (package-initialize)
 (unless package-archive-contents
-    (package-refresh-contents))
+  (package-refresh-contents))
 
 (unless (package-installed-p 'use-package)
-    (package-install 'use-package))
+  (package-install 'use-package))
 
 (require 'use-package)
 
@@ -30,6 +30,38 @@
 
 (use-package dash :ensure t :init (global-dash-fontify-mode 1))
 
+(defun my-try-delete (path &optional force)
+  "If PATH is exists isn't exists, then just do nothing, otherwise delete PATH.
+
+If FORCE is t, a directory will be deleted recursively."
+  (when (f-exists-p path)
+    (f-delete path force)))
+
+(defun my-try-move (from to)
+  "Move FROM to TO, if FROM is exists."
+  (when (f-exists-p from)
+    (f-move from to)))
+
+(defun my-files-with-extension (ext dir)
+  "Return list of files in DIR which has extension EXT."
+  (->>
+   dir
+   (f-files)
+   (--filter (f-ext-p it ext))))
+
+(defun my-humanize-string (s)
+  "Humanize normalized S."
+  (->> s (s-replace "-" " ") (s-titleize)))
+
+(defun my-normalize-string (s)
+  "Normalize humanized S for computer."
+  (->>
+   s
+   (s-downcase)
+   (s-replace " " "-")
+   (s-replace "'" "")
+   (s-replace "\"" "")))
+
 (setq user-full-name    "Semen Khramtsov"
       user-mail-address "hrams205@gmail.com"
       user-birthday     "2007-01-29"
@@ -39,10 +71,10 @@
 
 
 (defun user-os-windows-p ()
-    "If user have os Windows, then return t.
+  "If user have os Windows, then return t.
 Info take from var `user-os`, user must set it."
-    (interactive)
-    (s-equals? user-os "Windows"))
+  (interactive)
+  (s-equals? user-os "Windows"))
 
 (if (s-equals? (format-time-string "%Y-%m-%d") user-birthday)
     (animate-birthday-present))
@@ -56,8 +88,6 @@ Info take from var `user-os`, user must set it."
     (yas-wrap-around-region t)
     :bind (:map yas-keymap
                 ("<return>" . yas-exit-all-snippets)))
-
-(use-package yasnippet-classic-snippets :ensure t)
 
 (use-package flycheck
     :ensure t
@@ -85,11 +115,11 @@ Info take from var `user-os`, user must set it."
   "Enable yasnippet for all backends.")
 
 (defun company-mode/backend-with-yas (backend)
-    (if (or (not company-mode/enable-yas)
-            (and (listp backend) (member 'company-yasnippet backend)))
-        backend
-        (append (if (consp backend) backend (list backend))
-                '(:with company-yasnippet))))
+  (if (or (not company-mode/enable-yas)
+          (and (listp backend) (member 'company-yasnippet backend)))
+      backend
+    (append (if (consp backend) backend (list backend))
+            '(:with company-yasnippet))))
 
 (setq company-backends
       (mapcar #'company-mode/backend-with-yas company-backends))
@@ -105,62 +135,60 @@ Info take from var `user-os`, user must set it."
 
 (use-package xah-fly-keys
     :config
-    (xah-fly-keys-set-layout "qwerty")
-    (xah-fly-keys 1)
-    (define-key xah-fly-command-map (kbd "SPC l") nil)
-    (define-key xah-fly-command-map (kbd "SPC j") nil)
-    (define-key xah-fly-command-map (kbd "SPC SPC") nil))
+  (xah-fly-keys-set-layout "qwerty")
+  (xah-fly-keys 1)
+  (define-key xah-fly-command-map (kbd "SPC l") nil)
+  (define-key xah-fly-command-map (kbd "SPC j") nil)
+  (define-key xah-fly-command-map (kbd "SPC SPC") nil))
 
 (defvar my-local-major-mode-map nil
   "My map for current `major-mode'")
 
 (defun my-local-major-mode-map-run ()
-    "Run `my-local-major-mode-map'."
-    (interactive)
-    (set-transient-map my-local-major-mode-map))
+  "Run `my-local-major-mode-map'."
+  (interactive)
+  (set-transient-map my-local-major-mode-map))
 
 (define-key xah-fly-command-map (kbd "SPC l") 'my-local-major-mode-map-run)
 
 (add-to-list 'use-package-keywords :major-mode-map)
 
 (defun use-package-normalize/:major-mode-map (name keyword args)
-    "Normalizer of :major-mode-map for `use-package'."
-    (let* (map-name modes)
-        (if (eq (-first-item args) t) ; All by Default
-            (list (symbol-name name) (list name))
-            (cl-typecase (-first-item args)
-              (list (setq modes (-first-item args)))
-              (symbol (setq map-name (symbol-name (-first-item args))))
-              (string (setq map-name (-first-item args))))
-            (cl-typecase (-second-item args)
-              (list (setq modes (-first-item args)))
-              (symbol (setq map-name (symbol-name (-first-item args))))
-              (string (setq map-name (-first-item args))))
-            (message "map-name is %s" map-name)
-            (message "modes is %s" modes)
-            (list
-             (or map-name (symbol-name name))
-             modes))))
+  "Normalizer of :major-mode-map for `use-package'."
+  (let* (map-name modes)
+    (if (eq (-first-item args) t) ; All by Default
+        (list (symbol-name name) (list name))
+      (cl-typecase (-first-item args)
+        (list (setq modes (-first-item args)))
+        (symbol (setq map-name (symbol-name (-first-item args))))
+        (string (setq map-name (-first-item args))))
+      (cl-typecase (-second-item args)
+        (list (setq modes (-first-item args)))
+        (symbol (setq map-name (symbol-name (-first-item args))))
+        (string (setq map-name (-first-item args))))
+      (list
+       (or map-name (symbol-name name))
+       modes))))
 
 (defun use-package-handler/:major-mode-map (name keyword
                                             map-name-and-modes rest state)
-    (let* ((map-name (car map-name-and-modes))
-           (modes (-second-item map-name-and-modes))
-           (modes-hooks (--map (intern (s-append "-hook" (symbol-name it)))
-                               modes))
-           (map (intern (s-concat "my-" map-name "-local-map"))))
-        (setq rest
-              (-concat
-               rest
-               `(:config
-                 ((unless (boundp ',map)
-                      (define-prefix-command ',map))
-                  (--each ',modes-hooks
-                      (add-hook it
-                                (lambda ()
-                                    (setq-local my-local-major-mode-map
-                                                ',map))))))))
-        (use-package-process-keywords name rest)))
+  (let* ((map-name (car map-name-and-modes))
+         (modes (-second-item map-name-and-modes))
+         (modes-hooks (--map (intern (s-append "-hook" (symbol-name it)))
+                             modes))
+         (map (intern (s-concat "my-" map-name "-local-map"))))
+    (setq rest
+          (-concat
+           rest
+           `(:config
+             ((unless (boundp ',map)
+                (define-prefix-command ',map))
+              (--each ',modes-hooks
+                (add-hook it
+                          (lambda ()
+                            (setq-local my-local-major-mode-map
+                                        ',map))))))))
+    (use-package-process-keywords name rest)))
 
 (require 'fast-exec)
 
@@ -181,43 +209,19 @@ Info take from var `user-os`, user must set it."
 
 (define-key xah-fly-command-map (kbd "=") 'fast-exec/exec)
 
-(defun keymap-to-list (keymap)
-    "Convert `KEYMAP` to list."
-    (--filter (ignore-errors '((cat it) (cdr it))) (-drop 1 keymap)))
-
-
-(defun function-of-key (keymap key)
-    "Get function bound on `KEY` in `KEYMAP`."
-    (let* ((list-keymap (keymap-to-list keymap))
-           (kbd-key (kbd key))
-           (key-chars (string-to-list kbd-key))
-           (head-key-char (-first-item key-chars))
-           (tail-key-chars (-drop 1 key-chars))
-           (object-on-key (--filter (ignore-errors
-                                        (eq head-key-char (-first-item it)))
-                                    list-keymap))
-           )
-        (cond
-          (tail-key-chars
-           (function-of-key object-on-key
-                            (chars-to-string tail-key-chars)))
-          (t (cdr (-first-item object-on-key)))))
-    )
-
-
-(defun chars-to-string (chars)
-    "Convert list of `CHARS` to string."
-    (--reduce-from (s-concat acc (char-to-string it)) "" chars))
-
-
-(defmacro define-key-when (keymap key def condition)
-    "Macro for define keymaps for `rectangle-mode` in `xah-fly-command-mode`"
-    `(define-key ,keymap (kbd ,key)
-         (lambda ()
-             (interactive)
-             (if (funcall ,condition)
-                 (call-interactively ,def)
-                 (call-interactively ',(function-of-key (eval keymap) key))))))
+(defmacro define-key-when (fun-name map key def pred)
+  "Define to KEY in MAP DEF when PRED return t or run old command.
+Instead of KEY will command FUN-NAME"
+  (let ((old-def (key-binding key)))
+    `(unless (eq (key-binding ,key) #',fun-name)
+       (defun ,fun-name ()
+         ,(s-lex-format "Run `${old-def}' or `${def}'.")
+         (interactive)
+         (call-interactively
+          (if (funcall ,pred)
+              ,def
+            #',old-def)))
+       (define-key ,map ,key #',fun-name))))
 
 (use-package swiper-helm
     :ensure t
@@ -232,14 +236,11 @@ Info take from var `user-os`, user must set it."
 
 (define-key xah-fly-command-map (kbd "SPC SPC r") 'projectile-replace)
 
-(use-package semantic
-    :ensure t)
-
 (use-package imenu
     :custom (imenu-auto-rescan t))
 
 (bind-keys :map xah-fly-command-map
-           ("SPC SPC SPC" . helm-semantic-or-imenu))
+           ("SPC SPC SPC" . helm-imenu))
 
 (use-package imenu-anywhere
     :ensure t
@@ -264,265 +265,278 @@ Info take from var `user-os`, user must set it."
     (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (defun my-mark-all ()
-    "If enable `multiple-cursors', then mark all like this, other mark buffer."
-    (interactive)
-    (if multiple-cursors-mode
-        (mc/mark-all-words-like-this)
-        (mark-whole-buffer)))
+  "If enable `multiple-cursors', then mark all like this, other mark buffer."
+  (interactive)
+  (if multiple-cursors-mode
+      (mc/mark-all-words-like-this)
+    (mark-whole-buffer)))
 
 
 (defun my-bob-or-mc-align ()
-    "If enable `multiple-cursors', then mark then align by regexp, other bob.
+  "If enable `multiple-cursors', then mark then align by regexp, other bob.
 BOB - is `beginning-of-buffer'"
-    (interactive)
-    (if multiple-cursors-mode
-        (call-interactively 'mc/vertical-align)
-        (beginning-of-buffer)))
+  (interactive)
+  (if multiple-cursors-mode
+      (call-interactively 'mc/vertical-align)
+    (beginning-of-buffer)))
 
 
 (defun my-eob-or-mc-align-with-space ()
-    "If enable `multiple-cursors', then align by spaces, other bob.
+  "If enable `multiple-cursors', then align by spaces, other bob.
 EOB - is `end-of-buffer'"
-    (interactive)
-    (if multiple-cursors-mode
-        (mc/vertical-align-with-space)
-        (end-of-buffer)))
+  (interactive)
+  (if multiple-cursors-mode
+      (mc/vertical-align-with-space)
+    (end-of-buffer)))
 
 
 (defun my-mc-mark-like-this-or-edit-lines ()
-    "If region on some lines, `mc/edit-lines' other `mc/mark-next-like-this'."
-    (interactive)
-    (if (and (region-active-p)
-             (not (eq (line-number-at-pos (region-beginning))
-                      (line-number-at-pos (region-end)))))
-        (call-interactively 'mc/edit-lines)
-        (call-interactively 'mc/mark-next-like-this-word)))
+  "If region on some lines, `mc/edit-lines' other `mc/mark-next-like-this'."
+  (interactive)
+  (if (and (region-active-p)
+           (not (eq (line-number-at-pos (region-beginning))
+                    (line-number-at-pos (region-end)))))
+      (call-interactively 'mc/edit-lines)
+    (call-interactively 'mc/mark-next-like-this-word)))
 
 (use-package multiple-cursors :ensure t)
 
 (use-package multiple-cursors
     :config
-    (add-to-list 'mc--default-cmds-to-run-once 'my-mark-all)
-    (add-to-list 'mc--default-cmds-to-run-once
-                 'my-mc-mark-like-this-or-edit-lines)
-    (add-to-list 'mc--default-cmds-to-run-once
-                 'my-bob-or-mc-align)
-    (add-to-list 'mc--default-cmds-to-run-once
-                 'my-eob-or-align-with-spaces)
-    (add-to-list 'mc--default-cmds-to-run-once
-                 'my-mc-mark-like-this-or-edit-lines)
-    :bind
-    (:map xah-fly-command-map
-          ("7"         . my-mc-mark-like-this-or-edit-lines)
-          ("SPC 7"     . mc/mark-previous-like-this-word)
-          ("SPC TAB 7" . mc/reverse-regions)
-          ("SPC d 7"   . mc/unmark-next-like-this)
-          ("SPC h"     . my-bob-or-mc-align)
-          ("SPC n"     . my-eob-or-mc-align-with-space)
-          ("SPC a"     . my-mark-all)))
+  (add-to-list 'mc--default-cmds-to-run-once 'my-mark-all)
+  (add-to-list 'mc--default-cmds-to-run-once
+               'my-mc-mark-like-this-or-edit-lines)
+  (add-to-list 'mc--default-cmds-to-run-once
+               'my-bob-or-mc-align)
+  (add-to-list 'mc--default-cmds-to-run-once
+               'my-eob-or-align-with-spaces)
+  (add-to-list 'mc--default-cmds-to-run-once
+               'my-mc-mark-like-this-or-edit-lines)
+  (add-to-list 'mc--default-cmds-to-run-once
+               'toggle-input-method)
+  :bind
+  (:map xah-fly-command-map
+        ("7"         . my-mc-mark-like-this-or-edit-lines)
+        ("SPC 7"     . mc/mark-previous-like-this-word)
+        ("SPC TAB 7" . mc/reverse-regions)
+        ("SPC d 7"   . mc/unmark-next-like-this)
+        ("SPC h"     . my-bob-or-mc-align)
+        ("SPC n"     . my-eob-or-mc-align-with-space)
+        ("SPC a"     . my-mark-all)))
 
 (use-package avy
     :ensure t
-    :custom (avy-background t)
+    :custom
+    (avy-background t)
     (avy-translate-char-function #'translate-char-from-russian)
     :bind ((:map xah-fly-command-map)
-           ("n"           . avy-goto-char)
-           ("SPC SPC v"   . avy-yank-word)
-           ("SPC SPC x"   . avy-teleport-word)
-           ("SPC SPC t"   . avy-mark-word)
-           ("SPC SPC 5"   . avy-zap)
-           ("SPC SPC c"   . avy-copy-word)
-           ("SPC SPC d"   . avy-kill-word-stay)
-           ("SPC SPC TAB" . avy-transpose-words)
-           ("SPC SPC -"   . avy-sp-splice-sexp-in-word)
-           ("SPC SPC 8"   . avy-kill-word-move)
-           ("SPC SPC o"   . avy-change-word)
-           ("SPC SPC 9"   . avy-sp-change-enclosing-in-word)
-           ("SPC SPC z"   . avy-comment-line)
-           ("SPC SPC 5"   . avy-zap)
-           ("SPC SPC a v" . avy-copy-region)
-           ("SPC SPC a d" . avy-kill-region)
-           ("SPC SPC a x" . avy-move-region)
-           ("SPC SPC a c" . avy-kill-ring-save-region)
-           ("SPC SPC l v" . avy-copy-line)
-           ("SPC SPC l ;" . avy-goto-end-of-line)
-           ("SPC SPC l x" . avy-move-line)
-           ("SPC SPC l c" . avy-kill-ring-save-whole-line)
-           ("SPC SPC l d" . avy-kill-whole-line)))
+           ("n"     . nil) ; by default this is `isearch', so i turn
+                                        ; this to keymap
+           ("n n"   . avy-goto-char)
+           ("n v"   . avy-yank-word)
+           ("n x"   . avy-teleport-word)
+           ("n c"   . avy-copy-word)
+           ("n 8"   . avy-mark-word)
+           ("n d"   . avy-kill-word-stay)
+           ("n 5"   . avy-zap)
+           ("n TAB" . avy-transpose-words)
+           ("n -"   . avy-sp-splice-sexp-in-word)
+           ("n r"   . avy-kill-word-move)
+           ("n o"   . avy-change-word)
+           ("n 9"   . avy-sp-change-enclosing-in-word)
+           ("n z"   . avy-comment-line)
+           ("n t v" . avy-copy-region)
+           ("n t d" . avy-kill-region)
+           ("n t x" . avy-move-region)
+           ("n t c" . avy-kill-ring-save-region)
+           ("n ;"   . avy-goto-end-of-line)
+           ("n k v" . avy-copy-line)
+           ("n k x" . avy-move-line)
+           ("n k c" . avy-kill-ring-save-whole-line)
+           ("n k d" . avy-kill-whole-line)))
 
 
 (defun translate-char-from-russian (russian-char)
-    "Translate RUSSIAN-CHAR to corresponding char on qwerty keyboard.
+  "Translate RUSSIAN-CHAR to corresponding char on qwerty keyboard.
 I am use йцукенг russian keyboard."
-    (cl-case russian-char
-      (?й ?q)
-      (?ц ?w)
-      (?у ?e)
-      (?к ?r)
-      (?е ?t)
-      (?н ?y)
-      (?г ?u)
-      (?ш ?i)
-      (?щ ?o)
-      (?з ?p)
-      (?ф ?a)
-      (?ы ?s)
-      (?в ?d)
-      (?а ?f)
-      (?п ?g)
-      (?р ?h)
-      (?о ?j)
-      (?л ?k)
-      (?д ?l)
-      (?я ?z)
-      (?ч ?x)
-      (?с ?c)
-      (?м ?v)
-      (?и ?b)
-      (?т ?n)
-      (?ь ?m)
-      (t russian-char)))
+  (cl-case russian-char
+    (?й ?q)
+    (?ц ?w)
+    (?у ?e)
+    (?к ?r)
+    (?е ?t)
+    (?н ?y)
+    (?г ?u)
+    (?ш ?i)
+    (?щ ?o)
+    (?з ?p)
+    (?ф ?a)
+    (?ы ?s)
+    (?в ?d)
+    (?а ?f)
+    (?п ?g)
+    (?р ?h)
+    (?о ?j)
+    (?л ?k)
+    (?д ?l)
+    (?я ?z)
+    (?ч ?x)
+    (?с ?c)
+    (?м ?v)
+    (?и ?b)
+    (?т ?n)
+    (?ь ?m)
+    (t russian-char)))
 
 (defun avy-goto-word-1-with-action (char action &optional arg beg end symbol)
-    "Jump to the currently visible CHAR at a word start.
+  "Jump to the currently visible CHAR at a word start.
 The window scope is determined by `avy-all-windows'.
 When ARG is non-nil, do the opposite of `avy-all-windows'.
 BEG and END narrow the scope where candidates are searched.
 When SYMBOL is non-nil, jump to symbol start instead of word start.
 Do action of `avy' ACTION.'"
-    (interactive (list (read-char "char: " t)
-                       current-prefix-arg))
-    (avy-with avy-goto-word-1
-        (let* ((str (string char))
-               (regex (cond ((string= str ".")
-                             "\\.")
-                            ((and avy-word-punc-regexp
-                                  (string-match avy-word-punc-regexp str))
-                             (regexp-quote str))
-                            ((<= char 26)
-                             str)
-                            (t
-                             (concat
-                              (if symbol "\\_<" "\\b")
-                              str)))))
-            (avy-jump regex
-                      :window-flip arg
-                      :beg beg
-                      :end end
-                      :action action))))
+  (interactive (list (read-char "char: " t)
+                     current-prefix-arg))
+  (avy-with avy-goto-word-1
+    (let* ((str (string char))
+           (regex (cond ((string= str ".")
+                         "\\.")
+                        ((and avy-word-punc-regexp
+                              (string-match avy-word-punc-regexp str))
+                         (regexp-quote str))
+                        ((<= char 26)
+                         str)
+                        (t
+                         (concat
+                          (if symbol "\\_<" "\\b")
+                          str)))))
+      (avy-jump regex
+                :window-flip arg
+                :beg beg
+                :end end
+                :action action))))
 
 (defun avy-zap (char &optional arg)
-    "Zapping to next CHAR navigated by `avy'."
-    (interactive "cchar:\nP")
-    (avy-jump (s-concat (char-to-string char))
-              :window-flip arg
-              :beg (point-min)
-              :end (point-max)
-              :action 'avy-action-zap-to-char))
+  "Zapping to next CHAR navigated by `avy'."
+  (interactive "cchar:\nP")
+  (avy-jump (s-concat (char-to-string char))
+            :window-flip arg
+            :beg (point-min)
+            :end (point-max)
+            :action 'avy-action-zap-to-char))
 
 
 (defun avy-teleport-word (char &optional arg)
-    "Teleport word searched by `arg' with CHAR.
+  "Teleport word searched by `arg' with CHAR.
 Pass ARG to `avy-jump'."
-    (interactive "cchar:\nP")
-    (avy-goto-word-1-with-action char 'avy-action-teleport))
+  (interactive "cchar:\nP")
+  (avy-goto-word-1-with-action char 'avy-action-teleport))
 
 (defun avy-mark-word (char)
-    "Mark word begining with CHAR searched by `avy'."
-    (interactive "cchar: ")
-    (avy-goto-word-1-with-action char 'avy-action-mark))
+  "Mark word begining with CHAR searched by `avy'."
+  (interactive "cchar: ")
+  (avy-goto-word-1-with-action char 'avy-action-mark))
 
 
 (defun avy-copy-word (char &optional arg)
-    "Copy word searched by `arg' with CHAR.
+  "Copy word searched by `arg' with CHAR.
 Pass ARG to `avy-jump'."
-    (interactive "cchar:\nP")
-    (avy-goto-word-1-with-action char 'avy-action-copy))
+  (interactive "cchar:\nP")
+  (avy-goto-word-1-with-action char 'avy-action-copy))
 
 
 (defun avy-yank-word (char &optional arg)
-    "Paste word searched by `arg' with CHAR.
+  "Paste word searched by `arg' with CHAR.
 Pass ARG to `avy-jump'."
-    (interactive "cchar:\nP")
-    (avy-goto-word-1-with-action char 'avy-action-yank))
+  (interactive "cchar:\nP")
+  (avy-goto-word-1-with-action char 'avy-action-yank))
 
 
 (defun avy-kill-word-stay (char &optional arg)
-    "Paste word searched by `arg' with CHAR.
+  "Paste word searched by `arg' with CHAR.
 Pass ARG to `avy-jump'."
-    (interactive "cchar:\nP")
-    (avy-goto-word-1-with-action char 'avy-action-kill-stay))
+  (interactive "cchar:\nP")
+  (avy-goto-word-1-with-action char 'avy-action-kill-stay))
 
 
 (defun avy-kill-word-move (char &optional arg)
-    "Paste word searched by `arg' with CHAR.
+  "Paste word searched by `arg' with CHAR.
 Pass ARG to `avy-jump'."
-    (interactive "cchar:\nP")
-    (avy-goto-word-1-with-action char 'avy-action-kill-move))
+  (interactive "cchar:\nP")
+  (avy-goto-word-1-with-action char 'avy-action-kill-move))
+
 
 (defun avy-goto-line-1-with-action (action)
-    "Goto line via `avy' with CHAR and do ACTION."
-    (interactive)
-    (avy-jump "^." :action action))
+  "Goto line via `avy' with CHAR and do ACTION."
+  (interactive)
+  (avy-jump "^." :action action))
+
 
 (defun avy-comment-line ()
-    "With `avy' move to line and comment its."
-    (interactive)
-    (avy-goto-line-1-with-action 'avy-action-comment))
+  "With `avy' move to line and comment its."
+  (interactive)
+  (avy-goto-line-1-with-action 'avy-action-comment))
+
 
 (defun avy-action-comment (pt)
-    "Saving excursion comment line at point PT."
-    (save-excursion
-        (goto-char pt)
-        (comment-line 1)))
+  "Saving excursion comment line at point PT."
+  (save-excursion
+    (goto-char pt)
+    (comment-line 1)))
+
 
 (defun avy-sp-change-enclosing-in-word (ch)
-    "With `avy' move to word starting with CH and `sp-change-enclosing'."
-    (interactive "cchar:")
-    (avy-goto-word-1-with-action ch 'avy-action-sp-change-enclosing))
+  "With `avy' move to word starting with CH and `sp-change-enclosing'."
+  (interactive "cchar:")
+  (avy-goto-word-1-with-action ch 'avy-action-sp-change-enclosing))
+
 
 (defun avy-action-sp-change-enclosing (pt)
-    "Saving excursion `sp-change-enclosing' in word at point PT."
-    (save-excursion
-        (goto-char pt)
-        (sp-change-enclosing)))
+  "Saving excursion `sp-change-enclosing' in word at point PT."
+  (save-excursion
+    (goto-char pt)
+    (sp-change-enclosing)))
+
 
 (defun avy-sp-splice-sexp-in-word (ch)
-    "With `avy' move to word starting with CH and `sp-splice-sexp'."
-    (interactive "cchar:")
-    (avy-goto-word-1-with-action ch 'avy-action-sp-splice-sexp))
+  "With `avy' move to word starting with CH and `sp-splice-sexp'."
+  (interactive "cchar:")
+  (avy-goto-word-1-with-action ch 'avy-action-sp-splice-sexp))
+
 
 (defun avy-action-sp-splice-sexp (pt)
-    "Saving excursion `sp-splice-sexp' in word at point PT."
-    (save-excursion
-        (goto-char pt)
-        (sp-splice-sexp)))
+  "Saving excursion `sp-splice-sexp' in word at point PT."
+  (save-excursion
+    (goto-char pt)
+    (sp-splice-sexp)))
+
 
 (defun avy-change-word (ch)
-    "With `avy' move to word starting with CH and change its any other."
-    (interactive "cchar:")
-    (avy-goto-word-1-with-action ch 'avy-action-change-word))
+  "With `avy' move to word starting with CH and change its any other."
+  (interactive "cchar:")
+  (avy-goto-word-1-with-action ch 'avy-action-change-word))
+
 
 (defun avy-action-change-word (pt)
-    "Saving excursion navigate to word at point PT and change its."
-    (save-excursion
-        (avy-action-kill-move pt)
-        (insert (read-string "new word, please: " (current-kill 0)))))
+  "Saving excursion navigate to word at point PT and change its."
+  (save-excursion
+    (avy-action-kill-move pt)
+    (insert (read-string "new word, please: " (current-kill 0)))))
+
 
 (defun avy-transpose-words (char)
-    "Goto CHAR via `avy' and transpose at point word to word at prev point."
-    (interactive "cchar: ")
-    (avy-goto-word-1-with-action char 'avy-action-transpose-words))
+  "Goto CHAR via `avy' and transpose at point word to word at prev point."
+  (interactive "cchar: ")
+  (avy-goto-word-1-with-action char 'avy-action-transpose-words))
 
 
 (defun avy-action-transpose-words (second-pt)
-    "Goto SECOND-PT via `avy' and transpose at point to word at point ago."
-    (backward-sexp)
-    (avy-action-yank second-pt)
-    (kill-sexp)
-    (goto-char second-pt)
-    (yank)
-    (kill-sexp))
+  "Goto SECOND-PT via `avy' and transpose at point to word at point ago."
+  (avy-action-yank second-pt)
+  (kill-sexp)
+  (goto-char second-pt)
+  (yank)
+  (kill-sexp))
 
 (use-package smartparens
     :ensure t
@@ -551,24 +565,24 @@ Pass ARG to `avy-jump'."
 (require 'smartparens-config)
 
 (defun delete-only-1-char ()
-    "Delete only 1 character before point."
-    (interactive)
-    (backward-char)
-    (delete-char 1)
-    )
+  "Delete only 1 character before point."
+  (interactive)
+  (backward-char)
+  (delete-char 1)
+  )
 
 (define-key xah-fly-command-map (kbd "DEL") 'delete-only-1-char)
 
 (defun mark-inner-or-expand-region ()
-    "If text is selected, expand region, otherwise then mark inner of brackets."
-    (interactive)
-    (if (use-region-p)
-        (call-interactively 'er/expand-region)
-        (progn
-            (-when-let (ok (sp-get-sexp))
-                (sp-get ok
-                    (set-mark :beg-in)
-                    (goto-char :end-in))))))
+  "If text is selected, expand region, otherwise then mark inner of brackets."
+  (interactive)
+  (if (use-region-p)
+      (call-interactively 'er/expand-region)
+    (progn
+      (-when-let (ok (sp-get-sexp))
+        (sp-get ok
+          (set-mark :beg-in)
+          (goto-char :end-in))))))
 
 (use-package expand-region
     :ensure t
@@ -579,25 +593,25 @@ Pass ARG to `avy-jump'."
           ("m" . sp-backward-up-sexp)))
 
 (defun kmacro-start-or-end-macro ()
-    "If macro record have just started, then stop this record, otherwise start."
-    (interactive)
-    (if defining-kbd-macro
-        (kmacro-end-macro 1)
-        (kmacro-start-macro 1)))
+  "If macro record have just started, then stop this record, otherwise start."
+  (interactive)
+  (if defining-kbd-macro
+      (kmacro-end-macro 1)
+    (kmacro-start-macro 1)))
 
 (define-key xah-fly-command-map (kbd "\\") 'kmacro-start-or-end-macro)
 
 (defun kmacro-call-macro-or-apply-to-lines (arg &optional top bottom)
- "If selected region, then apply macro to selected lines, otherwise call macro."
-    (interactive
-     (list
-      1
-      (if (use-region-p) (region-beginning) nil)
-      (if (use-region-p) (region-end) nil)))
+  "If selected region, then apply macro to selected lines, otherwise call macro."
+  (interactive
+   (list
+    1
+    (if (use-region-p) (region-beginning) nil)
+    (if (use-region-p) (region-end) nil)))
 
-    (if (use-region-p)
-        (apply-macro-to-region-lines top bottom)
-        (kmacro-call-macro arg)))
+  (if (use-region-p)
+      (apply-macro-to-region-lines top bottom)
+    (kmacro-call-macro arg)))
 
 (define-key xah-fly-command-map (kbd "SPC RET") 'kmacro-call-macro-or-apply-to-lines)
 
@@ -606,119 +620,174 @@ Pass ARG to `avy-jump'."
     :bind (:map xah-fly-command-map
                 ("SPC `" . string-edit-at-point)))
 
-(bind-keys :map
-           xah-fly-command-map
-           ("SPC TAB o" . transpose-words)
-           ("SPC TAB u" . backward-transpose-words)
+(use-package drag-stuff
+    :ensure t
+    :config
+    (drag-stuff-global-mode t)
+    :bind
+    ((:map xah-fly-command-map)
+     ("SPC TAB i" . 'drag-stuff-up)
+     ("SPC TAB k" . 'drag-stuff-down)
 
-           ("SPC TAB l" . transpose-chars)
-           ("SPC TAB j" . backward-transpose-chars)
+     ("SPC TAB o" . 'drag-stuff-right)
+     ("SPC TAB u" . 'drag-stuff-left)
 
-           ("SPC TAB i" . backward-transpose-lines)
-           ("SPC TAB k" . transpose-lines)
+     ("SPC TAB ." . 'transpose-sexps)
+     ("SPC TAB m" . 'transpose-sexps)
 
-           ("SPC TAB ." . transpose-sexps)
-           ("SPC TAB m" . backward-transpose-sexps)
+     ("SPC TAB n" . 'avy-transpose-lines-in-region)
+     ("SPC TAB t" . 'transpose-regions)))
 
-           ("SPC TAB n" . avy-transpose-lines-bacin-region)
-           ("SPC TAB t" . transpose-regions))
+(defun my-function-is-drag-stuff-p (f)
+  "Return t, when F is one of functions of `drag-stuff'."
+  (->>
+   f
+   (symbol-name)
+   (s-prefix-p "drag-stuff")))
 
+(defun my-last-command-is-drag-stuff-p ()
+  "Return t, when last command is one of functions of `drag-stuff'."
+  (interactive)
+  (my-function-is-drag-stuff-p last-command))
 
-(defun backward-transpose-words ()
-    "As `transpose-words' but set position to backward of transpose."
-    (interactive)
-    (transpose-words -1))
+(defvar my-last-command-is-drag-stuff nil
+  "If last command is one of my functions which draged word then this in true.")
 
+(defun my-last-command-is-dragged-stuff-p ()
+  "Return t, when last command dragged someone stuff."
+  (or
+   (my-last-command-is-drag-stuff-p)
+   (and
+    (s-contains-p "drag-stuff" (symbol-name last-command))
+    my-last-command-is-drag-stuff)))
 
-(defun backward-transpose-chars ()
-    "As `transpose-chars' but set position to backward of transpose."
-    (interactive)
-    (transpose-chars -1))
+(defmacro my-define-stuff-key (keymap key normal-command drag-command)
+  "Define in KEYMAP to KEY command when run NORMAL-COMMAND or DRAG-COMMAND."
+  (let ((command-name (intern
+                       (s-concat
+                        "my-"
+                        (symbol-name (eval normal-command))
+                        "-or-"
+                        (symbol-name (eval drag-command))))))
+    `(progn
+       (defun ,command-name ()
+         ,(s-lex-format "Run `${normal-command}' or `${drag-command}'.")
+         (interactive)
+         (let* ((is-drag (my-last-command-is-dragged-stuff-p)))
+           (setq my-last-command-is-drag-stuff is-drag)
+           (if is-drag
+               (call-interactively ,drag-command)
+             (call-interactively ,normal-command))))
+       (define-key ,keymap ,key #',command-name))))
 
+(my-define-stuff-key
+ xah-fly-command-map
+ "o"
+ #'syntax-subword-forward
+ #'drag-stuff-right)
 
-(defun backward-transpose-lines ()
-    "As `transpose-lines' but set position to backward of transpose."
-    (interactive)
-    (transpose-lines -1))
+(define-key-when
+    my-insert-new-line-or-nothing
+    xah-fly-command-map
+  ""
+  'what-line
+  'my-last-command-is-dragged-stuff-p)
 
+(my-define-stuff-key
+ xah-fly-command-map
+ "u"
+ #'syntax-subword-backward
+ #'drag-stuff-left)
 
-(defun backward-transpose-sexps ()
-    "As `transpose-sexps' but set position to backward of transpose."
-    (interactive)
-    (transpose-sexps -1))
+(my-define-stuff-key
+ xah-fly-command-map
+ "i"
+ #'previous-line
+ #'drag-stuff-up)
+
+(my-define-stuff-key
+ xah-fly-command-map
+ "k"
+ #'next-line
+ #'drag-stuff-down)
 
 (defun delete-and-edit-current-line ()
-    "Delete current line and instroduce to insert mode."
-    (interactive)
-    (beginning-of-line-text)
-    (kill-line)
-    (xah-fly-insert-mode-init)
-    )
+  "Delete current line and instroduce to insert mode."
+  (interactive)
+  (beginning-of-line-text)
+  (kill-line)
+  (xah-fly-insert-mode-init)
+  )
 
 (define-key xah-fly-command-map (kbd "w") 'delete-and-edit-current-line)
 
 (defun clear-current-line ()
-    "Clear content of current line (including whitespaces)."
-    (interactive)
-    (kill-region (line-beginning-position) (line-end-position))
-    )
+  "Clear content of current line (including whitespaces)."
+  (interactive)
+  (kill-region (line-beginning-position) (line-end-position))
+  )
 
 (define-key xah-fly-command-map (kbd "SPC w") 'clear-current-line)
 
 (defun select-current-or-next-word ()
-    "If word was selected, then move to next word, otherwise select word."
-    (interactive)
-    (if (use-region-p)
-        (forward-word)
-        (xah-extend-selection))
-    )
+  "If word was selected, then move to next word, otherwise select word."
+  (interactive)
+  (if (use-region-p)
+      (forward-word)
+    (xah-extend-selection))
+  )
 
 (define-key xah-fly-command-map (kbd "8") 'select-current-or-next-word)
 
 (defun delete-current-text-block-or-cancel-selection ()
-    "If text is selected, then cancel selection, otherwise delete current block."
-    (interactive)
-    (if (use-region-p)
-        (deactivate-mark)
-        (xah-delete-current-text-block)))
+  "If text is selected, then cancel selection, otherwise delete current block."
+  (interactive)
+  (if (use-region-p)
+      (deactivate-mark)
+    (xah-delete-current-text-block)))
 
 (define-key xah-fly-command-map (kbd "g") nil)
 (define-key xah-fly-command-map (kbd "g") 'delete-current-text-block-or-cancel-selection)
 
-(define-key-when xah-fly-command-map "-" 'exchange-point-and-mark 'use-region-p)
+(define-key-when
+    my-exchange-point-and-mark-or-splice-sexp
+    xah-fly-command-map
+  "-"
+  'exchange-point-and-mark
+  'use-region-p)
 
 (defun open-line-saving-indent ()
-    "Inserting new line, saving position and inserting new line."
-    (interactive)
-    (newline)
-    (unless (s-blank-p (s-trim (thing-at-point 'line t)))
-        (indent-according-to-mode))
-    (forward-line -1)
-    (end-of-line)
-    (delete-horizontal-space t))
+  "Inserting new line, saving position and inserting new line."
+  (interactive)
+  (newline)
+  (unless (s-blank-p (s-trim (thing-at-point 'line t)))
+    (indent-according-to-mode))
+  (forward-line -1)
+  (end-of-line)
+  (delete-horizontal-space t))
 
 (define-key xah-fly-command-map (kbd "s") 'open-line-saving-indent)
 
 (defun open-line-below ()
-    (interactive)
-    (end-of-line)
-    (newline)
-    (indent-for-tab-command))
+  (interactive)
+  (end-of-line)
+  (newline)
+  (indent-for-tab-command))
 
 (defun open-line-above ()
-    (interactive)
-    (beginning-of-line)
-    (newline)
-    (forward-line -1)
-    (indent-for-tab-command))
+  (interactive)
+  (beginning-of-line)
+  (newline)
+  (forward-line -1)
+  (indent-for-tab-command))
 
 (defun new-line-in-between ()
-    (interactive)
+  (interactive)
+  (newline)
+  (save-excursion
     (newline)
-    (save-excursion
-        (newline)
-        (indent-for-tab-command))
     (indent-for-tab-command))
+  (indent-for-tab-command))
 
 (defun duplicate-current-line-or-region (arg)
   "Duplicates the current line or region ARG times.
@@ -787,34 +856,34 @@ region-end is used."
   "Threshold (# chars) over which indentation does not automatically occur.")
 
 (defun yank-advised-indent-function (beg end)
-    "Do indentation, as long as the region isn't too large."
-    (if (<= (- end beg) yank-advised-indent-threshold)
-        (indent-region beg end nil)))
+  "Do indentation, as long as the region isn't too large."
+  (if (<= (- end beg) yank-advised-indent-threshold)
+      (indent-region beg end nil)))
 
 (defadvice yank (after yank-indent activate)
-    "If current mode is one of 'yank-indent-modes, indent yanked text.
+  "If current mode is one of 'yank-indent-modes, indent yanked text.
 With prefix arg don't indent."
-    (if (and (not (ad-get-arg 0))
-             (--any? (derived-mode-p it) yank-indent-modes))
-        (let ((transient-mark-mode nil))
-            (yank-advised-indent-function (region-beginning) (region-end)))))
+  (if (and (not (ad-get-arg 0))
+           (--any? (derived-mode-p it) yank-indent-modes))
+      (let ((transient-mark-mode nil))
+        (yank-advised-indent-function (region-beginning) (region-end)))))
 
 (defadvice yank-pop (after yank-pop-indent activate)
-    "If current mode is one of 'yank-indent-modes, indent yanked text.
+  "If current mode is one of 'yank-indent-modes, indent yanked text.
 With prefix arg don't indent."
-    (if (and (not (ad-get-arg 0))
-             (member major-mode yank-indent-modes))
-        (let ((transient-mark-mode nil))
-            (yank-advised-indent-function (region-beginning) (region-end)))))
+  (if (and (not (ad-get-arg 0))
+           (member major-mode yank-indent-modes))
+      (let ((transient-mark-mode nil))
+        (yank-advised-indent-function (region-beginning) (region-end)))))
 
 (defun yank-unindented ()
-    (interactive)
-    (yank 1))
+  (interactive)
+  (yank 1))
 
 (defun kill-to-beginning-of-line ()
-    (interactive)
-    (kill-region (save-excursion (beginning-of-line) (point))
-                 (point)))
+  (interactive)
+  (kill-region (save-excursion (beginning-of-line) (point))
+               (point)))
 
 (bind-keys :map
            xah-fly-command-map
@@ -825,38 +894,38 @@ With prefix arg don't indent."
            ("SPC SPC s" . open-line-above))
 
 (defun insert-space-before-line ()
-    "Saving position, insert space to beginning of current line."
-     (interactive)
-     (save-excursion (beginning-of-line-text)
-                    (xah-insert-space-before))
-    )
+  "Saving position, insert space to beginning of current line."
+  (interactive)
+  (save-excursion (beginning-of-line-text)
+                  (xah-insert-space-before))
+  )
 
 (defun insert-spaces-before-each-line-by-line-nums (start-line end-line)
-    "Insert space before each line in region (`START-LINE`; `END-LINE`)."
-    (unless (= 0 (+ 1 (- end-line start-line)))
-        (goto-line start-line)
-        (insert-space-before-line)
-        (insert-spaces-before-each-line-by-line-nums (+ start-line 1) end-line))
-    )
+  "Insert space before each line in region (`START-LINE`; `END-LINE`)."
+  (unless (= 0 (+ 1 (- end-line start-line)))
+    (goto-line start-line)
+    (insert-space-before-line)
+    (insert-spaces-before-each-line-by-line-nums (+ start-line 1) end-line))
+  )
 
 (defun insert-spaces-before-each-line (beg end)
-    "Insert spaces before each selected line, selected line indentifier with `BEG` & `END`."
-    (interactive "r")
-    (save-excursion
-        (let (deactivate-mark)
-            (let ((begining-line-num (line-number-at-pos beg))
-                  (end-line-num (line-number-at-pos end)))
-                (insert-spaces-before-each-line-by-line-nums begining-line-num end-line-num))))
-    )
+  "Insert spaces before each selected line, selected line indentifier with `BEG` & `END`."
+  (interactive "r")
+  (save-excursion
+    (let (deactivate-mark)
+      (let ((begining-line-num (line-number-at-pos beg))
+            (end-line-num (line-number-at-pos end)))
+        (insert-spaces-before-each-line-by-line-nums begining-line-num end-line-num))))
+  )
 
 (defun insert-spaces-before-or-to-beginning-of-each-line (beg end)
-    "Insert space, and if selected region, insert space to beginning of each line, text is should will indentifier with `BEG` & `END`."
-    (interactive (list (if (use-region-p) (region-beginning))
-                       (if (use-region-p) (region-end))))
-    (if (use-region-p)
-        (insert-spaces-before-each-line beg end)
-        (xah-insert-space-before))
-    )
+  "Insert space, and if selected region, insert space to beginning of each line, text is should will indentifier with `BEG` & `END`."
+  (interactive (list (if (use-region-p) (region-beginning))
+                     (if (use-region-p) (region-end))))
+  (if (use-region-p)
+      (insert-spaces-before-each-line beg end)
+    (xah-insert-space-before))
+  )
 
 
 (define-key xah-fly-command-map (kbd "p") nil)
@@ -870,23 +939,46 @@ With prefix arg don't indent."
 (define-key xah-fly-command-map (kbd "SPC t") 'rectangle-mark-mode)
 (define-key xah-fly-command-map (kbd "SPC v") 'yank-rectangle)
 
-(define-key-when xah-fly-command-map "c" 'copy-rectangle-as-kill
-         (lambda () rectangle-mark-mode))
+(defun rectangle-mark-mode-p ()
+  "Return t, when `rectangle-mark-mode' is enabled."
+  rectangle-mark-mode)
 
-(define-key-when xah-fly-command-map "d" 'kill-rectangle
-         (lambda () rectangle-mark-mode))
+(define-key-when
+    my-copy-rectangle-or-copy-line
+    xah-fly-command-map
+    "c"
+  'copy-rectangle-as-kill
+  'rectangle-mark-mode-p)
 
-(define-key-when xah-fly-command-map "x" 'kill-rectangle
-         (lambda () rectangle-mark-mode))
+(define-key-when
+    my-kill-rectangle-or-delete-char
+    xah-fly-command-map
+    "d"
+  'kill-rectangle
+  'rectangle-mark-mode-p)
 
-(define-key-when xah-fly-command-map "f" 'replace-rectangle
-         (lambda () rectangle-mark-mode))
+(define-key-when
+    my-kill-rectangle-or-kill-line
+    xah-fly-command-map
+  "x"
+  'kill-rectangle
+  'rectangle-mark-mode-p)
 
-(define-key-when xah-fly-command-map "s" 'open-rectangle
-        (lambda () rectangle-mark-mode))
+(define-key-when
+    my-xah-activate-insert-mode-or-replace-rectangle
+    xah-fly-command-map
+  "f"
+  'replace-rectangle
+  'rectangle-mark-mode-p)
 
-(define-key-when xah-fly-command-map "-" 'rectangle-exchange-point-and-mark
-        (lambda () rectangle-mark-mode))
+(define-key-when
+    any-exchange-point-and-mark-or-splice-sexp
+    xah-fly-command-map
+  "-"
+  'rectangle-exchange-point-and-mark
+  'rectangle-mark-mode-p)
+
+;;
 
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width          4)
@@ -896,23 +988,23 @@ With prefix arg don't indent."
 
 
 (defun select-current-line ()
-    "Select as region current line."
-    (interactive)
-    (forward-line 0)
-    (set-mark (point))
-    (end-of-line)
-    )
+  "Select as region current line."
+  (interactive)
+  (forward-line 0)
+  (set-mark (point))
+  (end-of-line)
+  )
 
 
 (defun indent-line-or-region ()
-    "If text selected, then indent it, otherwise indent current line."
-    (interactive)
-    (save-excursion
-        (if (use-region-p)
-            (indent-region (region-beginning) (region-end))
-            (funcall indent-line-function)
-            ))
-    )
+  "If text selected, then indent it, otherwise indent current line."
+  (interactive)
+  (save-excursion
+    (if (use-region-p)
+        (indent-region (region-beginning) (region-end))
+      (funcall indent-line-function)
+      ))
+  )
 
 
 (global-set-key (kbd "RET") 'newline-and-indent)
@@ -925,14 +1017,14 @@ With prefix arg don't indent."
 
 (defmacro add-nav-to-imports-for-language (language to-imports-function)
   "Bind `TO-IMPORTS-FUNCTION` to `LANGUAGE`-map."
-      `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
-          (add-hook
-            language-hook
-            (lambda ()
-                (define-key
-                    xah-fly-command-map
-                    (kbd "SPC SPC i")
-                    ',to-imports-function)))))
+  `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
+     (add-hook
+      language-hook
+      (lambda ()
+        (define-key
+            xah-fly-command-map
+            (kbd "SPC SPC i")
+          ',to-imports-function)))))
 
 (require 'face-remap)
 
@@ -940,91 +1032,221 @@ With prefix arg don't indent."
     :ensure t)
 
 (defun visual-fill (&optional width)
-    (interactive)
-    (or width (setq width 70))
-    (setq-default visual-fill-column-width width
-                  visual-fill-column-center-text t)
-    (text-scale-mode 0)
-    (visual-fill-column-mode 1))
+  (interactive)
+  (or width (setq width 70))
+  (setq-default visual-fill-column-width width
+                visual-fill-column-center-text t)
+  (text-scale-mode 0)
+  (visual-fill-column-mode 1))
 
 (defmacro add-import-keymap-for-language (language add-import-function)
-    "Bind `ADD-IMPORT-FUNCTION` to `LANGUAGE`-map."
-    `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
-         (add-hook
-          language-hook
-          (lambda ()
-              (define-key
-                  xah-fly-command-map
-                  (kbd "SPC i")
-                  ',add-import-function)))))
+  "Bind `ADD-IMPORT-FUNCTION` to `LANGUAGE`-map."
+  `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
+     (add-hook
+      language-hook
+      (lambda ()
+        (define-key
+            xah-fly-command-map
+            (kbd "SPC i")
+          ',add-import-function)))))
 
-(use-package auctex
-    :ensure t)
+(use-package latex
+    :ensure auctex
+    :major-mode-map (LaTeX-mode)
+    :hook ((LaTeX-mode . prettify-symbols-mode))
+    :bind ((:map my-latex-local-map)
+           ("="     . my-calc-simplify-region-copy)
+           ("f"     . my-calc-simplify-region-change))
+    :config (require 'calc-lang)
+    (defun my-calc-simplify (expr)
+      "Simplify EXPR via `calc' and return this."
+      (calc-latex-language t)
+      (calc-alg-entry expr)
+      (with-temp-buffer
+        (calc-copy-to-buffer 1)
+        (delete-char -1)
+        (buffer-string)))
+
+    (defun my-calc-simplify-region-copy (beg end)
+      "Take from BEG to END, simplify this via `calc' and copy as kill."
+      (interactive "r")
+      (let ((expr (my-calc-simplify (buffer-substring beg end))))
+        (with-temp-buffer
+          (insert expr)
+          (copy-region-as-kill (point-min) (point-max)))
+        (message "coppied: %s" (current-kill 0))))
+
+    (defun my-calc-simplify-region-change (beg end)
+      "Get from BEG to END change this via `calc' and yank instead of region."
+      (interactive "r")
+      (let ((expr (buffer-substring beg end)))
+        (goto-char beg)
+        (delete-region beg end)
+        (insert (my-calc-simplify expr)))))
+
+(use-package preview
+    :after latex
+    :bind ((:map my-latex-local-map)
+           ("p" . org-latex-preview))
+    :config
+    (plist-put org-format-latex-options :scale 1.9))
+
+(use-package cdlatex
+    :ensure t
+    :hook (LaTeX-mode . turn-on-cdlatex)
+    :bind (:map cdlatex-mode-map ("<tab>" . cdlatex-tab)))
+
+;; fields
+(use-package cdlatex
+    :hook ((cdlatex-tab . yas-expand)
+           (cdlatex-tab . cdlatex-in-yas-field))
+    :config (use-package yasnippet
+                :bind (:map yas-keymap
+                            ("<tab>" . yas-next-field-or-cdlatex)
+                            ("TAB" . yas-next-field-or-cdlatex))
+                :config (defun cdlatex-in-yas-field
+                            ()
+                          ;; Check if we're at the end of the Yas field
+                          (when-let* ((_ (overlayp yas--active-field-overlay))
+                                      (end (overlay-end yas--active-field-overlay)))
+                            (if (>= (point) end)
+                                (let ((s (thing-at-point 'sexp)))
+                                  (unless (and s
+                                               (assoc
+                                                (substring-no-properties s)
+                                                cdlatex-command-alist-comb))
+                                    (yas-next-field-or-maybe-expand)
+                                    t))
+                              (let (cdlatex-tab-hook minp)
+                                (setq minp
+                                      (min
+                                       (save-excursion
+                                         (cdlatex-tab)
+                                         (point))
+                                       (overlay-end
+                                        yas--active-field-overlay)))
+                                (goto-char minp)
+                                t))))
+
+                (defun yas-next-field-or-cdlatex nil
+                  (interactive)
+                  "Jump to the next Yas field correctly with cdlatex active."
+                  (if (or
+                       (bound-and-true-p cdlatex-mode)
+                       (bound-and-true-p org-cdlatex-mode))
+                      (cdlatex-tab)
+                    (yas-next-field-or-maybe-expand)))))
+
+;; Array/tabular input with org-tables and cdlatex
+(use-package org-table
+    :after cdlatex
+    :bind (:map orgtbl-mode-map
+                ("<tab>" . lazytab-org-table-next-field-maybe)
+                ("TAB" . lazytab-org-table-next-field-maybe))
+    :init (add-hook 'cdlatex-tab-hook 'lazytab-cdlatex-or-orgtbl-next-field 90)
+    ;; Tabular environments using cdlatex
+    (add-to-list 'cdlatex-command-alist
+                 '("smat" "Insert smallmatrix env"
+                   "\\left( \\begin{smallmatrix} ? \\end{smallmatrix} \\right)"
+                   lazytab-position-cursor-and-edit
+                   nil nil t))
+    (add-to-list 'cdlatex-command-alist
+                 '("bmat" "Insert bmatrix env"
+                   "\\begin{bmatrix} ? \\end{bmatrix}"
+                   lazytab-position-cursor-and-edit
+                   nil nil t))
+    (add-to-list 'cdlatex-command-alist
+                 '("pmat" "Insert pmatrix env"
+                   "\\begin{pmatrix} ? \\end{pmatrix}"
+                   lazytab-position-cursor-and-edit
+                   nil nil t))
+    (add-to-list 'cdlatex-command-alist
+                 '("tbl" "Insert table"
+                   "\\begin{table}\n\\centering ? \\caption{}\n\\end{table}\n"
+                   lazytab-position-cursor-and-edit
+                   nil t nil))
+    :config ;; Tab handling in org tables
+    (defun lazytab-position-cursor-and-edit ()
+      ;; (if (search-backward "\?" (- (point) 100) t)
+      ;;     (delete-char 1))
+      (cdlatex-position-cursor)
+      (lazytab-orgtbl-edit))
+
+    (defun lazytab-orgtbl-edit ()
+      (advice-add 'orgtbl-ctrl-c-ctrl-c :after #'lazytab-orgtbl-replace)
+      (orgtbl-mode 1)
+      (open-line 1)
+      (insert "\n|"))
+
+    (defun lazytab-orgtbl-replace (_)
+      (interactive "P")
+      (unless (org-at-table-p) (user-error "Not at a table"))
+      (let* ((table (org-table-to-lisp))
+             params
+             (replacement-table
+              (if (texmathp)
+                  (lazytab-orgtbl-to-amsmath table params)
+                (orgtbl-to-latex table params))))
+        (kill-region (org-table-begin) (org-table-end))
+        (open-line 1)
+        (push-mark)
+        (insert replacement-table)
+        (align-regexp
+         (region-beginning)
+         (region-end)
+         "\\([:space:]*\\)& ")
+        (orgtbl-mode -1)
+        (advice-remove 'orgtbl-ctrl-c-ctrl-c #'lazytab-orgtbl-replace)))
+
+    (defun lazytab-orgtbl-to-amsmath (table params)
+      (orgtbl-to-generic
+       table
+       (org-combine-plists
+        '(:splice t
+          :lstart ""
+          :lend " \\\\"
+          :sep " & "
+          :hline nil
+          :llend "")
+        params)))
+
+    (defun lazytab-cdlatex-or-orgtbl-next-field ()
+      (when (and
+             (bound-and-true-p orgtbl-mode)
+             (org-table-p)
+             (looking-at "[[:space:]]*\\(?:|\\|$\\)")
+             (let ((s (thing-at-point 'sexp)))
+               (not (and s (assoc s cdlatex-command-alist-comb)))))
+        (call-interactively #'org-table-next-field)
+        t))
+
+    (defun lazytab-org-table-next-field-maybe ()
+      (interactive)
+      (if (bound-and-true-p cdlatex-mode)
+          (cdlatex-tab)
+        (org-table-next-field))))
 
 (setq latex-documentclasses
-    '("article" "reoport" "book" "proc" "minimal" "slides" "memoir" "letter" "beamer"))
+      '("article" "reoport" "book" "proc" "minimal" "slides" "memoir" "letter" "beamer"))
 
 (dolist (mode (list 'TeX-mode-hook
                     'tex-mode-hook
                     'latex-mode-hook
                     'LaTeX-mode-hook))
-    (add-hook mode (lambda () (call-interactively 'visual-fill))))
-
-(defun latex-wrap-text (command)
-    "If regions select, wrap region with COMMAND, otherwise wrap word."
-    (unless (use-region-p)
-        (set-mark (point))
-        (forward-word)
-        (exchange-point-and-mark)
-        (backward-word))
-    (goto-char (region-beginning))
-    (insert (s-lex-format "\\${command}{"))
-    (goto-char (region-end))
-    (insert "}")
-    (indent-region (region-beginning) (region-end)))
-
-
-(defun latex-make-text-italic ()
-    "If regions select, wrap region with `emph`, otherwise make word."
-    (interactive)
-    (latex-wrap-text "emph"))
-
-(defun latex-make-text-bold ()
-    "If regions select, wrap region with `textbf`, otherwise make word."
-    (interactive)
-    (latex-wrap-text "emph"))
-
-(defun latex-make-text-formula ()
-    "If regions select, make region formula, otherwise make line formula."
-    (interactive)
-    (unless (use-region-p)
-        (end-of-line)
-        (set-mark (point-at-bol)))
-    (let ((text-beg (region-beginning))
-          (text-end (region-end)))
-        (deactivate-mark)
-        (goto-char text-beg)
-        (insert "\\[")
-        (goto-char (+ text-end 2))
-        (insert "\\]")))
-
+  (add-hook mode (lambda () (call-interactively 'visual-fill))))
 
 (use-package latex
     :major-mode-map (TeX-mode LaTeX-mode tex-mode latex-mode)
-    :bind (:map
-           my-latex-local-map
-           ("m" . helm-insert-latex-math)
-           ("i" . latex-make-text-italic)
-           ("b" . latex-make-text-bold)
-           ("f" . latex-make-text-formula)))
+    :bind ((:map LaTeX-mode-map)
+           (";" . cdlatex-dollar)))
 
 (use-package company-math
     :ensure t
     :init
     (defun my-company-math-setup ()
-        "Setup for `company-math'."
-        (add-to-list 'company-backends 'company-math-symbols-latex)
-        (add-to-list 'company-backends 'company-latex-commands))
+      "Setup for `company-math'."
+      (add-to-list 'company-backends 'company-math-symbols-latex)
+      (add-to-list 'company-backends 'company-latex-commands))
     (add-hook 'LaTeX-mode 'my-company-math-setup))
 
 
@@ -1033,6 +1255,16 @@ With prefix arg don't indent."
     :config
     (company-auctex-init))
 
+(use-package laas
+    :ensure t
+    :hook (LaTeX-mode . laas-mode)
+    :config
+    (aas-set-snippets 'laas-mode
+      :cond #'texmathp
+      "Om"  "\\mathrm{Ом}"
+      "eqv" "\\mathrm{экв}"
+      "Vv"  "\\mathrm{В}"))
+
 (use-package org
     :major-mode-map (org-mode)
     :bind (:map
@@ -1040,24 +1272,30 @@ With prefix arg don't indent."
            ("'"   . org-edit-special)
            ("l"   . org-insert-link)
            ("t"   . org-babel-tangle)
+           ("p"   . org-latex-preview)
            ("RET" . org-open-at-point)))
 
 (add-hook 'org-mode-hook (lambda () (call-interactively 'visual-fill)))
 
 (use-package wikinforg
-  :ensure t)
+    :ensure t)
 
 (use-package org-download
     :ensure t
     :hook
-    (dired-mode-hook . org-download-enable)
-    )
+    (dired-mode-hook . org-download-enable))
 
 (use-package helm-org
     :ensure t
     :bind (:map org-mode-map
-                ([remap helm-semantic-or-imenu]
+                ([remap helm-imenu]
                  . helm-org-in-buffer-headings)))
+
+(use-package ox-clip
+    :ensure t
+    :bind
+    ((:map my-org-local-map)
+     ("c" . ox-clip-formatted-copy)))
 
 (use-package package-lint
     :ensure t
@@ -1080,22 +1318,24 @@ With prefix arg don't indent."
 
 (use-package elfmt
     :config
-    (elfmt-global-mode 1))
+  (elfmt-global-mode 1))
 
 (use-package suggest
     :ensure t
     )
 
 (defun my-edit-elisp-docstring ()
-    "Edit `elisp' docstring via `string-edit' and `elisp-docstring-mode'."
-    (interactive)
-    (string-edit-at-point)
-    (elisp-docstring-mode))
+  "Edit `elisp' docstring via `string-edit' and `elisp-docstring-mode'."
+  (interactive)
+  (string-edit-at-point)
+  (elisp-docstring-mode))
 
 (use-package elisp-docstring-mode
     :ensure t
     :bind (:map emacs-lisp-mode-map
                 ([remap string-edit-at-point] . my-edit-elisp-docstring)))
+
+(setq lisp-body-indent 2)
 
 (use-package markdown-mode
     :ensure t
@@ -1124,8 +1364,8 @@ With prefix arg don't indent."
 
     (add-hook 'markdown-mode-hook
               (lambda ()
-                  (setq-local imenu-generic-expression
-                              markdown-imenu-generic-expression))))
+                (setq-local imenu-generic-expression
+                            markdown-imenu-generic-expression))))
 
 (use-package markdown-toc
     :ensure t
@@ -1138,13 +1378,13 @@ With prefix arg don't indent."
 (setq python-shell-interpreter "python")
 
 (defun py-nav-to-imports ()
-    "Navigate to imports in Python mode."
-    (interactive)
-    (push-mark)
-    (let ((old-pos (point)))
-        (goto-char (point-min))
-        (search-forward-regexp py/imports-regexp old-pos old-pos))
-    )
+  "Navigate to imports in Python mode."
+  (interactive)
+  (push-mark)
+  (let ((old-pos (point)))
+    (goto-char (point-min))
+    (search-forward-regexp py/imports-regexp old-pos old-pos))
+  )
 
 (add-nav-to-imports-for-language
  python-mode
@@ -1158,10 +1398,10 @@ With prefix arg don't indent."
     :ensure t)
 
 (defun enable-dabbrev-company-backend ()
-    "Add `company-dabbrev' backend to `company-backends' for local major mode."
-    (interactive)
-    (setq-local company-backends (cons 'company-dabbrev company-backends))
-    )
+  "Add `company-dabbrev' backend to `company-backends' for local major mode."
+  (interactive)
+  (setq-local company-backends (cons 'company-dabbrev company-backends))
+  )
 
 
 (add-hook 'python-mode-hook 'enable-dabbrev-company-backend)
@@ -1223,7 +1463,7 @@ With prefix arg don't indent."
     :ensure t)
 
 (defun my-enable-flycheck ()
-    (flycheck-mode 1))
+  (flycheck-mode 1))
 
 (use-package js2-mode
     :ensure t
@@ -1261,13 +1501,13 @@ With prefix arg don't indent."
     :hook (js2-mode . my-enable-flycheck))
 
 (defun js/nav-to-imports ()
-    "Navigate to imports in JS mode."
-    (interactive)
-    (push-mark)
-    (let ((old-pos (point)))
-        (goto-char (point-min))
-        (search-forward-regexp js/imports-regexp old-pos old-pos))
-    )
+  "Navigate to imports in JS mode."
+  (interactive)
+  (push-mark)
+  (let ((old-pos (point)))
+    (goto-char (point-min))
+    (search-forward-regexp js/imports-regexp old-pos old-pos))
+  )
 
 (add-nav-to-imports-for-language
  js2-mode
@@ -1275,7 +1515,6 @@ With prefix arg don't indent."
 
 (use-package json-mode
     :major-mode-map t)
-
 
 (use-package json-snatcher
     :ensure t
@@ -1299,8 +1538,8 @@ With prefix arg don't indent."
     :config
     :init
     (--each html-modes
-        (add-hook (intern (s-append "-hook" (symbol-name it)))
-                  (lambda () (auto-rename-tag-mode 38)))))
+      (add-hook (intern (s-append "-hook" (symbol-name it)))
+                (lambda () (auto-rename-tag-mode 38)))))
 
 (use-package emmet-mode
     :ensure t
@@ -1316,9 +1555,9 @@ With prefix arg don't indent."
     :ensure t
     :init
     (defun fast-exec-helm-emmet-keys ()
-        "Keymaps for `helm-emmet'."
-        (fast-exec/some-commands
-         ("View Emmet Cheat" 'helm-emmet)))
+      "Keymaps for `helm-emmet'."
+      (fast-exec/some-commands
+       ("View Emmet Cheat" 'helm-emmet)))
     (fast-exec/register-keymap-func 'fast-exec-helm-emmet-keys)
     (fast-exec/reload-functions-chain))
 
@@ -1326,39 +1565,39 @@ With prefix arg don't indent."
     :ensure t
     :init
     (--each html-modes
-        (let ((map-symbol (intern (s-append "-map" (symbol-name it))))
-              map)
-            (when (boundp map-symbol)
-                (setq map (eval map-symbol))
-                (define-key
-                    map
-                    [remap sp-kill-hybrid-sexp]
-                    'tagedit-kill)
-                (define-key
-                    map
-                    [remap sp-join-sexp]
-                    'tagedit-join-tags)
-                (define-key
-                    map
-                    [remap sp-raise-sexp]
-                    'tagedit-raise-tag)
-                (define-key
-                    map
-                    [remap sp-splice-sexp]
-                    'tagedit-splice-tag)
-                (define-key
-                    map
-                    [remap sp-change-enclosing]
-                    'tagedit-kill-attribute)))))
+      (let ((map-symbol (intern (s-append "-map" (symbol-name it))))
+            map)
+        (when (boundp map-symbol)
+          (setq map (eval map-symbol))
+          (define-key
+              map
+              [remap sp-kill-hybrid-sexp]
+            'tagedit-kill)
+          (define-key
+              map
+              [remap sp-join-sexp]
+            'tagedit-join-tags)
+          (define-key
+              map
+              [remap sp-raise-sexp]
+            'tagedit-raise-tag)
+          (define-key
+              map
+              [remap sp-splice-sexp]
+            'tagedit-splice-tag)
+          (define-key
+              map
+              [remap sp-change-enclosing]
+            'tagedit-kill-attribute)))))
 
 (use-package company-web
     :ensure t
     :init
     (add-hook 'web-mode-hook
               (lambda ()
-                  (set (make-local-variable 'company-backends)
-                       '(company-web-html))
-                  (company-mode t))))
+                (set (make-local-variable 'company-backends)
+                     '(company-web-html))
+                (company-mode t))))
 
 (use-package css-mode)
 
@@ -1366,10 +1605,7 @@ With prefix arg don't indent."
     :ensure t
     :init
     (dolist (hook (list 'web-mode-hook 'css-mode-hook))
-        (add-hook hook 'css-eldoc-enable)))
-
-(add-hook 'calc-mode-hook (lambda () (interactive) (xah-fly-keys 0)))
-(add-hook 'calc-end-hook (lambda () (interactive) (xah-fly-keys 38)))
+      (add-hook hook 'css-eldoc-enable)))
 
 (show-paren-mode 2)
 (setq make-backup-files         nil)
@@ -1386,9 +1622,9 @@ With prefix arg don't indent."
     :ensure t
     :init
     (defun fast-exec-define-helm-tail-keys ()
-        "This is bind `fast-exec' with `helm-tail'."
-        (fast-exec/some-commands
-         ("Open Tail" 'helm-tail)))
+      "This is bind `fast-exec' with `helm-tail'."
+      (fast-exec/some-commands
+       ("Open Tail" 'helm-tail)))
     (fast-exec/register-keymap-func 'fast-exec-define-helm-tail-keys)
     (fast-exec/reload-functions-chain))
 
@@ -1410,7 +1646,9 @@ With prefix arg don't indent."
 
 (use-package helm
     :ensure t
-    :custom (helm-M-x-fuzzy-match t)
+    :custom
+    (helm-M-x-fuzzy-match t)
+    (helm-autoresize-min-height 20)
     :init (helm-autoresize-mode 1) (helm-mode 1)
     :bind (:map
            xah-fly-command-map
@@ -1454,18 +1692,41 @@ Thank you https://github.com/leuven65!"
     (global-syntax-subword-mode)
     )
 
+(defun my-pandoc-tex-to-documents-dir ()
+  "Move all .docx files in working dir to directroy documents."
+  (f-mkdir "documents")
+  (-->
+   (file-expand-wildcards "*.tex")
+   (-map 'f-base it)
+   (--each
+       it
+     (shell-command
+      (s-lex-format
+       "pandoc -t docx -f latex -o documents/${it}.docx ${it}.tex")))))
+
+(defun fast-exec-pandoc-keys ()
+  "Get some useful keymaps of  `fast-exec' for pandoc"
+  (fast-exec/some-commands
+   ("Convert Tex Files and Move to Documents Dir"
+    'my-pandoc-tex-to-documents-dir)))
+
+(fast-exec/register-keymap-func 'fast-exec-pandoc-keys)
+(fast-exec/reload-functions-chain)
+
+(setq default-input-method "russian-computer")
+
 (use-package cowsay
     :ensure t
     :custom
     (cowsay-directories '("~/.emacs.d/cows"))
     :config
     (defun fast-exec-define-cowsay-keymaps ()
-        "Some useful keymaps for `cowsay'/`fast-exec'."
-        (fast-exec/some-commands
-         ("Cow Say String..."  'cowsay-string)
-         ("Cow Say Region..."  'cowsay-region)
-         ("Cow Say and Insert" 'cowsay-replace-region)
-         ("Cow Say Load Cows"  'cowsay-load-cows)))
+      "Some useful keymaps for `cowsay'/`fast-exec'."
+      (fast-exec/some-commands
+       ("Cow Say String..."  'cowsay-string)
+       ("Cow Say Region..."  'cowsay-region)
+       ("Cow Say and Insert" 'cowsay-replace-region)
+       ("Cow Say Load Cows"  'cowsay-load-cows)))
     (fast-exec/register-keymap-func 'fast-exec-define-cowsay-keymaps)
     (fast-exec/reload-functions-chain))
 
@@ -1473,15 +1734,15 @@ Thank you https://github.com/leuven65!"
 
 (use-package super-save
     :config
-    (setq super-save-exclude '("Emacs.org"))
-    (setq auto-save-default nil)
-    (super-save-mode 38))
+  (setq super-save-exclude '("Emacs.org"))
+  (setq auto-save-default nil)
+  (super-save-mode 38))
 
 (use-package devdocs
     :ensure t
     :hook (python-mode . (lambda ()
-                              (setq-local devdocs-current-docs
-                                          '("python~3.9"))))
+                           (setq-local devdocs-current-docs
+                                       '("python~3.9"))))
     )
 
 (use-package pomidor
@@ -1492,19 +1753,19 @@ Thank you https://github.com/leuven65!"
     (pomidor-sound-tack . nil)
     :hook
     (pomidor-mode . (lambda ()
-                        (display-line-numbers-mode -1)
-                        (setq left-fringe-width 0 right-fringe-width 0)
-                        (setq left-margin-width 2 right-margin-width 0)
-                        (set-window-buffer nil (current-buffer)))))
+                      (display-line-numbers-mode -1)
+                      (setq left-fringe-width 0 right-fringe-width 0)
+                      (setq left-margin-width 2 right-margin-width 0)
+                      (set-window-buffer nil (current-buffer)))))
 
 (use-package pacmacs
     :ensure t
     :init
     (defun fast-exec-define-pacmacs-keys ()
-        "Bind `fast-exec' and `pacmacs'."
-        (fast-exec/some-commands
-         ("Play to Pacmacs" 'pacmacs-start))
-        )
+      "Bind `fast-exec' and `pacmacs'."
+      (fast-exec/some-commands
+       ("Play to Pacmacs" 'pacmacs-start))
+      )
     (fast-exec/register-keymap-func 'fast-exec-define-pacmacs-keys)
     (fast-exec/reload-functions-chain))
 
@@ -1520,9 +1781,9 @@ Thank you https://github.com/leuven65!"
     (helm-github-stars-username "semeninrussia")
     :init
     (defun fast-exec-define-helm-github-stars ()
-        "Bind `helm-github-stars' and `fast-exec'."
-        (fast-exec/some-commands
-         ("View Github Stars" 'helm-github-stars-fetch)))
+      "Bind `helm-github-stars' and `fast-exec'."
+      (fast-exec/some-commands
+       ("View Github Stars" 'helm-github-stars-fetch)))
     (fast-exec/register-keymap-func 'fast-exec-define-helm-github-stars)
     (fast-exec/reload-functions-chain))
 
@@ -1540,9 +1801,9 @@ Thank you https://github.com/leuven65!"
     :ensure t
     :init
     (defun fast-exec-helm-google-define-keys ()
-        "Keymaps for `helm-google' and `fast-exec'."
-        (fast-exec/some-commands
-         ("Search in Google" 'helm-google)))
+      "Keymaps for `helm-google' and `fast-exec'."
+      (fast-exec/some-commands
+       ("Search in Google" 'helm-google)))
     (fast-exec/register-keymap-func 'fast-exec-helm-google-define-keys)
     (fast-exec/reload-functions-chain))
 
@@ -1553,13 +1814,16 @@ Thank you https://github.com/leuven65!"
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 (add-hook 'emacs-startup-hook 'toggle-frame-fullscreen)
 
-(require 'gruber-darker-theme)
-
 (use-package gruber-darker-theme
-    :ensure t
-    :init
-    (load-theme 'gruber-darker t)
-    )
+    :ensure t)
+
+(use-package doom-themes
+    :ensure t)
+
+(add-to-list 'custom-theme-load-path
+             "~/.emacs.d/themes")
+
+(load-theme 'doom-monokai-classic t)
 
 (setq dont-display-lines-modes
       '(org-mode
@@ -1570,16 +1834,18 @@ Thank you https://github.com/leuven65!"
         helm-mode))
 
 (defun display-or-not-display-numbers-of-lines ()
-    "Display numbers of lines OR don't display numbers of lines.
+  "Display numbers of lines OR don't display numbers of lines.
 If current `major-mode` need to display numbers of lines, then display
 numbers of lines, otherwise don't display."
-    (interactive)
-    (if (-contains? dont-display-lines-modes major-mode)
-        (display-line-numbers-mode 0)
-        (display-line-numbers-mode 38))
-    )
+  (interactive)
+  (if (-contains? dont-display-lines-modes major-mode)
+      (display-line-numbers-mode 0)
+    (display-line-numbers-mode 38))
+  )
 
 (add-hook 'prog-mode-hook 'display-or-not-display-numbers-of-lines)
+
+(use-package doom-modeline :ensure t)
 
 (defcustom my-modeline-time-segment-format-string " [%H-%M]"
   "By this format string will draw time in `doom-modeline'.
@@ -1588,16 +1854,17 @@ See `format-time-string' for see what format string"
 
 (doom-modeline-def-segment time
     (let* ((hour (string-to-number (format-time-string "%H"))))
-        (propertize
-         (format-time-string my-modeline-time-segment-format-string)
-         'face
-         (if (> 4 hour 19)
-             'outline-1
-             'hi-red-b))))
+      (propertize
+       (format-time-string my-modeline-time-segment-format-string)
+       'face
+       (if (< 4 hour 19)
+           'hi-red-b
+         'outline-1))))
 
 (doom-modeline-def-segment pomidor
     ()
-    "Return header."
+  "Return header."
+  (when (featurep 'pomidor)
     (let* ((state (pomidor--current-state))
            (break (pomidor--break-duration state))
            (overwork (pomidor--overwork-duration state))
@@ -1607,35 +1874,39 @@ See `format-time-string' for see what format string"
                    (overwork 'pomidor-overwork-face)
                    (work 'pomidor-work-face)))
            (pomidor-time-format " Pom %-Mm")
-           (time (-first 'identity (list break work overwork))))
-        (propertize (pomidor--format-time time) 'face face)))
+           (time (-first 'identity (list break overwork work))))
+      (propertize (pomidor--format-time time) 'face face))))
 
 (defvar durand-buffer-name-max 20
   "The maximal length of the buffer name in modeline.")
 
 (doom-modeline-def-segment buffer-info-durand
     ()
-    (declare (pure t) (side-effect-free t))
-    (let* ((buffer-info
-            (format-mode-line
-             (s-truncate
-              durand-buffer-name-max
-              (doom-modeline-segment--buffer-info)))))
-        (concat
-         (s-truncate
-          durand-buffer-name-max
-          buffer-info))))
+  (declare (pure t) (side-effect-free t))
+  (let* ((buffer-info
+          (format-mode-line
+           (s-truncate
+            durand-buffer-name-max
+            (doom-modeline-segment--buffer-info)))))
+    (concat
+     (s-truncate
+      durand-buffer-name-max
+      buffer-info))))
 
 (defvar my-modeline-ignored-modes '(company-mode))
 
 (use-package doom-modeline
     :ensure t
     :defer 0.1
+    :init
+    (size-indication-mode t)
     :custom
     (doom-modeline-buffer-file-name-style 'buffer-name)
+    (doom-modeline-icon nil)
+    (xah-fly-insert-state-p nil)
     :config
     (display-time-mode t)
-    (doom-modeline-def-modeline 'my
+    (doom-modeline-def-modeline 'main
         '(bar
           matches
           buffer-info-durand
@@ -1643,26 +1914,22 @@ See `format-time-string' for see what format string"
           pomidor
           word-count
           selection-info)
-        '(objed-state
-          persp-name
-          grip
-          irc
-          gnus
-          github
-          debug
-          repl
-          input-method
-          indent-info
-          buffer-encoding
-          major-mode
-          process
-          vcs
-          checker))
-    (doom-modeline-set-modeline 'my t)
-    (add-hook 'after-change-major-mode-hook
-              (lambda ()
-                  (unless (-contains-p my-modeline-ignored-modes major-mode)
-                      (doom-modeline-mode t)))))
+      '(objed-state
+        persp-name
+        grip
+        irc
+        gnus
+        github
+        debug
+        repl
+        input-method
+        indent-info
+        buffer-encoding
+        major-mode
+        process
+        vcs
+        checker))
+    (doom-modeline-set-modeline 'main t))
 
 (set-face-attribute 'default nil :font "Consolas" :height 250)
 (set-frame-font "Consolas" nil t)
@@ -1676,12 +1943,12 @@ See `format-time-string' for see what format string"
 
 (use-package projectile
     :custom
-    (projectile-project-search-path '("~/projects/"))
-    (projectile-completion-system 'helm)
-    :init (projectile-mode 1)
-    :bind
-    (("S-<f5>" . projectile-test-project)
-     ("<f5>"   . projectile-run-project)))
+  (projectile-project-search-path '("~/projects/"))
+  (projectile-completion-system 'helm)
+  :init (projectile-mode 1)
+  :bind
+  (("S-<f5>" . projectile-test-project)
+   ("<f5>"   . projectile-run-project)))
 
 (projectile-mode 1)
 
@@ -1712,24 +1979,24 @@ See `format-time-string' for see what format string"
 
 (use-package git-undo
     :init
-    (defun fast-exec-define-git-undo-keymaps ()
-        "Bind `git-undo' and `fast-exec'."
-        (fast-exec/some-commands
-         ("Undo via Git" 'git-undo)))
-    (fast-exec/register-keymap-func 'fast-exec-define-git-undo-keymaps)
-    (fast-exec/reload-functions-chain))
+  (defun fast-exec-define-git-undo-keymaps ()
+    "Bind `git-undo' and `fast-exec'."
+    (fast-exec/some-commands
+     ("Undo via Git" 'git-undo)))
+  (fast-exec/register-keymap-func 'fast-exec-define-git-undo-keymaps)
+  (fast-exec/reload-functions-chain))
 
 (use-package git-modes
     :ensure t)
 
 (use-package helm-gitignore
     :init
-    (defun fast-exec-helm-gitignore-keys ()
-        "Bind of `helm-gitignore' and `fast-exec'."
-        (fast-exec/some-commands
-         ("Generate Gitignore" 'helm-gitignore)))
-    (fast-exec/register-keymap-func 'fast-exec-helm-gitignore-keys)
-    (fast-exec/reload-functions-chain))
+  (defun fast-exec-helm-gitignore-keys ()
+    "Bind of `helm-gitignore' and `fast-exec'."
+    (fast-exec/some-commands
+     ("Generate Gitignore" 'helm-gitignore)))
+  (fast-exec/register-keymap-func 'fast-exec-helm-gitignore-keys)
+  (fast-exec/reload-functions-chain))
 
 (add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
 
@@ -1757,86 +2024,534 @@ See `format-time-string' for see what format string"
     :config (global-hl-todo-mode))
 
 (defun run-command-recipe-snitch ()
-    "Recipes of `run-command' for snitch."
-    (when (f-directory-p (f-join (projectile-acquire-root)
-                                             ".git"))
-        (list
-         (list :command-name "sntich-list"
-               :display "See List of TODOs from via Snitch"
-               :command-line "snitch list")
-         (list :command-name "sntich-report"
-               :display "Report to VC TODOs of Project via Snitch"
-               :command-line "snitch list"))))
+  "Recipes of `run-command' for snitch."
+  (when (f-directory-p (f-join (projectile-acquire-root)
+                               ".git"))
+    (list
+     (list :command-name "sntich-list"
+           :display "See List of TODOs from via Snitch"
+           :command-line "snitch list")
+     (list :command-name "sntich-report"
+           :display "Report to VC TODOs of Project via Snitch"
+           :command-line "snitch list"))))
 
 (add-to-list 'run-command-recipes 'run-command-recipe-snitch)
 
-(defcustom my-mipt-homwork-dir "c:/Users/hrams/Documents/mfti-solutions"
-  "Path to directory of MIPT solutions."
-  :type 'string)
+(defcustom my-mipt-lessons
+  '("f" "m")
+  "List of codes of mipt's lessons.")
 
-(defcustom my-mipt-current-class-number 8
-  "My current class."
-  :type 'number)
+(defcustom my-mipt-directory "c:/Users/hrams/Documents/mfti-solutions"
+  "Path to directroy of mipt's solutions.")
 
-(defcustom my-mipt-lessons-types
-  '("m")
-  "My current class."
-  :type '(repeat string))
+(defcustom my-mipt-min-num 1
+  "Minimal normal number of mipt solution.")
 
-(defun my-new-mipt-solution ()
-    "Make .tex file for solution of mipt's homework."
-    (interactive)
-    (let* ((mipt-lesson
-            (completing-read "Print lesson's type: "
-                             my-mipt-lessons-types))
-           (mipt-last-solution
-            (with-temp-buffer
-                (-map 'insert (f-files my-mipt-homwork-dir))
-                (sort-lines t (point-min) (point-max))
-                (delete-non-matching-lines mipt-lesson)
-                (goto-char (point-min))
-                (f-filename (s-trim (thing-at-point 'line t)))))
-           mipt-number
-           last-mipt-number
-           mipt-section-number
-           last-mipt-class-num
-           last-mipt-section-num)
-        (-setq
-            (_ last-mipt-class-num _ last-mipt-section-num last-mipt-number)
-            (s-match
-             "\\(.\\)-\\(.\\)-\\(.\\)-\\(.\\)\\.tex" mipt-last-solution))
-        (setq last-mipt-number (string-to-number last-mipt-number))
-        (setq mipt-number (1+ last-mipt-number))
-        (setq mipt-section-number (read-number "Section, Please: "
-                                               (string-to-number
-                                                last-mipt-section-num)))
-        (message "mipt-number is %s" mipt-number)
-        (message "last-mipt-number is %s" last-mipt-number)
-        (message "mipt-section-number is %s" mipt-section-number)
-        (message "last-mipt-class-num is %s" last-mipt-class-num)
-        (message "last-mipt-section-num is %s" last-mipt-section-num)
-        (find-file (f-join
-                    my-mipt-homwork-dir
-                    (format "%s-%s-%s-%s.tex"
-                            last-mipt-class-num
-                            mipt-lesson
-                            mipt-section-number
-                            mipt-number)))))
+(defvar my--mipt-current-class nil
+  "Current mipt class.  This will changed automatically after input of user.")
 
-(defun fast-exec-define-mipt-keymaps ()
-    "MIPT + `fast-exec'."
-    (fast-exec/some-commands
-     ("New MIPT Solution" 'my-new-mipt-solution)))
+(defvar my--mipt-current-lesson nil
+  "Current mipt lesson.  This will changed automatically after input of user.")
 
-(fast-exec/register-keymap-func 'fast-exec-define-mipt-keymaps)
+(defvar my--mipt-current-section nil
+  "Current mipt section.  This will changed automatically after input of user.")
+
+(defvar my--mipt-current-type nil
+  "Current mipt `is-control'.
+One of 'control 'normal .
+This will changed automatically after input of user.")
+
+(defvar my--mipt-current-num nil
+  "Current mipt task's num.
+This will changed automatically after input of user.")
+
+(defclass my-mipt-solution ()
+  ((class :initarg :class :accessor my-mipt-solution-class)
+   (section :initarg :section :accessor my-mipt-solution-section)
+   (num :initarg :num :accessor my-mipt-solution-num)
+   (lesson :initarg :lesson :accessor my-mipt-solution-lesson)
+   (type :initarg :type :accessor my-mipt-solution-type))
+  "Class for solution of mipt.")
+
+(defun my-mipt-solution-path (mipt-solution)
+  "Get file path of MIPT-SOLUTION."
+  (f-join
+   my-mipt-directory
+   (format
+    "%s-%s-%s-%s%s.tex"
+    (my-mipt-solution-class mipt-solution)
+    (my-mipt-solution-lesson mipt-solution)
+    (my-mipt-solution-section mipt-solution)
+    (my-mipt-solution-num mipt-solution)
+    (if (my-mipt-solution-control-p mipt-solution) "-control" ""))))
+
+(defun my-mipt-solution-open (mipt-solution)
+  "Open, maybe create MIPT-SOLUTION file."
+  (->> mipt-solution (my-mipt-solution-path) (find-file)))
+
+(defun my-mipt-solution-normal-p (mipt-solution)
+  "Return t, if MIPT-SOLUTION isn't control."
+  (eq (my-mipt-solution-type mipt-solution) 'normal))
+
+(defun my-mipt-solution-control-p (mipt-solution)
+  "Return t, if MIPT-SOLUTION is control."
+  (eq (my-mipt-solution-type mipt-solution) 'control))
+
+(defun my-mipt-solution-parse (filename)
+  "Parse mipt solution from FILENAME."
+  (when (s-matches-p ".+-.-.+-.+\\(-control\\)?\\.tex" filename)
+    (-let*
+        ((base (f-no-ext filename))
+         ((class lesson section num is-control)
+          (s-split "-" base)))
+      (my-mipt-solution
+       :class (string-to-number class)
+       :lesson lesson
+       :section (string-to-number section)
+       :num (string-to-number num)
+       :type (if (stringp is-control)
+                 'control
+               'normal)))))
+
+(defun my-all-mipt-solutions ()
+  "Get list of all mipt solutions."
+  (->>
+   (f-files my-mipt-directory)
+   (--keep (my-mipt-solution-parse (f-filename it)))))
+
+(defun my-mipt-solution-lesson-p (mipt-solution lesson)
+  (string-equal (my-mipt-solution-lesson mipt-solution) lesson))
+
+(defun my-mipt-solution-class-p (mipt-solution class)
+  (equal (my-mipt-solution-class mipt-solution) class))
+
+(defun my-mipt-solution-section-p (mipt-solution section)
+  (eq (my-mipt-solution-section mipt-solution) section))
+
+(defun my-mipt-solution-search ()
+  "Search mipt-solution and open."
+  (interactive)
+  (->> (my-read-mipt-solution) (my-mipt-solution-open)))
+
+(defun my-current-mipt-solution ()
+  "Get current mipt's solution."
+  (prog1
+      (my-mipt-solution
+       :lesson (or my--mipt-current-lesson
+                   (my-read-mipt-lesson))
+       :class (or my--mipt-current-class
+                  (my-read-mipt-class))
+       :section (or my--mipt-current-section
+                    (my-read-mipt-section))
+       :num (or my--mipt-current-num (my-read-mipt-solution-num))
+       :type (or my--mipt-current-type (my-mipt-read-type)))
+    (setq my--mipt-current-lesson nil)
+    (setq my--mipt-current-class nil)
+    (setq my--mipt-current-section nil)
+    (setq my--mipt-current-type nil)))
+
+(defun my-read-mipt-solution ()
+  "Read mipt solution from user."
+  (or
+   (-some->>
+       (my-all-mipt-solutions)
+     (my--filter-mipt-solutions-by-lesson)
+     (my--filter-mipt-solutions-by-class)
+     (my--filter-mipt-solutions-by-section)
+     (my--filter-mipt-solutions-by-type)
+     (my-select-mipt-solution-by-num))
+   (my-current-mipt-solution)))
+
+(defun my--filter-mipt-solutions-by-lesson (mipt-solutions)
+  "Filter MIPT-SOLUTIONS by asked from user lesson."
+  (let ((lesson (my-read-mipt-lesson)))
+    (setq my--mipt-current-lesson lesson)
+    (--filter (my-mipt-solution-lesson-p it lesson) mipt-solutions)))
+
+(defun my-read-mipt-lesson ()
+  (completing-read "Select lesson of mipt solution, please"
+                   my-mipt-lessons))
+
+(defun my-read-mipt-class (last-class)
+  (read-number "Enter class of mipt solution, please: " last-class))
+
+(defun my--filter-mipt-solutions-by-class (mipt-solutions)
+  "Filter MIPT-SOLUTIONS by asked from user class."
+  (let* ((last-class
+          (->> mipt-solutions (-map 'my-mipt-solution-class) (-max)))
+         (current-class (my-read-mipt-class last-class)))
+    (setq my--mipt-current-class current-class)
+    (--filter
+     (my-mipt-solution-class-p it current-class)
+     mipt-solutions)))
+
+(defun my-read-mipt-section (last-section)
+  (read-number "Enter section of mipt solution, please: "
+               last-section))
+
+(defun my--filter-mipt-solutions-by-section (mipt-solutions)
+  "Filter MIPT-SOLUTIONS by asked from user section."
+  (let* ((last-section
+          (->> mipt-solutions (-map #'my-mipt-solution-section) (-max)))
+         (section (my-read-mipt-section last-section)))
+    (setq my--mipt-current-section section)
+    (--filter (my-mipt-solution-section-p it section) mipt-solutions)))
+
+(defun my--filter-mipt-solutions-by-type (mipt-solutions)
+  "Filter MIPT-SOLUTIONS by asked from user type."
+  (let ((type (my-read-mipt-type mipt-solutions)))
+    (setq my--mipt-current-type type)
+    (--filter
+     (eq type (my-mipt-solution-type it))
+     mipt-solutions)))
+
+(defun my-read-mipt-type (mipt-solutions)
+  "Watch MIPT-SOLUTIONS and ask from user solutions is control or normal."
+  (let* ((is-have-normal-tasks
+          (--some (my-mipt-solution-normal-p it) mipt-solutions))
+         (is-control
+          (if is-have-normal-tasks
+              (not (y-or-n-p "Your mipt task normal? "))
+            (y-or-n-p "Your mipt task control? "))))
+    (if is-control
+        'control
+      'normal)))
+
+(defun my-mipt-read-is-control ()
+  "Read from user mipt solutions is control or no."
+  (if (y-or-n-p "Mipt task is control or no? ")
+      'control
+    'normal))
+
+(defun my-read-mipt-solution-num (&optional last-num)
+  (read-number
+   "Number of mipt's solution, please: "
+   (if last-num (1+ last-num) my-mipt-min-num)))
+
+(defun my-select-mipt-solution-by-num (mipt-solutons)
+  "Ask from user num of one of MIPT-SOLUTONS, and selects solution."
+  (let* ((last-num
+          (-some->> mipt-solutons (-map #'my-mipt-solution-num) (-max)))
+         (mipt-num (my-read-mipt-solution-num last-num)))
+    (setq my--mipt-current-num mipt-num)
+    (--find (= (my-mipt-solution-num it) mipt-num) mipt-solutons)))
+
+(defun fast-exec-mipt-keys ()
+  "Get some useful keymaps of `fast-exec' for mipt."
+  (fast-exec/some-commands
+   ("Search MIPT Solution" 'my-mipt-solution-search)))
+
+(fast-exec/register-keymap-func 'fast-exec-mipt-keys)
+(fast-exec/reload-functions-chain)
+
+(defun my-copy-buffer-content-as-mipt-solution ()
+  "Take content of current buffer, compress it and copy its."
+  (interactive)
+  (->>
+   (buffer-string)
+   (my-compress-latex-source)
+   (kill-new)))
+
+(defun my-compress-latex-source (source)
+  "Take SOURCE and return compressed variant."
+  (->>
+   source
+   (s-replace "\n" " ")
+   (s-replace "\\begin{equation}" "\\[")
+   (s-replace "\\end{equation}" "\\]")
+   (s-append "% compresed by me `semenInRussia'")))
+
+(bind-keys
+ :map my-latex-local-map
+ ("c" . my-copy-buffer-content-as-mipt-solution))
+
+(defgroup my-notes nil
+  "My own simple system of notes."
+  :group 'tools)
+
+(defcustom my-notes-extension "org"
+  "Extension of notes, defaults to org."
+  :type 'string
+  :group 'my-notes)
+
+(defcustom my-notes-categories-list-file-path
+  "~/notes/categories.txt"
+  "Path to file which contains list of categories."
+  :type 'string
+  :group 'my-notes)
+
+(defun my-notes-parse-categories ()
+  "Find notes' categories in special path.
+See `my-notes-categories-list-file-path'"
+  (->>
+   my-notes-categories-list-file-path
+   (f-read)
+   (s-trim)
+   (s-lines)
+   (-remove #'s-blank-p)))
+
+(defcustom my-notes-categories
+  (my-notes-parse-categories)
+  "List of tags of notes."
+  :group 'my-notes
+  :type '(repeat symbol))
+
+(defcustom my-notes-templates-dir
+  "~/notes/templates"
+  "Directory in which will save templates of my notes."
+  :type 'string
+  :group 'my-notes)
+
+(defcustom my-notes-default-template
+  "~/notes/default.org"
+  "Default template for notes."
+  :type 'string
+  :group 'my-notes)
+
+(defcustom my-notes-directory
+  "~/notes"
+  "Main directory of my notes."
+  :type 'string
+  :group 'my-notes)
+
+(defun my-notes-read-note ()
+  "Read from user note."
+  (my-notes-note
+   :title (read-string "Please, enter title of note: ")
+   :category (my-notes-read-category)))
+
+(defun my-notes-read-category (&optional prompt)
+  "Read category from user with PROMPT."
+  (setq prompt (or prompt "Choose category, please: "))
+  (completing-read prompt my-notes-categories))
+
+(defun my-notes-find ()
+  "Find one of notes."
+  (interactive)
+  (let* ((category (my-notes-read-category))
+         (title
+          (->>
+           category
+           (my-notes-titles-of-category)
+           (completing-read "Choose one of notes, please: ")
+           (my-normalize-string))))
+    (my-notes-note :title title :category category)))
+
+(defun my-notes-visit (note)
+  "Visit NOTE's file."
+  (interactive (list (my-notes-find)))
+  (->> note (my-notes-note-path) (find-file)))
+
+(defun my-notes-change-category-of-note (note new-category)
+  "Change category of NOTE to NEW-CATEGORY."
+  (interactive
+   (list
+    (my-notes-find)
+    (my-notes-read-category "New category, please: ")))
+  (let ((new-note
+         (my-notes-note
+          :title (my-notes-note-title note)
+          :category new-category)))
+    (my-notes-category-mkdir new-category)
+    (f-move
+     (my-notes-note-path note)
+     (my-notes-note-path new-note))))
+
+(defun my-notes-delete (note)
+  "Delete NOTE."
+  (interactive (list (my-notes-find)))
+  (->> note (my-notes-note-path) (f-delete)))
+
+(defun my-notes-titles-of-category (category)
+  "Get list of notes' titles of CATEGORY."
+  (->>
+   category
+   (my-notes-category-path)
+   (my-files-with-extension my-notes-extension)
+   (-map #'f-base)
+   (-map #'my-humanize-string)))
+
+(defun my-notes-category-path (category)
+  "Get path to CATEGORY's directory."
+  (->> category (my-normalize-string) (f-join my-notes-directory)))
+
+(defun my-notes-category-mkdir (category)
+  "If directory of CATEGORY not created, then create its."
+  (->>
+   category
+   (my-notes-category-path)
+   (f-mkdir)))
+
+(defun my-notes-visit-category-template (category)
+  "Create or visit template for CATEGORY."
+  (interactive (list (my-notes-read-category)))
+  (->> category (my-notes-category-template-path) (find-file)))
+
+(defun my-notes-new (note &optional is-template-as-snippet)
+  "Create new note from NOTE object.
+If IS-TEMPLATE-AS-SNIPPET is t, then expand template of note as YAS snippet"
+  (interactive (list (my-notes-read-note) t))
+  (find-file (my-notes-note-path note))
+  (my-notes-note-insert-template note is-template-as-snippet))
+
+(defun my-notes-buffer-to-note (buffer note)
+  "Save BUFFER as NOTE."
+  (interactive
+   (list
+    (current-buffer)
+    (my-notes-note
+     :title (read-string "Name of note, please: " (buffer-name))
+     :category (my-notes-read-category))))
+  (with-current-buffer buffer
+    (let ((text (buffer-string)))
+      (kill-buffer buffer)
+      (my-notes-new note)
+      (insert text))))
+
+(defclass my-notes-note ()
+  ((title :initarg :title :accessor my-notes-note-title)
+   (category :initarg :category :accessor my-notes-note-category))
+  "My note object.")
+
+(defun my-notes-add-note-extension (s)
+  "Add `my-notes-extension' to S."
+  (f-swap-ext s my-notes-extension))
+
+(defun my-notes-note-path (note)
+  "Get path to file of note NOTE."
+  (->>
+   note
+   (my-notes-note-title)
+   (my-normalize-string)
+   (my-notes-add-note-extension)
+   (f-join (my-notes-category-path (my-notes-note-category note)))))
+
+(defun my-notes-note-template-path (note)
+  "Get path of template for NOTE."
+  (let ((template-for-category
+         (->>
+          note
+          (my-notes-note-category)
+          (my-notes-category-template-path))))
+    (if (f-exists-p template-for-category)
+        template-for-category
+      my-notes-default-template)))
+
+(defun my-notes-category-template-path (category)
+  "Get path of CATEGORY's template."
+  (->>
+   category
+   (my-normalize-string)
+   (f-join my-notes-templates-dir)
+   (my-notes-add-note-extension)))
+
+(defun my-notes-note-insert-template (note &optional is-as-snippet)
+  "Insert template for NOTE.
+If IS-AS-SNIPPET is t, then expand template as YAS snippet"
+  (let ((template (my-notes-note-get-template-string note)))
+    (if is-as-snippet
+        (yas-expand-snippet template)
+      (insert template))))
+
+(defun my-notes-note-get-template-string (note)
+  "Get string of template for NOTE."
+  (->>
+   note
+   (my-notes-note-template-path)
+   (f-read)
+   (s-replace "{title}" (my-notes-note-title note))
+   (s-replace "{category}" (my-notes-note-category note))))
+
+(defun my-notes-new-category (category)
+  "Add CATEGORY list of categories."
+  (interactive "sName of new category, please: ")
+  (->>
+   my-notes-categories
+   (cons category)
+   (my-notes-change-categories)))
+
+(defun my-notes-rename-category (category new-name)
+  "Change name of CATEGORY to NEW-NAME."
+  (interactive
+   (let* ((category (my-notes-read-category))
+          (new-name
+           (read-string "New name of this category, please: " category)))
+     (list category new-name)))
+  (my-notes-rename-category-directory category new-name)
+  (my-notes-rename-category-template category new-name)
+  (->>
+   my-notes-categories
+   (-replace category new-name)
+   (my-notes-change-categories)))
+
+(defun my-notes-rename-category-directory (category new-name)
+  "Rename directory of CATEGORY to NEW-NAME."
+  (my-try-move
+   (my-notes-category-path category)
+   (my-notes-category-path new-name)))
+
+(defun my-notes-rename-category-template (category new-name)
+  "Rename template of CATEGORY to template of NEW-NAME."
+  (my-try-move
+   (my-notes-category-template-path category)
+   (my-notes-category-template-path new-name)))
+
+(cl-defun my-notes-delete-category (category &optional (is-delete-notes t))
+  "Delete CATEGORY and files of this category if IS-DELETE-NOTES is true."
+  (interactive
+   (list
+    (my-notes-read-category)
+    (y-or-n-p "Is delete notes of this category? ")))
+  (when is-delete-notes ;nofmt
+    (my-notes-delete-notes-of-category category))
+  (my-notes-delete-category-template category)
+  (->>
+   my-notes-categories
+   (remove category)
+   (my-notes-change-categories)))
+
+(defun my-notes-delete-notes-of-category (category)
+  "Delete each note of CATEGORY."
+  (-> category (my-notes-category-path) (my-try-delete t)))
+
+(defun my-notes-delete-category-template (category)
+  "Delete template for CATEGORY."
+  (->> category (my-notes-category-template-path) (my-try-delete)))
+
+(defun my-notes-change-categories (new-categories)
+  "Change list of categories to NEW-CATEGORIES with change category's file."
+  (setq my-notes-categories new-categories)
+  (my-notes-change-categories-list-file new-categories))
+
+(defun my-notes-change-categories-list-file (new-categories)
+  "Change categories with file in which its writed to NEW-CATEGORIES."
+  (f-write-text
+   (s-join "\n" new-categories)
+   'utf-8
+   my-notes-categories-list-file-path))
+
+(defun fast-exec-my-notes-keys ()
+  "Get some useful keymaps of  `fast-exec' for my-notes."
+  (fast-exec/some-commands
+   ("New Note" 'my-notes-new)
+   ("Buffer to Note" 'my-notes-buffer-to-note)
+   ("Delete Note" 'my-notes-delete)
+   ("Change Category of Note" 'my-notes-change-category-of-note)
+   ("New Category of Notes" 'my-notes-new-category)
+   ("Delete Category of Notes" 'my-notes-delete-category)
+   ("Rename Category of Notes" 'my-notes-rename-category)
+   ("Find Template for Note" 'my-notes-visit-category-template)
+   ("Find Note" 'my-notes-visit)))
+
+(fast-exec/register-keymap-func 'fast-exec-my-notes-keys)
 (fast-exec/reload-functions-chain)
 
 (defun if-Emacs-org-then-org-babel-tangle ()
-    "If current open file is Emacs.org, then `org-babel-tangle`."
-    (interactive)
+  "If current open file is Emacs.org, then `org-babel-tangle`."
+  (interactive)
 
-    (when (s-equals? (f-filename buffer-file-name) "Emacs.org")
-        (org-babel-tangle)))
+  (when (s-equals? (f-filename buffer-file-name) "Emacs.org")
+    (org-babel-tangle)))
 
 
 (add-hook 'after-save-hook 'if-Emacs-org-then-org-babel-tangle)

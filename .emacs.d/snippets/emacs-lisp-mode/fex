@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: fex
+# key: fex
+# --
+
+(defun fast-exec-$1-keys ()
+  "Get some useful keymaps of  `fast-exec' for $1."
+  (fast-exec/some-commands (("$2" '))))
+
+(fast-exec/register-keymap-func 'fast-exec-$1-keys)
+(fast-exec/reload-functions-chain)

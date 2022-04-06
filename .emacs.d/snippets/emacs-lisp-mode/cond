@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: cond
+# key: cond
+# --
+(cond
+  (${1:t} ${2:then}))

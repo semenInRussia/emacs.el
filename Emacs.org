@@ -3,7 +3,6 @@
 
 * Hi!
   Hello, This is configuration of Emacs from semenInRussia!
-  I create this configuration with help of [[https://github.com/daviwil/emacs-from-scratch/][this cool repo]].
   
   My moto is "Good Luck!", so my homepage is "Good Luck":
 
@@ -28,21 +27,21 @@
 
      (package-initialize)
      (unless package-archive-contents
-         (package-refresh-contents))
+       (package-refresh-contents))
 
      (unless (package-installed-p 'use-package)
-         (package-install 'use-package))
+       (package-install 'use-package))
 
      (require 'use-package)
      #+END_SRC
 ** Packages Not in MELPA/ELPA/ORG-ELPA
 *** Stranger Packages
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-(add-to-list 'load-path "~/.emacs.d/lisp")
+      (add-to-list 'load-path "~/.emacs.d/lisp")
 
-#+END_SRC
+      #+END_SRC
 
 *** My Packages
 
@@ -78,6 +77,69 @@
       (use-package dash :ensure t :init (global-dash-fontify-mode 1))
 
       #+END_SRC
+** My Small Standard Library
+*** Work with Files
+    Function =my-try-delete= delete file when it is exists, otherwise
+    do nothing:
+    
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (defun my-try-delete (path &optional force)
+        "If PATH is exists isn't exists, then just do nothing, otherwise delete PATH.
+
+      If FORCE is t, a directory will be deleted recursively."
+        (when (f-exists-p path)
+          (f-delete path force)))
+
+   #+END_SRC
+
+   Function =my-try-move= also if file is exists, then move one to
+   other or do nothing:
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+     (defun my-try-move (from to)
+       "Move FROM to TO, if FROM is exists."
+       (when (f-exists-p from)
+         (f-move from to)))
+
+   #+END_SRC
+
+   Function =my-files-with-extension= return list of files in
+   directory which has extension:
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+     (defun my-files-with-extension (ext dir)
+       "Return list of files in DIR which has extension EXT."
+       (->>
+        dir
+        (f-files)
+        (--filter (f-ext-p it ext))))
+
+   #+END_SRC
+
+*** Work with Strings
+    Functions =my-humanize-string= and =my-normalize-string= transform
+    strings as =print-something-real-noral= to "Print Something Real
+    Noral" and to back.
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (defun my-humanize-string (s)
+        "Humanize normalized S."
+        (->> s (s-replace "-" " ") (s-titleize)))
+
+      (defun my-normalize-string (s)
+        "Normalize humanized S for computer."
+        (->>
+         s
+         (s-downcase)
+         (s-replace " " "-")
+         (s-replace "'" "")
+         (s-replace "\"" "")))
+
+    #+END_SRC
 
 * Info about me for Emacs
 
@@ -92,12 +154,12 @@
 
 
     (defun user-os-windows-p ()
-        "If user have os Windows, then return t.
+      "If user have os Windows, then return t.
     Info take from var `user-os`, user must set it."
-        (interactive)
-        (s-equals? user-os "Windows"))
+      (interactive)
+      (s-equals? user-os "Windows"))
 
-   #+END_SRC
+      #+END_SRC
 
 ** Congurlation me with my Birthday!
 
@@ -123,14 +185,8 @@
          :bind (:map yas-keymap
                      ("<return>" . yas-exit-all-snippets)))
 
-   #+END_SRC
-         
-   And [[https://github.com/emacsmirror/yasnippet-classic-snippets][yasnippet-classic-snippets]] for basic snippets' collection:
-
-   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-     (use-package yasnippet-classic-snippets :ensure t)
-   #+END_SRC
-
+                     #+END_SRC
+                     
 ** Linters
    I am use [[https://www.flycheck.org/en/latest/][flycheck]]:
 
@@ -144,7 +200,7 @@
              #'flycheck-pos-tip-error-messages))
          (global-flycheck-mode 1))
 
-   #+END_SRC
+         #+END_SRC
 
 ** Autocomplete
    I am use [[http://company-mode.github.io][company-mode]], I am set delay beetween typing text and viewing hints to
@@ -166,7 +222,7 @@
          (add-to-list 'company-backends 'company-keywords)
          (global-company-mode 1))
 
-   #+END_SRC
+         #+END_SRC
 
    And for =yasnippet= I am use code from [[https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names][this]] stackexchange:
 
@@ -176,75 +232,75 @@
        "Enable yasnippet for all backends.")
 
      (defun company-mode/backend-with-yas (backend)
-         (if (or (not company-mode/enable-yas)
-                 (and (listp backend) (member 'company-yasnippet backend)))
-             backend
-             (append (if (consp backend) backend (list backend))
-                     '(:with company-yasnippet))))
+       (if (or (not company-mode/enable-yas)
+               (and (listp backend) (member 'company-yasnippet backend)))
+           backend
+         (append (if (consp backend) backend (list backend))
+                 '(:with company-yasnippet))))
 
      (setq company-backends
            (mapcar #'company-mode/backend-with-yas company-backends))
 
-    #+END_SRC
+           #+END_SRC
 
 *** More Pretty Auto Complete
     I am use popular [[https://github.com/sebastiencs/company-box][company-box]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package company-box
-      :ensure t
-      :hook (company-mode . company-box-mode))
+      (use-package company-box
+          :ensure t
+          :hook (company-mode . company-box-mode))
 
-#+END_SRC
+          #+END_SRC
 
 ** Format All Code
    Each programmer need to format code for this I am use [[https://github.com/lassik/emacs-format-all-the-code][format-all]], its support 65 languages:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package format-all
-      :ensure t)
+     (use-package format-all
+         :ensure t)
 
-#+END_SRC
+         #+END_SRC
 
 *** I am Russian!
     I am need to use russian letters as english in key hots:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+END_SRC
 
 ** Main keymaps
    I am use [[https://github.com/xahlee/xah-fly-keys][xah-fly-keys]], this as VIM, but keymaps created for keyboard (in VIM keymaps created for easy remember):
    
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package xah-fly-keys
-      :config
-      (xah-fly-keys-set-layout "qwerty")
-      (xah-fly-keys 1)
-      (define-key xah-fly-command-map (kbd "SPC l") nil)
-      (define-key xah-fly-command-map (kbd "SPC j") nil)
-      (define-key xah-fly-command-map (kbd "SPC SPC") nil))
+     (use-package xah-fly-keys
+         :config
+       (xah-fly-keys-set-layout "qwerty")
+       (xah-fly-keys 1)
+       (define-key xah-fly-command-map (kbd "SPC l") nil)
+       (define-key xah-fly-command-map (kbd "SPC j") nil)
+       (define-key xah-fly-command-map (kbd "SPC SPC") nil))
 
-#+END_SRC
+       #+END_SRC
 *** Easy Create Major Modes Maps
     I am use =use-package=, so I'm add flag =:major-mode-map= for create major modes in =use-package= macro, I am bind local major mode map to =SPC l=:
 
 
- #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-   (defvar my-local-major-mode-map nil
-     "My map for current `major-mode'")
+      (defvar my-local-major-mode-map nil
+        "My map for current `major-mode'")
 
-   (defun my-local-major-mode-map-run ()
-       "Run `my-local-major-mode-map'."
-       (interactive)
-       (set-transient-map my-local-major-mode-map))
+      (defun my-local-major-mode-map-run ()
+        "Run `my-local-major-mode-map'."
+        (interactive)
+        (set-transient-map my-local-major-mode-map))
 
-   (define-key xah-fly-command-map (kbd "SPC l") 'my-local-major-mode-map-run)
+      (define-key xah-fly-command-map (kbd "SPC l") 'my-local-major-mode-map-run)
 
- #+END_SRC
+      #+END_SRC
 
 **** Setup for =:major-mode-map=
 
@@ -252,2262 +308,2590 @@
 
        (add-to-list 'use-package-keywords :major-mode-map)
 
-     #+END_SRC
+       #+END_SRC
 
 **** Normalizer for =:major-mode-map=
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defun use-package-normalize/:major-mode-map (name keyword args)
-      "Normalizer of :major-mode-map for `use-package'."
-      (let* (map-name modes)
-          (if (eq (-first-item args) t) ; All by Default
-              (list (symbol-name name) (list name))
-              (cl-typecase (-first-item args)
-                (list (setq modes (-first-item args)))
-                (symbol (setq map-name (symbol-name (-first-item args))))
-                (string (setq map-name (-first-item args))))
-              (cl-typecase (-second-item args)
-                (list (setq modes (-first-item args)))
-                (symbol (setq map-name (symbol-name (-first-item args))))
-                (string (setq map-name (-first-item args))))
-              (message "map-name is %s" map-name)
-              (message "modes is %s" modes)
-              (list
-               (or map-name (symbol-name name))
-               modes))))
+       (defun use-package-normalize/:major-mode-map (name keyword args)
+         "Normalizer of :major-mode-map for `use-package'."
+         (let* (map-name modes)
+           (if (eq (-first-item args) t) ; All by Default
+               (list (symbol-name name) (list name))
+             (cl-typecase (-first-item args)
+               (list (setq modes (-first-item args)))
+               (symbol (setq map-name (symbol-name (-first-item args))))
+               (string (setq map-name (-first-item args))))
+             (cl-typecase (-second-item args)
+               (list (setq modes (-first-item args)))
+               (symbol (setq map-name (symbol-name (-first-item args))))
+               (string (setq map-name (-first-item args))))
+             (list
+              (or map-name (symbol-name name))
+              modes))))
 
-#+END_SRC
+              #+END_SRC
 
 **** =major-mode-map='s Handler
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defun use-package-handler/:major-mode-map (name keyword
-                                              map-name-and-modes rest state)
-      (let* ((map-name (car map-name-and-modes))
-             (modes (-second-item map-name-and-modes))
-             (modes-hooks (--map (intern (s-append "-hook" (symbol-name it)))
-                                 modes))
-             (map (intern (s-concat "my-" map-name "-local-map"))))
-          (setq rest
-                (-concat
-                 rest
-                 `(:config
-                   ((unless (boundp ',map)
-                        (define-prefix-command ',map))
-                    (--each ',modes-hooks
-                        (add-hook it
-                                  (lambda ()
-                                      (setq-local my-local-major-mode-map
-                                                  ',map))))))))
-          (use-package-process-keywords name rest)))
+       (defun use-package-handler/:major-mode-map (name keyword
+                                                   map-name-and-modes rest state)
+         (let* ((map-name (car map-name-and-modes))
+                (modes (-second-item map-name-and-modes))
+                (modes-hooks (--map (intern (s-append "-hook" (symbol-name it)))
+                                    modes))
+                (map (intern (s-concat "my-" map-name "-local-map"))))
+           (setq rest
+                 (-concat
+                  rest
+                  `(:config
+                    ((unless (boundp ',map)
+                       (define-prefix-command ',map))
+                     (--each ',modes-hooks
+                       (add-hook it
+                                 (lambda ()
+                                   (setq-local my-local-major-mode-map
+                                               ',map))))))))
+           (use-package-process-keywords name rest)))
 
-#+END_SRC
+           #+END_SRC
 
 ** Fast Executing Command
    I am use [[https://github.com/semenInRussia/fast-exec.el][fast-exec]]:
    
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (require 'fast-exec)
+     (require 'fast-exec)
 
-  (fast-exec/enable-some-builtin-supports haskell-mode
-                                          flycheck
-                                          magit
-                                          deadgrep
-                                          projectile
-                                          skeletor
-                                          yasnippet
-                                          format-all
-                                          wikinforg
-                                          suggest
-                                          devdocs
-                                          helm-wikipedia)
+     (fast-exec/enable-some-builtin-supports haskell-mode
+                                             flycheck
+                                             magit
+                                             deadgrep
+                                             projectile
+                                             skeletor
+                                             yasnippet
+                                             format-all
+                                             wikinforg
+                                             suggest
+                                             devdocs
+                                             helm-wikipedia)
 
-  (fast-exec/initialize)
+     (fast-exec/initialize)
 
-  (define-key xah-fly-command-map (kbd "=") 'fast-exec/exec)
+     (define-key xah-fly-command-map (kbd "=") 'fast-exec/exec)
 
-#+END_SRC
+     #+END_SRC
 
 ** Functions for Define Keys
 
    Function =define-key-when= is wrap on =define-key=, but function DEF will call when
-will pressed KEY in KEYMAP and when CONDITION will true:
+   will pressed KEY in KEYMAP and when CONDITION will true:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defun keymap-to-list (keymap)
-      "Convert `KEYMAP` to list."
-      (--filter (ignore-errors '((cat it) (cdr it))) (-drop 1 keymap)))
+     (defmacro define-key-when (fun-name map key def pred)
+       "Define to KEY in MAP DEF when PRED return t or run old command.
+     Instead of KEY will command FUN-NAME"
+       (let ((old-def (key-binding key)))
+         `(unless (eq (key-binding ,key) #',fun-name)
+            (defun ,fun-name ()
+              ,(s-lex-format "Run `${old-def}' or `${def}'.")
+              (interactive)
+              (call-interactively
+               (if (funcall ,pred)
+                   ,def
+                 #',old-def)))
+            (define-key ,map ,key #',fun-name))))
 
-
-  (defun function-of-key (keymap key)
-      "Get function bound on `KEY` in `KEYMAP`."
-      (let* ((list-keymap (keymap-to-list keymap))
-             (kbd-key (kbd key))
-             (key-chars (string-to-list kbd-key))
-             (head-key-char (-first-item key-chars))
-             (tail-key-chars (-drop 1 key-chars))
-             (object-on-key (--filter (ignore-errors
-                                          (eq head-key-char (-first-item it)))
-                                      list-keymap))
-             )
-          (cond
-            (tail-key-chars
-             (function-of-key object-on-key
-                              (chars-to-string tail-key-chars)))
-            (t (cdr (-first-item object-on-key)))))
-      )
-
-
-  (defun chars-to-string (chars)
-      "Convert list of `CHARS` to string."
-      (--reduce-from (s-concat acc (char-to-string it)) "" chars))
-
-
-  (defmacro define-key-when (keymap key def condition)
-      "Macro for define keymaps for `rectangle-mode` in `xah-fly-command-mode`"
-      `(define-key ,keymap (kbd ,key)
-           (lambda ()
-               (interactive)
-               (if (funcall ,condition)
-                   (call-interactively ,def)
-                   (call-interactively ',(function-of-key (eval keymap) key))))))
-
-#+END_SRC
+              #+END_SRC
 
 ** Search
 *** Search in File
-   
-   I am press ='= for search word:
-   
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    
+    I am press ='= for search word:
+    
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package swiper-helm
-      :ensure t
-      :bind (:map xah-fly-command-map
-                  ("'" . swiper-helm)))
+      (use-package swiper-helm
+          :ensure t
+          :bind (:map xah-fly-command-map
+                      ("'" . swiper-helm)))
 
-#+END_SRC
+                      #+END_SRC
 
 *** Search in Very Some File
     I am use [[https://github.com/Wilfred/deadgrep][deadgrep]], because I am love =Rust=:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package deadgrep
-      :ensure t
-      :bind (:map
-             xah-fly-command-map
-             ("SPC '" . deadgrep)))
+      (use-package deadgrep
+          :ensure t
+          :bind (:map
+                 xah-fly-command-map
+                 ("SPC '" . deadgrep)))
 
-#+END_SRC
+                 #+END_SRC
 
 ** Search and Replace
    I am use =SPC r= for replace word in buffer, and =SPC SPC r= for replace word in project:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (define-key xah-fly-command-map (kbd "SPC SPC r") 'projectile-replace)
+     (define-key xah-fly-command-map (kbd "SPC SPC r") 'projectile-replace)
 
-#+END_SRC
+     #+END_SRC
 
 ** Navigation beetween Functions/Classes/etc.
    I am use =imenu= with =Helm= and keymap =SPC SPC SPC=:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     (use-package imenu
+         :custom (imenu-auto-rescan t))
 
-  (use-package semantic
-      :ensure t)
+     (bind-keys :map xah-fly-command-map
+                ("SPC SPC SPC" . helm-imenu))
 
-  (use-package imenu
-      :custom (imenu-auto-rescan t))
-
-  (bind-keys :map xah-fly-command-map
-             ("SPC SPC SPC" . helm-semantic-or-imenu))
-
-#+END_SRC
+                #+END_SRC
 
 *** In Project
     For Imenu In Project I am use [[https://github.com/vspinu/imenu-anywhere][imenu-anywhere]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package imenu-anywhere
-      :ensure t
-      :bind (:map xah-fly-command-map
-                  ("SPC SPC n" . imenu-anywhere)))
+      (use-package imenu-anywhere
+          :ensure t
+          :bind (:map xah-fly-command-map
+                      ("SPC SPC n" . imenu-anywhere)))
 
-#+END_SRC
+                      #+END_SRC
 
 ** Smart Comment/Uncomment
    I am use [[https://github.com/remyferre/comment-dwim-2][comment-dwim-2]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package comment-dwim-2
-      :ensure t
-      :bind (:map xah-fly-command-map
-                  ("z" . comment-dwim-2)))
+     (use-package comment-dwim-2
+         :ensure t
+         :bind (:map xah-fly-command-map
+                     ("z" . comment-dwim-2)))
 
-#+END_SRC
+                     #+END_SRC
 
 ** Jump to Defnition
    I am use [[https://github.com/jacktasia/dumb-jump][cool package dumb-jump]] for jump to defnition in 50+ languages:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package rg
-      :ensure t)
+     (use-package rg
+         :ensure t)
 
-  (use-package dumb-jump
-      :ensure t
-      :custom
-      (dumb-jump-force-searcher 'rg)
-      (dumb-jump-prefer-searcher 'rg)
-      :bind (:map xah-fly-command-map ("SPC SPC ." . dumb-jump-back))
-      :init
-      (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+     (use-package dumb-jump
+         :ensure t
+         :custom
+         (dumb-jump-force-searcher 'rg)
+         (dumb-jump-prefer-searcher 'rg)
+         :bind (:map xah-fly-command-map ("SPC SPC ." . dumb-jump-back))
+         :init
+         (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
-#+END_SRC
+         #+END_SRC
 
 ** Multiple Cursors
    I am use package of magnars [[https://github.com/magnars/multiple-cursors.el][multiple-cursors]]:
 
-#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+   #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
 
-  (defun my-mark-all ()
-      "If enable `multiple-cursors', then mark all like this, other mark buffer."
-      (interactive)
-      (if multiple-cursors-mode
-          (mc/mark-all-words-like-this)
-          (mark-whole-buffer)))
-
-
-  (defun my-bob-or-mc-align ()
-      "If enable `multiple-cursors', then mark then align by regexp, other bob.
-  BOB - is `beginning-of-buffer'"
-      (interactive)
-      (if multiple-cursors-mode
-          (call-interactively 'mc/vertical-align)
-          (beginning-of-buffer)))
+     (defun my-mark-all ()
+       "If enable `multiple-cursors', then mark all like this, other mark buffer."
+       (interactive)
+       (if multiple-cursors-mode
+           (mc/mark-all-words-like-this)
+         (mark-whole-buffer)))
 
 
-  (defun my-eob-or-mc-align-with-space ()
-      "If enable `multiple-cursors', then align by spaces, other bob.
-  EOB - is `end-of-buffer'"
-      (interactive)
-      (if multiple-cursors-mode
-          (mc/vertical-align-with-space)
-          (end-of-buffer)))
+     (defun my-bob-or-mc-align ()
+       "If enable `multiple-cursors', then mark then align by regexp, other bob.
+     BOB - is `beginning-of-buffer'"
+       (interactive)
+       (if multiple-cursors-mode
+           (call-interactively 'mc/vertical-align)
+         (beginning-of-buffer)))
 
 
-  (defun my-mc-mark-like-this-or-edit-lines ()
-      "If region on some lines, `mc/edit-lines' other `mc/mark-next-like-this'."
-      (interactive)
-      (if (and (region-active-p)
-               (not (eq (line-number-at-pos (region-beginning))
-                        (line-number-at-pos (region-end)))))
-          (call-interactively 'mc/edit-lines)
-          (call-interactively 'mc/mark-next-like-this-word)))
+     (defun my-eob-or-mc-align-with-space ()
+       "If enable `multiple-cursors', then align by spaces, other bob.
+     EOB - is `end-of-buffer'"
+       (interactive)
+       (if multiple-cursors-mode
+           (mc/vertical-align-with-space)
+         (end-of-buffer)))
 
-  (use-package multiple-cursors :ensure t)
 
-  (use-package multiple-cursors
-      :config
-      (add-to-list 'mc--default-cmds-to-run-once 'my-mark-all)
-      (add-to-list 'mc--default-cmds-to-run-once
-                   'my-mc-mark-like-this-or-edit-lines)
-      (add-to-list 'mc--default-cmds-to-run-once
-                   'my-bob-or-mc-align)
-      (add-to-list 'mc--default-cmds-to-run-once
-                   'my-eob-or-align-with-spaces)
-      (add-to-list 'mc--default-cmds-to-run-once
-                   'my-mc-mark-like-this-or-edit-lines)
-      :bind
-      (:map xah-fly-command-map
-            ("7"         . my-mc-mark-like-this-or-edit-lines)
-            ("SPC 7"     . mc/mark-previous-like-this-word)
-            ("SPC TAB 7" . mc/reverse-regions)
-            ("SPC d 7"   . mc/unmark-next-like-this)
-            ("SPC h"     . my-bob-or-mc-align)
-            ("SPC n"     . my-eob-or-mc-align-with-space)
-            ("SPC a"     . my-mark-all)))
+     (defun my-mc-mark-like-this-or-edit-lines ()
+       "If region on some lines, `mc/edit-lines' other `mc/mark-next-like-this'."
+       (interactive)
+       (if (and (region-active-p)
+                (not (eq (line-number-at-pos (region-beginning))
+                         (line-number-at-pos (region-end)))))
+           (call-interactively 'mc/edit-lines)
+         (call-interactively 'mc/mark-next-like-this-word)))
 
-#+END_SRC
+     (use-package multiple-cursors :ensure t)
+
+     (use-package multiple-cursors
+         :config
+       (add-to-list 'mc--default-cmds-to-run-once 'my-mark-all)
+       (add-to-list 'mc--default-cmds-to-run-once
+                    'my-mc-mark-like-this-or-edit-lines)
+       (add-to-list 'mc--default-cmds-to-run-once
+                    'my-bob-or-mc-align)
+       (add-to-list 'mc--default-cmds-to-run-once
+                    'my-eob-or-align-with-spaces)
+       (add-to-list 'mc--default-cmds-to-run-once
+                    'my-mc-mark-like-this-or-edit-lines)
+       (add-to-list 'mc--default-cmds-to-run-once
+                    'toggle-input-method)
+       :bind
+       (:map xah-fly-command-map
+             ("7"         . my-mc-mark-like-this-or-edit-lines)
+             ("SPC 7"     . mc/mark-previous-like-this-word)
+             ("SPC TAB 7" . mc/reverse-regions)
+             ("SPC d 7"   . mc/unmark-next-like-this)
+             ("SPC h"     . my-bob-or-mc-align)
+             ("SPC n"     . my-eob-or-mc-align-with-space)
+             ("SPC a"     . my-mark-all)))
+
+             #+END_SRC
 
 ** Very Fast Jump
    I am use [[https://github.com/abo-abo/avy][avy]]:
    
-#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+   #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
 
-  (use-package avy
-      :ensure t
-      :custom (avy-background t)
-      (avy-translate-char-function #'translate-char-from-russian)
-      :bind ((:map xah-fly-command-map)
-             ("n"           . avy-goto-char)
-             ("SPC SPC v"   . avy-yank-word)
-             ("SPC SPC x"   . avy-teleport-word)
-             ("SPC SPC t"   . avy-mark-word)
-             ("SPC SPC 5"   . avy-zap)
-             ("SPC SPC c"   . avy-copy-word)
-             ("SPC SPC d"   . avy-kill-word-stay)
-             ("SPC SPC TAB" . avy-transpose-words)
-             ("SPC SPC -"   . avy-sp-splice-sexp-in-word)
-             ("SPC SPC 8"   . avy-kill-word-move)
-             ("SPC SPC o"   . avy-change-word)
-             ("SPC SPC 9"   . avy-sp-change-enclosing-in-word)
-             ("SPC SPC z"   . avy-comment-line)
-             ("SPC SPC 5"   . avy-zap)
-             ("SPC SPC a v" . avy-copy-region)
-             ("SPC SPC a d" . avy-kill-region)
-             ("SPC SPC a x" . avy-move-region)
-             ("SPC SPC a c" . avy-kill-ring-save-region)
-             ("SPC SPC l v" . avy-copy-line)
-             ("SPC SPC l ;" . avy-goto-end-of-line)
-             ("SPC SPC l x" . avy-move-line)
-             ("SPC SPC l c" . avy-kill-ring-save-whole-line)
-             ("SPC SPC l d" . avy-kill-whole-line)))
-
-
-  (defun translate-char-from-russian (russian-char)
-      "Translate RUSSIAN-CHAR to corresponding char on qwerty keyboard.
-  I am use йцукенг russian keyboard."
-      (cl-case russian-char
-        (?й ?q)
-        (?ц ?w)
-        (?у ?e)
-        (?к ?r)
-        (?е ?t)
-        (?н ?y)
-        (?г ?u)
-        (?ш ?i)
-        (?щ ?o)
-        (?з ?p)
-        (?ф ?a)
-        (?ы ?s)
-        (?в ?d)
-        (?а ?f)
-        (?п ?g)
-        (?р ?h)
-        (?о ?j)
-        (?л ?k)
-        (?д ?l)
-        (?я ?z)
-        (?ч ?x)
-        (?с ?c)
-        (?м ?v)
-        (?и ?b)
-        (?т ?n)
-        (?ь ?m)
-        (t russian-char)))
-
-  (defun avy-goto-word-1-with-action (char action &optional arg beg end symbol)
-      "Jump to the currently visible CHAR at a word start.
-  The window scope is determined by `avy-all-windows'.
-  When ARG is non-nil, do the opposite of `avy-all-windows'.
-  BEG and END narrow the scope where candidates are searched.
-  When SYMBOL is non-nil, jump to symbol start instead of word start.
-  Do action of `avy' ACTION.'"
-      (interactive (list (read-char "char: " t)
-                         current-prefix-arg))
-      (avy-with avy-goto-word-1
-          (let* ((str (string char))
-                 (regex (cond ((string= str ".")
-                               "\\.")
-                              ((and avy-word-punc-regexp
-                                    (string-match avy-word-punc-regexp str))
-                               (regexp-quote str))
-                              ((<= char 26)
-                               str)
-                              (t
-                               (concat
-                                (if symbol "\\_<" "\\b")
-                                str)))))
-              (avy-jump regex
-                        :window-flip arg
-                        :beg beg
-                        :end end
-                        :action action))))
-
-  (defun avy-zap (char &optional arg)
-      "Zapping to next CHAR navigated by `avy'."
-      (interactive "cchar:\nP")
-      (avy-jump (s-concat (char-to-string char))
-                :window-flip arg
-                :beg (point-min)
-                :end (point-max)
-                :action 'avy-action-zap-to-char))
+     (use-package avy
+         :ensure t
+         :custom
+         (avy-background t)
+         (avy-translate-char-function #'translate-char-from-russian)
+         :bind ((:map xah-fly-command-map)
+                ("n"     . nil) ; by default this is `isearch', so i turn
+                                             ; this to keymap
+                ("n n"   . avy-goto-char)
+                ("n v"   . avy-yank-word)
+                ("n x"   . avy-teleport-word)
+                ("n c"   . avy-copy-word)
+                ("n 8"   . avy-mark-word)
+                ("n d"   . avy-kill-word-stay)
+                ("n 5"   . avy-zap)
+                ("n TAB" . avy-transpose-words)
+                ("n -"   . avy-sp-splice-sexp-in-word)
+                ("n r"   . avy-kill-word-move)
+                ("n o"   . avy-change-word)
+                ("n 9"   . avy-sp-change-enclosing-in-word)
+                ("n z"   . avy-comment-line)
+                ("n t v" . avy-copy-region)
+                ("n t d" . avy-kill-region)
+                ("n t x" . avy-move-region)
+                ("n t c" . avy-kill-ring-save-region)
+                ("n ;"   . avy-goto-end-of-line)
+                ("n k v" . avy-copy-line)
+                ("n k x" . avy-move-line)
+                ("n k c" . avy-kill-ring-save-whole-line)
+                ("n k d" . avy-kill-whole-line)))
 
 
-  (defun avy-teleport-word (char &optional arg)
-      "Teleport word searched by `arg' with CHAR.
-  Pass ARG to `avy-jump'."
-      (interactive "cchar:\nP")
-      (avy-goto-word-1-with-action char 'avy-action-teleport))
+     (defun translate-char-from-russian (russian-char)
+       "Translate RUSSIAN-CHAR to corresponding char on qwerty keyboard.
+     I am use йцукенг russian keyboard."
+       (cl-case russian-char
+         (?й ?q)
+         (?ц ?w)
+         (?у ?e)
+         (?к ?r)
+         (?е ?t)
+         (?н ?y)
+         (?г ?u)
+         (?ш ?i)
+         (?щ ?o)
+         (?з ?p)
+         (?ф ?a)
+         (?ы ?s)
+         (?в ?d)
+         (?а ?f)
+         (?п ?g)
+         (?р ?h)
+         (?о ?j)
+         (?л ?k)
+         (?д ?l)
+         (?я ?z)
+         (?ч ?x)
+         (?с ?c)
+         (?м ?v)
+         (?и ?b)
+         (?т ?n)
+         (?ь ?m)
+         (t russian-char)))
 
-  (defun avy-mark-word (char)
-      "Mark word begining with CHAR searched by `avy'."
-      (interactive "cchar: ")
-      (avy-goto-word-1-with-action char 'avy-action-mark))
+     (defun avy-goto-word-1-with-action (char action &optional arg beg end symbol)
+       "Jump to the currently visible CHAR at a word start.
+     The window scope is determined by `avy-all-windows'.
+     When ARG is non-nil, do the opposite of `avy-all-windows'.
+     BEG and END narrow the scope where candidates are searched.
+     When SYMBOL is non-nil, jump to symbol start instead of word start.
+     Do action of `avy' ACTION.'"
+       (interactive (list (read-char "char: " t)
+                          current-prefix-arg))
+       (avy-with avy-goto-word-1
+         (let* ((str (string char))
+                (regex (cond ((string= str ".")
+                              "\\.")
+                             ((and avy-word-punc-regexp
+                                   (string-match avy-word-punc-regexp str))
+                              (regexp-quote str))
+                             ((<= char 26)
+                              str)
+                             (t
+                              (concat
+                               (if symbol "\\_<" "\\b")
+                               str)))))
+           (avy-jump regex
+                     :window-flip arg
+                     :beg beg
+                     :end end
+                     :action action))))
 
-
-  (defun avy-copy-word (char &optional arg)
-      "Copy word searched by `arg' with CHAR.
-  Pass ARG to `avy-jump'."
-      (interactive "cchar:\nP")
-      (avy-goto-word-1-with-action char 'avy-action-copy))
-
-
-  (defun avy-yank-word (char &optional arg)
-      "Paste word searched by `arg' with CHAR.
-  Pass ARG to `avy-jump'."
-      (interactive "cchar:\nP")
-      (avy-goto-word-1-with-action char 'avy-action-yank))
-
-
-  (defun avy-kill-word-stay (char &optional arg)
-      "Paste word searched by `arg' with CHAR.
-  Pass ARG to `avy-jump'."
-      (interactive "cchar:\nP")
-      (avy-goto-word-1-with-action char 'avy-action-kill-stay))
-
-
-  (defun avy-kill-word-move (char &optional arg)
-      "Paste word searched by `arg' with CHAR.
-  Pass ARG to `avy-jump'."
-      (interactive "cchar:\nP")
-      (avy-goto-word-1-with-action char 'avy-action-kill-move))
-
-  (defun avy-goto-line-1-with-action (action)
-      "Goto line via `avy' with CHAR and do ACTION."
-      (interactive)
-      (avy-jump "^." :action action))
-
-  (defun avy-comment-line ()
-      "With `avy' move to line and comment its."
-      (interactive)
-      (avy-goto-line-1-with-action 'avy-action-comment))
-
-  (defun avy-action-comment (pt)
-      "Saving excursion comment line at point PT."
-      (save-excursion
-          (goto-char pt)
-          (comment-line 1)))
-
-  (defun avy-sp-change-enclosing-in-word (ch)
-      "With `avy' move to word starting with CH and `sp-change-enclosing'."
-      (interactive "cchar:")
-      (avy-goto-word-1-with-action ch 'avy-action-sp-change-enclosing))
-
-  (defun avy-action-sp-change-enclosing (pt)
-      "Saving excursion `sp-change-enclosing' in word at point PT."
-      (save-excursion
-          (goto-char pt)
-          (sp-change-enclosing)))
-
-  (defun avy-sp-splice-sexp-in-word (ch)
-      "With `avy' move to word starting with CH and `sp-splice-sexp'."
-      (interactive "cchar:")
-      (avy-goto-word-1-with-action ch 'avy-action-sp-splice-sexp))
-
-  (defun avy-action-sp-splice-sexp (pt)
-      "Saving excursion `sp-splice-sexp' in word at point PT."
-      (save-excursion
-          (goto-char pt)
-          (sp-splice-sexp)))
-
-  (defun avy-change-word (ch)
-      "With `avy' move to word starting with CH and change its any other."
-      (interactive "cchar:")
-      (avy-goto-word-1-with-action ch 'avy-action-change-word))
-
-  (defun avy-action-change-word (pt)
-      "Saving excursion navigate to word at point PT and change its."
-      (save-excursion
-          (avy-action-kill-move pt)
-          (insert (read-string "new word, please: " (current-kill 0)))))
-
-  (defun avy-transpose-words (char)
-      "Goto CHAR via `avy' and transpose at point word to word at prev point."
-      (interactive "cchar: ")
-      (avy-goto-word-1-with-action char 'avy-action-transpose-words))
+     (defun avy-zap (char &optional arg)
+       "Zapping to next CHAR navigated by `avy'."
+       (interactive "cchar:\nP")
+       (avy-jump (s-concat (char-to-string char))
+                 :window-flip arg
+                 :beg (point-min)
+                 :end (point-max)
+                 :action 'avy-action-zap-to-char))
 
 
-  (defun avy-action-transpose-words (second-pt)
-      "Goto SECOND-PT via `avy' and transpose at point to word at point ago."
-      (backward-sexp)
-      (avy-action-yank second-pt)
-      (kill-sexp)
-      (goto-char second-pt)
-      (yank)
-      (kill-sexp))
+     (defun avy-teleport-word (char &optional arg)
+       "Teleport word searched by `arg' with CHAR.
+     Pass ARG to `avy-jump'."
+       (interactive "cchar:\nP")
+       (avy-goto-word-1-with-action char 'avy-action-teleport))
 
-#+END_SRC
+     (defun avy-mark-word (char)
+       "Mark word begining with CHAR searched by `avy'."
+       (interactive "cchar: ")
+       (avy-goto-word-1-with-action char 'avy-action-mark))
+
+
+     (defun avy-copy-word (char &optional arg)
+       "Copy word searched by `arg' with CHAR.
+     Pass ARG to `avy-jump'."
+       (interactive "cchar:\nP")
+       (avy-goto-word-1-with-action char 'avy-action-copy))
+
+
+     (defun avy-yank-word (char &optional arg)
+       "Paste word searched by `arg' with CHAR.
+     Pass ARG to `avy-jump'."
+       (interactive "cchar:\nP")
+       (avy-goto-word-1-with-action char 'avy-action-yank))
+
+
+     (defun avy-kill-word-stay (char &optional arg)
+       "Paste word searched by `arg' with CHAR.
+     Pass ARG to `avy-jump'."
+       (interactive "cchar:\nP")
+       (avy-goto-word-1-with-action char 'avy-action-kill-stay))
+
+
+     (defun avy-kill-word-move (char &optional arg)
+       "Paste word searched by `arg' with CHAR.
+     Pass ARG to `avy-jump'."
+       (interactive "cchar:\nP")
+       (avy-goto-word-1-with-action char 'avy-action-kill-move))
+
+
+     (defun avy-goto-line-1-with-action (action)
+       "Goto line via `avy' with CHAR and do ACTION."
+       (interactive)
+       (avy-jump "^." :action action))
+
+
+     (defun avy-comment-line ()
+       "With `avy' move to line and comment its."
+       (interactive)
+       (avy-goto-line-1-with-action 'avy-action-comment))
+
+
+     (defun avy-action-comment (pt)
+       "Saving excursion comment line at point PT."
+       (save-excursion
+         (goto-char pt)
+         (comment-line 1)))
+
+
+     (defun avy-sp-change-enclosing-in-word (ch)
+       "With `avy' move to word starting with CH and `sp-change-enclosing'."
+       (interactive "cchar:")
+       (avy-goto-word-1-with-action ch 'avy-action-sp-change-enclosing))
+
+
+     (defun avy-action-sp-change-enclosing (pt)
+       "Saving excursion `sp-change-enclosing' in word at point PT."
+       (save-excursion
+         (goto-char pt)
+         (sp-change-enclosing)))
+
+
+     (defun avy-sp-splice-sexp-in-word (ch)
+       "With `avy' move to word starting with CH and `sp-splice-sexp'."
+       (interactive "cchar:")
+       (avy-goto-word-1-with-action ch 'avy-action-sp-splice-sexp))
+
+
+     (defun avy-action-sp-splice-sexp (pt)
+       "Saving excursion `sp-splice-sexp' in word at point PT."
+       (save-excursion
+         (goto-char pt)
+         (sp-splice-sexp)))
+
+
+     (defun avy-change-word (ch)
+       "With `avy' move to word starting with CH and change its any other."
+       (interactive "cchar:")
+       (avy-goto-word-1-with-action ch 'avy-action-change-word))
+
+
+     (defun avy-action-change-word (pt)
+       "Saving excursion navigate to word at point PT and change its."
+       (save-excursion
+         (avy-action-kill-move pt)
+         (insert (read-string "new word, please: " (current-kill 0)))))
+
+
+     (defun avy-transpose-words (char)
+       "Goto CHAR via `avy' and transpose at point word to word at prev point."
+       (interactive "cchar: ")
+       (avy-goto-word-1-with-action char 'avy-action-transpose-words))
+
+
+     (defun avy-action-transpose-words (second-pt)
+       "Goto SECOND-PT via `avy' and transpose at point to word at point ago."
+       (avy-action-yank second-pt)
+       (kill-sexp)
+       (goto-char second-pt)
+       (yank)
+       (kill-sexp))
+
+       #+END_SRC
 
 ** Smart Parens
 *** Smartparens
-   I am use [[https://github.com/Fuco1/smartparens/][smartparens]], for slurp expresion I am use =]=, also for splice parens I am
-use =-=, for navigating I am use =.= and =m=:
+    I am use [[https://github.com/Fuco1/smartparens/][smartparens]], for slurp expresion I am use =]=, also for splice parens I am
+    use =-=, for navigating I am use =.= and =m=:
 
-#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+    #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
 
-  (use-package smartparens
-      :ensure t
-      :init
-      (smartparens-global-mode 1)
-      :bind (("RET"       . sp-newline)
-             :map
-             xah-fly-command-map
-             (("]"         . sp-forward-slurp-sexp)
-              ("M-("       . sp-wrap-round)
-              ("M-["       . sp-wrap-square)
-              ("M-{"       . sp-wrap-curly)
-              ("["         . sp-backward-slurp-sexp)
-              ("-"         . sp-splice-sexp)
-              ("SPC -"     . sp-rewrap-sexp)
-              ("m"         . sp-backward-sexp)
-              ("."         . sp-forward-sexp)
-              ("SPC 1"     . sp-join-sexp)
-              ("SPC SPC 1" . sp-split-sexp)
-              ("SPC 9"     . sp-change-enclosing)
-              ("SPC SPC g" . sp-kill-hybrid-sexp)
-              ("SPC ="     . sp-raise-sexp)
-              ("M-("       . sp-wrap-round)
-              ("M-{"       . sp-wrap-curly))))
+      (use-package smartparens
+          :ensure t
+          :init
+          (smartparens-global-mode 1)
+          :bind (("RET"       . sp-newline)
+                 :map
+                 xah-fly-command-map
+                 (("]"         . sp-forward-slurp-sexp)
+                  ("M-("       . sp-wrap-round)
+                  ("M-["       . sp-wrap-square)
+                  ("M-{"       . sp-wrap-curly)
+                  ("["         . sp-backward-slurp-sexp)
+                  ("-"         . sp-splice-sexp)
+                  ("SPC -"     . sp-rewrap-sexp)
+                  ("m"         . sp-backward-sexp)
+                  ("."         . sp-forward-sexp)
+                  ("SPC 1"     . sp-join-sexp)
+                  ("SPC SPC 1" . sp-split-sexp)
+                  ("SPC 9"     . sp-change-enclosing)
+                  ("SPC SPC g" . sp-kill-hybrid-sexp)
+                  ("SPC ="     . sp-raise-sexp)
+                  ("M-("       . sp-wrap-round)
+                  ("M-{"       . sp-wrap-curly))))
 
-#+END_SRC
+                  #+END_SRC
 *** Special Configuration for Major Modes
     For enable builtin smartparens configuration for major modes, add require statement to =.emacs.el=, with name of major mode and smartparens prefix:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (require 'smartparens-config)
+      (require 'smartparens-config)
 
-#+END_SRC
+      #+END_SRC
 
 *** Delete Only Parens without Inner Contents
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-(defun delete-only-1-char ()
-    "Delete only 1 character before point."
-    (interactive)
-    (backward-char)
-    (delete-char 1)
-    )
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+      (defun delete-only-1-char ()
+        "Delete only 1 character before point."
+        (interactive)
+        (backward-char)
+        (delete-char 1)
+        )
 
-(define-key xah-fly-command-map (kbd "DEL") 'delete-only-1-char)
-#+END_SRC
+      (define-key xah-fly-command-map (kbd "DEL") 'delete-only-1-char)
+      #+END_SRC
 
 ** Smart Select Text
    I am use cool package [[https://github.com/magnars/expand-region.el/][expand-region]]:
-#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
-  (defun mark-inner-or-expand-region ()
-      "If text is selected, expand region, otherwise then mark inner of brackets."
-      (interactive)
-      (if (use-region-p)
-          (call-interactively 'er/expand-region)
-          (progn
-              (-when-let (ok (sp-get-sexp))
-                  (sp-get ok
-                      (set-mark :beg-in)
-                      (goto-char :end-in))))))
+   #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+     (defun mark-inner-or-expand-region ()
+       "If text is selected, expand region, otherwise then mark inner of brackets."
+       (interactive)
+       (if (use-region-p)
+           (call-interactively 'er/expand-region)
+         (progn
+           (-when-let (ok (sp-get-sexp))
+             (sp-get ok
+               (set-mark :beg-in)
+               (goto-char :end-in))))))
 
-  (use-package expand-region
-      :ensure t
-      :bind
-      (:map xah-fly-command-map
-            ("1" . er/expand-region)
-            ("9" . mark-inner-or-expand-region)
-            ("m" . sp-backward-up-sexp)))
+     (use-package expand-region
+         :ensure t
+         :bind
+         (:map xah-fly-command-map
+               ("1" . er/expand-region)
+               ("9" . mark-inner-or-expand-region)
+               ("m" . sp-backward-up-sexp)))
 
-#+END_SRC
+               #+END_SRC
 ** Macros
    I am use =\= in command mode for start of record macro.
    I am also use =SPC RET= for execute last macro or execute macro to lines:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-  (defun kmacro-start-or-end-macro ()
-      "If macro record have just started, then stop this record, otherwise start."
-      (interactive)
-      (if defining-kbd-macro
-          (kmacro-end-macro 1)
-          (kmacro-start-macro 1)))
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     (defun kmacro-start-or-end-macro ()
+       "If macro record have just started, then stop this record, otherwise start."
+       (interactive)
+       (if defining-kbd-macro
+           (kmacro-end-macro 1)
+         (kmacro-start-macro 1)))
 
-  (define-key xah-fly-command-map (kbd "\\") 'kmacro-start-or-end-macro)
+     (define-key xah-fly-command-map (kbd "\\") 'kmacro-start-or-end-macro)
 
-  (defun kmacro-call-macro-or-apply-to-lines (arg &optional top bottom)
-   "If selected region, then apply macro to selected lines, otherwise call macro."
-      (interactive
-       (list
-        1
-        (if (use-region-p) (region-beginning) nil)
-        (if (use-region-p) (region-end) nil)))
+     (defun kmacro-call-macro-or-apply-to-lines (arg &optional top bottom)
+       "If selected region, then apply macro to selected lines, otherwise call macro."
+       (interactive
+        (list
+         1
+         (if (use-region-p) (region-beginning) nil)
+         (if (use-region-p) (region-end) nil)))
 
-      (if (use-region-p)
-          (apply-macro-to-region-lines top bottom)
-          (kmacro-call-macro arg)))
+       (if (use-region-p)
+           (apply-macro-to-region-lines top bottom)
+         (kmacro-call-macro arg)))
 
-  (define-key xah-fly-command-map (kbd "SPC RET") 'kmacro-call-macro-or-apply-to-lines)
+     (define-key xah-fly-command-map (kbd "SPC RET") 'kmacro-call-macro-or-apply-to-lines)
 
-#+END_SRC
+     #+END_SRC
 
-#+RESULTS:
-: kmacro-call-macro-or-apply-to-lines
+   #+RESULTS:
+   : kmacro-call-macro-or-apply-to-lines
 ** Special Strings as Seperated Buffers
    I am use [[https://github.com/magnars/string-edit.el][string-edit]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package string-edit
-      :ensure t
-      :bind (:map xah-fly-command-map
-                  ("SPC `" . string-edit-at-point)))
+     (use-package string-edit
+         :ensure t
+         :bind (:map xah-fly-command-map
+                     ("SPC `" . string-edit-at-point)))
 
-#+END_SRC
+                     #+END_SRC
 
 ** Transpose
-   I am press =n=, when select text for transpose lines in region:
+   I am use [[https://github.com/rejeep/drag-stuff.el][drag-stuff]].  For example I am press =SPC TAB o=, then
+   current word will moved to right, but again press this hard key
+   sequence is hard, so I am press just =o=, and current word again
+   moved to right, next time I am press =i= and now line moved to up.
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
+     (use-package drag-stuff
+         :ensure t
+         :config
+         (drag-stuff-global-mode t)
+         :bind
+         ((:map xah-fly-command-map)
+          ("SPC TAB i" . 'drag-stuff-up)
+          ("SPC TAB k" . 'drag-stuff-down)
 
-  (bind-keys :map
-             xah-fly-command-map
-             ("SPC TAB o" . transpose-words)
-             ("SPC TAB u" . backward-transpose-words)
+          ("SPC TAB o" . 'drag-stuff-right)
+          ("SPC TAB u" . 'drag-stuff-left)
 
-             ("SPC TAB l" . transpose-chars)
-             ("SPC TAB j" . backward-transpose-chars)
+          ("SPC TAB ." . 'transpose-sexps)
+          ("SPC TAB m" . 'transpose-sexps)
 
-             ("SPC TAB i" . backward-transpose-lines)
-             ("SPC TAB k" . transpose-lines)
+          ("SPC TAB n" . 'avy-transpose-lines-in-region)
+          ("SPC TAB t" . 'transpose-regions)))
 
-             ("SPC TAB ." . transpose-sexps)
-             ("SPC TAB m" . backward-transpose-sexps)
+     (defun my-function-is-drag-stuff-p (f)
+       "Return t, when F is one of functions of `drag-stuff'."
+       (->>
+        f
+        (symbol-name)
+        (s-prefix-p "drag-stuff")))
 
-             ("SPC TAB n" . avy-transpose-lines-bacin-region)
-             ("SPC TAB t" . transpose-regions))
+     (defun my-last-command-is-drag-stuff-p ()
+       "Return t, when last command is one of functions of `drag-stuff'."
+       (interactive)
+       (my-function-is-drag-stuff-p last-command))
 
+     (defvar my-last-command-is-drag-stuff nil
+       "If last command is one of my functions which draged word then this in true.")
 
-  (defun backward-transpose-words ()
-      "As `transpose-words' but set position to backward of transpose."
-      (interactive)
-      (transpose-words -1))
+     (defun my-last-command-is-dragged-stuff-p ()
+       "Return t, when last command dragged someone stuff."
+       (or
+        (my-last-command-is-drag-stuff-p)
+        (and
+         (s-contains-p "drag-stuff" (symbol-name last-command))
+         my-last-command-is-drag-stuff)))
 
+     (defmacro my-define-stuff-key (keymap key normal-command drag-command)
+       "Define in KEYMAP to KEY command when run NORMAL-COMMAND or DRAG-COMMAND."
+       (let ((command-name (intern
+                            (s-concat
+                             "my-"
+                             (symbol-name (eval normal-command))
+                             "-or-"
+                             (symbol-name (eval drag-command))))))
+         `(progn
+            (defun ,command-name ()
+              ,(s-lex-format "Run `${normal-command}' or `${drag-command}'.")
+              (interactive)
+              (let* ((is-drag (my-last-command-is-dragged-stuff-p)))
+                (setq my-last-command-is-drag-stuff is-drag)
+                (if is-drag
+                    (call-interactively ,drag-command)
+                  (call-interactively ,normal-command))))
+            (define-key ,keymap ,key #',command-name))))
 
-  (defun backward-transpose-chars ()
-      "As `transpose-chars' but set position to backward of transpose."
-      (interactive)
-      (transpose-chars -1))
+     (my-define-stuff-key
+      xah-fly-command-map
+      "o"
+      #'syntax-subword-forward
+      #'drag-stuff-right)
 
+     (define-key-when
+         my-insert-new-line-or-nothing
+         xah-fly-command-map
+       ""
+       'what-line
+       'my-last-command-is-dragged-stuff-p)
 
-  (defun backward-transpose-lines ()
-      "As `transpose-lines' but set position to backward of transpose."
-      (interactive)
-      (transpose-lines -1))
+     (my-define-stuff-key
+      xah-fly-command-map
+      "u"
+      #'syntax-subword-backward
+      #'drag-stuff-left)
 
+     (my-define-stuff-key
+      xah-fly-command-map
+      "i"
+      #'previous-line
+      #'drag-stuff-up)
 
-  (defun backward-transpose-sexps ()
-      "As `transpose-sexps' but set position to backward of transpose."
-      (interactive)
-      (transpose-sexps -1))
-
-#+END_SRC
+     (my-define-stuff-key
+      xah-fly-command-map
+      "k"
+      #'next-line
+      #'drag-stuff-down)
+       #+END_SRC
 
 ** Custom Deleting Text
    I am delete this line and edit this by press =w=:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defun delete-and-edit-current-line ()
-      "Delete current line and instroduce to insert mode."
-      (interactive)
-      (beginning-of-line-text)
-      (kill-line)
-      (xah-fly-insert-mode-init)
-      )
+     (defun delete-and-edit-current-line ()
+       "Delete current line and instroduce to insert mode."
+       (interactive)
+       (beginning-of-line-text)
+       (kill-line)
+       (xah-fly-insert-mode-init)
+       )
 
-  (define-key xah-fly-command-map (kbd "w") 'delete-and-edit-current-line)
+     (define-key xah-fly-command-map (kbd "w") 'delete-and-edit-current-line)
 
-#+END_SRC
+     #+END_SRC
 
-    I am delete content of this line (including whitespaces) on press =SPC w=:
-    
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   I am delete content of this line (including whitespaces) on press =SPC w=:
+   
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defun clear-current-line ()
-      "Clear content of current line (including whitespaces)."
-      (interactive)
-      (kill-region (line-beginning-position) (line-end-position))
-      )
+     (defun clear-current-line ()
+       "Clear content of current line (including whitespaces)."
+       (interactive)
+       (kill-region (line-beginning-position) (line-end-position))
+       )
 
-  (define-key xah-fly-command-map (kbd "SPC w") 'clear-current-line)
-#+END_SRC
+     (define-key xah-fly-command-map (kbd "SPC w") 'clear-current-line)
+     #+END_SRC
 
 ** Custom Selecting Text
    I am press 2 times =8= for selecting 2 words
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-  (defun select-current-or-next-word ()
-      "If word was selected, then move to next word, otherwise select word."
-      (interactive)
-      (if (use-region-p)
-          (forward-word)
-          (xah-extend-selection))
-      )
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     (defun select-current-or-next-word ()
+       "If word was selected, then move to next word, otherwise select word."
+       (interactive)
+       (if (use-region-p)
+           (forward-word)
+         (xah-extend-selection))
+       )
 
-  (define-key xah-fly-command-map (kbd "8") 'select-current-or-next-word)
+     (define-key xah-fly-command-map (kbd "8") 'select-current-or-next-word)
 
-#+END_SRC
+   #+END_SRC
 
-    I am press =g=, for deleting current block, but if selected region, then I am cancel 
-this select:
+   I am press =g=, for deleting current block, but if selected region, then I am cancel 
+   this select:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defun delete-current-text-block-or-cancel-selection ()
-      "If text is selected, then cancel selection, otherwise delete current block."
-      (interactive)
-      (if (use-region-p)
-          (deactivate-mark)
-          (xah-delete-current-text-block)))
+     (defun delete-current-text-block-or-cancel-selection ()
+       "If text is selected, then cancel selection, otherwise delete current block."
+       (interactive)
+       (if (use-region-p)
+           (deactivate-mark)
+         (xah-delete-current-text-block)))
 
-  (define-key xah-fly-command-map (kbd "g") nil)
-  (define-key xah-fly-command-map (kbd "g") 'delete-current-text-block-or-cancel-selection)
+     (define-key xah-fly-command-map (kbd "g") nil)
+     (define-key xah-fly-command-map (kbd "g") 'delete-current-text-block-or-cancel-selection)
 
-#+END_SRC
+   #+END_SRC
 
-I am press =-= for change position when select text to begin/end of selected region:
+   I am press =-= for change position when select text to begin/end of selected region:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (define-key-when xah-fly-command-map "-" 'exchange-point-and-mark 'use-region-p)
+     (define-key-when
+         my-exchange-point-and-mark-or-splice-sexp
+         xah-fly-command-map
+       "-"
+       'exchange-point-and-mark
+       'use-region-p)
 
-#+END_SRC
+     #+END_SRC
 
 ** Custom Editing Text
    I am use =s= for inserting new line:
    
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defun open-line-saving-indent ()
-      "Inserting new line, saving position and inserting new line."
-      (interactive)
-      (newline)
-      (unless (s-blank-p (s-trim (thing-at-point 'line t)))
-          (indent-according-to-mode))
-      (forward-line -1)
-      (end-of-line)
-      (delete-horizontal-space t))
+     (defun open-line-saving-indent ()
+       "Inserting new line, saving position and inserting new line."
+       (interactive)
+       (newline)
+       (unless (s-blank-p (s-trim (thing-at-point 'line t)))
+         (indent-according-to-mode))
+       (forward-line -1)
+       (end-of-line)
+       (delete-horizontal-space t))
 
-  (define-key xah-fly-command-map (kbd "s") 'open-line-saving-indent)
+     (define-key xah-fly-command-map (kbd "s") 'open-line-saving-indent)
 
-#+END_SRC
+     #+END_SRC
 
-And =SPC s= for new line below and =SPC SPC s= for new line above:
+   And =SPC s= for new line below and =SPC SPC s= for new line above:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defun open-line-below ()
-      (interactive)
-      (end-of-line)
-      (newline)
-      (indent-for-tab-command))
+     (defun open-line-below ()
+       (interactive)
+       (end-of-line)
+       (newline)
+       (indent-for-tab-command))
 
-  (defun open-line-above ()
-      (interactive)
-      (beginning-of-line)
-      (newline)
-      (forward-line -1)
-      (indent-for-tab-command))
+     (defun open-line-above ()
+       (interactive)
+       (beginning-of-line)
+       (newline)
+       (forward-line -1)
+       (indent-for-tab-command))
 
-  (defun new-line-in-between ()
-      (interactive)
-      (newline)
-      (save-excursion
-          (newline)
-          (indent-for-tab-command))
-      (indent-for-tab-command))
+     (defun new-line-in-between ()
+       (interactive)
+       (newline)
+       (save-excursion
+         (newline)
+         (indent-for-tab-command))
+       (indent-for-tab-command))
 
-  (defun duplicate-current-line-or-region (arg)
-    "Duplicates the current line or region ARG times.
-  If there's no region, the current line will be duplicated."
-    (interactive "p")
-    (if (region-active-p)
-        (let ((beg (region-beginning))
-              (end (region-end)))
-          (duplicate-region arg beg end)
-          (one-shot-keybinding "d" (λ (duplicate-region 1 beg end))))
-      (duplicate-current-line arg)
-      (one-shot-keybinding "d" 'duplicate-current-line)))
+     (defun duplicate-current-line-or-region (arg)
+       "Duplicates the current line or region ARG times.
+     If there's no region, the current line will be duplicated."
+       (interactive "p")
+       (if (region-active-p)
+           (let ((beg (region-beginning))
+                 (end (region-end)))
+             (duplicate-region arg beg end)
+             (one-shot-keybinding "d" (λ (duplicate-region 1 beg end))))
+         (duplicate-current-line arg)
+         (one-shot-keybinding "d" 'duplicate-current-line)))
 
-  (defun one-shot-keybinding (key command)
-    (set-temporary-overlay-map
-     (let ((map (make-sparse-keymap)))
-       (define-key map (kbd key) command)
-       map) t))
+     (defun one-shot-keybinding (key command)
+       (set-temporary-overlay-map
+        (let ((map (make-sparse-keymap)))
+          (define-key map (kbd key) command)
+          map) t))
 
-  (defun replace-region-by (fn)
-    (let* ((beg (region-beginning))
-           (end (region-end))
-           (contents (buffer-substring beg end)))
-      (delete-region beg end)
-      (insert (funcall fn contents))))
+     (defun replace-region-by (fn)
+       (let* ((beg (region-beginning))
+              (end (region-end))
+              (contents (buffer-substring beg end)))
+         (delete-region beg end)
+         (insert (funcall fn contents))))
 
-  (defun duplicate-region (&optional num start end)
-    "Duplicates the region bounded by START and END NUM times.
-  If no START and END is provided, the current region-beginning and
-  region-end is used."
-    (interactive "p")
-    (save-excursion
-      (let* ((start (or start (region-beginning)))
-             (end (or end (region-end)))
-             (region (buffer-substring start end)))
-        (goto-char end)
-        (dotimes (i num)
-          (insert region)))))
+     (defun duplicate-region (&optional num start end)
+       "Duplicates the region bounded by START and END NUM times.
+     If no START and END is provided, the current region-beginning and
+     region-end is used."
+       (interactive "p")
+       (save-excursion
+         (let* ((start (or start (region-beginning)))
+                (end (or end (region-end)))
+                (region (buffer-substring start end)))
+           (goto-char end)
+           (dotimes (i num)
+             (insert region)))))
 
-  (defun paredit-duplicate-current-line ()
-    (back-to-indentation)
-    (let (kill-ring kill-ring-yank-pointer)
-      (paredit-kill)
-      (yank)
-      (newline-and-indent)
-      (yank)))
+     (defun paredit-duplicate-current-line ()
+       (back-to-indentation)
+       (let (kill-ring kill-ring-yank-pointer)
+         (paredit-kill)
+         (yank)
+         (newline-and-indent)
+         (yank)))
 
-  (defun duplicate-current-line (&optional num)
-    "Duplicate the current line NUM times."
-    (interactive "p")
-    (if (bound-and-true-p paredit-mode)
-        (paredit-duplicate-current-line)
-      (save-excursion
-        (when (eq (point-at-eol) (point-max))
-          (goto-char (point-max))
-          (newline)
-          (forward-char -1))
-        (duplicate-region num (point-at-bol) (1+ (point-at-eol))))))
+     (defun duplicate-current-line (&optional num)
+       "Duplicate the current line NUM times."
+       (interactive "p")
+       (if (bound-and-true-p paredit-mode)
+           (paredit-duplicate-current-line)
+         (save-excursion
+           (when (eq (point-at-eol) (point-max))
+             (goto-char (point-max))
+             (newline)
+             (forward-char -1))
+           (duplicate-region num (point-at-bol) (1+ (point-at-eol))))))
 
-  (defvar yank-indent-modes '(prog-mode
-                              sgml-mode
-                              js2-mode)
-    "Modes in which to indent regions that are yanked (or yank-popped)")
+     (defvar yank-indent-modes '(prog-mode
+                                 sgml-mode
+                                 js2-mode)
+       "Modes in which to indent regions that are yanked (or yank-popped)")
 
-  (defvar yank-advised-indent-threshold 1000
-    "Threshold (# chars) over which indentation does not automatically occur.")
+     (defvar yank-advised-indent-threshold 1000
+       "Threshold (# chars) over which indentation does not automatically occur.")
 
-  (defun yank-advised-indent-function (beg end)
-      "Do indentation, as long as the region isn't too large."
-      (if (<= (- end beg) yank-advised-indent-threshold)
-          (indent-region beg end nil)))
+     (defun yank-advised-indent-function (beg end)
+       "Do indentation, as long as the region isn't too large."
+       (if (<= (- end beg) yank-advised-indent-threshold)
+           (indent-region beg end nil)))
 
-  (defadvice yank (after yank-indent activate)
-      "If current mode is one of 'yank-indent-modes, indent yanked text.
-  With prefix arg don't indent."
-      (if (and (not (ad-get-arg 0))
-               (--any? (derived-mode-p it) yank-indent-modes))
-          (let ((transient-mark-mode nil))
-              (yank-advised-indent-function (region-beginning) (region-end)))))
+     (defadvice yank (after yank-indent activate)
+       "If current mode is one of 'yank-indent-modes, indent yanked text.
+     With prefix arg don't indent."
+       (if (and (not (ad-get-arg 0))
+                (--any? (derived-mode-p it) yank-indent-modes))
+           (let ((transient-mark-mode nil))
+             (yank-advised-indent-function (region-beginning) (region-end)))))
 
-  (defadvice yank-pop (after yank-pop-indent activate)
-      "If current mode is one of 'yank-indent-modes, indent yanked text.
-  With prefix arg don't indent."
-      (if (and (not (ad-get-arg 0))
-               (member major-mode yank-indent-modes))
-          (let ((transient-mark-mode nil))
-              (yank-advised-indent-function (region-beginning) (region-end)))))
+     (defadvice yank-pop (after yank-pop-indent activate)
+       "If current mode is one of 'yank-indent-modes, indent yanked text.
+     With prefix arg don't indent."
+       (if (and (not (ad-get-arg 0))
+                (member major-mode yank-indent-modes))
+           (let ((transient-mark-mode nil))
+             (yank-advised-indent-function (region-beginning) (region-end)))))
 
-  (defun yank-unindented ()
-      (interactive)
-      (yank 1))
+     (defun yank-unindented ()
+       (interactive)
+       (yank 1))
 
-  (defun kill-to-beginning-of-line ()
-      (interactive)
-      (kill-region (save-excursion (beginning-of-line) (point))
-                   (point)))
+     (defun kill-to-beginning-of-line ()
+       (interactive)
+       (kill-region (save-excursion (beginning-of-line) (point))
+                    (point)))
 
-  (bind-keys :map
-             xah-fly-command-map
-             ("SPC y"     . duplicate-current-line-or-region)
-             ("SPC s"     . open-line-below)
-             ("SPC e"     . kill-to-beginning-of-line)
-             ("SPC k RET" . new-line-in-between)
-             ("SPC SPC s" . open-line-above))
+     (bind-keys :map
+                xah-fly-command-map
+                ("SPC y"     . duplicate-current-line-or-region)
+                ("SPC s"     . open-line-below)
+                ("SPC e"     . kill-to-beginning-of-line)
+                ("SPC k RET" . new-line-in-between)
+                ("SPC SPC s" . open-line-above))
 
-#+END_SRC
+                #+END_SRC
 
-#+RESULTS:
-: open-line-above
+   #+RESULTS:
+   : open-line-above
 
 
-And I am press =p= for inserting space, and if I am selected region,  for inserting space
-to beginning of each line:
+   And I am press =p= for inserting space, and if I am selected region,  for inserting space
+   to beginning of each line:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defun insert-space-before-line ()
-      "Saving position, insert space to beginning of current line."
+     (defun insert-space-before-line ()
+       "Saving position, insert space to beginning of current line."
        (interactive)
        (save-excursion (beginning-of-line-text)
-                      (xah-insert-space-before))
-      )
+                       (xah-insert-space-before))
+       )
 
-  (defun insert-spaces-before-each-line-by-line-nums (start-line end-line)
-      "Insert space before each line in region (`START-LINE`; `END-LINE`)."
-      (unless (= 0 (+ 1 (- end-line start-line)))
-          (goto-line start-line)
-          (insert-space-before-line)
-          (insert-spaces-before-each-line-by-line-nums (+ start-line 1) end-line))
-      )
+     (defun insert-spaces-before-each-line-by-line-nums (start-line end-line)
+       "Insert space before each line in region (`START-LINE`; `END-LINE`)."
+       (unless (= 0 (+ 1 (- end-line start-line)))
+         (goto-line start-line)
+         (insert-space-before-line)
+         (insert-spaces-before-each-line-by-line-nums (+ start-line 1) end-line))
+       )
 
-  (defun insert-spaces-before-each-line (beg end)
-      "Insert spaces before each selected line, selected line indentifier with `BEG` & `END`."
-      (interactive "r")
-      (save-excursion
-          (let (deactivate-mark)
-              (let ((begining-line-num (line-number-at-pos beg))
-                    (end-line-num (line-number-at-pos end)))
-                  (insert-spaces-before-each-line-by-line-nums begining-line-num end-line-num))))
-      )
+     (defun insert-spaces-before-each-line (beg end)
+       "Insert spaces before each selected line, selected line indentifier with `BEG` & `END`."
+       (interactive "r")
+       (save-excursion
+         (let (deactivate-mark)
+           (let ((begining-line-num (line-number-at-pos beg))
+                 (end-line-num (line-number-at-pos end)))
+             (insert-spaces-before-each-line-by-line-nums begining-line-num end-line-num))))
+       )
 
-  (defun insert-spaces-before-or-to-beginning-of-each-line (beg end)
-      "Insert space, and if selected region, insert space to beginning of each line, text is should will indentifier with `BEG` & `END`."
-      (interactive (list (if (use-region-p) (region-beginning))
-                         (if (use-region-p) (region-end))))
-      (if (use-region-p)
-          (insert-spaces-before-each-line beg end)
-          (xah-insert-space-before))
-      )
+     (defun insert-spaces-before-or-to-beginning-of-each-line (beg end)
+       "Insert space, and if selected region, insert space to beginning of each line, text is should will indentifier with `BEG` & `END`."
+       (interactive (list (if (use-region-p) (region-beginning))
+                          (if (use-region-p) (region-end))))
+       (if (use-region-p)
+           (insert-spaces-before-each-line beg end)
+         (xah-insert-space-before))
+       )
 
 
-  (define-key xah-fly-command-map (kbd "p") nil)
-  (define-key xah-fly-command-map (kbd "p") 'insert-spaces-before-or-to-beginning-of-each-line)
+     (define-key xah-fly-command-map (kbd "p") nil)
+     (define-key xah-fly-command-map (kbd "p") 'insert-spaces-before-or-to-beginning-of-each-line)
 
-#+END_SRC
+     #+END_SRC
 
 ** Custom Navigation
    I am press =m= and =.= for go to next, previous sexp:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (define-key xah-fly-command-map (kbd "m") 'backward-sexp)
-  (define-key xah-fly-command-map (kbd ".") 'forward-sexp)
+     (define-key xah-fly-command-map (kbd "m") 'backward-sexp)
+     (define-key xah-fly-command-map (kbd ".") 'forward-sexp)
 
-#+END_SRC
+     #+END_SRC
 
 ** Rectangles
 
-I am press =SPC t= for enable =rectangle-mark-mode=, and =f= when =rectangle-mark-mode=
-is enabled for replace rectangle:
+   I am press =SPC t= for enable =rectangle-mark-mode=, and =f= when =rectangle-mark-mode=
+   is enabled for replace rectangle:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-  (require 'rect)
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     (require 'rect)
 
-  (define-key xah-fly-command-map (kbd "SPC t") 'rectangle-mark-mode)
-  (define-key xah-fly-command-map (kbd "SPC v") 'yank-rectangle)
+     (define-key xah-fly-command-map (kbd "SPC t") 'rectangle-mark-mode)
+     (define-key xah-fly-command-map (kbd "SPC v") 'yank-rectangle)
 
-  (define-key-when xah-fly-command-map "c" 'copy-rectangle-as-kill
-           (lambda () rectangle-mark-mode))
+     (defun rectangle-mark-mode-p ()
+       "Return t, when `rectangle-mark-mode' is enabled."
+       rectangle-mark-mode)
 
-  (define-key-when xah-fly-command-map "d" 'kill-rectangle
-           (lambda () rectangle-mark-mode))
+     (define-key-when
+         my-copy-rectangle-or-copy-line
+         xah-fly-command-map
+         "c"
+       'copy-rectangle-as-kill
+       'rectangle-mark-mode-p)
 
-  (define-key-when xah-fly-command-map "x" 'kill-rectangle
-           (lambda () rectangle-mark-mode))
+     (define-key-when
+         my-kill-rectangle-or-delete-char
+         xah-fly-command-map
+         "d"
+       'kill-rectangle
+       'rectangle-mark-mode-p)
 
-  (define-key-when xah-fly-command-map "f" 'replace-rectangle
-           (lambda () rectangle-mark-mode))
+     (define-key-when
+         my-kill-rectangle-or-kill-line
+         xah-fly-command-map
+       "x"
+       'kill-rectangle
+       'rectangle-mark-mode-p)
 
-  (define-key-when xah-fly-command-map "s" 'open-rectangle
-          (lambda () rectangle-mark-mode))
+     (define-key-when
+         my-xah-activate-insert-mode-or-replace-rectangle
+         xah-fly-command-map
+       "f"
+       'replace-rectangle
+       'rectangle-mark-mode-p)
 
-  (define-key-when xah-fly-command-map "-" 'rectangle-exchange-point-and-mark
-          (lambda () rectangle-mark-mode))
+     (define-key-when
+         any-exchange-point-and-mark-or-splice-sexp
+         xah-fly-command-map
+       "-"
+       'rectangle-exchange-point-and-mark
+       'rectangle-mark-mode-p)
 
-#+END_SRC
+     ;;
+
+                      #+END_SRC
 
 ** Indent Settings
    
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (setq-default indent-tabs-mode nil)
-  (setq-default tab-width          4)
-  (setq-default c-basic-offset     4)
-  (setq-default standart-indent    4)
-  (setq-default lisp-body-indent   4)
-
-
-  (defun select-current-line ()
-      "Select as region current line."
-      (interactive)
-      (forward-line 0)
-      (set-mark (point))
-      (end-of-line)
-      )
+     (setq-default indent-tabs-mode nil)
+     (setq-default tab-width          4)
+     (setq-default c-basic-offset     4)
+     (setq-default standart-indent    4)
+     (setq-default lisp-body-indent   4)
 
 
-  (defun indent-line-or-region ()
-      "If text selected, then indent it, otherwise indent current line."
-      (interactive)
-      (save-excursion
-          (if (use-region-p)
-              (indent-region (region-beginning) (region-end))
-              (funcall indent-line-function)
-              ))
-      )
+     (defun select-current-line ()
+       "Select as region current line."
+       (interactive)
+       (forward-line 0)
+       (set-mark (point))
+       (end-of-line)
+       )
 
 
-  (global-set-key (kbd "RET") 'newline-and-indent)
-  (define-key xah-fly-command-map (kbd "q") 'indent-line-or-region)
-  (define-key xah-fly-command-map (kbd "SPC q") 'join-line)
+     (defun indent-line-or-region ()
+       "If text selected, then indent it, otherwise indent current line."
+       (interactive)
+       (save-excursion
+         (if (use-region-p)
+             (indent-region (region-beginning) (region-end))
+           (funcall indent-line-function)
+           ))
+       )
 
-  (setq lisp-indent-function  'common-lisp-indent-function)
 
-#+END_SRC
+     (global-set-key (kbd "RET") 'newline-and-indent)
+     (define-key xah-fly-command-map (kbd "q") 'indent-line-or-region)
+     (define-key xah-fly-command-map (kbd "SPC q") 'join-line)
 
-I am press =SPC , ,= for go to defnition:
+     (setq lisp-indent-function  'common-lisp-indent-function)
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+END_SRC
 
-  (define-key xah-fly-command-map (kbd "SPC .") 'xref-find-definitions)
+   I am press =SPC , ,= for go to defnition:
 
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+     (define-key xah-fly-command-map (kbd "SPC .") 'xref-find-definitions)
+
+     #+END_SRC
 
 * Support of Languages
 ** Functions for extending functional of language
 *** Functions for Navigation
     Function `add-nav-to-imports-for-language`, is define keys for go to imports:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-(defmacro add-nav-to-imports-for-language (language to-imports-function)
-  "Bind `TO-IMPORTS-FUNCTION` to `LANGUAGE`-map."
-      `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
-          (add-hook
+      (defmacro add-nav-to-imports-for-language (language to-imports-function)
+        "Bind `TO-IMPORTS-FUNCTION` to `LANGUAGE`-map."
+        `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
+           (add-hook
             language-hook
             (lambda ()
-                (define-key
-                    xah-fly-command-map
-                    (kbd "SPC SPC i")
-                    ',to-imports-function)))))
+              (define-key
+                  xah-fly-command-map
+                  (kbd "SPC SPC i")
+                ',to-imports-function)))))
 
-#+END_SRC
+                #+END_SRC
 
 *** Functions for Pretty View
-  I am use [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] for centering content of org file:
+    I am use [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] for centering content of org file:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-  (require 'face-remap)
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+      (require 'face-remap)
 
-  (use-package visual-fill-column
-      :ensure t)
+      (use-package visual-fill-column
+          :ensure t)
 
-  (defun visual-fill (&optional width)
-      (interactive)
-      (or width (setq width 70))
-      (setq-default visual-fill-column-width width
-                    visual-fill-column-center-text t)
-      (text-scale-mode 0)
-      (visual-fill-column-mode 1))
-#+END_SRC
+      (defun visual-fill (&optional width)
+        (interactive)
+        (or width (setq width 70))
+        (setq-default visual-fill-column-width width
+                      visual-fill-column-center-text t)
+        (text-scale-mode 0)
+        (visual-fill-column-mode 1))
+        #+END_SRC
 
 *** Functions for Import
     Function `add-import-keymap-for-language` defines key for `add-import`.
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-  (defmacro add-import-keymap-for-language (language add-import-function)
-      "Bind `ADD-IMPORT-FUNCTION` to `LANGUAGE`-map."
-      `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+      (defmacro add-import-keymap-for-language (language add-import-function)
+        "Bind `ADD-IMPORT-FUNCTION` to `LANGUAGE`-map."
+        `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
            (add-hook
             language-hook
             (lambda ()
-                (define-key
-                    xah-fly-command-map
-                    (kbd "SPC i")
-                    ',add-import-function)))))
+              (define-key
+                  xah-fly-command-map
+                  (kbd "SPC i")
+                ',add-import-function)))))
 
-#+END_SRC
+                #+END_SRC
 
 ** Supported Languages
 *** LaTeX
-    I am use [[https://github.com/emacsmirror/auctex][auctex]]:
-    
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    I am use [[https://github.com/emacsmirror/auctex][auctex]], I am take some configuration from
+    [[https://habr.com/ru/company/skillfactory/blog/593999/][this article from HABR]]:
 
-  (use-package auctex
-      :ensure t)
+**** LaTeX + calc 
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-#+END_SRC
+       (use-package latex
+           :ensure auctex
+           :major-mode-map (LaTeX-mode)
+           :hook ((LaTeX-mode . prettify-symbols-mode))
+           :bind ((:map my-latex-local-map)
+                  ("="     . my-calc-simplify-region-copy)
+                  ("f"     . my-calc-simplify-region-change))
+           :config (require 'calc-lang)
+           (defun my-calc-simplify (expr)
+             "Simplify EXPR via `calc' and return this."
+             (calc-latex-language t)
+             (calc-alg-entry expr)
+             (with-temp-buffer
+               (calc-copy-to-buffer 1)
+               (delete-char -1)
+               (buffer-string)))
 
-**** Vars
+           (defun my-calc-simplify-region-copy (beg end)
+             "Take from BEG to END, simplify this via `calc' and copy as kill."
+             (interactive "r")
+             (let ((expr (my-calc-simplify (buffer-substring beg end))))
+               (with-temp-buffer
+                 (insert expr)
+                 (copy-region-as-kill (point-min) (point-max)))
+               (message "coppied: %s" (current-kill 0))))
+
+           (defun my-calc-simplify-region-change (beg end)
+             "Get from BEG to END change this via `calc' and yank instead of region."
+             (interactive "r")
+             (let ((expr (buffer-substring beg end)))
+               (goto-char beg)
+               (delete-region beg end)
+               (insert (my-calc-simplify expr)))))
+
+               #+END_SRC
+
+**** Preview
+      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+        (use-package preview
+            :after latex
+            :bind ((:map my-latex-local-map)
+                   ("p" . org-latex-preview))
+            :config
+            (plist-put org-format-latex-options :scale 1.9))
+
+      #+END_SRC
+
+**** Fast Navigation and Insertion in LaTeX
+
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+       (use-package cdlatex
+           :ensure t
+           :hook (LaTeX-mode . turn-on-cdlatex)
+           :bind (:map cdlatex-mode-map ("<tab>" . cdlatex-tab)))
+
+       ;; fields
+       (use-package cdlatex
+           :hook ((cdlatex-tab . yas-expand)
+                  (cdlatex-tab . cdlatex-in-yas-field))
+           :config (use-package yasnippet
+                       :bind (:map yas-keymap
+                                   ("<tab>" . yas-next-field-or-cdlatex)
+                                   ("TAB" . yas-next-field-or-cdlatex))
+                       :config (defun cdlatex-in-yas-field
+                                   ()
+                                 ;; Check if we're at the end of the Yas field
+                                 (when-let* ((_ (overlayp yas--active-field-overlay))
+                                             (end (overlay-end yas--active-field-overlay)))
+                                   (if (>= (point) end)
+                                       (let ((s (thing-at-point 'sexp)))
+                                         (unless (and s
+                                                      (assoc
+                                                       (substring-no-properties s)
+                                                       cdlatex-command-alist-comb))
+                                           (yas-next-field-or-maybe-expand)
+                                           t))
+                                     (let (cdlatex-tab-hook minp)
+                                       (setq minp
+                                             (min
+                                              (save-excursion
+                                                (cdlatex-tab)
+                                                (point))
+                                              (overlay-end
+                                               yas--active-field-overlay)))
+                                       (goto-char minp)
+                                       t))))
+
+                       (defun yas-next-field-or-cdlatex nil
+                         (interactive)
+                         "Jump to the next Yas field correctly with cdlatex active."
+                         (if (or
+                              (bound-and-true-p cdlatex-mode)
+                              (bound-and-true-p org-cdlatex-mode))
+                             (cdlatex-tab)
+                           (yas-next-field-or-maybe-expand)))))
+                           #+END_SRC
+
+**** LaTeX tables
+
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+       ;; Array/tabular input with org-tables and cdlatex
+       (use-package org-table
+           :after cdlatex
+           :bind (:map orgtbl-mode-map
+                       ("<tab>" . lazytab-org-table-next-field-maybe)
+                       ("TAB" . lazytab-org-table-next-field-maybe))
+           :init (add-hook 'cdlatex-tab-hook 'lazytab-cdlatex-or-orgtbl-next-field 90)
+           ;; Tabular environments using cdlatex
+           (add-to-list 'cdlatex-command-alist
+                        '("smat" "Insert smallmatrix env"
+                          "\\left( \\begin{smallmatrix} ? \\end{smallmatrix} \\right)"
+                          lazytab-position-cursor-and-edit
+                          nil nil t))
+           (add-to-list 'cdlatex-command-alist
+                        '("bmat" "Insert bmatrix env"
+                          "\\begin{bmatrix} ? \\end{bmatrix}"
+                          lazytab-position-cursor-and-edit
+                          nil nil t))
+           (add-to-list 'cdlatex-command-alist
+                        '("pmat" "Insert pmatrix env"
+                          "\\begin{pmatrix} ? \\end{pmatrix}"
+                          lazytab-position-cursor-and-edit
+                          nil nil t))
+           (add-to-list 'cdlatex-command-alist
+                        '("tbl" "Insert table"
+                          "\\begin{table}\n\\centering ? \\caption{}\n\\end{table}\n"
+                          lazytab-position-cursor-and-edit
+                          nil t nil))
+           :config ;; Tab handling in org tables
+           (defun lazytab-position-cursor-and-edit ()
+             ;; (if (search-backward "\?" (- (point) 100) t)
+             ;;     (delete-char 1))
+             (cdlatex-position-cursor)
+             (lazytab-orgtbl-edit))
+
+           (defun lazytab-orgtbl-edit ()
+             (advice-add 'orgtbl-ctrl-c-ctrl-c :after #'lazytab-orgtbl-replace)
+             (orgtbl-mode 1)
+             (open-line 1)
+             (insert "\n|"))
+
+           (defun lazytab-orgtbl-replace (_)
+             (interactive "P")
+             (unless (org-at-table-p) (user-error "Not at a table"))
+             (let* ((table (org-table-to-lisp))
+                    params
+                    (replacement-table
+                     (if (texmathp)
+                         (lazytab-orgtbl-to-amsmath table params)
+                       (orgtbl-to-latex table params))))
+               (kill-region (org-table-begin) (org-table-end))
+               (open-line 1)
+               (push-mark)
+               (insert replacement-table)
+               (align-regexp
+                (region-beginning)
+                (region-end)
+                "\\([:space:]*\\)& ")
+               (orgtbl-mode -1)
+               (advice-remove 'orgtbl-ctrl-c-ctrl-c #'lazytab-orgtbl-replace)))
+
+           (defun lazytab-orgtbl-to-amsmath (table params)
+             (orgtbl-to-generic
+              table
+              (org-combine-plists
+               '(:splice t
+                 :lstart ""
+                 :lend " \\\\"
+                 :sep " & "
+                 :hline nil
+                 :llend "")
+               params)))
+
+           (defun lazytab-cdlatex-or-orgtbl-next-field ()
+             (when (and
+                    (bound-and-true-p orgtbl-mode)
+                    (org-table-p)
+                    (looking-at "[[:space:]]*\\(?:|\\|$\\)")
+                    (let ((s (thing-at-point 'sexp)))
+                      (not (and s (assoc s cdlatex-command-alist-comb)))))
+               (call-interactively #'org-table-next-field)
+               t))
+
+           (defun lazytab-org-table-next-field-maybe ()
+             (interactive)
+             (if (bound-and-true-p cdlatex-mode)
+                 (cdlatex-tab)
+               (org-table-next-field))))
+
+               #+END_SRC
+
+**** Variables for LaTeX
      Variable `latex-documentclasses` is list of documentclasses in Emacs, each element
- of this list is name of documentclass in lower case. Defaults to:
- 
- #+BEGIN_SRC emacs-lisp :tangle ~/init.el
- (setq latex-documentclasses
-     '("article" "reoport" "book" "proc" "minimal" "slides" "memoir" "letter" "beamer"))
- #+END_SRC
- 
-**** Visual Fill
+     of this list is name of documentclass in lower case. Defaults to:
+     
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+       (setq latex-documentclasses
+             '("article" "reoport" "book" "proc" "minimal" "slides" "memoir" "letter" "beamer"))
+             #+END_SRC
+             
+**** Visual Fill for LaTeX
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (dolist (mode (list 'TeX-mode-hook
-                      'tex-mode-hook
-                      'latex-mode-hook
-                      'LaTeX-mode-hook))
-      (add-hook mode (lambda () (call-interactively 'visual-fill))))
-
-
-#+END_SRC
-**** Keymaps
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-  (defun latex-wrap-text (command)
-      "If regions select, wrap region with COMMAND, otherwise wrap word."
-      (unless (use-region-p)
-          (set-mark (point))
-          (forward-word)
-          (exchange-point-and-mark)
-          (backward-word))
-      (goto-char (region-beginning))
-      (insert (s-lex-format "\\${command}{"))
-      (goto-char (region-end))
-      (insert "}")
-      (indent-region (region-beginning) (region-end)))
+       (dolist (mode (list 'TeX-mode-hook
+                           'tex-mode-hook
+                           'latex-mode-hook
+                           'LaTeX-mode-hook))
+         (add-hook mode (lambda () (call-interactively 'visual-fill))))
 
 
-  (defun latex-make-text-italic ()
-      "If regions select, wrap region with `emph`, otherwise make word."
-      (interactive)
-      (latex-wrap-text "emph"))
+         #+END_SRC
+**** Keymaps for LaTeX
+     I am russian, and on my native keyboard =;= is =$=:
 
-  (defun latex-make-text-bold ()
-      "If regions select, wrap region with `textbf`, otherwise make word."
-      (interactive)
-      (latex-wrap-text "emph"))
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defun latex-make-text-formula ()
-      "If regions select, make region formula, otherwise make line formula."
-      (interactive)
-      (unless (use-region-p)
-          (end-of-line)
-          (set-mark (point-at-bol)))
-      (let ((text-beg (region-beginning))
-            (text-end (region-end)))
-          (deactivate-mark)
-          (goto-char text-beg)
-          (insert "\\[")
-          (goto-char (+ text-end 2))
-          (insert "\\]")))
+       (use-package latex
+           :major-mode-map (TeX-mode LaTeX-mode tex-mode latex-mode)
+           :bind ((:map LaTeX-mode-map)
+                  (";" . cdlatex-dollar)))
 
-
-  (use-package latex
-      :major-mode-map (TeX-mode LaTeX-mode tex-mode latex-mode)
-      :bind (:map
-             my-latex-local-map
-             ("m" . helm-insert-latex-math)
-             ("i" . latex-make-text-italic)
-             ("b" . latex-make-text-bold)
-             ("f" . latex-make-text-formula)))
-
-
-#+END_SRC
+     #+END_SRC
 **** Auto Complete for LaTeX
      I am use [[https://github.com/vspinu/company-math][company-math]] and [[https://github.com/alexeyr/company-auctex][company-auctex]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package company-math
-      :ensure t
-      :init
-      (defun my-company-math-setup ()
-          "Setup for `company-math'."
-          (add-to-list 'company-backends 'company-math-symbols-latex)
-          (add-to-list 'company-backends 'company-latex-commands))
-      (add-hook 'LaTeX-mode 'my-company-math-setup))
+       (use-package company-math
+           :ensure t
+           :init
+           (defun my-company-math-setup ()
+             "Setup for `company-math'."
+             (add-to-list 'company-backends 'company-math-symbols-latex)
+             (add-to-list 'company-backends 'company-latex-commands))
+           (add-hook 'LaTeX-mode 'my-company-math-setup))
 
 
-  (use-package company-auctex
-      :ensure t
-      :config
-      (company-auctex-init))
+       (use-package company-auctex
+           :ensure t
+           :config
+           (company-auctex-init))
 
-#+END_SRC
+           #+END_SRC
+**** Auto Activating Snippets for LaTeX  
+     I am use [[https://github.com/tecosaur/LaTeX-auto-activating-snippets][LaTeX-auto-activating-snippets]]. I am use some standard
+     snippets, but also I need to some things, which will expands as
+     units, for example /Om/ will be expanded to /\mathrm{Ом}/:
+
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+
+       (use-package laas
+           :ensure t
+           :hook (LaTeX-mode . laas-mode)
+           :config
+           (aas-set-snippets 'laas-mode
+             :cond #'texmathp
+             "Om"  "\\mathrm{Ом}"
+             "eqv" "\\mathrm{экв}"
+             "Vv"  "\\mathrm{В}"))
+
+     #+END_SRC
 
 *** Org
     I am consider that Org Mode builtin Emacs:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package org
-      :major-mode-map (org-mode)
-      :bind (:map
-             my-org-local-map
-             ("'"   . org-edit-special)
-             ("l"   . org-insert-link)
-             ("t"   . org-babel-tangle)
-             ("RET" . org-open-at-point)))
+      (use-package org
+          :major-mode-map (org-mode)
+          :bind (:map
+                 my-org-local-map
+                 ("'"   . org-edit-special)
+                 ("l"   . org-insert-link)
+                 ("t"   . org-babel-tangle)
+                 ("p"   . org-latex-preview)
+                 ("RET" . org-open-at-point)))
 
-#+END_SRC
+    #+END_SRC
 
 **** Centering 
      I am centering text, when enable =org-mode=:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (add-hook 'org-mode-hook (lambda () (call-interactively 'visual-fill)))
+       (add-hook 'org-mode-hook (lambda () (call-interactively 'visual-fill)))
 
-#+END_SRC
+     #+END_SRC
 
 **** Load from Wiki
      I am use [[https://github.com/progfolio/wikinforg][wikinforg]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package wikinforg
-    :ensure t)
+       (use-package wikinforg
+           :ensure t)
 
-#+END_SRC
+     #+END_SRC
 
 **** Drag and Drop Images
      I am use [[https://github.com/abo-abo/org-download][org-download]] for this:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package org-download
-      :ensure t
-      :hook
-      (dired-mode-hook . org-download-enable)
-      )
+       (use-package org-download
+           :ensure t
+           :hook
+           (dired-mode-hook . org-download-enable))
 
-#+END_SRC
+     #+END_SRC
 
 **** Navigation
      I am use [[https://github.com/emacs-helm/helm-org][helm-org]] for navigation in Org Mode:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-    (use-package helm-org
-        :ensure t
-        :bind (:map org-mode-map
-                    ([remap helm-semantic-or-imenu]
-                     . helm-org-in-buffer-headings)))
+       (use-package helm-org
+           :ensure t
+           :bind (:map org-mode-map
+                       ([remap helm-imenu]
+                        . helm-org-in-buffer-headings)))
 
-#+END_SRC
+                        #+END_SRC
+
+**** Copy Org Code for Other Programms (Word, PowerPoint)
+     I am use [[https://github.com/jkitchin/ox-clip][ox-clip]]:
+
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+       (use-package ox-clip
+           :ensure t
+           :bind
+           ((:map my-org-local-map)
+            ("c" . ox-clip-formatted-copy)))
+
+     #+END_SRC
+
 
 *** Elisp
 **** Special Linters
 ***** Package Linter
       I am use [[https://github.com/purcell/package-lint][package-lint]] for lint my packages for Melpa for view I am use [[https://github.com/purcell/flycheck-package][flycheck-package]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package package-lint
-      :ensure t
-      )
+        (use-package package-lint
+            :ensure t
+            )
 
-  (use-package flycheck-package
-      :ensure t
-      :init
-      (flycheck-package-setup)
-      )
+        (use-package flycheck-package
+            :ensure t
+            :init
+            (flycheck-package-setup)
+            )
 
-#+END_SRC
+            #+END_SRC
 
-# ***** ELSA (Static Analyzer)
-#       I am use [[https://github.com/emacs-elsa/Elsa#how-do-i-run-it][ELSA]] and [[https://github.com/emacs-elsa/flycheck-elsa][flycheck-elsa]]:
+      # ***** ELSA (Static Analyzer)
+      #       I am use [[https://github.com/emacs-elsa/Elsa#how-do-i-run-it][ELSA]] and [[https://github.com/emacs-elsa/flycheck-elsa][flycheck-elsa]]:
 
-# #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+      # #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-#   (use-package elsa
-#       :ensure t)
+      #   (use-package elsa
+      #       :ensure t)
 
-#   (use-package flycheck-elsa
-#       :ensure t
-#       :init
-#       (add-hook 'emacs-lisp-mode-hook #'flycheck-elsa-setup)
-#       ;; (add-to-list 'flycheck-checkers 'flyc))
-#       )
+      #   (use-package flycheck-elsa
+      #       :ensure t
+      #       :init
+      #       (add-hook 'emacs-lisp-mode-hook #'flycheck-elsa-setup)
+      #       ;; (add-to-list 'flycheck-checkers 'flyc))
+      #       )
 
-# #+END_SRC
+      # #+END_SRC
 
 **** Refactoring
      I am use [[https://github.com/Wilfred/emacs-refactor][emacs-refactor]] for refactor not only in =emacs-lisp=:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package emr
-      :ensure t
-      :bind (:map xah-fly-command-map
-                  ("SPC /" . emr-show-refactor-menu)))
-#+END_SRC
+       (use-package emr
+           :ensure t
+           :bind (:map xah-fly-command-map
+                       ("SPC /" . emr-show-refactor-menu)))
+                       #+END_SRC
 
 **** Package Manager
      I am use [[https://github.com/cask/cask/][Cask]] for manage packages of =elisp=:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package cask-mode
-      :ensure t
-      )
+       (use-package cask-mode
+           :ensure t
+           )
 
-#+END_SRC
+           #+END_SRC
 
 **** Elisp Format Code
      I am use [[https://github.com/riscy/elfmt][elfmt]] of =Riscky=:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-  (use-package elfmt
-      :config
-      (elfmt-global-mode 1))
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+       (use-package elfmt
+           :config
+         (elfmt-global-mode 1))
 
-#+END_SRC
-
+         #+END_SRC
 
 **** Modern Documentation
      I am use [[https://github.com/Wilfred/suggest.el][suggest]], I am just type print input and excepted output and see suggesting examples as this do:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package suggest
-      :ensure t
-      )
+       (use-package suggest
+           :ensure t
+           )
 
-#+END_SRC
+           #+END_SRC
 
 **** Elisp Docstrings Mode
      I am use [[https://github.com/Fuco1/elisp-docstring-mode][elisp-docstring-mode]] with [[https://github.com/Fuco1/elisp-docstring-mode][string-edit]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-(defun my-edit-elisp-docstring ()
-    "Edit `elisp' docstring via `string-edit' and `elisp-docstring-mode'."
-    (interactive)
-    (string-edit-at-point)
-    (elisp-docstring-mode))
+       (defun my-edit-elisp-docstring ()
+         "Edit `elisp' docstring via `string-edit' and `elisp-docstring-mode'."
+         (interactive)
+         (string-edit-at-point)
+         (elisp-docstring-mode))
 
-(use-package elisp-docstring-mode
-    :ensure t
-    :bind (:map emacs-lisp-mode-map
-                ([remap string-edit-at-point] . my-edit-elisp-docstring)))
+       (use-package elisp-docstring-mode
+           :ensure t
+           :bind (:map emacs-lisp-mode-map
+                       ([remap string-edit-at-point] . my-edit-elisp-docstring)))
 
 
-#+END_SRC
+                       #+END_SRC
+
+**** Elisp Indent Code
+     I am use standard functions of indenting lisp code, but some
+     variables set to non normal values:
+
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+       (setq lisp-body-indent 2)
+       #+END_SRC
 
 *** Markdown
     I am use [[https://github.com/jrblevin/markdown-mode/][markdown-mode]] , and for its I am centering code:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package markdown-mode
-      :ensure t
-      :major-mode-map t
-      :bind (:map
-             my-markdown-mode-local-map
-             ("<SPC>"     . markdown-toggle-gfm-checkbox)
-             ("b"     . markdown-insert-bold)
-             ("i"     . markdown-insert-italic)
-             ("l"     . markdown-insert-link)
-             ("p"     . markdown-live-preview-mode)
-             ("'"     . markdown-edit-code-block)
-             ("<RET>" . markdown-follow-thing-at-point))
-      :hook (markdown-mode . visual-fill)
-      :init
-      (setq markdown-imenu-generic-expression
-            '(("title""^\\(.*\\)[\n]=+$" 1)
-              ("h2-"  "^\\(.*\\)[\n]-+$" 1)
-              ("h1"   "^# \\(.*\\)$" 1)
-              ("h2"   "^## \\(.*\\)$" 1)
-              ("h3"   "^### \\(.*\\)$" 1)
-              ("h4"   "^#### \\(.*\\)$" 1)
-              ("h5"   "^##### \\(.*\\)$" 1)
-              ("h6"   "^###### \\(.*\\)$" 1)
-              ("fn"   "^\\[\\^\\(.*\\)\\]" 1)))
+      (use-package markdown-mode
+          :ensure t
+          :major-mode-map t
+          :bind (:map
+                 my-markdown-mode-local-map
+                 ("<SPC>"     . markdown-toggle-gfm-checkbox)
+                 ("b"     . markdown-insert-bold)
+                 ("i"     . markdown-insert-italic)
+                 ("l"     . markdown-insert-link)
+                 ("p"     . markdown-live-preview-mode)
+                 ("'"     . markdown-edit-code-block)
+                 ("<RET>" . markdown-follow-thing-at-point))
+          :hook (markdown-mode . visual-fill)
+          :init
+          (setq markdown-imenu-generic-expression
+                '(("title""^\\(.*\\)[\n]=+$" 1)
+                  ("h2-"  "^\\(.*\\)[\n]-+$" 1)
+                  ("h1"   "^# \\(.*\\)$" 1)
+                  ("h2"   "^## \\(.*\\)$" 1)
+                  ("h3"   "^### \\(.*\\)$" 1)
+                  ("h4"   "^#### \\(.*\\)$" 1)
+                  ("h5"   "^##### \\(.*\\)$" 1)
+                  ("h6"   "^###### \\(.*\\)$" 1)
+                  ("fn"   "^\\[\\^\\(.*\\)\\]" 1)))
 
-      (add-hook 'markdown-mode-hook
-                (lambda ()
-                    (setq-local imenu-generic-expression
-                                markdown-imenu-generic-expression))))
+          (add-hook 'markdown-mode-hook
+                    (lambda ()
+                      (setq-local imenu-generic-expression
+                                  markdown-imenu-generic-expression))))
 
-#+END_SRC
+                                  #+END_SRC
 
 **** Create Table of Contents in Markdown
      I am use [[https://github.com/ardumont/markdown-toc][markdown-toc]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package markdown-toc
-      :ensure t
-      :bind (:map
-             my-markdown-mode-local-map
-             ("t" . 'markdown-toc-generate-or-refresh-toc)))
+       (use-package markdown-toc
+           :ensure t
+           :bind (:map
+                  my-markdown-mode-local-map
+                  ("t" . 'markdown-toc-generate-or-refresh-toc)))
 
-#+END_SRC
+                  #+END_SRC
 
 *** Python
 **** Vars
      Var =py/imports-regexp= is regexp of import statements in python:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (setq py/imports-regexp "import\\|from")
+       (setq py/imports-regexp "import\\|from")
 
-#+END_SRC
+       #+END_SRC
 
-Var =python-shell-interpreter= is builtin Emacs var, see docs in Emacs:
+     Var =python-shell-interpreter= is builtin Emacs var, see docs in Emacs:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (setq python-shell-interpreter "python")
+       (setq python-shell-interpreter "python")
 
-#+END_SRC
+       #+END_SRC
 
 **** Navigation
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defun py-nav-to-imports ()
-      "Navigate to imports in Python mode."
-      (interactive)
-      (push-mark)
-      (let ((old-pos (point)))
-          (goto-char (point-min))
-          (search-forward-regexp py/imports-regexp old-pos old-pos))
-      )
+       (defun py-nav-to-imports ()
+         "Navigate to imports in Python mode."
+         (interactive)
+         (push-mark)
+         (let ((old-pos (point)))
+           (goto-char (point-min))
+           (search-forward-regexp py/imports-regexp old-pos old-pos))
+         )
 
-  (add-nav-to-imports-for-language
-   python-mode
-   py-nav-to-imports)
+       (add-nav-to-imports-for-language
+        python-mode
+        py-nav-to-imports)
 
-#+END_SRC
+        #+END_SRC
 
 **** Linters
      
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (setq flycheck-python-flake8-command "python -m flake8")
-  (setq flycheck-python-mypy-executable "python -m mypy")
-  (setq flycheck-python-pylint-executable "python -m pylint")
+       (setq flycheck-python-flake8-command "python -m flake8")
+       (setq flycheck-python-mypy-executable "python -m mypy")
+       (setq flycheck-python-pylint-executable "python -m pylint")
 
-#+END_SRC
+       #+END_SRC
 
 **** Helping info
      I am use [[https://www.emacswiki.org/emacs/pydoc-info.el][pydoc-info]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package pydoc
-      :ensure t)
+       (use-package pydoc
+           :ensure t)
 
-#+END_SRC
+           #+END_SRC
 
 **** Autocomplete
      I am hasn't autocompletion special for python, so I enable default =dabbrev-autocompletion=:
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defun enable-dabbrev-company-backend ()
-      "Add `company-dabbrev' backend to `company-backends' for local major mode."
-      (interactive)
-      (setq-local company-backends (cons 'company-dabbrev company-backends))
-      )
+       (defun enable-dabbrev-company-backend ()
+         "Add `company-dabbrev' backend to `company-backends' for local major mode."
+         (interactive)
+         (setq-local company-backends (cons 'company-dabbrev company-backends))
+         )
 
 
-  (add-hook 'python-mode-hook 'enable-dabbrev-company-backend)
+       (add-hook 'python-mode-hook 'enable-dabbrev-company-backend)
 
-#+END_SRC
+       #+END_SRC
 
 *** Rust
 **** Auto Completion
-    I am use [[https://github.com/racer-rust/emacs-racer][racer]]:
+     I am use [[https://github.com/racer-rust/emacs-racer][racer]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package racer
-      :ensure t
-      :hook ((rust-mode  . racer-mode)
-             (racer-mode . eldoc-mode)))
+       (use-package racer
+           :ensure t
+           :hook ((rust-mode  . racer-mode)
+                  (racer-mode . eldoc-mode)))
 
-#+END_SRC
+                  #+END_SRC
 **** Check Errors
      I am use [[https://github.com/flycheck/flycheck-rust][flycheck-rust]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package flycheck-rust
-      :ensure t
-      :config
-      (flycheck-rust-setup))
+       (use-package flycheck-rust
+           :ensure t
+           :config
+           (flycheck-rust-setup))
 
-#+END_SRC
+           #+END_SRC
 
 *** Go Lang
     I am use [[https://github.com/dominikh/go-mode.el][go-mode]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package go-mode
-      :ensure t)
+      (use-package go-mode
+          :ensure t)
 
-  (use-package go-eldoc
-      :ensure t
-      :hook (go-mode-hook . 'go-eldoc-setup))
+      (use-package go-eldoc
+          :ensure t
+          :hook (go-mode-hook . 'go-eldoc-setup))
 
-#+END_SRC
+          #+END_SRC
 
 **** Add Import
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (add-import-keymap-for-language go-mode
-                                  go-import-add)
+       (add-import-keymap-for-language go-mode
+                                       go-import-add)
 
-#+END_SRC
+                                       #+END_SRC
 
 *** PDF
     I am use [[https://github.com/vedang/pdf-tools][pdf-tools]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package pdf-tools
-      :ensure t
-      )
+      (use-package pdf-tools
+          :ensure t
+          )
 
-#+END_SRC
+          #+END_SRC
 
 *** Haskell
     I am use [[https://github.com/haskell/haskell-mode][haskell-mode]], and I love =indention-mode=:
 
- #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-   (use-package haskell-mode
-       :ensure t
-       :hook (haskell-mode . haskell-indent-mode))
+      (use-package haskell-mode
+          :ensure t
+          :hook (haskell-mode . haskell-indent-mode))
 
-   (add-import-keymap-for-language
-    haskell-mode
-    haskell-add-import)
+      (add-import-keymap-for-language
+       haskell-mode
+       haskell-add-import)
 
-   (add-nav-to-imports-for-language
-    haskell-mode
-    haskell-navigate-imports)
+      (add-nav-to-imports-for-language
+       haskell-mode
+       haskell-navigate-imports)
 
- #+END_SRC
+       #+END_SRC
 **** Auto Completion for Haskell
      I am use [[https://github.com/horellana/company-ghci][company-ghci]]:
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package company-ghci
-      :ensure t
-      :init
-      (push 'company-ghci company-backends)
-      (add-hook 'haskell-mode-hook 'company-mode)
-      (add-hook 'haskell-interactive-mode-hook 'company-mode))
+       (use-package company-ghci
+           :ensure t
+           :init
+           (push 'company-ghci company-backends)
+           (add-hook 'haskell-mode-hook 'company-mode)
+           (add-hook 'haskell-interactive-mode-hook 'company-mode))
 
-#+END_SRC
-     
+           #+END_SRC
+           
 *** JavaScript (Node.js)
 **** Variables
      Variable `js/imports-regexp` if regular expression for search imports in JS. 
-Defaults to:
+     Defaults to:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (setq js/imports-regexp "import")
+       (setq js/imports-regexp "import")
 
-#+END_SRC
+       #+END_SRC
 
-Variable `js/function-or-class-regexp` if regular expression for search imports in JS. 
-Defaults to:
+     Variable `js/function-or-class-regexp` if regular expression for search imports in JS. 
+     Defaults to:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (setq js/function-or-class-regexp "function \\|class ")
+       (setq js/function-or-class-regexp "function \\|class ")
 
-#+END_SRC
+       #+END_SRC
 
 **** Repl
      I am use [[https://github.com/redguardtoo/js-comint][js-comint]] for run my JS' code:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package js-comint
-      :ensure t)
+       (use-package js-comint
+           :ensure t)
 
-  (if (user-os-windows-p)
-      (setq js-comint-program-command "C:/Program Files/nodejs/node.exe"))
+       (if (user-os-windows-p)
+           (setq js-comint-program-command "C:/Program Files/nodejs/node.exe"))
 
-#+END_SRC
+           #+END_SRC
 
 **** Linters
      I am use some packages which you can see on [[http://codewinds.com/blog/2015-04-02-emacs-flycheck-eslint-jsx.html#summary][this]] page:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package web-mode
-      :ensure t)
+       (use-package web-mode
+           :ensure t)
 
-  (defun my-enable-flycheck ()
-      (flycheck-mode 1))
+       (defun my-enable-flycheck ()
+         (flycheck-mode 1))
 
-  (use-package js2-mode
-      :ensure t
-      :mode "\\.js$"
-      :custom
-      (js2-allow-rhino-new-expr-initializer nil)
-      (js2-auto-indent-p nil)
-      (js2-enter-indents-newline nil)
-      (js2-global-externs '("module"
-                            "require"
-                            "buster"
-                            "sinon"
-                            "assert"
-                            "refute"
-                            "setTimeout"
-                            "clearTimeout"
-                            "setInterval"
-                            "clearInterval"
-                            "location"
-                            "__dirname"
-                            "console"
-                            "JSON"))
-      (js2-idle-timer-delay 0.1)
-      (js2-indent-on-enter-key nil)
-      (js2-mirror-mode nil)
-      (js2-strict-inconsistent-return-warning nil)
-      (js2-auto-indent-p t)
-      (js2-include-rhino-externs nil)
-      (js2-include-gears-externs nil)
-      (js2-concat-multiline-strings 'eol)
-      (js2-rebind-eol-bol-keys nil)
-      (js2-show-parse-errors nil)
-      (js2-strict-missing-semi-warning nil)
-      (js2-strict-trailing-comma-warning t)
-      :hook (js2-mode . my-enable-flycheck))
+       (use-package js2-mode
+           :ensure t
+           :mode "\\.js$"
+           :custom
+           (js2-allow-rhino-new-expr-initializer nil)
+           (js2-auto-indent-p nil)
+           (js2-enter-indents-newline nil)
+           (js2-global-externs '("module"
+                                 "require"
+                                 "buster"
+                                 "sinon"
+                                 "assert"
+                                 "refute"
+                                 "setTimeout"
+                                 "clearTimeout"
+                                 "setInterval"
+                                 "clearInterval"
+                                 "location"
+                                 "__dirname"
+                                 "console"
+                                 "JSON"))
+           (js2-idle-timer-delay 0.1)
+           (js2-indent-on-enter-key nil)
+           (js2-mirror-mode nil)
+           (js2-strict-inconsistent-return-warning nil)
+           (js2-auto-indent-p t)
+           (js2-include-rhino-externs nil)
+           (js2-include-gears-externs nil)
+           (js2-concat-multiline-strings 'eol)
+           (js2-rebind-eol-bol-keys nil)
+           (js2-show-parse-errors nil)
+           (js2-strict-missing-semi-warning nil)
+           (js2-strict-trailing-comma-warning t)
+           :hook (js2-mode . my-enable-flycheck))
 
-#+END_SRC
+           #+END_SRC
 
 **** Navigation
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defun js/nav-to-imports ()
-      "Navigate to imports in JS mode."
-      (interactive)
-      (push-mark)
-      (let ((old-pos (point)))
-          (goto-char (point-min))
-          (search-forward-regexp js/imports-regexp old-pos old-pos))
-      )
+       (defun js/nav-to-imports ()
+         "Navigate to imports in JS mode."
+         (interactive)
+         (push-mark)
+         (let ((old-pos (point)))
+           (goto-char (point-min))
+           (search-forward-regexp js/imports-regexp old-pos old-pos))
+         )
 
-  (add-nav-to-imports-for-language
-   js2-mode
-   js/nav-to-imports)
+       (add-nav-to-imports-for-language
+        js2-mode
+        js/nav-to-imports)
 
 
-#+END_SRC
+        #+END_SRC
 
 *** JSON
     I am use [[https://github.com/Sterlingg/json-snatcher][json-snatcher]] for copy JSON "path" to current node:
-For this I am press =SPC l c=:
+    For this I am press =SPC l c=:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package json-mode
-      :major-mode-map t)
+      (use-package json-mode
+          :major-mode-map t)
 
+      (use-package json-snatcher
+          :ensure t
+          :bind
+          (:map
+           my-json-mode-local-map
+           ("c" . jsons-print-path)))
 
-  (use-package json-snatcher
-      :ensure t
-      :bind
-      (:map
-       my-json-mode-local-map
-       ("c" . jsons-print-path)))
+           #+END_SRC
 
-#+END_SRC
-
-#+RESULTS:
-: my-json-setup
+    #+RESULTS:
+    : my-json-setup
 
 *** HTML
 **** Variables
      Variable =html-modes= is list of modes which is for =html=:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defcustom html-modes '(web-mode html-mode mhtml-mode)
-    "List of `html` major modes.")
+       (defcustom html-modes '(web-mode html-mode mhtml-mode)
+         "List of `html` major modes.")
 
-#+END_SRC
+         #+END_SRC
 
 **** Web Mode
-    I am use [[https://web-mode.org][web-mode]] and [[https://github.com/smihica/emmet-mode][emmet]] and [[https://github.com/jcs-elpa/auto-rename-tag][auto-rename-tag]]:
+     I am use [[https://web-mode.org][web-mode]] and [[https://github.com/smihica/emmet-mode][emmet]] and [[https://github.com/jcs-elpa/auto-rename-tag][auto-rename-tag]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-  (use-package web-mode
-      :ensure t
-      :hook (web-mode . yas-minor-mode-off)
-      :custom
-      (web-mode-script-padding 1)
-      (web-mode-block-padding 0))
-#+END_SRC
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+       (use-package web-mode
+           :ensure t
+           :hook (web-mode . yas-minor-mode-off)
+           :custom
+           (web-mode-script-padding 1)
+           (web-mode-block-padding 0))
+           #+END_SRC
 
 **** Auto Rename Tag
      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package auto-rename-tag
-      :ensure t
-      :config
-      :init
-      (--each html-modes
-          (add-hook (intern (s-append "-hook" (symbol-name it)))
-                    (lambda () (auto-rename-tag-mode 38)))))
+       (use-package auto-rename-tag
+           :ensure t
+           :config
+           :init
+           (--each html-modes
+             (add-hook (intern (s-append "-hook" (symbol-name it)))
+                       (lambda () (auto-rename-tag-mode 38)))))
 
-     #+END_SRC
+                       #+END_SRC
 
 **** Emmet
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package emmet-mode
-      :ensure t
-      :custom (emmet-move-cursor-between-quotes t)
-      :hook
-      (web-mode . emmet-mode)
-      (mhtml-mode . emmet-mode)
-      (css-mode . emmet-mode)
-      (html-mode . emmet-mode))
+       (use-package emmet-mode
+           :ensure t
+           :custom (emmet-move-cursor-between-quotes t)
+           :hook
+           (web-mode . emmet-mode)
+           (mhtml-mode . emmet-mode)
+           (css-mode . emmet-mode)
+           (html-mode . emmet-mode))
 
 
-  (use-package helm-emmet
-      :ensure t
-      :init
-      (defun fast-exec-helm-emmet-keys ()
-          "Keymaps for `helm-emmet'."
-          (fast-exec/some-commands
-           ("View Emmet Cheat" 'helm-emmet)))
-      (fast-exec/register-keymap-func 'fast-exec-helm-emmet-keys)
-      (fast-exec/reload-functions-chain))
+       (use-package helm-emmet
+           :ensure t
+           :init
+           (defun fast-exec-helm-emmet-keys ()
+             "Keymaps for `helm-emmet'."
+             (fast-exec/some-commands
+              ("View Emmet Cheat" 'helm-emmet)))
+           (fast-exec/register-keymap-func 'fast-exec-helm-emmet-keys)
+           (fast-exec/reload-functions-chain))
 
-#+END_SRC
+           #+END_SRC
 
 **** =Paredit= for HTML
      I am use [[https://github.com/magnars/tagedit][tagedit]] of =magnars=:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-  (use-package tagedit
-      :ensure t
-      :init
-      (--each html-modes
-          (let ((map-symbol (intern (s-append "-map" (symbol-name it))))
-                map)
-              (when (boundp map-symbol)
-                  (setq map (eval map-symbol))
-                  (define-key
-                      map
-                      [remap sp-kill-hybrid-sexp]
-                      'tagedit-kill)
-                  (define-key
-                      map
-                      [remap sp-join-sexp]
-                      'tagedit-join-tags)
-                  (define-key
-                      map
-                      [remap sp-raise-sexp]
-                      'tagedit-raise-tag)
-                  (define-key
-                      map
-                      [remap sp-splice-sexp]
-                      'tagedit-splice-tag)
-                  (define-key
-                      map
-                      [remap sp-change-enclosing]
-                      'tagedit-kill-attribute)))))
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+       (use-package tagedit
+           :ensure t
+           :init
+           (--each html-modes
+             (let ((map-symbol (intern (s-append "-map" (symbol-name it))))
+                   map)
+               (when (boundp map-symbol)
+                 (setq map (eval map-symbol))
+                 (define-key
+                     map
+                     [remap sp-kill-hybrid-sexp]
+                   'tagedit-kill)
+                 (define-key
+                     map
+                     [remap sp-join-sexp]
+                   'tagedit-join-tags)
+                 (define-key
+                     map
+                     [remap sp-raise-sexp]
+                   'tagedit-raise-tag)
+                 (define-key
+                     map
+                     [remap sp-splice-sexp]
+                   'tagedit-splice-tag)
+                 (define-key
+                     map
+                     [remap sp-change-enclosing]
+                   'tagedit-kill-attribute)))))
 
-#+END_SRC
+                   #+END_SRC
 
 **** Auto Complete for HTML
      I am use [[https://github.com/osv/company-web][company-web]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package company-web
-      :ensure t
-      :init
-      (add-hook 'web-mode-hook
-                (lambda ()
-                    (set (make-local-variable 'company-backends)
-                         '(company-web-html))
-                    (company-mode t))))
+       (use-package company-web
+           :ensure t
+           :init
+           (add-hook 'web-mode-hook
+                     (lambda ()
+                       (set (make-local-variable 'company-backends)
+                            '(company-web-html))
+                       (company-mode t))))
 
-#+END_SRC
+                       #+END_SRC
 
 *** CSS
     I am use =web-mode= and builtin =css-mode=:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package css-mode)
+      (use-package css-mode)
 
-#+END_SRC
+      #+END_SRC
 
 **** Fly Documentation
-    I am use =css-eldoc= from =Elpa=:
+     I am use =css-eldoc= from =Elpa=:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package css-eldoc
-      :ensure t
-      :init
-      (dolist (hook (list 'web-mode-hook 'css-mode-hook))
-          (add-hook hook 'css-eldoc-enable)))
+       (use-package css-eldoc
+           :ensure t
+           :init
+           (dolist (hook (list 'web-mode-hook 'css-mode-hook))
+             (add-hook hook 'css-eldoc-enable)))
 
-#+END_SRC
+             #+END_SRC
 * Support of Some Special Modes
 ** Calc
    I am use built-in emacs =calc=, I disable =xah-fly-keys= when run calc:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle no
 
-  (add-hook 'calc-mode-hook (lambda () (interactive) (xah-fly-keys 0)))
-  (add-hook 'calc-end-hook (lambda () (interactive) (xah-fly-keys 38)))
+     (add-hook 'after-change-major-mode-hook
+               (lambda ()
+                 (when (eq major-mode 'calc-mode)
+                   (calc-mode))))
 
-#+END_SRC
+                   #+END_SRC
 
 * Small Organize Tricks
 ** Very Small Tricks
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (show-paren-mode 2)
-  (setq make-backup-files         nil)
-  (setq auto-save-list-file-name  nil)
-  (defalias 'yes-or-no-p 'y-or-n-p)
-  (toggle-truncate-lines 38)
+     (show-paren-mode 2)
+     (setq make-backup-files         nil)
+     (setq auto-save-list-file-name  nil)
+     (defalias 'yes-or-no-p 'y-or-n-p)
+     (toggle-truncate-lines 38)
 
-#+END_SRC
+     #+END_SRC
 ** Highlight Git Changes
    I am use [[https://github.com/emacsorphanage/git-gutter][git-gutter]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package git-gutter
-      :ensure t
-      :hook
-      (prog-mode . git-gutter-mode))
+     (use-package git-gutter
+         :ensure t
+         :hook
+         (prog-mode . git-gutter-mode))
 
-#+END_SRC
+         #+END_SRC
 ** See Emacs [Lisp] Errors, Messages
    I am use [[https://github.com/akirak/helm-tail][helm-tail]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package helm-tail
-      :ensure t
-      :init
-      (defun fast-exec-define-helm-tail-keys ()
-          "This is bind `fast-exec' with `helm-tail'."
-          (fast-exec/some-commands
-           ("Open Tail" 'helm-tail)))
-      (fast-exec/register-keymap-func 'fast-exec-define-helm-tail-keys)
-      (fast-exec/reload-functions-chain))
+     (use-package helm-tail
+         :ensure t
+         :init
+         (defun fast-exec-define-helm-tail-keys ()
+           "This is bind `fast-exec' with `helm-tail'."
+           (fast-exec/some-commands
+            ("Open Tail" 'helm-tail)))
+         (fast-exec/register-keymap-func 'fast-exec-define-helm-tail-keys)
+         (fast-exec/reload-functions-chain))
 
-#+END_SRC
+         #+END_SRC
 
 ** Helpful
 *** Which Key?
     
     I am use [[https://github.com/justbur/emacs-which-key][which-key]]:
     
-#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
-(use-package which-key
-    :ensure t
-    :config
-    (which-key-setup-side-window-bottom)
-    (which-key-mode))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+      (use-package which-key
+          :ensure t
+          :config
+          (which-key-setup-side-window-bottom)
+          (which-key-mode))
+          #+END_SRC
 *** Helpful Package
     I am use [[https://github.com/Wilfred/helpful][helpful]], for pretty help info about lisp functions and major modes:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package helpful
-      :ensure t
-      :init
-      (global-set-key (kbd "C-h f") #'helpful-callable)
-      (global-set-key (kbd "C-h v") #'helpful-variable)
-      (global-set-key (kbd "C-h k") #'helpful-key)
-      (global-set-key (kbd "C-c C-d") #'helpful-at-point)
-      (global-set-key (kbd "C-h F") #'helpful-function)
-      (global-set-key (kbd "C-h C") #'helpful-command))
+      (use-package helpful
+          :ensure t
+          :init
+          (global-set-key (kbd "C-h f") #'helpful-callable)
+          (global-set-key (kbd "C-h v") #'helpful-variable)
+          (global-set-key (kbd "C-h k") #'helpful-key)
+          (global-set-key (kbd "C-c C-d") #'helpful-at-point)
+          (global-set-key (kbd "C-h F") #'helpful-function)
+          (global-set-key (kbd "C-h C") #'helpful-command))
 
-#+END_SRC
+          #+END_SRC
 
 ** Framework for Incremental Completions and Narrowing Selections 
    I am use [[https://github.com/emacs-helm/helm][HELM]]:
    
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package helm
-      :ensure t
-      :custom (helm-M-x-fuzzy-match t)
-      :init (helm-autoresize-mode 1) (helm-mode 1)
-      :bind (:map
-             xah-fly-command-map
-             ("SPC SPC f" . helm-find-files)))
+     (use-package helm
+         :ensure t
+         :custom
+         (helm-M-x-fuzzy-match t)
+         (helm-autoresize-min-height 20)
+         :init (helm-autoresize-mode 1) (helm-mode 1)
+         :bind (:map
+                xah-fly-command-map
+                ("SPC SPC f" . helm-find-files)))
 
 
-#+END_SRC
+                #+END_SRC
 
 ** Translate
    I am use [[https://github.com/atykhonov/google-translate][google-translate]]:
    
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package google-translate
-      :ensure t
-      :bind
-      (:map xah-fly-command-map
-            ("SPC \\" . google-translate-at-point)))
+     (use-package google-translate
+         :ensure t
+         :bind
+         (:map xah-fly-command-map
+               ("SPC \\" . google-translate-at-point)))
 
-  (defun google-translate--search-tkk ()
-    "Search TKK. From https://github.com/atykhonov/google-translate/issues/137.
-  Thank you https://github.com/leuven65!"
-    (list 430675 2721866130))
+     (defun google-translate--search-tkk ()
+       "Search TKK. From https://github.com/atykhonov/google-translate/issues/137.
+     Thank you https://github.com/leuven65!"
+       (list 430675 2721866130))
 
-#+END_SRC
+       #+END_SRC
 
 ** Command Log
    I am use [[https://github.com/lewang/command-log-mode][command-log-mode]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package command-log-mode
-      :ensure t)
+     (use-package command-log-mode
+         :ensure t)
 
-#+END_SRC
+         #+END_SRC
 
 ** Whitespaces Mode
    I am enable whitespaces mode on =prog-mode=:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (add-hook 'prog-mode-hook 'whitespace-mode)
+     (add-hook 'prog-mode-hook 'whitespace-mode)
 
-#+END_SRC
+     #+END_SRC
 
 ** Visual Fill Line Mode
    I am ussally use =visual-fill-line-mode=:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (add-hook 'change-major-mode-hook 'visual-line-mode)
+     (add-hook 'change-major-mode-hook 'visual-line-mode)
 
-#+END_SRC
+     #+END_SRC
 
 ** Auto Fill Paragraphs
    I am enable [[https://github.com/davidshepherd7/aggressive-fill-paragraph-mode/][aggressive-fill-paragraph-mode]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package aggressive-fill-paragraph
-      :ensure t
-      :config
-      (afp-setup-recommended-hooks))
+     (use-package aggressive-fill-paragraph
+         :ensure t
+         :config
+         (afp-setup-recommended-hooks))
 
-#+END_SRC
+   #+END_SRC
 
 ** Scratches
    I am press =C-t= for opening scratch for this I am use [[https://github.com/ieure/scratch-el][scratch-el]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package scratch
-      :ensure t
-      :bind (("C-t" . scratch))
-      )
+     (use-package scratch
+         :ensure t
+         :bind (("C-t" . scratch))
+         )
 
-#+END_SRC
+         #+END_SRC
 
 ** Sub Word Mode
    I am use builtin =subword-mode=:
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (global-subword-mode)
+     (global-subword-mode)
 
-#+END_SRC
+     #+END_SRC
 
 ** Syntax Subword Mode
    I am use [[https://melpa.org/#/syntax-subword][syntax-subword]], for example if I am in current situation:
 
-#+BEGIN_SRC shell
-   \|print(name)
-#+END_SRC
+   #+BEGIN_SRC shell
+     \|print(name)
+     #+END_SRC
 
    And i am need to delete indent, I am just delete its when delete backward word:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package syntax-subword
-      :ensure t
-      :custom
-      (syntax-subword-skip-spaces t)
-      :config
-      (global-syntax-subword-mode)
-      )
+     (use-package syntax-subword
+         :ensure t
+         :custom
+         (syntax-subword-skip-spaces t)
+         :config
+         (global-syntax-subword-mode)
+         )
 
-#+END_SRC
+         #+END_SRC
+
+** Small Pandoc Functions
+   I have function =my-pandoc-tex-to-documents-dir=, which do what
+   name say:
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+     (defun my-pandoc-tex-to-documents-dir ()
+       "Move all .docx files in working dir to directroy documents."
+       (f-mkdir "documents")
+       (-->
+        (file-expand-wildcards "*.tex")
+        (-map 'f-base it)
+        (--each
+            it
+          (shell-command
+           (s-lex-format
+            "pandoc -t docx -f latex -o documents/${it}.docx ${it}.tex")))))
+
+     (defun fast-exec-pandoc-keys ()
+       "Get some useful keymaps of  `fast-exec' for pandoc"
+       (fast-exec/some-commands
+        ("Convert Tex Files and Move to Documents Dir"
+         'my-pandoc-tex-to-documents-dir)))
+
+     (fast-exec/register-keymap-func 'fast-exec-pandoc-keys)
+     (fast-exec/reload-functions-chain)
+
+     #+END_SRC
+
+** I am Russian!
+   I am russian man, and I must use russian keyboard with `english`
+   hot keys, so I am use builtin emacs =input-method=:
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+
+     (setq default-input-method "russian-computer")
+
+
+     #+END_SRC
 
 ** Cow Say
    I am use [[https://github.com/lassik/emacs-cowsay][very serious cowsay]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package cowsay
-      :ensure t
-      :custom
-      (cowsay-directories '("~/.emacs.d/cows"))
-      :config
-      (defun fast-exec-define-cowsay-keymaps ()
-          "Some useful keymaps for `cowsay'/`fast-exec'."
-          (fast-exec/some-commands
-           ("Cow Say String..."  'cowsay-string)
-           ("Cow Say Region..."  'cowsay-region)
-           ("Cow Say and Insert" 'cowsay-replace-region)
-           ("Cow Say Load Cows"  'cowsay-load-cows)))
-      (fast-exec/register-keymap-func 'fast-exec-define-cowsay-keymaps)
-      (fast-exec/reload-functions-chain))
+     (use-package cowsay
+         :ensure t
+         :custom
+         (cowsay-directories '("~/.emacs.d/cows"))
+         :config
+         (defun fast-exec-define-cowsay-keymaps ()
+           "Some useful keymaps for `cowsay'/`fast-exec'."
+           (fast-exec/some-commands
+            ("Cow Say String..."  'cowsay-string)
+            ("Cow Say Region..."  'cowsay-region)
+            ("Cow Say and Insert" 'cowsay-replace-region)
+            ("Cow Say Load Cows"  'cowsay-load-cows)))
+         (fast-exec/register-keymap-func 'fast-exec-define-cowsay-keymaps)
+         (fast-exec/reload-functions-chain))
 
-#+END_SRC
+         #+END_SRC
 
 ** Auto Save
    I am use [[https://github.com/bbatsov/super-save][super-save]]:
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (add-to-list 'load-path "~/projects/super-save/")
+     (add-to-list 'load-path "~/projects/super-save/")
 
-  (use-package super-save
-      :config
-      (setq super-save-exclude '("Emacs.org"))
-      (setq auto-save-default nil)
-      (super-save-mode 38))
+     (use-package super-save
+         :config
+       (setq super-save-exclude '("Emacs.org"))
+       (setq auto-save-default nil)
+       (super-save-mode 38))
 
-#+END_SRC
+       #+END_SRC
 
 ** Read Documentation for Developers
    I am use [[https://github.com/astoff/devdocs.el][devdocs]] for see documentation from [[https://devdocs.io][DevDocs]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package devdocs
-      :ensure t
-      :hook (python-mode . (lambda ()
+     (use-package devdocs
+         :ensure t
+         :hook (python-mode . (lambda ()
                                 (setq-local devdocs-current-docs
                                             '("python~3.9"))))
-      )
+         )
 
-#+END_SRC
+         #+END_SRC
 
 ** Pomidor
    For pomidor I am use [[https://github.com/TatriX/pomidor][pomidor]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package pomidor
-      :ensure t
-      :bind (("<f12>" . pomidor))
-      :custom
-      (pomidor-sound-tick . nil)
-      (pomidor-sound-tack . nil)
-      :hook
-      (pomidor-mode . (lambda ()
-                          (display-line-numbers-mode -1)
-                          (setq left-fringe-width 0 right-fringe-width 0)
-                          (setq left-margin-width 2 right-margin-width 0)
-                          (set-window-buffer nil (current-buffer)))))
+     (use-package pomidor
+         :ensure t
+         :bind (("<f12>" . pomidor))
+         :custom
+         (pomidor-sound-tick . nil)
+         (pomidor-sound-tack . nil)
+         :hook
+         (pomidor-mode . (lambda ()
+                           (display-line-numbers-mode -1)
+                           (setq left-fringe-width 0 right-fringe-width 0)
+                           (setq left-margin-width 2 right-margin-width 0)
+                           (set-window-buffer nil (current-buffer)))))
 
-#+END_SRC
+                           #+END_SRC
 
 ** Pacman
    I am use [[https://github.com/semenInRussia?tab=stars][pacmacs]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package pacmacs
-      :ensure t
-      :init
-      (defun fast-exec-define-pacmacs-keys ()
-          "Bind `fast-exec' and `pacmacs'."
-          (fast-exec/some-commands
-           ("Play to Pacmacs" 'pacmacs-start))
-          )
-      (fast-exec/register-keymap-func 'fast-exec-define-pacmacs-keys)
-      (fast-exec/reload-functions-chain))
+     (use-package pacmacs
+         :ensure t
+         :init
+         (defun fast-exec-define-pacmacs-keys ()
+           "Bind `fast-exec' and `pacmacs'."
+           (fast-exec/some-commands
+            ("Play to Pacmacs" 'pacmacs-start))
+           )
+         (fast-exec/register-keymap-func 'fast-exec-define-pacmacs-keys)
+         (fast-exec/reload-functions-chain))
 
-#+END_SRC
+         #+END_SRC
 
 ** Wikipedia
    I am use [[https://github.com/emacs-helm/helm-wikipedia][helm-wikipedia]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package helm-wikipedia
-      :ensure t)
+     (use-package helm-wikipedia
+         :ensure t)
 
-#+END_SRC
+         #+END_SRC
 
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package helm-spotify-plus
-      :ensure t)
+     (use-package helm-spotify-plus
+         :ensure t)
 
-#+END_SRC
+         #+END_SRC
 
 ** View Github Stars
    I am use [[https://github.com/Sliim/helm-github-stars][helm-github-stars]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package helm-github-stars
-      :ensure t
-      :custom
-      (helm-github-stars-username "semeninrussia")
-      :init
-      (defun fast-exec-define-helm-github-stars ()
-          "Bind `helm-github-stars' and `fast-exec'."
-          (fast-exec/some-commands
-           ("View Github Stars" 'helm-github-stars-fetch)))
-      (fast-exec/register-keymap-func 'fast-exec-define-helm-github-stars)
-      (fast-exec/reload-functions-chain))
+     (use-package helm-github-stars
+         :ensure t
+         :custom
+         (helm-github-stars-username "semeninrussia")
+         :init
+         (defun fast-exec-define-helm-github-stars ()
+           "Bind `helm-github-stars' and `fast-exec'."
+           (fast-exec/some-commands
+            ("View Github Stars" 'helm-github-stars-fetch)))
+         (fast-exec/register-keymap-func 'fast-exec-define-helm-github-stars)
+         (fast-exec/reload-functions-chain))
 
-#+END_SRC
+         #+END_SRC
 
 ** Easy Generate .gitignore
    I am use [[https://github.com/jupl/helm-gitignore][helm-gitignore]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  ;; (use-package helm-gitignore
-  ;;     :ensure t
-  ;;     :init
-  ;;     (defun fast-exec-define-helm-gitignore-keys ()
-  ;;         "Bind `fast-exec' and `helm-gitignore'."
-  ;;         (fast-exec/some-commands
-  ;;          ("Generate Gitignore" 'helm-gitignore)))
-  ;;     (fast-exec/register-keymap-func 'fast-exec-define-helm-gitignore-keys)
-  ;;     (fast-exec/reload-functions-chain)))
+     ;; (use-package helm-gitignore
+     ;;     :ensure t
+     ;;     :init
+     ;;     (defun fast-exec-define-helm-gitignore-keys ()
+     ;;         "Bind `fast-exec' and `helm-gitignore'."
+     ;;         (fast-exec/some-commands
+     ;;          ("Generate Gitignore" 'helm-gitignore)))
+     ;;     (fast-exec/register-keymap-func 'fast-exec-define-helm-gitignore-keys)
+     ;;     (fast-exec/reload-functions-chain)))
 
-#+END_SRC
+     #+END_SRC
 
 ** Google
    I am use [[https://github.com/cwhatley/helm-google][helm-google]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package helm-google
-      :ensure t
-      :init
-      (defun fast-exec-helm-google-define-keys ()
-          "Keymaps for `helm-google' and `fast-exec'."
-          (fast-exec/some-commands
-           ("Search in Google" 'helm-google)))
-      (fast-exec/register-keymap-func 'fast-exec-helm-google-define-keys)
-      (fast-exec/reload-functions-chain))
+     (use-package helm-google
+         :ensure t
+         :init
+         (defun fast-exec-helm-google-define-keys ()
+           "Keymaps for `helm-google' and `fast-exec'."
+           (fast-exec/some-commands
+            ("Search in Google" 'helm-google)))
+         (fast-exec/register-keymap-func 'fast-exec-helm-google-define-keys)
+         (fast-exec/reload-functions-chain))
 
-#+END_SRC
+         #+END_SRC
 
 * Graphic User Interface
 ** Hide ALL
    This is standard stuf
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode   -1)
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     (menu-bar-mode -1)
+     (tool-bar-mode -1)
+     (scroll-bar-mode   -1)
 
-  (add-to-list 'default-frame-alist '(fullscreen . maximized))
-  (add-hook 'emacs-startup-hook 'toggle-frame-fullscreen)
+     (add-to-list 'default-frame-alist '(fullscreen . maximized))
+     (add-hook 'emacs-startup-hook 'toggle-frame-fullscreen)
 
-#+END_SRC
+     #+END_SRC
 
-** Color Theme
-   I am use [[https://github.com/hlissner/emacs-doom-themes][doom-themes]]:
+** Color Themes
+   I am use some themes, depends on my state.
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+*** Gruber Darker Theme
 
-  (require 'gruber-darker-theme)
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package gruber-darker-theme
-      :ensure t
-      :init
-      (load-theme 'gruber-darker t)
-      )
+     (use-package gruber-darker-theme
+         :ensure t)
 
-#+END_SRC
+   #+END_SRC
+
+*** Some Proffesional Themes
+    I am use [[https://github.com/doomemacs/themes][doom-themes]]:
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (use-package doom-themes
+          :ensure t)
+
+    #+END_SRC
+
+
+*** Some other themes
+    Also I am use black theme of =magnars=:
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (add-to-list 'custom-theme-load-path
+                   "~/.emacs.d/themes")
+
+    #+END_SRC
+
+    
+*** Load Theme
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (load-theme 'doom-monokai-classic t)
+
+    #+END_SRC
 
 ** Numbers of lines
 *** Vars 
     Var `dont-display-lines-mode` is list of modes,
-for this modes willn't display numbers of lines. Defaults to:
+    for this modes willn't display numbers of lines. Defaults to:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (setq dont-display-lines-modes
-        '(org-mode
-          term-mode
-          shell-mode
-          treemacs-mode
-          eshell-mode
-          helm-mode))
+      (setq dont-display-lines-modes
+            '(org-mode
+              term-mode
+              shell-mode
+              treemacs-mode
+              eshell-mode
+              helm-mode))
 
-#+END_SRC
+              #+END_SRC
 
 *** Enable and Disable
     I am display numbers of lines in each mode, excluding modes from
-`dont-display-lines-mode` list:
+    `dont-display-lines-mode` list:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-  (defun display-or-not-display-numbers-of-lines ()
-      "Display numbers of lines OR don't display numbers of lines.
-  If current `major-mode` need to display numbers of lines, then display
-  numbers of lines, otherwise don't display."
-      (interactive)
-      (if (-contains? dont-display-lines-modes major-mode)
-          (display-line-numbers-mode 0)
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+      (defun display-or-not-display-numbers-of-lines ()
+        "Display numbers of lines OR don't display numbers of lines.
+      If current `major-mode` need to display numbers of lines, then display
+      numbers of lines, otherwise don't display."
+        (interactive)
+        (if (-contains? dont-display-lines-modes major-mode)
+            (display-line-numbers-mode 0)
           (display-line-numbers-mode 38))
-      )
+        )
 
-  (add-hook 'prog-mode-hook 'display-or-not-display-numbers-of-lines)
-#+END_SRC
+      (add-hook 'prog-mode-hook 'display-or-not-display-numbers-of-lines)
+      #+END_SRC
 
 ** Modeline
-I am use [[https://github.com/gexplorer/simple-modeline][simple-modeline]]:
+   I am use [[https://github.com/gexplorer/simple-modeline][simple-modeline]]:
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+     (use-package doom-modeline :ensure t)
+
+     #+END_SRC
+
 *** Watch Time in Doom-Modeline
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defcustom my-modeline-time-segment-format-string " [%H-%M]"
-    "By this format string will draw time in `doom-modeline'.
-  See `format-time-string' for see what format string"
-    :type 'string)
+      (defcustom my-modeline-time-segment-format-string " [%H-%M]"
+        "By this format string will draw time in `doom-modeline'.
+      See `format-time-string' for see what format string"
+        :type 'string)
 
-  (doom-modeline-def-segment time
-      (let* ((hour (string-to-number (format-time-string "%H"))))
-          (propertize
-           (format-time-string my-modeline-time-segment-format-string)
-           'face
-           (if (> 4 hour 19)
-               'outline-1
-               'hi-red-b))))
+      (doom-modeline-def-segment time
+          (let* ((hour (string-to-number (format-time-string "%H"))))
+            (propertize
+             (format-time-string my-modeline-time-segment-format-string)
+             'face
+             (if (< 4 hour 19)
+                 'hi-red-b
+               'outline-1))))
 
-#+END_SRC
-*** Pomidor
+               #+END_SRC
+*** Pomidor in Modeline
     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
       (doom-modeline-def-segment pomidor
           ()
-          "Return header."
+        "Return header."
+        (when (featurep 'pomidor)
           (let* ((state (pomidor--current-state))
                  (break (pomidor--break-duration state))
                  (overwork (pomidor--overwork-duration state))
@@ -2517,12 +2901,12 @@ I am use [[https://github.com/gexplorer/simple-modeline][simple-modeline]]:
                          (overwork 'pomidor-overwork-face)
                          (work 'pomidor-work-face)))
                  (pomidor-time-format " Pom %-Mm")
-                 (time (-first 'identity (list break work overwork))))
-              (propertize (pomidor--format-time time) 'face face)))
+                 (time (-first 'identity (list break overwork work))))
+            (propertize (pomidor--format-time time) 'face face))))
 
 
 
-    #+END_SRC
+            #+END_SRC
 
 *** Truncate Buffer's Name in Modeline
 
@@ -2533,279 +2917,277 @@ I am use [[https://github.com/gexplorer/simple-modeline][simple-modeline]]:
 
       (doom-modeline-def-segment buffer-info-durand
           ()
-          (declare (pure t) (side-effect-free t))
-          (let* ((buffer-info
-                  (format-mode-line
-                   (s-truncate
-                    durand-buffer-name-max
-                    (doom-modeline-segment--buffer-info)))))
-              (concat
-               (s-truncate
-                durand-buffer-name-max
-                buffer-info))))
+        (declare (pure t) (side-effect-free t))
+        (let* ((buffer-info
+                (format-mode-line
+                 (s-truncate
+                  durand-buffer-name-max
+                  (doom-modeline-segment--buffer-info)))))
+          (concat
+           (s-truncate
+            durand-buffer-name-max
+            buffer-info))))
 
-    #+END_SRC
-
+            #+END_SRC
 *** Enable Modeline
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defvar my-modeline-ignored-modes '(company-mode))
+      (defvar my-modeline-ignored-modes '(company-mode))
 
-  (use-package doom-modeline
-      :ensure t
-      :defer 0.1
-      :custom
-      (doom-modeline-buffer-file-name-style 'buffer-name)
-      :config
-      (display-time-mode t)
-      (doom-modeline-def-modeline 'my
-          '(bar
-            matches
-            buffer-info-durand
-            time
-            pomidor
-            word-count
-            selection-info)
-          '(objed-state
-            persp-name
-            grip
-            irc
-            gnus
-            github
-            debug
-            repl
-            input-method
-            indent-info
-            buffer-encoding
-            major-mode
-            process
-            vcs
-            checker))
-      (doom-modeline-set-modeline 'my t)
-      (add-hook 'after-change-major-mode-hook
-                (lambda ()
-                    (unless (-contains-p my-modeline-ignored-modes major-mode)
-                        (doom-modeline-mode t)))))
+      (use-package doom-modeline
+          :ensure t
+          :defer 0.1
+          :init
+          (size-indication-mode t)
+          :custom
+          (doom-modeline-buffer-file-name-style 'buffer-name)
+          (doom-modeline-icon nil)
+          (xah-fly-insert-state-p nil)
+          :config
+          (display-time-mode t)
+          (doom-modeline-def-modeline 'main
+              '(bar
+                matches
+                buffer-info-durand
+                time
+                pomidor
+                word-count
+                selection-info)
+            '(objed-state
+              persp-name
+              grip
+              irc
+              gnus
+              github
+              debug
+              repl
+              input-method
+              indent-info
+              buffer-encoding
+              major-mode
+              process
+              vcs
+              checker))
+          (doom-modeline-set-modeline 'main t))
 
-
-#+END_SRC
+          #+END_SRC
 
 ** Fonts
 
    
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (set-face-attribute 'default nil :font "Consolas" :height 250)
-  (set-frame-font "Consolas" nil t)
+     (set-face-attribute 'default nil :font "Consolas" :height 250)
+     (set-frame-font "Consolas" nil t)
 
-#+END_SRC
+     #+END_SRC
 
-#+RESULTS:
+   #+RESULTS:
 
 ** Highlight Current Line
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-(global-hl-line-mode 1)
+     (global-hl-line-mode 1)
 
-#+END_SRC
+     #+END_SRC
 
 ** Centering
 
-I
+   I
 
 ** View Break Page Lines
    I am use [[https://github.com/purcell/page-break-lines][page-break-lines]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package page-break-lines
-      :ensure t
-      :init
-      (global-page-break-lines-mode 38))
+     (use-package page-break-lines
+         :ensure t
+         :init
+         (global-page-break-lines-mode 38))
 
-#+END_SRC
+         #+END_SRC
 
 * Developer Environment
 ** Projects Management
    I am use [[https://github.com/bbatsov/projectile][projectile]]:
 
-#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+   #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
 
-  (use-package projectile
-      :custom
-      (projectile-project-search-path '("~/projects/"))
-      (projectile-completion-system 'helm)
-      :init (projectile-mode 1)
-      :bind
-      (("S-<f5>" . projectile-test-project)
-       ("<f5>"   . projectile-run-project)))
+     (use-package projectile
+         :custom
+       (projectile-project-search-path '("~/projects/"))
+       (projectile-completion-system 'helm)
+       :init (projectile-mode 1)
+       :bind
+       (("S-<f5>" . projectile-test-project)
+        ("<f5>"   . projectile-run-project)))
 
-  (projectile-mode 1)
+     (projectile-mode 1)
 
-#+END_SRC
+     #+END_SRC
 *** Projectile with Helm
     I am use offical [[https://github.com/bbatsov/helm-projectile][helm-projectile]] I am press =SPC j= and find file in current project:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package helm-projectile
-      :ensure t
-      :bind (:map xah-fly-command-map
-                  ("SPC j" . 'helm-projectile-find-file)))
+      (use-package helm-projectile
+          :ensure t
+          :bind (:map xah-fly-command-map
+                      ("SPC j" . 'helm-projectile-find-file)))
 
-#+END_SRC
+                      #+END_SRC
 
 ** Regexp IDE
    I am use [[https://github.com/jwiegley/regex-tool][regex-tool]] for testing regexp in Emacs
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package regex-tool
-      :ensure t
-      :init
-      (add-hook 'regex-tool-mode-hook (lambda () (toggle-frame-maximized))))
+     (use-package regex-tool
+         :ensure t
+         :init
+         (add-hook 'regex-tool-mode-hook (lambda () (toggle-frame-maximized))))
 
-#+END_SRC
+         #+END_SRC
 
 ** Git
    I am use super famous [[https://github.com/magit/magit][magit]]:
 
-#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+   #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
 
-  (use-package magit :ensure t)
+     (use-package magit :ensure t)
 
-#+END_SRC
+     #+END_SRC
 
 *** Fly View Authors of Changes
     For this I am use [[https://github.com/Artawower/blamer.el][blamer]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package blamer
-      :ensure t
-      :defer 20
-      :custom
-      (blamer-idle-time 0.3)
-      (blamer-min-offset 70)
-      :custom-face
-      (blamer-face ((t :foreground "#7a88cf"
-                       :background nil
-                       :height 140
-                       :italic t)))
-      )
+      (use-package blamer
+          :ensure t
+          :defer 20
+          :custom
+          (blamer-idle-time 0.3)
+          (blamer-min-offset 70)
+          :custom-face
+          (blamer-face ((t :foreground "#7a88cf"
+                           :background nil
+                           :height 140
+                           :italic t)))
+          )
 
-#+END_SRC
+          #+END_SRC
 
 *** Undo with Git
     I am use [[https://github.com/jwiegley/git-undo-el][git-undo]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package git-undo
-      :init
-      (defun fast-exec-define-git-undo-keymaps ()
+      (use-package git-undo
+          :init
+        (defun fast-exec-define-git-undo-keymaps ()
           "Bind `git-undo' and `fast-exec'."
           (fast-exec/some-commands
            ("Undo via Git" 'git-undo)))
-      (fast-exec/register-keymap-func 'fast-exec-define-git-undo-keymaps)
-      (fast-exec/reload-functions-chain))
+        (fast-exec/register-keymap-func 'fast-exec-define-git-undo-keymaps)
+        (fast-exec/reload-functions-chain))
 
-#+END_SRC
+        #+END_SRC
 
 *** Git Major Modes
     As major modes of (.github, gitconfig) I am use [[https://github.com/magit/git-modes][git-modes]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package git-modes
-      :ensure t)
+      (use-package git-modes
+          :ensure t)
 
-#+END_SRC
+          #+END_SRC
 
 *** Genreate .gitignore
     I am use [[https://github.com/jupl/helm-gitignore][helm-gitignore]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package helm-gitignore
-      :init
-      (defun fast-exec-helm-gitignore-keys ()
+      (use-package helm-gitignore
+          :init
+        (defun fast-exec-helm-gitignore-keys ()
           "Bind of `helm-gitignore' and `fast-exec'."
           (fast-exec/some-commands
            ("Generate Gitignore" 'helm-gitignore)))
-      (fast-exec/register-keymap-func 'fast-exec-helm-gitignore-keys)
-      (fast-exec/reload-functions-chain))
+        (fast-exec/register-keymap-func 'fast-exec-helm-gitignore-keys)
+        (fast-exec/reload-functions-chain))
 
-#+END_SRC
+        #+END_SRC
 
 ** View Directories
    I am use =dired=:
    
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-(add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     (add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
+     #+END_SRC
 
 ** Run Command
    I am use [[https://github.com/bard/emacs-run-command][run-command]] for run special commands for special files:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package run-command
-      :ensure t
-      :custom
-      (run-command-completion-method 'helm)
-      :bind (:map xah-fly-command-map
-                  ("SPC , c" . run-command)))
+     (use-package run-command
+         :ensure t
+         :custom
+         (run-command-completion-method 'helm)
+         :bind (:map xah-fly-command-map
+                     ("SPC , c" . run-command)))
 
-#+END_SRC
+                     #+END_SRC
 
 *** Run Command Recipes
     I am use [[https://github.com/semenInRussia/emacs-run-command-recipes/][run-command-recipes]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package run-command-recipes
-      :ensure t
-      :config
-      (run-command-recipes-use-all))
+      (use-package run-command-recipes
+          :ensure t
+          :config
+          (run-command-recipes-use-all))
 
-#+END_SRC
+          #+END_SRC
 ** Projects with Templates
    I am use [[https://github.com/chrisbarrett/skeletor.el][skeletor]] for creating new projects by temlate:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package skeletor
-      :ensure t
-      :custom
-      (skeletor-init-with-git nil)
-      (skeletor-project-directory "~/projects")
-      (skeletor-completing-read-function completing-read-function))
+     (use-package skeletor
+         :ensure t
+         :custom
+         (skeletor-init-with-git nil)
+         (skeletor-project-directory "~/projects")
+         (skeletor-completing-read-function completing-read-function))
 
-#+END_SRC
+         #+END_SRC
 ** Snitch
    I am use [[https://github.com/tsoding/snitch][snitch]] for managing TODOs
 
 *** Highlight TODOs
     I am use [[https://github.com/tarsius/hl-todo][hl-todo]]:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (use-package hl-todo
-      :ensure t
-      :config (global-hl-todo-mode))
+      (use-package hl-todo
+          :ensure t
+          :config (global-hl-todo-mode))
 
-#+END_SRC
+          #+END_SRC
 *** Run Snitch Commands
     I am use =run-command= (see in this config) for run command:
 
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defun run-command-recipe-snitch ()
-      "Recipes of `run-command' for snitch."
-      (when (f-directory-p (f-join (projectile-acquire-root)
-                                               ".git"))
+      (defun run-command-recipe-snitch ()
+        "Recipes of `run-command' for snitch."
+        (when (f-directory-p (f-join (projectile-acquire-root)
+                                     ".git"))
           (list
            (list :command-name "sntich-list"
                  :display "See List of TODOs from via Snitch"
@@ -2814,92 +3196,557 @@ I
                  :display "Report to VC TODOs of Project via Snitch"
                  :command-line "snitch list"))))
 
-  (add-to-list 'run-command-recipes 'run-command-recipe-snitch)
+      (add-to-list 'run-command-recipes 'run-command-recipe-snitch)
 
-#+END_SRC
+      #+END_SRC
 
 * MIPT
-  I am make homework of [[https://mipt.ru][MIPT]], so I make small script, which create
-  new file of homework of mipt's homework:
+** Management of MIPT Files
+   I am make homework of [[https://mipt.ru][MIPT]], so I make small script, which create
+   new file of homework of mipt's homework:
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     (defcustom my-mipt-lessons
+       '("f" "m")
+       "List of codes of mipt's lessons.")
+
+     (defcustom my-mipt-directory "c:/Users/hrams/Documents/mfti-solutions"
+       "Path to directroy of mipt's solutions.")
+
+     (defcustom my-mipt-min-num 1
+       "Minimal normal number of mipt solution.")
+
+     (defvar my--mipt-current-class nil
+       "Current mipt class.  This will changed automatically after input of user.")
+
+     (defvar my--mipt-current-lesson nil
+       "Current mipt lesson.  This will changed automatically after input of user.")
+
+     (defvar my--mipt-current-section nil
+       "Current mipt section.  This will changed automatically after input of user.")
+
+     (defvar my--mipt-current-type nil
+       "Current mipt `is-control'.
+     One of 'control 'normal .
+     This will changed automatically after input of user.")
+
+     (defvar my--mipt-current-num nil
+       "Current mipt task's num.
+     This will changed automatically after input of user.")
+
+     (defclass my-mipt-solution ()
+       ((class :initarg :class :accessor my-mipt-solution-class)
+        (section :initarg :section :accessor my-mipt-solution-section)
+        (num :initarg :num :accessor my-mipt-solution-num)
+        (lesson :initarg :lesson :accessor my-mipt-solution-lesson)
+        (type :initarg :type :accessor my-mipt-solution-type))
+       "Class for solution of mipt.")
+
+     (defun my-mipt-solution-path (mipt-solution)
+       "Get file path of MIPT-SOLUTION."
+       (f-join
+        my-mipt-directory
+        (format
+         "%s-%s-%s-%s%s.tex"
+         (my-mipt-solution-class mipt-solution)
+         (my-mipt-solution-lesson mipt-solution)
+         (my-mipt-solution-section mipt-solution)
+         (my-mipt-solution-num mipt-solution)
+         (if (my-mipt-solution-control-p mipt-solution) "-control" ""))))
+
+     (defun my-mipt-solution-open (mipt-solution)
+       "Open, maybe create MIPT-SOLUTION file."
+       (->> mipt-solution (my-mipt-solution-path) (find-file)))
+
+     (defun my-mipt-solution-normal-p (mipt-solution)
+       "Return t, if MIPT-SOLUTION isn't control."
+       (eq (my-mipt-solution-type mipt-solution) 'normal))
+
+     (defun my-mipt-solution-control-p (mipt-solution)
+       "Return t, if MIPT-SOLUTION is control."
+       (eq (my-mipt-solution-type mipt-solution) 'control))
+
+     (defun my-mipt-solution-parse (filename)
+       "Parse mipt solution from FILENAME."
+       (when (s-matches-p ".+-.-.+-.+\\(-control\\)?\\.tex" filename)
+         (-let*
+             ((base (f-no-ext filename))
+              ((class lesson section num is-control)
+               (s-split "-" base)))
+           (my-mipt-solution
+            :class (string-to-number class)
+            :lesson lesson
+            :section (string-to-number section)
+            :num (string-to-number num)
+            :type (if (stringp is-control)
+                      'control
+                    'normal)))))
+
+     (defun my-all-mipt-solutions ()
+       "Get list of all mipt solutions."
+       (->>
+        (f-files my-mipt-directory)
+        (--keep (my-mipt-solution-parse (f-filename it)))))
+
+     (defun my-mipt-solution-lesson-p (mipt-solution lesson)
+       (string-equal (my-mipt-solution-lesson mipt-solution) lesson))
+
+     (defun my-mipt-solution-class-p (mipt-solution class)
+       (equal (my-mipt-solution-class mipt-solution) class))
+
+     (defun my-mipt-solution-section-p (mipt-solution section)
+       (eq (my-mipt-solution-section mipt-solution) section))
+
+     (defun my-mipt-solution-search ()
+       "Search mipt-solution and open."
+       (interactive)
+       (->> (my-read-mipt-solution) (my-mipt-solution-open)))
+
+     (defun my-current-mipt-solution ()
+       "Get current mipt's solution."
+       (prog1
+           (my-mipt-solution
+            :lesson (or my--mipt-current-lesson
+                        (my-read-mipt-lesson))
+            :class (or my--mipt-current-class
+                       (my-read-mipt-class))
+            :section (or my--mipt-current-section
+                         (my-read-mipt-section))
+            :num (or my--mipt-current-num (my-read-mipt-solution-num))
+            :type (or my--mipt-current-type (my-mipt-read-type)))
+         (setq my--mipt-current-lesson nil)
+         (setq my--mipt-current-class nil)
+         (setq my--mipt-current-section nil)
+         (setq my--mipt-current-type nil)))
+
+     (defun my-read-mipt-solution ()
+       "Read mipt solution from user."
+       (or
+        (-some->>
+            (my-all-mipt-solutions)
+          (my--filter-mipt-solutions-by-lesson)
+          (my--filter-mipt-solutions-by-class)
+          (my--filter-mipt-solutions-by-section)
+          (my--filter-mipt-solutions-by-type)
+          (my-select-mipt-solution-by-num))
+        (my-current-mipt-solution)))
+
+     (defun my--filter-mipt-solutions-by-lesson (mipt-solutions)
+       "Filter MIPT-SOLUTIONS by asked from user lesson."
+       (let ((lesson (my-read-mipt-lesson)))
+         (setq my--mipt-current-lesson lesson)
+         (--filter (my-mipt-solution-lesson-p it lesson) mipt-solutions)))
+
+     (defun my-read-mipt-lesson ()
+       (completing-read "Select lesson of mipt solution, please"
+                        my-mipt-lessons))
+
+     (defun my-read-mipt-class (last-class)
+       (read-number "Enter class of mipt solution, please: " last-class))
+
+     (defun my--filter-mipt-solutions-by-class (mipt-solutions)
+       "Filter MIPT-SOLUTIONS by asked from user class."
+       (let* ((last-class
+               (->> mipt-solutions (-map 'my-mipt-solution-class) (-max)))
+              (current-class (my-read-mipt-class last-class)))
+         (setq my--mipt-current-class current-class)
+         (--filter
+          (my-mipt-solution-class-p it current-class)
+          mipt-solutions)))
+
+     (defun my-read-mipt-section (last-section)
+       (read-number "Enter section of mipt solution, please: "
+                    last-section))
+
+     (defun my--filter-mipt-solutions-by-section (mipt-solutions)
+       "Filter MIPT-SOLUTIONS by asked from user section."
+       (let* ((last-section
+               (->> mipt-solutions (-map #'my-mipt-solution-section) (-max)))
+              (section (my-read-mipt-section last-section)))
+         (setq my--mipt-current-section section)
+         (--filter (my-mipt-solution-section-p it section) mipt-solutions)))
+
+     (defun my--filter-mipt-solutions-by-type (mipt-solutions)
+       "Filter MIPT-SOLUTIONS by asked from user type."
+       (let ((type (my-read-mipt-type mipt-solutions)))
+         (setq my--mipt-current-type type)
+         (--filter
+          (eq type (my-mipt-solution-type it))
+          mipt-solutions)))
+
+     (defun my-read-mipt-type (mipt-solutions)
+       "Watch MIPT-SOLUTIONS and ask from user solutions is control or normal."
+       (let* ((is-have-normal-tasks
+               (--some (my-mipt-solution-normal-p it) mipt-solutions))
+              (is-control
+               (if is-have-normal-tasks
+                   (not (y-or-n-p "Your mipt task normal? "))
+                 (y-or-n-p "Your mipt task control? "))))
+         (if is-control
+             'control
+           'normal)))
+
+     (defun my-mipt-read-is-control ()
+       "Read from user mipt solutions is control or no."
+       (if (y-or-n-p "Mipt task is control or no? ")
+           'control
+         'normal))
+
+     (defun my-read-mipt-solution-num (&optional last-num)
+       (read-number
+        "Number of mipt's solution, please: "
+        (if last-num (1+ last-num) my-mipt-min-num)))
+
+     (defun my-select-mipt-solution-by-num (mipt-solutons)
+       "Ask from user num of one of MIPT-SOLUTONS, and selects solution."
+       (let* ((last-num
+               (-some->> mipt-solutons (-map #'my-mipt-solution-num) (-max)))
+              (mipt-num (my-read-mipt-solution-num last-num)))
+         (setq my--mipt-current-num mipt-num)
+         (--find (= (my-mipt-solution-num it) mipt-num) mipt-solutons)))
+
+     (defun fast-exec-mipt-keys ()
+       "Get some useful keymaps of `fast-exec' for mipt."
+       (fast-exec/some-commands
+        ("Search MIPT Solution" 'my-mipt-solution-search)))
+
+     (fast-exec/register-keymap-func 'fast-exec-mipt-keys)
+     (fast-exec/reload-functions-chain)
+   #+END_SRC
+   
+** Copy Content of File as MIPT Solution
+   MIPT has bug, when LaTeX's source is too big, source will limited,
+   so I need to compess my code, function
+   =my-copy-buffer-content-as-mipt-solution= make this, I am press on
+   =SPC l c= in =LaTeX-mode=, and this copy compessed variant of
+   current buffer:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defcustom my-mipt-homwork-dir "c:/Users/hrams/Documents/mfti-solutions"
-    "Path to directory of MIPT solutions."
-    :type 'string)
+  (defun my-copy-buffer-content-as-mipt-solution ()
+    "Take content of current buffer, compress it and copy its."
+    (interactive)
+    (->>
+     (buffer-string)
+     (my-compress-latex-source)
+     (kill-new)))
 
-  (defcustom my-mipt-current-class-number 8
-    "My current class."
-    :type 'number)
+  (defun my-compress-latex-source (source)
+    "Take SOURCE and return compressed variant."
+    (->>
+     source
+     (s-replace "\n" " ")
+     (s-replace "\\begin{equation}" "\\[")
+     (s-replace "\\end{equation}" "\\]")
+     (s-append "% compresed by me `semenInRussia'")))
 
-  (defcustom my-mipt-lessons-types
-    '("m")
-    "My current class."
-    :type '(repeat string))
-
-  (defun my-new-mipt-solution ()
-      "Make .tex file for solution of mipt's homework."
-      (interactive)
-      (let* ((mipt-lesson
-              (completing-read "Print lesson's type: "
-                               my-mipt-lessons-types))
-             (mipt-last-solution
-              (with-temp-buffer
-                  (-map 'insert (f-files my-mipt-homwork-dir))
-                  (sort-lines t (point-min) (point-max))
-                  (delete-non-matching-lines mipt-lesson)
-                  (goto-char (point-min))
-                  (f-filename (s-trim (thing-at-point 'line t)))))
-             mipt-number
-             last-mipt-number
-             mipt-section-number
-             last-mipt-class-num
-             last-mipt-section-num)
-          (-setq
-              (_ last-mipt-class-num _ last-mipt-section-num last-mipt-number)
-              (s-match
-               "\\(.\\)-\\(.\\)-\\(.\\)-\\(.\\)\\.tex" mipt-last-solution))
-          (setq last-mipt-number (string-to-number last-mipt-number))
-          (setq mipt-number (1+ last-mipt-number))
-          (setq mipt-section-number (read-number "Section, Please: "
-                                                 (string-to-number
-                                                  last-mipt-section-num)))
-          (message "mipt-number is %s" mipt-number)
-          (message "last-mipt-number is %s" last-mipt-number)
-          (message "mipt-section-number is %s" mipt-section-number)
-          (message "last-mipt-class-num is %s" last-mipt-class-num)
-          (message "last-mipt-section-num is %s" last-mipt-section-num)
-          (find-file (f-join
-                      my-mipt-homwork-dir
-                      (format "%s-%s-%s-%s.tex"
-                              last-mipt-class-num
-                              mipt-lesson
-                              mipt-section-number
-                              mipt-number)))))
-
-  (defun fast-exec-define-mipt-keymaps ()
-      "MIPT + `fast-exec'."
-      (fast-exec/some-commands
-       ("New MIPT Solution" 'my-new-mipt-solution)))
-
-  (fast-exec/register-keymap-func 'fast-exec-define-mipt-keymaps)
-  (fast-exec/reload-functions-chain)
+  (bind-keys
+   :map my-latex-local-map
+   ("c" . my-copy-buffer-content-as-mipt-solution))
 
 #+END_SRC
 
+* Notes
+  I am create own simple system of notes:
+
+  #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+
+    (defgroup my-notes nil
+      "My own simple system of notes."
+      :group 'tools)
+
+    (defcustom my-notes-extension "org"
+      "Extension of notes, defaults to org."
+      :type 'string
+      :group 'my-notes)
+
+    (defcustom my-notes-categories-list-file-path
+      "~/notes/categories.txt"
+      "Path to file which contains list of categories."
+      :type 'string
+      :group 'my-notes)
+
+    (defun my-notes-parse-categories ()
+      "Find notes' categories in special path.
+    See `my-notes-categories-list-file-path'"
+      (->>
+       my-notes-categories-list-file-path
+       (f-read)
+       (s-trim)
+       (s-lines)
+       (-remove #'s-blank-p)))
+
+    (defcustom my-notes-categories
+      (my-notes-parse-categories)
+      "List of tags of notes."
+      :group 'my-notes
+      :type '(repeat symbol))
+
+    (defcustom my-notes-templates-dir
+      "~/notes/templates"
+      "Directory in which will save templates of my notes."
+      :type 'string
+      :group 'my-notes)
+
+    (defcustom my-notes-default-template
+      "~/notes/default.org"
+      "Default template for notes."
+      :type 'string
+      :group 'my-notes)
+
+    (defcustom my-notes-directory
+      "~/notes"
+      "Main directory of my notes."
+      :type 'string
+      :group 'my-notes)
+
+    (defun my-notes-read-note ()
+      "Read from user note."
+      (my-notes-note
+       :title (read-string "Please, enter title of note: ")
+       :category (my-notes-read-category)))
+
+    (defun my-notes-read-category (&optional prompt)
+      "Read category from user with PROMPT."
+      (setq prompt (or prompt "Choose category, please: "))
+      (completing-read prompt my-notes-categories))
+
+    (defun my-notes-find ()
+      "Find one of notes."
+      (interactive)
+      (let* ((category (my-notes-read-category))
+             (title
+              (->>
+               category
+               (my-notes-titles-of-category)
+               (completing-read "Choose one of notes, please: ")
+               (my-normalize-string))))
+        (my-notes-note :title title :category category)))
+
+    (defun my-notes-visit (note)
+      "Visit NOTE's file."
+      (interactive (list (my-notes-find)))
+      (->> note (my-notes-note-path) (find-file)))
+
+    (defun my-notes-change-category-of-note (note new-category)
+      "Change category of NOTE to NEW-CATEGORY."
+      (interactive
+       (list
+        (my-notes-find)
+        (my-notes-read-category "New category, please: ")))
+      (let ((new-note
+             (my-notes-note
+              :title (my-notes-note-title note)
+              :category new-category)))
+        (my-notes-category-mkdir new-category)
+        (f-move
+         (my-notes-note-path note)
+         (my-notes-note-path new-note))))
+
+    (defun my-notes-delete (note)
+      "Delete NOTE."
+      (interactive (list (my-notes-find)))
+      (->> note (my-notes-note-path) (f-delete)))
+
+    (defun my-notes-titles-of-category (category)
+      "Get list of notes' titles of CATEGORY."
+      (->>
+       category
+       (my-notes-category-path)
+       (my-files-with-extension my-notes-extension)
+       (-map #'f-base)
+       (-map #'my-humanize-string)))
+
+    (defun my-notes-category-path (category)
+      "Get path to CATEGORY's directory."
+      (->> category (my-normalize-string) (f-join my-notes-directory)))
+
+    (defun my-notes-category-mkdir (category)
+      "If directory of CATEGORY not created, then create its."
+      (->>
+       category
+       (my-notes-category-path)
+       (f-mkdir)))
+
+    (defun my-notes-visit-category-template (category)
+      "Create or visit template for CATEGORY."
+      (interactive (list (my-notes-read-category)))
+      (->> category (my-notes-category-template-path) (find-file)))
+
+    (defun my-notes-new (note &optional is-template-as-snippet)
+      "Create new note from NOTE object.
+    If IS-TEMPLATE-AS-SNIPPET is t, then expand template of note as YAS snippet"
+      (interactive (list (my-notes-read-note) t))
+      (find-file (my-notes-note-path note))
+      (my-notes-note-insert-template note is-template-as-snippet))
+
+    (defun my-notes-buffer-to-note (buffer note)
+      "Save BUFFER as NOTE."
+      (interactive
+       (list
+        (current-buffer)
+        (my-notes-note
+         :title (read-string "Name of note, please: " (buffer-name))
+         :category (my-notes-read-category))))
+      (with-current-buffer buffer
+        (let ((text (buffer-string)))
+          (kill-buffer buffer)
+          (my-notes-new note)
+          (insert text))))
+
+    (defclass my-notes-note ()
+      ((title :initarg :title :accessor my-notes-note-title)
+       (category :initarg :category :accessor my-notes-note-category))
+      "My note object.")
+
+    (defun my-notes-add-note-extension (s)
+      "Add `my-notes-extension' to S."
+      (f-swap-ext s my-notes-extension))
+
+    (defun my-notes-note-path (note)
+      "Get path to file of note NOTE."
+      (->>
+       note
+       (my-notes-note-title)
+       (my-normalize-string)
+       (my-notes-add-note-extension)
+       (f-join (my-notes-category-path (my-notes-note-category note)))))
+
+    (defun my-notes-note-template-path (note)
+      "Get path of template for NOTE."
+      (let ((template-for-category
+             (->>
+              note
+              (my-notes-note-category)
+              (my-notes-category-template-path))))
+        (if (f-exists-p template-for-category)
+            template-for-category
+          my-notes-default-template)))
+
+    (defun my-notes-category-template-path (category)
+      "Get path of CATEGORY's template."
+      (->>
+       category
+       (my-normalize-string)
+       (f-join my-notes-templates-dir)
+       (my-notes-add-note-extension)))
+
+    (defun my-notes-note-insert-template (note &optional is-as-snippet)
+      "Insert template for NOTE.
+    If IS-AS-SNIPPET is t, then expand template as YAS snippet"
+      (let ((template (my-notes-note-get-template-string note)))
+        (if is-as-snippet
+            (yas-expand-snippet template)
+          (insert template))))
+
+    (defun my-notes-note-get-template-string (note)
+      "Get string of template for NOTE."
+      (->>
+       note
+       (my-notes-note-template-path)
+       (f-read)
+       (s-replace "{title}" (my-notes-note-title note))
+       (s-replace "{category}" (my-notes-note-category note))))
+
+    (defun my-notes-new-category (category)
+      "Add CATEGORY list of categories."
+      (interactive "sName of new category, please: ")
+      (->>
+       my-notes-categories
+       (cons category)
+       (my-notes-change-categories)))
+
+    (defun my-notes-rename-category (category new-name)
+      "Change name of CATEGORY to NEW-NAME."
+      (interactive
+       (let* ((category (my-notes-read-category))
+              (new-name
+               (read-string "New name of this category, please: " category)))
+         (list category new-name)))
+      (my-notes-rename-category-directory category new-name)
+      (my-notes-rename-category-template category new-name)
+      (->>
+       my-notes-categories
+       (-replace category new-name)
+       (my-notes-change-categories)))
+
+    (defun my-notes-rename-category-directory (category new-name)
+      "Rename directory of CATEGORY to NEW-NAME."
+      (my-try-move
+       (my-notes-category-path category)
+       (my-notes-category-path new-name)))
+
+    (defun my-notes-rename-category-template (category new-name)
+      "Rename template of CATEGORY to template of NEW-NAME."
+      (my-try-move
+       (my-notes-category-template-path category)
+       (my-notes-category-template-path new-name)))
+
+    (cl-defun my-notes-delete-category (category &optional (is-delete-notes t))
+      "Delete CATEGORY and files of this category if IS-DELETE-NOTES is true."
+      (interactive
+       (list
+        (my-notes-read-category)
+        (y-or-n-p "Is delete notes of this category? ")))
+      (when is-delete-notes ;nofmt
+        (my-notes-delete-notes-of-category category))
+      (my-notes-delete-category-template category)
+      (->>
+       my-notes-categories
+       (remove category)
+       (my-notes-change-categories)))
+
+    (defun my-notes-delete-notes-of-category (category)
+      "Delete each note of CATEGORY."
+      (-> category (my-notes-category-path) (my-try-delete t)))
+
+    (defun my-notes-delete-category-template (category)
+      "Delete template for CATEGORY."
+      (->> category (my-notes-category-template-path) (my-try-delete)))
+
+    (defun my-notes-change-categories (new-categories)
+      "Change list of categories to NEW-CATEGORIES with change category's file."
+      (setq my-notes-categories new-categories)
+      (my-notes-change-categories-list-file new-categories))
+
+    (defun my-notes-change-categories-list-file (new-categories)
+      "Change categories with file in which its writed to NEW-CATEGORIES."
+      (f-write-text
+       (s-join "\n" new-categories)
+       'utf-8
+       my-notes-categories-list-file-path))
+
+    (defun fast-exec-my-notes-keys ()
+      "Get some useful keymaps of  `fast-exec' for my-notes."
+      (fast-exec/some-commands
+       ("New Note" 'my-notes-new)
+       ("Buffer to Note" 'my-notes-buffer-to-note)
+       ("Delete Note" 'my-notes-delete)
+       ("Change Category of Note" 'my-notes-change-category-of-note)
+       ("New Category of Notes" 'my-notes-new-category)
+       ("Delete Category of Notes" 'my-notes-delete-category)
+       ("Rename Category of Notes" 'my-notes-rename-category)
+       ("Find Template for Note" 'my-notes-visit-category-template)
+       ("Find Note" 'my-notes-visit)))
+
+    (fast-exec/register-keymap-func 'fast-exec-my-notes-keys)
+    (fast-exec/reload-functions-chain)
+    #+END_SRC
+
 * Auto Tangle This File
 
-#+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
+  #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
 
-  (defun if-Emacs-org-then-org-babel-tangle ()
+    (defun if-Emacs-org-then-org-babel-tangle ()
       "If current open file is Emacs.org, then `org-babel-tangle`."
       (interactive)
 
       (when (s-equals? (f-filename buffer-file-name) "Emacs.org")
-          (org-babel-tangle)))
+        (org-babel-tangle)))
 
 
-  (add-hook 'after-save-hook 'if-Emacs-org-then-org-babel-tangle)
+    (add-hook 'after-save-hook 'if-Emacs-org-then-org-babel-tangle)
 
-#+END_SRC
+    #+END_SRC
 
