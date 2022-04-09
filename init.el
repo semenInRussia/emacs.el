@@ -62,6 +62,35 @@ If FORCE is t, a directory will be deleted recursively."
    (s-replace "'" "")
    (s-replace "\"" "")))
 
+(defun my-one-of-prefixes-p (prefixes s)
+  "Return t, when S has one of PREFIXES."
+  (->>
+   prefixes
+   (--some (s-prefix-p it s))))
+
+(defun my-current-line (&optional pos)
+        "Return line at POS, POS defaults to `point'."
+        (setq pos (or pos (point)))
+        (save-excursion
+          (goto-char pos)
+          (buffer-substring-no-properties
+           (point-at-bol)
+           (point-at-eol))))
+
+(defun my-current-line-prefix-p (p)
+  "Return t, when current text line starts with P."
+  (s-prefix-p p (my-current-line)))
+
+(defun if-Emacs-org-then-org-babel-tangle ()
+  "If current open file is Emacs.org, then `org-babel-tangle`."
+  (interactive)
+
+  (when (s-equals? (f-filename buffer-file-name) "Emacs.org")
+    (org-babel-tangle)))
+
+
+(add-hook 'after-save-hook 'if-Emacs-org-then-org-babel-tangle)
+
 (setq user-full-name    "Semen Khramtsov"
       user-mail-address "hrams205@gmail.com"
       user-birthday     "2007-01-29"
@@ -85,9 +114,10 @@ Info take from var `user-os`, user must set it."
     (yas-global-mode 1)
     :custom
     (yas-snippet-dirs '("~/.emacs.d/snippets"))
-    (yas-wrap-around-region t)
-    :bind (:map yas-keymap
-                ("<return>" . yas-exit-all-snippets)))
+    (yas-wrap-around-region t))
+
+(use-package yasnippet-snippets
+    :ensure t)
 
 (use-package flycheck
     :ensure t
@@ -195,6 +225,7 @@ Info take from var `user-os`, user must set it."
 (fast-exec/enable-some-builtin-supports haskell-mode
                                         flycheck
                                         magit
+                                        org-agenda
                                         deadgrep
                                         projectile
                                         skeletor
@@ -247,6 +278,12 @@ Instead of KEY will command FUN-NAME"
     :bind (:map xah-fly-command-map
                 ("SPC SPC n" . imenu-anywhere)))
 
+(use-package recentf
+    :config (recentf-mode 69) ; Lol!
+    :bind ((:map xah-fly-command-map)
+           ("SPC k f" . 'recentf-open-files))
+    :hook ((recentf-dialog-mode) . 'xah-fly-insert-mode-activate))
+
 (use-package comment-dwim-2
     :ensure t
     :bind (:map xah-fly-command-map
@@ -263,6 +300,13 @@ Instead of KEY will command FUN-NAME"
     :bind (:map xah-fly-command-map ("SPC SPC ." . dumb-jump-back))
     :init
     (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+
+(defun my-buffer-list-or-edit-lines ()
+  "Do `helm-buffer-list' or `mc/edit-lines'."
+  (interactive)
+  (if (use-region-p)
+      (call-interactively #'mc/edit-lines)
+    (call-interactively #'helm-buffers-list)))
 
 (defun my-mark-all ()
   "If enable `multiple-cursors', then mark all like this, other mark buffer."
@@ -316,6 +360,7 @@ EOB - is `end-of-buffer'"
                'toggle-input-method)
   :bind
   (:map xah-fly-command-map
+        ("SPC f"         . 'my-buffer-list-or-edit-lines)
         ("7"         . my-mc-mark-like-this-or-edit-lines)
         ("SPC 7"     . mc/mark-previous-like-this-word)
         ("SPC TAB 7" . mc/reverse-regions)
@@ -545,22 +590,22 @@ Pass ARG to `avy-jump'."
     :bind (("RET"       . sp-newline)
            :map
            xah-fly-command-map
-           (("]"         . sp-forward-slurp-sexp)
-            ("M-("       . sp-wrap-round)
-            ("M-["       . sp-wrap-square)
-            ("M-{"       . sp-wrap-curly)
-            ("["         . sp-backward-slurp-sexp)
-            ("-"         . sp-splice-sexp)
-            ("SPC -"     . sp-rewrap-sexp)
-            ("m"         . sp-backward-sexp)
-            ("."         . sp-forward-sexp)
-            ("SPC 1"     . sp-join-sexp)
-            ("SPC SPC 1" . sp-split-sexp)
-            ("SPC 9"     . sp-change-enclosing)
-            ("SPC SPC g" . sp-kill-hybrid-sexp)
-            ("SPC ="     . sp-raise-sexp)
-            ("M-("       . sp-wrap-round)
-            ("M-{"       . sp-wrap-curly))))
+           (("]"         . 'sp-forward-slurp-sexp)
+            ("["         . 'sp-forward-barf-sexp)
+            ("M-("       . 'sp-wrap-round)
+            ("M-["       . 'sp-wrap-square)
+            ("M-{"       . 'sp-wrap-curly)
+            ("-"         . 'sp-splice-sexp)
+            ("SPC -"     . 'sp-rewrap-sexp)
+            ("m"         . 'sp-backward-sexp)
+            ("."         . 'sp-forward-sexp)
+            ("SPC 1"     . 'sp-join-sexp)
+            ("SPC SPC 1" . 'sp-split-sexp)
+            ("SPC 9"     . 'sp-change-enclosing)
+            ("SPC SPC g" . 'sp-kill-hybrid-sexp)
+            ("SPC ="     . 'sp-raise-sexp)
+            ("M-("       . 'sp-wrap-round)
+            ("M-{"       . 'sp-wrap-curly))))
 
 (require 'smartparens-config)
 
@@ -620,96 +665,227 @@ Pass ARG to `avy-jump'."
     :bind (:map xah-fly-command-map
                 ("SPC `" . string-edit-at-point)))
 
-(use-package drag-stuff
-    :ensure t
-    :config
-    (drag-stuff-global-mode t)
-    :bind
-    ((:map xah-fly-command-map)
-     ("SPC TAB i" . 'drag-stuff-up)
-     ("SPC TAB k" . 'drag-stuff-down)
+(defcustom my-left-draggers nil
+"Functions, which drag stuff to left, or return nil.
+  Is used in `my-drag-stuff-left'.")
 
-     ("SPC TAB o" . 'drag-stuff-right)
-     ("SPC TAB u" . 'drag-stuff-left)
+  (defun my-drag-stuff-left ()
+"My more general and functional version of `drag-stuff-left'."
+(interactive)
+(--find (call-interactively it) my-left-draggers)
+(message "Start dragging, use keys u, i, o, k. Type RET for exit..."))
 
-     ("SPC TAB ." . 'transpose-sexps)
-     ("SPC TAB m" . 'transpose-sexps)
+  (defcustom my-right-draggers nil
+"Functions, which drag stuff to right, or return nil.
+  Is used in `my-drag-stuff-right'.")
 
-     ("SPC TAB n" . 'avy-transpose-lines-in-region)
-     ("SPC TAB t" . 'transpose-regions)))
+  (defun my-drag-stuff-right ()
+"My more general and functional version of `drag-stuff-right'."
+(interactive)
+(--find (call-interactively it) my-right-draggers)
+(message "Start dragging, use keys u, i, o, k. Type RET for exit..."))
 
-(defun my-function-is-drag-stuff-p (f)
-  "Return t, when F is one of functions of `drag-stuff'."
-  (->>
-   f
-   (symbol-name)
-   (s-prefix-p "drag-stuff")))
+  (defcustom my-up-draggers nil
+"Functions, which drag stuff to up, or return nil.
+  Is used in `my-drag-stuff-up'.")
 
-(defun my-last-command-is-drag-stuff-p ()
-  "Return t, when last command is one of functions of `drag-stuff'."
+  (defun my-drag-stuff-up ()
+"My more general and functional version of `drag-stuff-up'."
+(interactive)
+(--find (call-interactively it) my-up-draggers)
+(message "Start dragging, use keys u, i, o, k. Type RET for exit..."))
+
+  (defcustom my-down-draggers nil
+"Functions, which drag stuff to up, or return nil.
+  Is used in `my-drag-stuff-down'.")
+
+  (defun my-drag-stuff-down ()
+"My more general and functional version of `drag-stuff-down'."
+(interactive)
+(--find (call-interactively it) my-down-draggers)
+(message "Start dragging, use keys u, i, o, k. Type RET for exit..."))
+
+  (defun add-left-dragger (f)
+"Add F to list draggers for `my-drag-stuff-left'."
+(when (-contains-p my-left-draggers f)
+	(setq my-left-draggers (remove f my-left-draggers)))
+(setq my-left-draggers (cons f my-left-draggers)))
+
+  (defun add-right-dragger (f)
+"Add F to list draggers for `my-drag-stuff-right'."
+(when (-contains-p my-right-draggers f)
+  (setq my-right-draggers (remove f my-right-draggers)))
+(setq my-right-draggers (cons f my-right-draggers)))
+
+  (defun add-up-dragger (f)
+"Add F to list draggers for `my-drag-stuff-up'."
+(when (-contains-p my-up-draggers f)
+  (setq my-up-draggers (remove f my-up-draggers)))
+(setq my-up-draggers (cons f my-up-draggers)))
+
+  (defun add-down-dragger (f)
+"Add F to list draggers for `my-drag-stuff-down'."
+(when (-contains-p my-down-draggers f)
+  (setq my-down-draggers (remove f my-down-draggers)))
+(setq my-down-draggers (cons f my-down-draggers)))
+
+  (defun add-right-dragger (f)
+"Add F to list draggers for `my-drag-stuff-right'."
+(when (-contains-p my-right-draggers f)
+  (setq my-right-draggers (remove f my-right-draggers)))
+(setq my-right-draggers (cons f my-right-draggers)))
+
+  (use-package drag-stuff
+  :ensure t
+  :config
+  (drag-stuff-global-mode t)
+  :bind
+  ((:map xah-fly-command-map)
+   ("SPC TAB i" . 'my-drag-stuff-up)
+   ("SPC TAB k" . 'my-drag-stuff-down)
+   ("SPC TAB o" . 'my-drag-stuff-right)
+   ("SPC TAB u" . 'my-drag-stuff-left)
+   ("SPC TAB ." . 'transpose-sexps)
+   ("SPC TAB m" . 'transpose-sexps)
+   ("SPC TAB n" . 'avy-transpose-lines-in-region)
+   ("SPC TAB t" . 'transpose-regions)))
+
+  (defcustom my-drag-stuff-functions '(my-drag-stuff-up
+				   my-drag-stuff-down
+				   my-drag-stuff-right
+				   my-drag-stuff-left)
+"List of my functions, which always drag stuffs.")
+
+  (defun my-last-command-is-drag-stuff-p ()
+"Get t, when last command is one of `my-drag-stuff-functions'."
+(interactive)
+(-contains-p my-drag-stuff-functions last-command))
+
+  (defvar my-last-command-is-drag-stuff nil
+"If last command is one of my functions which draged word then this in true.")
+
+  (defun my-last-command-is-dragged-stuff-p ()
+"Return t, when last command dragged someone stuff."
+(or
+ (my-last-command-is-drag-stuff-p)
+ (and
+  (s-contains-p "drag-stuff" (symbol-name last-command))
+  my-last-command-is-drag-stuff)))
+
+  (defmacro my-define-stuff-key (keymap key normal-command drag-command)
+"Define in KEYMAP to KEY command when run NORMAL-COMMAND or DRAG-COMMAND."
+(let ((command-name (intern
+			 (s-concat
+			  "my-"
+			  (symbol-name (eval normal-command))
+			  "-or-"
+			  (symbol-name (eval drag-command))))))
+  `(progn
+	 (defun ,command-name ()
+	   ,(s-lex-format "Run `${normal-command}' or `${drag-command}'.")
+	   (interactive)
+	   (let* ((is-drag (my-last-command-is-dragged-stuff-p)))
+	 (setq my-last-command-is-drag-stuff is-drag)
+	 (if is-drag
+		 (call-interactively ,drag-command)
+	   (call-interactively ,normal-command))))
+	 (define-key ,keymap ,key #',command-name))))
+
+  (defun stop-drag ()
+"Stop drag, just something print, and nothing do, set to nil something."
+(interactive)
+(setq my-last-command-is-drag-stuff nil)
+(message "Turn `drag' to normal!"))
+
+  (define-key-when
+  my-insert-new-line-or-nothing
+  xah-fly-command-map
+""
+'stop-drag
+'my-last-command-is-dragged-stuff-p)
+
+  (my-define-stuff-key
+   xah-fly-command-map
+   "o"
+   #'syntax-subword-forward
+   #'my-drag-stuff-right)
+
+  (my-define-stuff-key
+   xah-fly-command-map
+   "u"
+   #'syntax-subword-backward
+   #'my-drag-stuff-left)
+
+  (my-define-stuff-key
+   xah-fly-command-map
+   "i"
+   #'previous-line
+   #'my-drag-stuff-up)
+
+  (my-define-stuff-key
+   xah-fly-command-map
+   "k"
+   #'next-line
+   #'my-drag-stuff-down)
+
+(add-left-dragger  #'drag-stuff-left)
+(add-right-dragger #'drag-stuff-right)
+(add-up-dragger    #'drag-stuff-up)
+(add-down-dragger  #'drag-stuff-down)
+
+(defun my-org-mode-in-heading-start-p ()
+  "Return t, when current position now in start of org's heading."
+  (interactive "d")
+  (and
+   (not (org-in-src-block-p))
+   (my-current-line-prefix-p "*")))
+
+(defun my-drag-org-heading-right ()
+  "Drag Org's heading to right."
   (interactive)
-  (my-function-is-drag-stuff-p last-command))
+  (when (and
+         (eq major-mode 'org-mode)
+         (or
+          (my-org-mode-in-heading-start-p)
+          (org-at-table-p)))
+    (org-metaright)
+    t))
 
-(defvar my-last-command-is-drag-stuff nil
-  "If last command is one of my functions which draged word then this in true.")
+(defun my-drag-org-heading-left ()
+  "Drag Org's heading to left."
+  (interactive)
+  (when (and
+         (eq major-mode 'org-mode)
+         (or
+          (my-org-mode-in-heading-start-p)
+          (org-at-table-p)))
+    (org-metaleft)
+    t))
 
-(defun my-last-command-is-dragged-stuff-p ()
-  "Return t, when last command dragged someone stuff."
-  (or
-   (my-last-command-is-drag-stuff-p)
-   (and
-    (s-contains-p "drag-stuff" (symbol-name last-command))
-    my-last-command-is-drag-stuff)))
+(defun my-drag-org-heading-up ()
+  "Drag Org's heading to up."
+  (interactive)
+  (when (and
+         (eq major-mode 'org-mode)
+         (or
+          (my-org-mode-in-heading-start-p)
+          (org-at-table-p)))
+    (org-metaup)
+    t))
 
-(defmacro my-define-stuff-key (keymap key normal-command drag-command)
-  "Define in KEYMAP to KEY command when run NORMAL-COMMAND or DRAG-COMMAND."
-  (let ((command-name (intern
-                       (s-concat
-                        "my-"
-                        (symbol-name (eval normal-command))
-                        "-or-"
-                        (symbol-name (eval drag-command))))))
-    `(progn
-       (defun ,command-name ()
-         ,(s-lex-format "Run `${normal-command}' or `${drag-command}'.")
-         (interactive)
-         (let* ((is-drag (my-last-command-is-dragged-stuff-p)))
-           (setq my-last-command-is-drag-stuff is-drag)
-           (if is-drag
-               (call-interactively ,drag-command)
-             (call-interactively ,normal-command))))
-       (define-key ,keymap ,key #',command-name))))
+(defun my-drag-org-heading-down ()
+  "Drag Org's heading to down."
+  (interactive)
+  (when (or
+         (org-at-table-p)
+         (my-org-mode-in-heading-start-p))
+    (org-metadown)
+    t))
 
-(my-define-stuff-key
- xah-fly-command-map
- "o"
- #'syntax-subword-forward
- #'drag-stuff-right)
-
-(define-key-when
-    my-insert-new-line-or-nothing
-    xah-fly-command-map
-  ""
-  'what-line
-  'my-last-command-is-dragged-stuff-p)
-
-(my-define-stuff-key
- xah-fly-command-map
- "u"
- #'syntax-subword-backward
- #'drag-stuff-left)
-
-(my-define-stuff-key
- xah-fly-command-map
- "i"
- #'previous-line
- #'drag-stuff-up)
-
-(my-define-stuff-key
- xah-fly-command-map
- "k"
- #'next-line
- #'drag-stuff-down)
+(add-right-dragger #'my-drag-org-heading-right)
+(add-left-dragger #'my-drag-org-heading-left)
+(add-down-dragger #'my-drag-org-heading-down)
+(add-up-dragger #'my-drag-org-heading-up)
 
 (defun delete-and-edit-current-line ()
   "Delete current line and instroduce to insert mode."
@@ -1258,22 +1434,47 @@ With prefix arg don't indent."
 (use-package laas
     :ensure t
     :hook (LaTeX-mode . laas-mode)
-    :config
-    (aas-set-snippets 'laas-mode
-      :cond #'texmathp
-      "Om"  "\\mathrm{Ом}"
-      "eqv" "\\mathrm{экв}"
-      "Vv"  "\\mathrm{В}"))
+    :config (aas-set-snippets 'laas-mode
+              :cond #'texmathp
+              ;; Some Units
+              "As" "\\mathrm{А}"
+              "Vs"  "\\mathrm{В}"
+              "Oms"  "\\mathrm{Ом}"
+              "cls" "^\\circ C"
+
+              ;; Some Physics Sheet
+              "eqv" "\\mathrm{экв}"))
 
 (use-package org
     :major-mode-map (org-mode)
-    :bind (:map
-           my-org-local-map
-           ("'"   . org-edit-special)
-           ("l"   . org-insert-link)
-           ("t"   . org-babel-tangle)
-           ("p"   . org-latex-preview)
-           ("RET" . org-open-at-point)))
+    :bind
+    ((:map xah-fly-command-map)
+     ("1"   . 'my-er-expand-region-or-org-todo)
+     (:map my-org-local-map)
+     ("SPC" . 'org-toggle-checkbox)
+     ("'"   . 'org-edit-special)
+     ("l"   . 'org-insert-link)
+     ("t"   . 'org-babel-tangle)
+     ("p"   . 'org-latex-preview)
+     ("1"   . 'org-todo)
+     ("s"   . 'org-schedule)
+     ("RET" . 'org-open-at-point)))
+
+(defvar my- nil
+  "Return t, when last `my-er-expand-region-or-org-todo' done `org-todo'.")
+
+(defun my-er-expand-region-or-org-todo ()
+  "If need do `org-todo', otherwise do `er/expand-region'."
+  (interactive)
+  (let ((is-org-todo (or
+                       (eq last-command #'org-todo)
+                       (and
+                        (eq last-command this-command)
+                        my-last-command-is-org-todo))))
+    (setq my-last-command-is-org-todo is-org-todo)
+    (if is-org-todo
+        (call-interactively #'org-todo)
+      (call-interactively #'er/expand-region))))
 
 (add-hook 'org-mode-hook (lambda () (call-interactively 'visual-fill)))
 
@@ -1296,6 +1497,13 @@ With prefix arg don't indent."
     :bind
     ((:map my-org-local-map)
      ("c" . ox-clip-formatted-copy)))
+
+(defun turn-on-org-cdlatex-mode ()
+  "Turn on `org-cdlatex-mode'."
+  (interactive)
+  (org-cdlatex-mode t))
+
+(add-hook 'org-mode-hook #'turn-on-org-cdlatex-mode)
 
 (use-package package-lint
     :ensure t
@@ -1618,16 +1826,6 @@ With prefix arg don't indent."
     :hook
     (prog-mode . git-gutter-mode))
 
-(use-package helm-tail
-    :ensure t
-    :init
-    (defun fast-exec-define-helm-tail-keys ()
-      "This is bind `fast-exec' with `helm-tail'."
-      (fast-exec/some-commands
-       ("Open Tail" 'helm-tail)))
-    (fast-exec/register-keymap-func 'fast-exec-define-helm-tail-keys)
-    (fast-exec/reload-functions-chain))
-
 (use-package which-key
     :ensure t
     :config
@@ -1654,17 +1852,6 @@ With prefix arg don't indent."
            xah-fly-command-map
            ("SPC SPC f" . helm-find-files)))
 
-(use-package google-translate
-    :ensure t
-    :bind
-    (:map xah-fly-command-map
-          ("SPC \\" . google-translate-at-point)))
-
-(defun google-translate--search-tkk ()
-  "Search TKK. From https://github.com/atykhonov/google-translate/issues/137.
-Thank you https://github.com/leuven65!"
-  (list 430675 2721866130))
-
 (use-package command-log-mode
     :ensure t)
 
@@ -1679,18 +1866,14 @@ Thank you https://github.com/leuven65!"
 
 (use-package scratch
     :ensure t
-    :bind (("C-t" . scratch))
-    )
-
-(global-subword-mode)
+    :bind (("C-t" . scratch)))
 
 (use-package syntax-subword
     :ensure t
     :custom
     (syntax-subword-skip-spaces t)
     :config
-    (global-syntax-subword-mode)
-    )
+    (global-syntax-subword-mode))
 
 (defun my-pandoc-tex-to-documents-dir ()
   "Move all .docx files in working dir to directroy documents."
@@ -1756,7 +1939,9 @@ Thank you https://github.com/leuven65!"
                       (display-line-numbers-mode -1)
                       (setq left-fringe-width 0 right-fringe-width 0)
                       (setq left-margin-width 2 right-margin-width 0)
-                      (set-window-buffer nil (current-buffer)))))
+                      (set-window-buffer nil (current-buffer))))
+    :init
+    (pomidor))
 
 (use-package pacmacs
     :ensure t
@@ -1847,6 +2032,21 @@ numbers of lines, otherwise don't display."
 
 (use-package doom-modeline :ensure t)
 
+(doom-modeline-def-segment drag
+  (when (my-last-command-is-dragged-stuff-p)
+    (propertize
+     " DRG "
+     'face (if (doom-modeline--active)
+               'doom-modeline-panel
+             'mode-line-inactive))))
+
+(doom-modeline-def-segment my-matches
+  "Display `macro-recoring', `multiple-cursors' and `buffer-size'."
+  (let ((meta (concat (doom-modeline--macro-recording)
+                      (doom-modeline--multiple-cursors))))
+    (or (and (not (equal meta "")) meta)
+        (doom-modeline--buffer-size))))
+
 (defcustom my-modeline-time-segment-format-string " [%H-%M]"
   "By this format string will draw time in `doom-modeline'.
 See `format-time-string' for see what format string"
@@ -1908,7 +2108,8 @@ See `format-time-string' for see what format string"
     (display-time-mode t)
     (doom-modeline-def-modeline 'main
         '(bar
-          matches
+          my-matches
+          drag
           buffer-info-durand
           time
           pomidor
@@ -2037,233 +2238,18 @@ See `format-time-string' for see what format string"
 
 (add-to-list 'run-command-recipes 'run-command-recipe-snitch)
 
-(defcustom my-mipt-lessons
-  '("f" "m")
-  "List of codes of mipt's lessons.")
+(setq org-agenda-files '("~/agenda.org"))
 
-(defcustom my-mipt-directory "c:/Users/hrams/Documents/mfti-solutions"
-  "Path to directroy of mipt's solutions.")
-
-(defcustom my-mipt-min-num 1
-  "Minimal normal number of mipt solution.")
-
-(defvar my--mipt-current-class nil
-  "Current mipt class.  This will changed automatically after input of user.")
-
-(defvar my--mipt-current-lesson nil
-  "Current mipt lesson.  This will changed automatically after input of user.")
-
-(defvar my--mipt-current-section nil
-  "Current mipt section.  This will changed automatically after input of user.")
-
-(defvar my--mipt-current-type nil
-  "Current mipt `is-control'.
-One of 'control 'normal .
-This will changed automatically after input of user.")
-
-(defvar my--mipt-current-num nil
-  "Current mipt task's num.
-This will changed automatically after input of user.")
-
-(defclass my-mipt-solution ()
-  ((class :initarg :class :accessor my-mipt-solution-class)
-   (section :initarg :section :accessor my-mipt-solution-section)
-   (num :initarg :num :accessor my-mipt-solution-num)
-   (lesson :initarg :lesson :accessor my-mipt-solution-lesson)
-   (type :initarg :type :accessor my-mipt-solution-type))
-  "Class for solution of mipt.")
-
-(defun my-mipt-solution-path (mipt-solution)
-  "Get file path of MIPT-SOLUTION."
-  (f-join
-   my-mipt-directory
-   (format
-    "%s-%s-%s-%s%s.tex"
-    (my-mipt-solution-class mipt-solution)
-    (my-mipt-solution-lesson mipt-solution)
-    (my-mipt-solution-section mipt-solution)
-    (my-mipt-solution-num mipt-solution)
-    (if (my-mipt-solution-control-p mipt-solution) "-control" ""))))
-
-(defun my-mipt-solution-open (mipt-solution)
-  "Open, maybe create MIPT-SOLUTION file."
-  (->> mipt-solution (my-mipt-solution-path) (find-file)))
-
-(defun my-mipt-solution-normal-p (mipt-solution)
-  "Return t, if MIPT-SOLUTION isn't control."
-  (eq (my-mipt-solution-type mipt-solution) 'normal))
-
-(defun my-mipt-solution-control-p (mipt-solution)
-  "Return t, if MIPT-SOLUTION is control."
-  (eq (my-mipt-solution-type mipt-solution) 'control))
-
-(defun my-mipt-solution-parse (filename)
-  "Parse mipt solution from FILENAME."
-  (when (s-matches-p ".+-.-.+-.+\\(-control\\)?\\.tex" filename)
-    (-let*
-        ((base (f-no-ext filename))
-         ((class lesson section num is-control)
-          (s-split "-" base)))
-      (my-mipt-solution
-       :class (string-to-number class)
-       :lesson lesson
-       :section (string-to-number section)
-       :num (string-to-number num)
-       :type (if (stringp is-control)
-                 'control
-               'normal)))))
-
-(defun my-all-mipt-solutions ()
-  "Get list of all mipt solutions."
-  (->>
-   (f-files my-mipt-directory)
-   (--keep (my-mipt-solution-parse (f-filename it)))))
-
-(defun my-mipt-solution-lesson-p (mipt-solution lesson)
-  (string-equal (my-mipt-solution-lesson mipt-solution) lesson))
-
-(defun my-mipt-solution-class-p (mipt-solution class)
-  (equal (my-mipt-solution-class mipt-solution) class))
-
-(defun my-mipt-solution-section-p (mipt-solution section)
-  (eq (my-mipt-solution-section mipt-solution) section))
-
-(defun my-mipt-solution-search ()
-  "Search mipt-solution and open."
+(defun my-open-main-agenda-file ()
+  "Open \"~/agenda.org\"."
   (interactive)
-  (->> (my-read-mipt-solution) (my-mipt-solution-open)))
+  (find-file "~/agenda.org"))
 
-(defun my-current-mipt-solution ()
-  "Get current mipt's solution."
-  (prog1
-      (my-mipt-solution
-       :lesson (or my--mipt-current-lesson
-                   (my-read-mipt-lesson))
-       :class (or my--mipt-current-class
-                  (my-read-mipt-class))
-       :section (or my--mipt-current-section
-                    (my-read-mipt-section))
-       :num (or my--mipt-current-num (my-read-mipt-solution-num))
-       :type (or my--mipt-current-type (my-mipt-read-type)))
-    (setq my--mipt-current-lesson nil)
-    (setq my--mipt-current-class nil)
-    (setq my--mipt-current-section nil)
-    (setq my--mipt-current-type nil)))
+(global-set-key (kbd "<f9>") #'org-agenda)
+(global-set-key (kbd "S-<f9>") #'org-todo-list)
+(define-key xah-fly-command-map (kbd "SPC <f9>") #'org-todo-list)
 
-(defun my-read-mipt-solution ()
-  "Read mipt solution from user."
-  (or
-   (-some->>
-       (my-all-mipt-solutions)
-     (my--filter-mipt-solutions-by-lesson)
-     (my--filter-mipt-solutions-by-class)
-     (my--filter-mipt-solutions-by-section)
-     (my--filter-mipt-solutions-by-type)
-     (my-select-mipt-solution-by-num))
-   (my-current-mipt-solution)))
-
-(defun my--filter-mipt-solutions-by-lesson (mipt-solutions)
-  "Filter MIPT-SOLUTIONS by asked from user lesson."
-  (let ((lesson (my-read-mipt-lesson)))
-    (setq my--mipt-current-lesson lesson)
-    (--filter (my-mipt-solution-lesson-p it lesson) mipt-solutions)))
-
-(defun my-read-mipt-lesson ()
-  (completing-read "Select lesson of mipt solution, please"
-                   my-mipt-lessons))
-
-(defun my-read-mipt-class (last-class)
-  (read-number "Enter class of mipt solution, please: " last-class))
-
-(defun my--filter-mipt-solutions-by-class (mipt-solutions)
-  "Filter MIPT-SOLUTIONS by asked from user class."
-  (let* ((last-class
-          (->> mipt-solutions (-map 'my-mipt-solution-class) (-max)))
-         (current-class (my-read-mipt-class last-class)))
-    (setq my--mipt-current-class current-class)
-    (--filter
-     (my-mipt-solution-class-p it current-class)
-     mipt-solutions)))
-
-(defun my-read-mipt-section (last-section)
-  (read-number "Enter section of mipt solution, please: "
-               last-section))
-
-(defun my--filter-mipt-solutions-by-section (mipt-solutions)
-  "Filter MIPT-SOLUTIONS by asked from user section."
-  (let* ((last-section
-          (->> mipt-solutions (-map #'my-mipt-solution-section) (-max)))
-         (section (my-read-mipt-section last-section)))
-    (setq my--mipt-current-section section)
-    (--filter (my-mipt-solution-section-p it section) mipt-solutions)))
-
-(defun my--filter-mipt-solutions-by-type (mipt-solutions)
-  "Filter MIPT-SOLUTIONS by asked from user type."
-  (let ((type (my-read-mipt-type mipt-solutions)))
-    (setq my--mipt-current-type type)
-    (--filter
-     (eq type (my-mipt-solution-type it))
-     mipt-solutions)))
-
-(defun my-read-mipt-type (mipt-solutions)
-  "Watch MIPT-SOLUTIONS and ask from user solutions is control or normal."
-  (let* ((is-have-normal-tasks
-          (--some (my-mipt-solution-normal-p it) mipt-solutions))
-         (is-control
-          (if is-have-normal-tasks
-              (not (y-or-n-p "Your mipt task normal? "))
-            (y-or-n-p "Your mipt task control? "))))
-    (if is-control
-        'control
-      'normal)))
-
-(defun my-mipt-read-is-control ()
-  "Read from user mipt solutions is control or no."
-  (if (y-or-n-p "Mipt task is control or no? ")
-      'control
-    'normal))
-
-(defun my-read-mipt-solution-num (&optional last-num)
-  (read-number
-   "Number of mipt's solution, please: "
-   (if last-num (1+ last-num) my-mipt-min-num)))
-
-(defun my-select-mipt-solution-by-num (mipt-solutons)
-  "Ask from user num of one of MIPT-SOLUTONS, and selects solution."
-  (let* ((last-num
-          (-some->> mipt-solutons (-map #'my-mipt-solution-num) (-max)))
-         (mipt-num (my-read-mipt-solution-num last-num)))
-    (setq my--mipt-current-num mipt-num)
-    (--find (= (my-mipt-solution-num it) mipt-num) mipt-solutons)))
-
-(defun fast-exec-mipt-keys ()
-  "Get some useful keymaps of `fast-exec' for mipt."
-  (fast-exec/some-commands
-   ("Search MIPT Solution" 'my-mipt-solution-search)))
-
-(fast-exec/register-keymap-func 'fast-exec-mipt-keys)
-(fast-exec/reload-functions-chain)
-
-(defun my-copy-buffer-content-as-mipt-solution ()
-  "Take content of current buffer, compress it and copy its."
-  (interactive)
-  (->>
-   (buffer-string)
-   (my-compress-latex-source)
-   (kill-new)))
-
-(defun my-compress-latex-source (source)
-  "Take SOURCE and return compressed variant."
-  (->>
-   source
-   (s-replace "\n" " ")
-   (s-replace "\\begin{equation}" "\\[")
-   (s-replace "\\end{equation}" "\\]")
-   (s-append "% compresed by me `semenInRussia'")))
-
-(bind-keys
- :map my-latex-local-map
- ("c" . my-copy-buffer-content-as-mipt-solution))
+(global-set-key (kbd "<f5>") #'my-open-main-agenda-file)
 
 (defgroup my-notes nil
   "My own simple system of notes."
@@ -2546,12 +2532,228 @@ If IS-AS-SNIPPET is t, then expand template as YAS snippet"
 (fast-exec/register-keymap-func 'fast-exec-my-notes-keys)
 (fast-exec/reload-functions-chain)
 
-(defun if-Emacs-org-then-org-babel-tangle ()
-  "If current open file is Emacs.org, then `org-babel-tangle`."
+(defcustom my-mipt-lessons
+  '("f" "m")
+  "List of codes of mipt's lessons.")
+
+(defcustom my-mipt-directory "c:/Users/hrams/Documents/mfti-solutions"
+  "Path to directroy of mipt's solutions.")
+
+(defcustom my-mipt-min-num 1
+  "Minimal normal number of mipt solution.")
+
+(defvar my--mipt-current-class nil
+  "Current mipt class.  This will changed automatically after input of user.")
+
+(defvar my--mipt-current-lesson nil
+  "Current mipt lesson.  This will changed automatically after input of user.")
+
+(defvar my--mipt-current-section nil
+  "Current mipt section.  This will changed automatically after input of user.")
+
+(defvar my--mipt-current-type nil
+  "Current mipt `is-control'.
+One of 'control 'normal .
+This will changed automatically after input of user.")
+
+(defvar my--mipt-current-num nil
+  "Current mipt task's num.
+This will changed automatically after input of user.")
+
+(defclass my-mipt-solution ()
+  ((class :initarg :class :accessor my-mipt-solution-class)
+   (section :initarg :section :accessor my-mipt-solution-section)
+   (num :initarg :num :accessor my-mipt-solution-num)
+   (lesson :initarg :lesson :accessor my-mipt-solution-lesson)
+   (type :initarg :type :accessor my-mipt-solution-type))
+  "Class for solution of mipt.")
+
+(defun my-mipt-solution-path (mipt-solution)
+  "Get file path of MIPT-SOLUTION."
+  (f-join
+   my-mipt-directory
+   (format
+    "%s-%s-%s-%s%s.tex"
+    (my-mipt-solution-class mipt-solution)
+    (my-mipt-solution-lesson mipt-solution)
+    (my-mipt-solution-section mipt-solution)
+    (my-mipt-solution-num mipt-solution)
+    (if (my-mipt-solution-control-p mipt-solution) "-control" ""))))
+
+(defun my-mipt-solution-open (mipt-solution)
+  "Open, maybe create MIPT-SOLUTION file."
+  (->> mipt-solution (my-mipt-solution-path) (find-file)))
+
+(defun my-mipt-solution-normal-p (mipt-solution)
+  "Return t, if MIPT-SOLUTION isn't control."
+  (eq (my-mipt-solution-type mipt-solution) 'normal))
+
+(defun my-mipt-solution-control-p (mipt-solution)
+  "Return t, if MIPT-SOLUTION is control."
+  (eq (my-mipt-solution-type mipt-solution) 'control))
+
+(defun my-mipt-solution-parse (filename)
+  "Parse mipt solution from FILENAME."
+  (when (s-matches-p ".+-.-.+-.+\\(-control\\)?\\.tex" filename)
+    (-let*
+        ((base (f-no-ext filename))
+         ((class lesson section num is-control)
+          (s-split "-" base)))
+      (my-mipt-solution
+       :class (string-to-number class)
+       :lesson lesson
+       :section (string-to-number section)
+       :num (string-to-number num)
+       :type (if (stringp is-control)
+                 'control
+               'normal)))))
+
+(defun my-all-mipt-solutions ()
+  "Get list of all mipt solutions."
+  (->>
+   (f-files my-mipt-directory)
+   (--keep (my-mipt-solution-parse (f-filename it)))))
+
+(defun my-mipt-solution-lesson-p (mipt-solution lesson)
+  (string-equal (my-mipt-solution-lesson mipt-solution) lesson))
+
+(defun my-mipt-solution-class-p (mipt-solution class)
+  (equal (my-mipt-solution-class mipt-solution) class))
+
+(defun my-mipt-solution-section-p (mipt-solution section)
+  (eq (my-mipt-solution-section mipt-solution) section))
+
+(defun my-mipt-solution-search ()
+  "Search mipt-solution and open."
   (interactive)
+  (->> (my-read-mipt-solution) (my-mipt-solution-open)))
 
-  (when (s-equals? (f-filename buffer-file-name) "Emacs.org")
-    (org-babel-tangle)))
+(defun my-current-mipt-solution ()
+  "Get current mipt's solution."
+  (prog1
+      (my-mipt-solution
+       :lesson (or my--mipt-current-lesson
+                   (my-read-mipt-lesson))
+       :class (or my--mipt-current-class
+                  (my-read-mipt-class))
+       :section (or my--mipt-current-section
+                    (my-read-mipt-section))
+       :num (or my--mipt-current-num (my-read-mipt-solution-num))
+       :type (or my--mipt-current-type (my-mipt-read-type)))
+    (setq my--mipt-current-lesson nil)
+    (setq my--mipt-current-class nil)
+    (setq my--mipt-current-section nil)
+    (setq my--mipt-current-type nil)))
 
+(defun my-read-mipt-solution ()
+  "Read mipt solution from user."
+  (or
+   (-some->>
+       (my-all-mipt-solutions)
+     (my--filter-mipt-solutions-by-lesson)
+     (my--filter-mipt-solutions-by-class)
+     (my--filter-mipt-solutions-by-section)
+     (my--filter-mipt-solutions-by-type)
+     (my-select-mipt-solution-by-num))
+   (my-current-mipt-solution)))
 
-(add-hook 'after-save-hook 'if-Emacs-org-then-org-babel-tangle)
+(defun my--filter-mipt-solutions-by-lesson (mipt-solutions)
+  "Filter MIPT-SOLUTIONS by asked from user lesson."
+  (let ((lesson (my-read-mipt-lesson)))
+    (setq my--mipt-current-lesson lesson)
+    (--filter (my-mipt-solution-lesson-p it lesson) mipt-solutions)))
+
+(defun my-read-mipt-lesson ()
+  (completing-read "Select lesson of mipt solution, please"
+                   my-mipt-lessons))
+
+(defun my-read-mipt-class (last-class)
+  (read-number "Enter class of mipt solution, please: " last-class))
+
+(defun my--filter-mipt-solutions-by-class (mipt-solutions)
+  "Filter MIPT-SOLUTIONS by asked from user class."
+  (let* ((last-class
+          (->> mipt-solutions (-map 'my-mipt-solution-class) (-max)))
+         (current-class (my-read-mipt-class last-class)))
+    (setq my--mipt-current-class current-class)
+    (--filter
+     (my-mipt-solution-class-p it current-class)
+     mipt-solutions)))
+
+(defun my-read-mipt-section (last-section)
+  (read-number "Enter section of mipt solution, please: "
+               last-section))
+
+(defun my--filter-mipt-solutions-by-section (mipt-solutions)
+  "Filter MIPT-SOLUTIONS by asked from user section."
+  (let* ((last-section
+          (->> mipt-solutions (-map #'my-mipt-solution-section) (-max)))
+         (section (my-read-mipt-section last-section)))
+    (setq my--mipt-current-section section)
+    (--filter (my-mipt-solution-section-p it section) mipt-solutions)))
+
+(defun my--filter-mipt-solutions-by-type (mipt-solutions)
+  "Filter MIPT-SOLUTIONS by asked from user type."
+  (let ((type (my-read-mipt-type mipt-solutions)))
+    (setq my--mipt-current-type type)
+    (--filter
+     (eq type (my-mipt-solution-type it))
+     mipt-solutions)))
+
+(defun my-read-mipt-type (mipt-solutions)
+  "Watch MIPT-SOLUTIONS and ask from user solutions is control or normal."
+  (let* ((is-have-normal-tasks
+          (--some (my-mipt-solution-normal-p it) mipt-solutions))
+         (is-control
+          (if is-have-normal-tasks
+              (not (y-or-n-p "Your mipt task normal? "))
+            (y-or-n-p "Your mipt task control? "))))
+    (if is-control
+        'control
+      'normal)))
+
+(defun my-mipt-read-is-control ()
+  "Read from user mipt solutions is control or no."
+  (if (y-or-n-p "Mipt task is control or no? ")
+      'control
+    'normal))
+
+(defun my-read-mipt-solution-num (&optional last-num)
+  (read-number
+   "Number of mipt's solution, please: "
+   (if last-num (1+ last-num) my-mipt-min-num)))
+
+(defun my-select-mipt-solution-by-num (mipt-solutons)
+  "Ask from user num of one of MIPT-SOLUTONS, and selects solution."
+  (let* ((last-num
+          (-some->> mipt-solutons (-map #'my-mipt-solution-num) (-max)))
+         (mipt-num (my-read-mipt-solution-num last-num)))
+    (setq my--mipt-current-num mipt-num)
+    (--find (= (my-mipt-solution-num it) mipt-num) mipt-solutons)))
+
+(defun fast-exec-mipt-keys ()
+  "Get some useful keymaps of `fast-exec' for mipt."
+  (fast-exec/some-commands
+   ("Search MIPT Solution" 'my-mipt-solution-search)))
+
+(fast-exec/register-keymap-func 'fast-exec-mipt-keys)
+(fast-exec/reload-functions-chain)
+
+(defun my-copy-buffer-content-as-mipt-solution ()
+  "Take content of current buffer, compress it and copy its."
+  (interactive)
+  (->> (buffer-string) (my-compress-latex-source) (kill-new)))
+
+(defun my-compress-latex-source (source)
+  "Take SOURCE and return compressed variant."
+  (->>
+   source
+   (s-replace "\n" " ")
+I   (s-replace "\\begin{equation}" "\\[")
+   (s-replace "\\end{equation}" "\\]")
+   (s-append "Так как ваш сайт не любит большие решения, ")
+   (s-append "то оно было уменьшено с помощю програмного кода")))
+
+(bind-keys
+ :map my-latex-local-map
+ ("c" . my-copy-buffer-content-as-mipt-solution))
