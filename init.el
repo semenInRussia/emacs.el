@@ -371,35 +371,37 @@ EOB - is `end-of-buffer'"
 
 (use-package avy
     :ensure t
-    :custom
-    (avy-background t)
+    :custom (avy-background t)
     (avy-translate-char-function #'translate-char-from-russian)
     :bind ((:map xah-fly-command-map)
            ("n"     . nil) ; by default this is `isearch', so i turn
-                                        ; this to keymap
-           ("n n"   . avy-goto-char)
-           ("n v"   . avy-yank-word)
-           ("n x"   . avy-teleport-word)
-           ("n c"   . avy-copy-word)
-           ("n 8"   . avy-mark-word)
-           ("n d"   . avy-kill-word-stay)
-           ("n 5"   . avy-zap)
-           ("n TAB" . avy-transpose-words)
-           ("n -"   . avy-sp-splice-sexp-in-word)
-           ("n r"   . avy-kill-word-move)
-           ("n o"   . avy-change-word)
-           ("n 9"   . avy-sp-change-enclosing-in-word)
-           ("n z"   . avy-comment-line)
-           ("n t v" . avy-copy-region)
-           ("n t d" . avy-kill-region)
-           ("n t x" . avy-move-region)
-           ("n t c" . avy-kill-ring-save-region)
-           ("n ;"   . avy-goto-end-of-line)
-           ("n k v" . avy-copy-line)
-           ("n k x" . avy-move-line)
-           ("n k c" . avy-kill-ring-save-whole-line)
-           ("n k d" . avy-kill-whole-line)))
-
+           ;; this to keymap
+           ("n n"   . 'avy-goto-char)
+           ("n v"   . 'avy-yank-word)
+           ("n x"   . 'avy-teleport-word)
+           ("n c"   . 'avy-copy-word)
+           ("n 8"   . 'avy-mark-word)
+           ("n d"   . 'avy-kill-word-stay)
+           ("n s ;" . 'avy-insert-new-line-at-eol)
+           ("n s h" . 'avy-insert-new-line-at-bol)
+           ("n 5"   . 'avy-zap)
+           ("n TAB" . 'avy-transpose-words)
+           ("n w"   . 'avy-clear-line)
+           ("n -"   . 'avy-sp-splice-sexp-in-word)
+           ("n r"   . 'avy-kill-word-move)
+           ("n o"   . 'avy-change-word)
+           ("n 9"   . 'avy-sp-change-enclosing-in-word)
+           ("n z"   . 'avy-comment-line)
+           ("n t v" . 'avy-copy-region)
+           ("n t d" . 'avy-kill-region)
+           ("n t x" . 'avy-move-region)
+           ("n t c" . 'avy-kill-ring-save-region)
+           ("n ;"   . 'avy-goto-end-of-line)
+           ("n h"   . 'avy-goto-begin-of-line-text)
+           ("n k v" . 'avy-copy-line)
+           ("n k x" . 'avy-move-line)
+           ("n k c" . 'avy-kill-ring-save-whole-line)
+           ("n k d" . 'avy-kill-whole-line)))
 
 (defun translate-char-from-russian (russian-char)
   "Translate RUSSIAN-CHAR to corresponding char on qwerty keyboard.
@@ -440,21 +442,19 @@ When ARG is non-nil, do the opposite of `avy-all-windows'.
 BEG and END narrow the scope where candidates are searched.
 When SYMBOL is non-nil, jump to symbol start instead of word start.
 Do action of `avy' ACTION.'"
-  (interactive (list (read-char "char: " t)
-                     current-prefix-arg))
+  (interactive (list (read-char "char: " t) current-prefix-arg))
   (avy-with avy-goto-word-1
     (let* ((str (string char))
-           (regex (cond ((string= str ".")
-                         "\\.")
-                        ((and avy-word-punc-regexp
-                              (string-match avy-word-punc-regexp str))
-                         (regexp-quote str))
-                        ((<= char 26)
-                         str)
-                        (t
-                         (concat
-                          (if symbol "\\_<" "\\b")
-                          str)))))
+           (regex
+            (cond
+              ((string= str ".")
+               "\\.")
+              ((and avy-word-punc-regexp
+                    (string-match avy-word-punc-regexp str))
+               (regexp-quote str))
+              ((<= char 26)
+               str)
+              (t (concat (if symbol "\\_<" "\\b") str)))))
       (avy-jump regex
                 :window-flip arg
                 :beg beg
@@ -464,12 +464,12 @@ Do action of `avy' ACTION.'"
 (defun avy-zap (char &optional arg)
   "Zapping to next CHAR navigated by `avy'."
   (interactive "cchar:\nP")
-  (avy-jump (s-concat (char-to-string char))
-            :window-flip arg
-            :beg (point-min)
-            :end (point-max)
-            :action 'avy-action-zap-to-char))
-
+  (avy-jump
+   (s-concat (char-to-string char))
+   :window-flip arg
+   :beg (point-min)
+   :end (point-max)
+   :action 'avy-action-zap-to-char))
 
 (defun avy-teleport-word (char &optional arg)
   "Teleport word searched by `arg' with CHAR.
@@ -482,13 +482,11 @@ Pass ARG to `avy-jump'."
   (interactive "cchar: ")
   (avy-goto-word-1-with-action char 'avy-action-mark))
 
-
 (defun avy-copy-word (char &optional arg)
   "Copy word searched by `arg' with CHAR.
 Pass ARG to `avy-jump'."
   (interactive "cchar:\nP")
   (avy-goto-word-1-with-action char 'avy-action-copy))
-
 
 (defun avy-yank-word (char &optional arg)
   "Paste word searched by `arg' with CHAR.
@@ -496,13 +494,11 @@ Pass ARG to `avy-jump'."
   (interactive "cchar:\nP")
   (avy-goto-word-1-with-action char 'avy-action-yank))
 
-
 (defun avy-kill-word-stay (char &optional arg)
   "Paste word searched by `arg' with CHAR.
 Pass ARG to `avy-jump'."
   (interactive "cchar:\nP")
   (avy-goto-word-1-with-action char 'avy-action-kill-stay))
-
 
 (defun avy-kill-word-move (char &optional arg)
   "Paste word searched by `arg' with CHAR.
@@ -510,57 +506,42 @@ Pass ARG to `avy-jump'."
   (interactive "cchar:\nP")
   (avy-goto-word-1-with-action char 'avy-action-kill-move))
 
-
 (defun avy-goto-line-1-with-action (action)
   "Goto line via `avy' with CHAR and do ACTION."
   (interactive)
   (avy-jump "^." :action action))
-
 
 (defun avy-comment-line ()
   "With `avy' move to line and comment its."
   (interactive)
   (avy-goto-line-1-with-action 'avy-action-comment))
 
-
 (defun avy-action-comment (pt)
   "Saving excursion comment line at point PT."
-  (save-excursion
-    (goto-char pt)
-    (comment-line 1)))
-
+  (save-excursion (goto-char pt) (comment-line 1)))
 
 (defun avy-sp-change-enclosing-in-word (ch)
   "With `avy' move to word starting with CH and `sp-change-enclosing'."
   (interactive "cchar:")
   (avy-goto-word-1-with-action ch 'avy-action-sp-change-enclosing))
 
-
 (defun avy-action-sp-change-enclosing (pt)
   "Saving excursion `sp-change-enclosing' in word at point PT."
-  (save-excursion
-    (goto-char pt)
-    (sp-change-enclosing)))
-
+  (save-excursion (goto-char pt) (sp-change-enclosing)))
 
 (defun avy-sp-splice-sexp-in-word (ch)
   "With `avy' move to word starting with CH and `sp-splice-sexp'."
   (interactive "cchar:")
   (avy-goto-word-1-with-action ch 'avy-action-sp-splice-sexp))
 
-
 (defun avy-action-sp-splice-sexp (pt)
   "Saving excursion `sp-splice-sexp' in word at point PT."
-  (save-excursion
-    (goto-char pt)
-    (sp-splice-sexp)))
-
+  (save-excursion (goto-char pt) (sp-splice-sexp)))
 
 (defun avy-change-word (ch)
   "With `avy' move to word starting with CH and change its any other."
   (interactive "cchar:")
   (avy-goto-word-1-with-action ch 'avy-action-change-word))
-
 
 (defun avy-action-change-word (pt)
   "Saving excursion navigate to word at point PT and change its."
@@ -568,12 +549,10 @@ Pass ARG to `avy-jump'."
     (avy-action-kill-move pt)
     (insert (read-string "new word, please: " (current-kill 0)))))
 
-
 (defun avy-transpose-words (char)
   "Goto CHAR via `avy' and transpose at point word to word at prev point."
   (interactive "cchar: ")
   (avy-goto-word-1-with-action char 'avy-action-transpose-words))
-
 
 (defun avy-action-transpose-words (second-pt)
   "Goto SECOND-PT via `avy' and transpose at point to word at point ago."
@@ -582,6 +561,51 @@ Pass ARG to `avy-jump'."
   (goto-char second-pt)
   (yank)
   (kill-sexp))
+
+(defun avy-goto-begin-of-line-text (&optional arg)
+  "Call `avy-goto-line' and move to the begin of the text of line.
+ARG is will be passed to `avy-goto-line'"
+  (interactive "p")
+  (avy-goto-line arg)
+  (beginning-of-line-text))
+
+(defun avy-clear-line (&optional arg)
+  "Move to any line via `avy' and clear this line from begin to end.
+ARG is will be passed to `avy-goto-line'"
+  (interactive "p")
+  (avy-goto-line-1-with-action #'avy-action-clear-line))
+
+(defun avy-action-clear-line (pt)
+  "Move to PT, and clear current line, move back.
+Action of `avy', see `avy-action-yank' for example"
+  (save-excursion (goto-char pt) (clear-current-line)))
+
+
+(defun avy-insert-new-line-at-eol ()
+  "Move to any line via `avy' and insert new line at end of line."
+  (interactive)
+  (avy-goto-line-1-with-action #'avy-action-insert-new-line-at-eol))
+
+(defun avy-action-insert-new-line-at-eol (pt)
+  "Move to PT, and insert new line at end of line, move back.
+Action of `avy', see `avy-action-yank' for example"
+  (save-excursion
+    (goto-char pt)
+    (end-of-line)
+    (newline)))
+
+(defun avy-insert-new-line-at-bol ()
+  "Move to any line via `avy' and insert new at beginning of line."
+  (interactive)
+  (avy-goto-line-1-with-action #'avy-action-insert-new-line-at-bol))
+
+(defun avy-action-insert-new-line-at-bol (pt)
+  "Move to PT, and insert new at beginning of line, move back.
+Action of `avy', see `avy-action-yank' for example"
+  (save-excursion
+    (goto-char pt)
+    (beginning-of-line)
+    (newline)))
 
 (use-package smartparens
     :ensure t
@@ -665,168 +689,194 @@ Pass ARG to `avy-jump'."
     :bind (:map xah-fly-command-map
                 ("SPC `" . string-edit-at-point)))
 
+(defun my-drag-stuff-left-char ()
+  "Drag char to left."
+  (interactive)
+  (transpose-chars -1))
+
+(defun my-drag-stuff-right-char ()
+  "Drag char to right."
+  (interactive)
+  (transpose-chars 1))
+
 (defcustom my-left-draggers nil
-"Functions, which drag stuff to left, or return nil.
-  Is used in `my-drag-stuff-left'.")
+  "Functions, which drag stuff to left, or return nil.
+Is used in `my-drag-stuff-left'.")
 
-  (defun my-drag-stuff-left ()
-"My more general and functional version of `drag-stuff-left'."
-(interactive)
-(--find (call-interactively it) my-left-draggers)
-(message "Start dragging, use keys u, i, o, k. Type RET for exit..."))
+(defun my-drag-stuff-left ()
+  "My more general and functional version of `drag-stuff-left'."
+  (interactive)
+  (--find (call-interactively it) my-left-draggers)
+  (message "Start dragging, use keys u, i, o, k. Type RET for exit..."))
 
-  (defcustom my-right-draggers nil
-"Functions, which drag stuff to right, or return nil.
-  Is used in `my-drag-stuff-right'.")
+(defcustom my-right-draggers nil
+  "Functions, which drag stuff to right, or return nil.
+Is used in `my-drag-stuff-right'.")
 
-  (defun my-drag-stuff-right ()
-"My more general and functional version of `drag-stuff-right'."
-(interactive)
-(--find (call-interactively it) my-right-draggers)
-(message "Start dragging, use keys u, i, o, k. Type RET for exit..."))
+(defun my-drag-stuff-right ()
+  "My more general and functional version of `drag-stuff-right'."
+  (interactive)
+  (--find (call-interactively it) my-right-draggers)
+  (message "Start dragging, use keys u, i, o, k. Type RET for exit..."))
 
-  (defcustom my-up-draggers nil
-"Functions, which drag stuff to up, or return nil.
-  Is used in `my-drag-stuff-up'.")
+(defcustom my-up-draggers nil
+  "Functions, which drag stuff to up, or return nil.
+Is used in `my-drag-stuff-up'.")
 
-  (defun my-drag-stuff-up ()
-"My more general and functional version of `drag-stuff-up'."
-(interactive)
-(--find (call-interactively it) my-up-draggers)
-(message "Start dragging, use keys u, i, o, k. Type RET for exit..."))
+(defun my-drag-stuff-up ()
+  "My more general and functional version of `drag-stuff-up'."
+  (interactive)
+  (--find (call-interactively it) my-up-draggers)
+  (message "Start dragging, use keys u, i, o, k. Type RET for exit..."))
 
-  (defcustom my-down-draggers nil
-"Functions, which drag stuff to up, or return nil.
-  Is used in `my-drag-stuff-down'.")
+(defcustom my-down-draggers nil
+  "Functions, which drag stuff to up, or return nil.
+Is used in `my-drag-stuff-down'.")
 
-  (defun my-drag-stuff-down ()
-"My more general and functional version of `drag-stuff-down'."
-(interactive)
-(--find (call-interactively it) my-down-draggers)
-(message "Start dragging, use keys u, i, o, k. Type RET for exit..."))
+(defun my-drag-stuff-down ()
+  "My more general and functional version of `drag-stuff-down'."
+  (interactive)
+  (--find (call-interactively it) my-down-draggers)
+  (message "Start dragging, use keys u, i, o, k. Type RET for exit..."))
 
-  (defun add-left-dragger (f)
-"Add F to list draggers for `my-drag-stuff-left'."
-(when (-contains-p my-left-draggers f)
-	(setq my-left-draggers (remove f my-left-draggers)))
-(setq my-left-draggers (cons f my-left-draggers)))
+(defun add-left-dragger (f)
+  "Add F to list draggers for `my-drag-stuff-left'."
+  (when (-contains-p my-left-draggers f)
+    (setq my-left-draggers (remove f my-left-draggers)))
+  (setq my-left-draggers (cons f my-left-draggers)))
 
-  (defun add-right-dragger (f)
-"Add F to list draggers for `my-drag-stuff-right'."
-(when (-contains-p my-right-draggers f)
-  (setq my-right-draggers (remove f my-right-draggers)))
-(setq my-right-draggers (cons f my-right-draggers)))
+(defun add-right-dragger (f)
+  "Add F to list draggers for `my-drag-stuff-right'."
+  (when (-contains-p my-right-draggers f)
+    (setq my-right-draggers (remove f my-right-draggers)))
+  (setq my-right-draggers (cons f my-right-draggers)))
 
-  (defun add-up-dragger (f)
-"Add F to list draggers for `my-drag-stuff-up'."
-(when (-contains-p my-up-draggers f)
-  (setq my-up-draggers (remove f my-up-draggers)))
-(setq my-up-draggers (cons f my-up-draggers)))
+(defun add-up-dragger (f)
+  "Add F to list draggers for `my-drag-stuff-up'."
+  (when (-contains-p my-up-draggers f)
+    (setq my-up-draggers (remove f my-up-draggers)))
+  (setq my-up-draggers (cons f my-up-draggers)))
 
-  (defun add-down-dragger (f)
-"Add F to list draggers for `my-drag-stuff-down'."
-(when (-contains-p my-down-draggers f)
-  (setq my-down-draggers (remove f my-down-draggers)))
-(setq my-down-draggers (cons f my-down-draggers)))
+(defun add-down-dragger (f)
+  "Add F to list draggers for `my-drag-stuff-down'."
+  (when (-contains-p my-down-draggers f)
+    (setq my-down-draggers (remove f my-down-draggers)))
+  (setq my-down-draggers (cons f my-down-draggers)))
 
-  (defun add-right-dragger (f)
-"Add F to list draggers for `my-drag-stuff-right'."
-(when (-contains-p my-right-draggers f)
-  (setq my-right-draggers (remove f my-right-draggers)))
-(setq my-right-draggers (cons f my-right-draggers)))
+(defun add-right-dragger (f)
+  "Add F to list draggers for `my-drag-stuff-right'."
+  (when (-contains-p my-right-draggers f)
+    (setq my-right-draggers (remove f my-right-draggers)))
+  (setq my-right-draggers (cons f my-right-draggers)))
 
-  (use-package drag-stuff
-  :ensure t
-  :config
-  (drag-stuff-global-mode t)
-  :bind
-  ((:map xah-fly-command-map)
-   ("SPC TAB i" . 'my-drag-stuff-up)
-   ("SPC TAB k" . 'my-drag-stuff-down)
-   ("SPC TAB o" . 'my-drag-stuff-right)
-   ("SPC TAB u" . 'my-drag-stuff-left)
-   ("SPC TAB ." . 'transpose-sexps)
-   ("SPC TAB m" . 'transpose-sexps)
-   ("SPC TAB n" . 'avy-transpose-lines-in-region)
-   ("SPC TAB t" . 'transpose-regions)))
+(defcustom my-drag-stuff-functions '(my-drag-stuff-up
+                                     my-drag-stuff-down
+                                     my-drag-stuff-right
+                                     my-drag-stuff-left
+                                     my-drag-stuff-right-char
+                                     my-drag-stuff-left-char)
+  "List of my functions, which always drag stuffs.")
 
-  (defcustom my-drag-stuff-functions '(my-drag-stuff-up
-				   my-drag-stuff-down
-				   my-drag-stuff-right
-				   my-drag-stuff-left)
-"List of my functions, which always drag stuffs.")
+(defun my-last-command-is-drag-stuff-p ()
+  "Get t, when last command is one of `my-drag-stuff-functions'."
+  (interactive)
+  (-contains-p my-drag-stuff-functions last-command))
 
-  (defun my-last-command-is-drag-stuff-p ()
-"Get t, when last command is one of `my-drag-stuff-functions'."
-(interactive)
-(-contains-p my-drag-stuff-functions last-command))
+(defvar my-last-command-is-drag-stuff nil
+  "If last command is one of my functions which draged word then this in true.")
 
-  (defvar my-last-command-is-drag-stuff nil
-"If last command is one of my functions which draged word then this in true.")
+(defun my-last-command-is-dragged-stuff-p ()
+  "Return t, when last command dragged someone stuff."
+  (or
+   (my-last-command-is-drag-stuff-p)
+   (and
+    (s-contains-p "drag-stuff" (symbol-name last-command))
+    my-last-command-is-drag-stuff)))
 
-  (defun my-last-command-is-dragged-stuff-p ()
-"Return t, when last command dragged someone stuff."
-(or
- (my-last-command-is-drag-stuff-p)
- (and
-  (s-contains-p "drag-stuff" (symbol-name last-command))
-  my-last-command-is-drag-stuff)))
+(defmacro my-define-stuff-key (keymap key normal-command drag-command)
+  "Define in KEYMAP to KEY command when run NORMAL-COMMAND or DRAG-COMMAND."
+  (let ((command-name (intern
+                       (s-concat
+                        "my-"
+                        (symbol-name (eval normal-command))
+                        "-or-"
+                        (symbol-name (eval drag-command))))))
+    `(progn
+       (defun ,command-name ()
+         ,(s-lex-format "Run `${normal-command}' or `${drag-command}'.")
+         (interactive)
+         (let* ((is-drag (my-last-command-is-dragged-stuff-p)))
+           (setq my-last-command-is-drag-stuff is-drag)
+           (if is-drag
+               (call-interactively ,drag-command)
+             (call-interactively ,normal-command))))
+       (define-key ,keymap ,key #',command-name))))
 
-  (defmacro my-define-stuff-key (keymap key normal-command drag-command)
-"Define in KEYMAP to KEY command when run NORMAL-COMMAND or DRAG-COMMAND."
-(let ((command-name (intern
-			 (s-concat
-			  "my-"
-			  (symbol-name (eval normal-command))
-			  "-or-"
-			  (symbol-name (eval drag-command))))))
-  `(progn
-	 (defun ,command-name ()
-	   ,(s-lex-format "Run `${normal-command}' or `${drag-command}'.")
-	   (interactive)
-	   (let* ((is-drag (my-last-command-is-dragged-stuff-p)))
-	 (setq my-last-command-is-drag-stuff is-drag)
-	 (if is-drag
-		 (call-interactively ,drag-command)
-	   (call-interactively ,normal-command))))
-	 (define-key ,keymap ,key #',command-name))))
+(defun stop-drag ()
+  "Stop drag, just something print, and nothing do, set to nil something."
+  (interactive)
+  (setq my-last-command-is-drag-stuff nil)
+  (message "Turn `drag' to normal!"))
 
-  (defun stop-drag ()
-"Stop drag, just something print, and nothing do, set to nil something."
-(interactive)
-(setq my-last-command-is-drag-stuff nil)
-(message "Turn `drag' to normal!"))
+(define-key-when
+    my-insert-new-line-or-nothing
+    xah-fly-command-map
+  ""
+  'stop-drag
+  'my-last-command-is-dragged-stuff-p)
 
-  (define-key-when
-  my-insert-new-line-or-nothing
-  xah-fly-command-map
-""
-'stop-drag
-'my-last-command-is-dragged-stuff-p)
+(my-define-stuff-key
+ xah-fly-command-map
+ "j"
+ #'backward-char
+ #'my-drag-stuff-left-char)
 
-  (my-define-stuff-key
-   xah-fly-command-map
-   "o"
-   #'syntax-subword-forward
-   #'my-drag-stuff-right)
+(my-define-stuff-key
+ xah-fly-command-map
+ "l"
+ #'forward-char
+ #'my-drag-stuff-right-char)
 
-  (my-define-stuff-key
-   xah-fly-command-map
-   "u"
-   #'syntax-subword-backward
-   #'my-drag-stuff-left)
+(my-define-stuff-key
+ xah-fly-command-map
+ "o"
+ #'syntax-subword-forward
+ #'my-drag-stuff-right)
 
-  (my-define-stuff-key
-   xah-fly-command-map
-   "i"
-   #'previous-line
-   #'my-drag-stuff-up)
+(my-define-stuff-key
+ xah-fly-command-map
+ "u"
+ #'syntax-subword-backward
+ #'my-drag-stuff-left)
 
-  (my-define-stuff-key
-   xah-fly-command-map
-   "k"
-   #'next-line
-   #'my-drag-stuff-down)
+(my-define-stuff-key
+ xah-fly-command-map
+ "i"
+ #'previous-line
+ #'my-drag-stuff-up)
+
+(my-define-stuff-key
+ xah-fly-command-map
+ "k"
+ #'next-line
+ #'my-drag-stuff-down)
+
+(use-package drag-stuff
+    :ensure t
+    :config
+    (drag-stuff-global-mode t)
+    :bind
+    ((:map xah-fly-command-map)
+     ("SPC TAB j" . 'my-drag-stuff-left-char)
+     ("SPC TAB l" . 'my-drag-stuff-right-char)
+     ("SPC TAB i" . 'my-drag-stuff-up)
+     ("SPC TAB k" . 'my-drag-stuff-down)
+     ("SPC TAB o" . 'my-drag-stuff-right)
+     ("SPC TAB u" . 'my-drag-stuff-left)
+     ("SPC TAB ." . 'transpose-sexps)
+     ("SPC TAB m" . 'transpose-sexps)
+     ("SPC TAB n" . 'avy-transpose-lines-in-region)
+     ("SPC TAB t" . 'transpose-regions)))
 
 (add-left-dragger  #'drag-stuff-left)
 (add-right-dragger #'drag-stuff-right)
@@ -2532,209 +2582,191 @@ If IS-AS-SNIPPET is t, then expand template as YAS snippet"
 (fast-exec/register-keymap-func 'fast-exec-my-notes-keys)
 (fast-exec/reload-functions-chain)
 
-(defcustom my-mipt-lessons
-  '("f" "m")
-  "List of codes of mipt's lessons.")
+(defcustom my-mipt-dir "c:/Users/hrams/Documents/mfti-solutions"
+  "Path to directory in which will saved solutions of MIPT tasks.")
 
-(defcustom my-mipt-directory "c:/Users/hrams/Documents/mfti-solutions"
-  "Path to directroy of mipt's solutions.")
+(defcustom my-mipt-lessons '("f" "m") "Lessons of MIPT.")
 
-(defcustom my-mipt-min-num 1
-  "Minimal normal number of mipt solution.")
+(defclass my-mipt-task ()
+  ((class :initform nil :initarg :class :accessor my-mipt-task-class)
+   (lesson :initform nil
+           :initarg :lesson
+           :accessor my-mipt-task-lesson)
+   (section :initform nil
+            :initarg :section
+            :accessor my-mipt-task-section)
+   (kind :initform nil :initarg :kind :accessor my-mipt-task-kind)   ; 'control or 'normal
+   (number  :initform nil
+            :initarg :number
+            :accessor my-mipt-task-number))
+  "Object for task of MIPT.")
 
-(defvar my--mipt-current-class nil
-  "Current mipt class.  This will changed automatically after input of user.")
+(defvar my-mipt-found-task
+  (my-mipt-task)
+  "Object of `my-mipt-task', will set automatically when find task.")
 
-(defvar my--mipt-current-lesson nil
-  "Current mipt lesson.  This will changed automatically after input of user.")
+(defun my-mipt-task-control-p (task)
+  "Return t, when TASK is control."
+  (eq (my-mipt-task-kind task) 'control))
 
-(defvar my--mipt-current-section nil
-  "Current mipt section.  This will changed automatically after input of user.")
+(defun my-mipt-task-normal-p (task)
+  "Return t, when TASK is normal, no control."
+  (not (my-mipt-task-control-p task)))
 
-(defvar my--mipt-current-type nil
-  "Current mipt `is-control'.
-One of 'control 'normal .
-This will changed automatically after input of user.")
-
-(defvar my--mipt-current-num nil
-  "Current mipt task's num.
-This will changed automatically after input of user.")
-
-(defclass my-mipt-solution ()
-  ((class :initarg :class :accessor my-mipt-solution-class)
-   (section :initarg :section :accessor my-mipt-solution-section)
-   (num :initarg :num :accessor my-mipt-solution-num)
-   (lesson :initarg :lesson :accessor my-mipt-solution-lesson)
-   (type :initarg :type :accessor my-mipt-solution-type))
-  "Class for solution of mipt.")
-
-(defun my-mipt-solution-path (mipt-solution)
-  "Get file path of MIPT-SOLUTION."
-  (f-join
-   my-mipt-directory
-   (format
-    "%s-%s-%s-%s%s.tex"
-    (my-mipt-solution-class mipt-solution)
-    (my-mipt-solution-lesson mipt-solution)
-    (my-mipt-solution-section mipt-solution)
-    (my-mipt-solution-num mipt-solution)
-    (if (my-mipt-solution-control-p mipt-solution) "-control" ""))))
-
-(defun my-mipt-solution-open (mipt-solution)
-  "Open, maybe create MIPT-SOLUTION file."
-  (->> mipt-solution (my-mipt-solution-path) (find-file)))
-
-(defun my-mipt-solution-normal-p (mipt-solution)
-  "Return t, if MIPT-SOLUTION isn't control."
-  (eq (my-mipt-solution-type mipt-solution) 'normal))
-
-(defun my-mipt-solution-control-p (mipt-solution)
-  "Return t, if MIPT-SOLUTION is control."
-  (eq (my-mipt-solution-type mipt-solution) 'control))
-
-(defun my-mipt-solution-parse (filename)
-  "Parse mipt solution from FILENAME."
+(defun my-mipt-task-parse (filename)
+  "Parse from FILENAME MIPT task."
   (when (s-matches-p ".+-.-.+-.+\\(-control\\)?\\.tex" filename)
     (-let*
-        ((base (f-no-ext filename))
+        ((base (f-base (f-no-ext filename)))
          ((class lesson section num is-control)
           (s-split "-" base)))
-      (my-mipt-solution
+      (my-mipt-task
        :class (string-to-number class)
        :lesson lesson
        :section (string-to-number section)
-       :num (string-to-number num)
-       :type (if (stringp is-control)
-                 'control
-               'normal)))))
+       :number (string-to-number num)
+       :kind (if (stringp is-control) 'control 'normal)))))
 
-(defun my-all-mipt-solutions ()
-  "Get list of all mipt solutions."
+(defun my-mipt-task-path (task)
+  "Get path to TASK's solution."
   (->>
-   (f-files my-mipt-directory)
-   (--keep (my-mipt-solution-parse (f-filename it)))))
+   (format
+    "%s-%s-%s-%s%s.tex"
+    (my-mipt-task-class task)
+    (my-mipt-task-lesson task)
+    (my-mipt-task-section task)
+    (my-mipt-task-number task)
+    (if (my-mipt-task-control-p task) "-control" ""))
+   (f-join my-mipt-dir)))
 
-(defun my-mipt-solution-lesson-p (mipt-solution lesson)
-  (string-equal (my-mipt-solution-lesson mipt-solution) lesson))
-
-(defun my-mipt-solution-class-p (mipt-solution class)
-  (equal (my-mipt-solution-class mipt-solution) class))
-
-(defun my-mipt-solution-section-p (mipt-solution section)
-  (eq (my-mipt-solution-section mipt-solution) section))
-
-(defun my-mipt-solution-search ()
-  "Search mipt-solution and open."
+(defun my-mipt-next-task ()
+  "Return next task, after last found task."
   (interactive)
-  (->> (my-read-mipt-solution) (my-mipt-solution-open)))
+  (let ((next-task my-mipt-found-task))
+    (incf (my-mipt-task-number next-task))
+    (if (interactive-p)
+        (my-mipt-task-visit next-task)
+      next-task)))
 
-(defun my-current-mipt-solution ()
-  "Get current mipt's solution."
-  (prog1
-      (my-mipt-solution
-       :lesson (or my--mipt-current-lesson
-                   (my-read-mipt-lesson))
-       :class (or my--mipt-current-class
-                  (my-read-mipt-class))
-       :section (or my--mipt-current-section
-                    (my-read-mipt-section))
-       :num (or my--mipt-current-num (my-read-mipt-solution-num))
-       :type (or my--mipt-current-type (my-mipt-read-type)))
-    (setq my--mipt-current-lesson nil)
-    (setq my--mipt-current-class nil)
-    (setq my--mipt-current-section nil)
-    (setq my--mipt-current-type nil)))
+(defun my-mipt-task-visit (task)
+  "Visit file of TASK's solution."
+  (interactive (list (my-mipt-find-task)))
+  (->> task (my-mipt-task-path) (find-file)))
 
-(defun my-read-mipt-solution ()
-  "Read mipt solution from user."
-  (or
-   (-some->>
-       (my-all-mipt-solutions)
-     (my--filter-mipt-solutions-by-lesson)
-     (my--filter-mipt-solutions-by-class)
-     (my--filter-mipt-solutions-by-section)
-     (my--filter-mipt-solutions-by-type)
-     (my-select-mipt-solution-by-num))
-   (my-current-mipt-solution)))
+(defun my-mipt-all-tasks ()
+  "Return all mipt tasks in special dir `my-mipt-dir'."
+  (->> my-mipt-dir (f-files) (-keep #'my-mipt-task-parse)))
 
-(defun my--filter-mipt-solutions-by-lesson (mipt-solutions)
-  "Filter MIPT-SOLUTIONS by asked from user lesson."
-  (let ((lesson (my-read-mipt-lesson)))
-    (setq my--mipt-current-lesson lesson)
-    (--filter (my-mipt-solution-lesson-p it lesson) mipt-solutions)))
+(defun my-mipt-find-task ()
+  "Find task of MIPT from created."
+  (interactive)
+  (setq my-mipt-found-task (my-mipt-task))
+  (->>
+   (my-mipt-all-tasks)
+   (my-mipt--find-lesson-from-tasks)
+   (my-mipt--find-class-from-tasks)
+   (my-mipt--find-section-from-tasks)
+   (my-mipt--find-kind-from-tasks)
+   (my-mipt--find-number-from-tasks))
+  (my-mipt-complete-task my-mipt-found-task))
 
-(defun my-read-mipt-lesson ()
-  (completing-read "Select lesson of mipt solution, please"
-                   my-mipt-lessons))
+(defun my-mipt--find-lesson-from-tasks (tasks)
+  "From TASKS find lesson, save in special variable, and return filtered TASKS.
+Special variable is `my-mipt-found-task'"
+  (let ((lesson (my-mipt-read-lesson)))
+    (setf (my-mipt-task-lesson my-mipt-found-task) lesson)
+    (->> tasks (--filter (string-equal (my-mipt-task-lesson it) lesson)))))
 
-(defun my-read-mipt-class (last-class)
-  (read-number "Enter class of mipt solution, please: " last-class))
+(defun my-mipt-read-lesson ()
+  "Read from user MIPT's lesson."
+  (completing-read "Choose one of MIPT lessons, please: " my-mipt-lessons))
 
-(defun my--filter-mipt-solutions-by-class (mipt-solutions)
-  "Filter MIPT-SOLUTIONS by asked from user class."
-  (let* ((last-class
-          (->> mipt-solutions (-map 'my-mipt-solution-class) (-max)))
-         (current-class (my-read-mipt-class last-class)))
-    (setq my--mipt-current-class current-class)
-    (--filter
-     (my-mipt-solution-class-p it current-class)
-     mipt-solutions)))
+(defun my-mipt--find-class-from-tasks (tasks)
+  "From TASKS find class, save in special variable, and return filtered TASKS.
+Special variable is `my-mipt-found-task'"
+  (let* ((class (my-mipt-choose-one-of-task-classes tasks)))
+    (setf (my-mipt-task-class my-mipt-found-task) class)
+    (->> tasks (--filter (= (my-mipt-task-class it) class)))))
 
-(defun my-read-mipt-section (last-section)
-  (read-number "Enter section of mipt solution, please: "
-               last-section))
+(defun my-mipt-choose-one-of-task-classes (tasks)
+  "Take TASKS and choose one of classes."
+  (->> tasks (-map #'my-mipt-task-class) (-max) (my-mipt-read-class)))
 
-(defun my--filter-mipt-solutions-by-section (mipt-solutions)
-  "Filter MIPT-SOLUTIONS by asked from user section."
-  (let* ((last-section
-          (->> mipt-solutions (-map #'my-mipt-solution-section) (-max)))
-         (section (my-read-mipt-section last-section)))
-    (setq my--mipt-current-section section)
-    (--filter (my-mipt-solution-section-p it section) mipt-solutions)))
+(defun my-mipt-read-class (&optional default)
+  "Read from user class of MIPT task, defaults to DEFAULT."
+  (read-number "Choose one of MIPT classes, please: " default))
 
-(defun my--filter-mipt-solutions-by-type (mipt-solutions)
-  "Filter MIPT-SOLUTIONS by asked from user type."
-  (let ((type (my-read-mipt-type mipt-solutions)))
-    (setq my--mipt-current-type type)
-    (--filter
-     (eq type (my-mipt-solution-type it))
-     mipt-solutions)))
+(defun my-mipt--find-section-from-tasks (tasks)
+  "From TASKS find section, save in special variable, and return filtered TASKS.
+Special variable is `my-mipt-found-task'"
+  (let* ((section (my-mipt-choose-one-of-task-sections tasks)))
+    (setf (my-mipt-task-section my-mipt-found-task) section)
+    (->> tasks (--filter (= (my-mipt-task-section it) section)))))
 
-(defun my-read-mipt-type (mipt-solutions)
-  "Watch MIPT-SOLUTIONS and ask from user solutions is control or normal."
-  (let* ((is-have-normal-tasks
-          (--some (my-mipt-solution-normal-p it) mipt-solutions))
-         (is-control
-          (if is-have-normal-tasks
-              (not (y-or-n-p "Your mipt task normal? "))
-            (y-or-n-p "Your mipt task control? "))))
-    (if is-control
-        'control
-      'normal)))
+(defun my-mipt-choose-one-of-task-sections (tasks)
+  "Take TASKS and choose one of sections."
+  (->>
+   tasks
+   (-map #'my-mipt-task-section)
+   (-max)
+   (my-mipt-read-section)))
 
-(defun my-mipt-read-is-control ()
-  "Read from user mipt solutions is control or no."
-  (if (y-or-n-p "Mipt task is control or no? ")
-      'control
-    'normal))
+(defun my-mipt-read-section (&optional default)
+  "Read from user section of MIPT task, defaults to DEFAULT."
+  (read-number "Enter section of MIPT task, please: " default))
 
-(defun my-read-mipt-solution-num (&optional last-num)
-  (read-number
-   "Number of mipt's solution, please: "
-   (if last-num (1+ last-num) my-mipt-min-num)))
+(defun my-mipt--find-kind-from-tasks (tasks)
+  "From TASKS find kind, save in special variable, and return filtered TASKS.
+Special variable is `my-mipt-found-task'"
+  (let ((kind (my-mipt-choose-one-of-task-kinds tasks)))
+    (setf (my-mipt-task-kind my-mipt-found-task) kind)
+    (->> tasks (--filter (eq (my-mipt-task-kind it) kind)))))
 
-(defun my-select-mipt-solution-by-num (mipt-solutons)
-  "Ask from user num of one of MIPT-SOLUTONS, and selects solution."
-  (let* ((last-num
-          (-some->> mipt-solutons (-map #'my-mipt-solution-num) (-max)))
-         (mipt-num (my-read-mipt-solution-num last-num)))
-    (setq my--mipt-current-num mipt-num)
-    (--find (= (my-mipt-solution-num it) mipt-num) mipt-solutons)))
+(defun my-mipt-choose-one-of-task-kinds (tasks)
+  "Take TASKS and choose one of kinds."
+  (let* ((is-was-normal-tasks (-any #'my-mipt-task-normal-p tasks))
+         (is-normal
+          (if is-was-normal-tasks
+              (y-or-n-p "Your task normal? ")
+            (not (y-or-n-p "Your task control? ")))))
+    (if is-normal 'normal 'control)))
+
+(defun my-mipt-read-kind (&optional default)
+  "Read from user kind of MIPT task, defaults to DEFAULT."
+  (if (y-or-n-p "Your task normal? ") 'normal 'control))
+
+(defun my-mipt--find-number-from-tasks (tasks)
+  "From TASKS find number, save in special variable, and return filtered TASKS.
+Special variable is `my-mipt-found-task'"
+  (let* ((number (my-mipt-choose-one-of-task-numbers tasks)))
+    (setf (my-mipt-task-number my-mipt-found-task) number)
+    (->> tasks (--filter (= (my-mipt-task-number it) number)))))
+
+(defun my-mipt-choose-one-of-task-numbers (tasks)
+  "Take TASKS and choose one of classes."
+  (->> tasks
+       (-map #'my-mipt-task-number)
+       (-max)
+       (my-mipt-read-number)))
+
+(defun my-mipt-read-number (&optional default)
+  "Read from user number of MIPT's task, defaults to DEFAULT."
+  (read-number "Please, type number of MIPT task: " default))
+
+(defun my-mipt-complete-task (task)
+  "Complete all fields of TASK, and return modified TASK."
+  (my-mipt-task
+   :class (or (my-mipt-task-class task) (my-mipt-read-class))
+   :lesson (or (my-mipt-task-lesson task) (my-mipt-read-lesson))
+   :section (or (my-mipt-task-section task) (my-mipt-read-section))
+   :kind (or (my-mipt-task-kind task) (my-mipt-read-kind))
+   :number (or (my-mipt-task-number task) (my-mipt-read-number))))
 
 (defun fast-exec-mipt-keys ()
-  "Get some useful keymaps of `fast-exec' for mipt."
+  "Get some useful keymaps of  `fast-exec' for MIPT."
   (fast-exec/some-commands
-   ("Search MIPT Solution" 'my-mipt-solution-search)))
+   ("Next MIPT Task" 'my-mipt-next-task)
+   ("Find MIPT Task" 'my-mipt-task-visit)))
 
 (fast-exec/register-keymap-func 'fast-exec-mipt-keys)
 (fast-exec/reload-functions-chain)

@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: avy-sexp-action
+# key: aacts
+# --
+(defun avy-$1 (ch)
+  \"With `avy' move to word starts by CH and ${1:$(s-replace "-" " " yas-text)}.\"
+  (interactive "cchar:")
+  (avy-goto-word-1-with-action ch #'avy-action-$1))
+
+(defun avy-action-$1 (pt)
+  \"Move to PT and ${1:$(s-replace "-" " " yas-text)}, move back.\"
+  (save-excursion
+    (goto-char pt)
+    ($1)))
