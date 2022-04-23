@@ -3,7 +3,7 @@
 
 * Hi!
   Hello, This is configuration of Emacs from semenInRussia!
-  
+
   My moto is "Good Luck!", so my homepage is "Good Luck":
 
   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -12,10 +12,10 @@
 
   #+END_SRC
 
-* Package Management - base 
+* Package Management - base
 ** use-package
    I am use [[https://github.com/jwiegley/use-package][use-package]]:
-   
+
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
      (require 'package)
 
@@ -62,14 +62,14 @@
     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
       (use-package s :ensure t)
       #+END_SRC
-      
+
 *** f
     This is [[https://github.com/rejeep/f.el][f]]:
-    
+
     #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
       (use-package f :ensure t)
       #+END_SRC
-      
+
 *** Dash
     This is [[https://github.com/magnars/dash.el][dash:]]
     #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
@@ -81,7 +81,7 @@
 *** Work with Files
     Function =my-try-delete= delete file when it is exists, otherwise
     do nothing:
-    
+
     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
       (defun my-try-delete (path &optional force)
@@ -153,7 +153,6 @@
          (--some (s-prefix-p it s))))
     #+END_SRC
 
-
 *** Work with Editor
     Function =my-current-line= return current line:
 
@@ -181,6 +180,22 @@
 
     #+END_SRC
 
+    Function =my-current-line-empty-p= return t, when current line is
+    empty:
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (defun my-current-line-is-empty-p (&optional pt)
+        "Return t, when line on PT is empty."
+        (setq pt (or pt (point)))
+        (->>
+         pt
+         (my-current-line)
+         (s-trim)
+         (string-equal "")))
+
+    #+END_SRC
+
 ** Auto Tangle This File
 
    #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
@@ -191,7 +206,6 @@
 
        (when (s-equals? (f-filename buffer-file-name) "Emacs.org")
          (org-babel-tangle)))
-
 
      (add-hook 'after-save-hook 'if-Emacs-org-then-org-babel-tangle)
 
@@ -207,7 +221,6 @@
           user-name         "semenInRussia"
           user-os           "Windows" ; "Windows" or "Linux"
           )
-
 
     (defun user-os-windows-p ()
       "If user have os Windows, then return t.
@@ -337,7 +350,7 @@
 
 ** Main keymaps
    I am use [[https://github.com/xahlee/xah-fly-keys][xah-fly-keys]], this as VIM, but keymaps created for keyboard (in VIM keymaps created for easy remember):
-   
+
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
      (use-package xah-fly-keys
@@ -351,7 +364,6 @@
        #+END_SRC
 *** Easy Create Major Modes Maps
     I am use =use-package=, so I'm add flag =:major-mode-map= for create major modes in =use-package= macro, I am bind local major mode map to =SPC l=:
-
 
     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
@@ -424,7 +436,7 @@
 
 ** Fast Executing Command
    I am use [[https://github.com/semenInRussia/fast-exec.el][fast-exec]]:
-   
+
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
      (require 'fast-exec)
@@ -474,9 +486,9 @@
 
 ** Search
 *** Search in File
-    
+
     I am press ='= for search word:
-    
+
     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
       (use-package swiper-helm
@@ -596,7 +608,6 @@
            (mc/mark-all-words-like-this)
          (mark-whole-buffer)))
 
-
      (defun my-bob-or-mc-align ()
        "If enable `multiple-cursors', then mark then align by regexp, other bob.
      BOB - is `beginning-of-buffer'"
@@ -605,7 +616,6 @@
            (call-interactively 'mc/vertical-align)
          (beginning-of-buffer)))
 
-
      (defun my-eob-or-mc-align-with-space ()
        "If enable `multiple-cursors', then align by spaces, other bob.
      EOB - is `end-of-buffer'"
@@ -613,7 +623,6 @@
        (if multiple-cursors-mode
            (mc/vertical-align-with-space)
          (end-of-buffer)))
-
 
      (defun my-mc-mark-like-this-or-edit-lines ()
        "If region on some lines, `mc/edit-lines' other `mc/mark-next-like-this'."
@@ -654,7 +663,7 @@
 
 ** Very Fast Jump
    I am use [[https://github.com/abo-abo/avy][avy]]:
-   
+
    #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
 
      (use-package avy
@@ -868,7 +877,6 @@
      Action of `avy', see `avy-action-yank' for example"
        (save-excursion (goto-char pt) (clear-current-line)))
 
-
      (defun avy-insert-new-line-at-eol ()
        "Move to any line via `avy' and insert new line at end of line."
        (interactive)
@@ -1032,7 +1040,7 @@
   - =add-down-dragger=
   - =add-up-dragger=
   - =add-right-dragger=
-   
+
     This functions take =dragger= which take zero arguments, and
     return t when word was successufully moved:
 
@@ -1232,8 +1240,6 @@
          ("SPC TAB n" . 'avy-transpose-lines-in-region)
          ("SPC TAB t" . 'transpose-regions)))
 
-
-
   #+END_SRC
 
 *** Draggers of =drag-stuff=
@@ -1325,7 +1331,7 @@
      #+END_SRC
 
    I am delete content of this line (including whitespaces) on press =SPC w=:
-   
+
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
      (defun clear-current-line ()
@@ -1353,7 +1359,7 @@
 
    #+END_SRC
 
-   I am press =g=, for deleting current block, but if selected region, then I am cancel 
+   I am press =g=, for deleting current block, but if selected region, then I am cancel
    this select:
 
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -1385,7 +1391,7 @@
 
 ** Custom Editing Text
    I am use =s= for inserting new line:
-   
+
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
      (defun open-line-saving-indent ()
@@ -1536,7 +1542,6 @@
    #+RESULTS:
    : open-line-above
 
-
    And I am press =p= for inserting space, and if I am selected region,  for inserting space
    to beginning of each line:
 
@@ -1575,7 +1580,6 @@
            (insert-spaces-before-each-line beg end)
          (xah-insert-space-before))
        )
-
 
      (define-key xah-fly-command-map (kbd "p") nil)
      (define-key xah-fly-command-map (kbd "p") 'insert-spaces-before-or-to-beginning-of-each-line)
@@ -1647,7 +1651,7 @@
                       #+END_SRC
 
 ** Indent Settings
-   
+
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
      (setq-default indent-tabs-mode nil)
@@ -1656,7 +1660,6 @@
      (setq-default standart-indent    4)
      (setq-default lisp-body-indent   4)
 
-
      (defun select-current-line ()
        "Select as region current line."
        (interactive)
@@ -1664,7 +1667,6 @@
        (set-mark (point))
        (end-of-line)
        )
-
 
      (defun indent-line-or-region ()
        "If text selected, then indent it, otherwise indent current line."
@@ -1675,7 +1677,6 @@
            (funcall indent-line-function)
            ))
        )
-
 
      (global-set-key (kbd "RET") 'newline-and-indent)
      (define-key xah-fly-command-map (kbd "q") 'indent-line-or-region)
@@ -1748,12 +1749,104 @@
 
                 #+END_SRC
 
+*** Functions for Auto Format Code
+    I am take this from [[https://github.com/jkitchin/scimax/][scimax]]:
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (defvar my-autoformat-functions nil
+        "Current used autoformat functions.")
+
+      (defcustom my-autoformat-all-functions '(sentence-capitalization
+                                               ordinals
+                                               transposed-caps)
+        "All my autoformat functions.")
+
+      (defun my-use-autoformat-function-p (f)
+        "Return t, when must use F as autoformat function."
+        (-contains-p my-autoformat-functions f))
+
+      (defmacro my-use-autoformat-in-mode (mode &rest autoformat-functions)
+        "Add hook to MODE, which enable AUTOFORMAT-FUNCTIONS."
+        (let* ((hook (intern (s-append "-hook" (symbol-name (eval mode)))))
+               (funcs (->>
+                       autoformat-functions
+                       (--map (symbol-name it))
+                       (--map (intern (s-prepend "autoformat-" it))))))
+          `(add-hook ',hook
+                     (lambda ()
+                       (setq-local my-autoformat-functions ',funcs)))))
+
+      (defmacro my-use-all-autoformat-in-mode (mode)
+        "Use my all autoformat functions in MODE."
+        `(my-use-autoformat-in-mode ,mode ,@my-autoformat-all-functions))
+
+      (defun autoformat-sentence-capitalization ()
+        "Auto-capitalize first words of a sentence.
+      Either at the beginning of a line, or after a sentence end."
+        (interactive)
+        (when (and (my-use-autoformat-function-p 'autoformat-sentence-capitalization)
+                   (not (org-in-src-block-p))
+                   (or (save-excursion (backward-char) (bolp))
+                       (looking-back "\*+\\W*.")
+                       (looking-back (concat (sentence-end) "[a-z]"))))
+          (undo-boundary)
+          (capitalize-word -1)))
+
+      (defun autoformat-transposed-caps ()
+        "If you write hTe, fixes it to The."
+        (interactive)
+        (when (and (my-use-autoformat-function-p 'autoformat-transposed-caps)
+                   (not (org-in-src-block-p))
+                   (let ((case-fold-search nil))
+                     (looking-back "\\<\\(?1:[a-z]\\)\\(?2:[A-Z]\\)[a-z]+"
+                                   (line-beginning-position))))
+          (undo-boundary)
+          (save-excursion
+            (replace-match (upcase (match-string 1)) nil nil nil 1)
+            (replace-match (downcase (match-string 2)) nil nil nil 2))))
+
+      (defun autoformat-ordinals ()
+        "Expand ordinal words to superscripted versions in `org-mode'.
+      1st to 1^{st}.
+      2nd to 2^{nd}
+      3rd to 3^{rd}
+      4th to 4^{th}"
+        (interactive)
+        (when (and (my-use-autoformat-function-p 'autoformat-ordinals)
+                   (not (org-in-src-block-p))
+                   (looking-back
+                    "\\(?3:\\<\\(?1:[0-9]+\\)\\(?2:st\\|nd\\|rd\\|th\\)\\>\\)\\(?:[[:punct:]]\\|[[:space:]]\\)"
+                    (line-beginning-position)))
+          (undo-boundary)
+          (save-excursion
+            (replace-match "\\1^{\\2}" nil nil nil 3))))
+
+      (defun my-autoformat ()
+        "Call all autoformat functions."
+        (interactive)
+        (--each my-autoformat-functions
+          (funcall it)))
+
+      (define-minor-mode my-autoformat-mode
+          "Toggle `my-autoformat-mode'.  Converts 1st to 1^{st} as you type."
+        :init-value nil
+        (if my-autoformat-mode
+            (add-hook 'post-self-insert-hook #'my-autoformat)
+          (remove-hook 'post-self-insert-hook #'my-autoformat)))
+
+      (my-autoformat-mode t)
+    #+END_SRC
+
+    #+RESULTS:
+    : t
+
 ** Supported Languages
 *** LaTeX
     I am use [[https://github.com/emacsmirror/auctex][auctex]], I am take some configuration from
     [[https://habr.com/ru/company/skillfactory/blog/593999/][this article from HABR]]:
 
-**** LaTeX + calc 
+**** LaTeX + calc
      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
        (use-package latex
@@ -1953,12 +2046,12 @@
 **** Variables for LaTeX
      Variable `latex-documentclasses` is list of documentclasses in Emacs, each element
      of this list is name of documentclass in lower case. Defaults to:
-     
+
      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
        (setq latex-documentclasses
              '("article" "reoport" "book" "proc" "minimal" "slides" "memoir" "letter" "beamer"))
              #+END_SRC
-             
+
 **** Visual Fill for LaTeX
 
      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -1968,7 +2061,6 @@
                            'latex-mode-hook
                            'LaTeX-mode-hook))
          (add-hook mode (lambda () (call-interactively 'visual-fill))))
-
 
          #+END_SRC
 **** Keymaps for LaTeX
@@ -1996,20 +2088,18 @@
              (add-to-list 'company-backends 'company-latex-commands))
            (add-hook 'LaTeX-mode 'my-company-math-setup))
 
-
        (use-package company-auctex
            :ensure t
            :config
            (company-auctex-init))
 
            #+END_SRC
-**** Auto Activating Snippets for LaTeX  
+**** Auto Activating Snippets for LaTeX
      I am use [[https://github.com/tecosaur/LaTeX-auto-activating-snippets][LaTeX-auto-activating-snippets]]. I am use some standard
      snippets, but also I need to some things, which will expands as
      units, for example /Om/ will be expanded to /\mathrm{Ом}/:
 
      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
 
               (use-package laas
                   :ensure t
@@ -2047,8 +2137,8 @@
            ("s"   . 'org-schedule)
            ("RET" . 'org-open-at-point)))
 
-      (defvar my- nil
-        "Return t, when last `my-er-expand-region-or-org-todo' done `org-todo'.")
+      (defvar my-last-command-is-org-todo nil
+        "To t, when last `my-er-expand-region-or-org-todo' done `org-todo'.")
 
       (defun my-er-expand-region-or-org-todo ()
         "If need do `org-todo', otherwise do `er/expand-region'."
@@ -2065,12 +2155,21 @@
 
     #+END_SRC
 
-**** Centering 
+**** Centering Org
      I am centering text, when enable =org-mode=:
 
      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
        (add-hook 'org-mode-hook (lambda () (call-interactively 'visual-fill)))
+
+     #+END_SRC
+
+**** Auto Format in Org
+     I am use my autoformat system, which I am taked from [[https://github.com/jkitchin/scimax/][scimax]]:
+
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+       (my-use-all-autoformat-in-mode 'org-mode)
 
      #+END_SRC
 
@@ -2107,7 +2206,7 @@
                        ([remap helm-imenu]
                         . helm-org-in-buffer-headings)))
 
-                        #+END_SRC
+     #+END_SRC
 
 **** Copy Org Code for Other Programms (Word, PowerPoint)
      I am use [[https://github.com/jkitchin/ox-clip][ox-clip]]:
@@ -2140,38 +2239,20 @@
 *** Elisp
 **** Special Linters
 ***** Package Linter
-      I am use [[https://github.com/purcell/package-lint][package-lint]] for lint my packages for Melpa for view I am use [[https://github.com/purcell/flycheck-package][flycheck-package]]:
+      I am use [[https://github.com/purcell/package-lint][package-lint]] for lint my packages for Melpa for view I
+      am use [[https://github.com/purcell/flycheck-package][flycheck-package]]:
 
       #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
         (use-package package-lint
-            :ensure t
-            )
+            :ensure t)
 
         (use-package flycheck-package
             :ensure t
             :init
-            (flycheck-package-setup)
-            )
+            (flycheck-package-setup))
 
-            #+END_SRC
-
-      # ***** ELSA (Static Analyzer)
-      #       I am use [[https://github.com/emacs-elsa/Elsa#how-do-i-run-it][ELSA]] and [[https://github.com/emacs-elsa/flycheck-elsa][flycheck-elsa]]:
-
-      # #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-      #   (use-package elsa
-      #       :ensure t)
-
-      #   (use-package flycheck-elsa
-      #       :ensure t
-      #       :init
-      #       (add-hook 'emacs-lisp-mode-hook #'flycheck-elsa-setup)
-      #       ;; (add-to-list 'flycheck-checkers 'flyc))
-      #       )
-
-      # #+END_SRC
+       #+END_SRC
 
 **** Refactoring
      I am use [[https://github.com/Wilfred/emacs-refactor][emacs-refactor]] for refactor not only in =emacs-lisp=:
@@ -2232,7 +2313,6 @@
            :bind (:map emacs-lisp-mode-map
                        ([remap string-edit-at-point] . my-edit-elisp-docstring)))
 
-
                        #+END_SRC
 
 **** Elisp Indent Code
@@ -2242,6 +2322,62 @@
      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
        (setq lisp-body-indent 2)
        #+END_SRC
+
+**** Some Insertion Functions for Elisp
+     In =org-mode= I am press =M-RET= for insertion heading, in
+     =elisp= I need to press =M-RET= for insetion of class' fields
+     (see [[info:EIEIO][Info about Classes in Elisp]]):
+
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+       ;;
+
+       (defun my-goto-defclass-beg ()
+         "Goto backward defclass."
+         (search-backward-regexp "(\\W*defclass" nil t)
+         (skip-chars-forward "("))
+
+       (defun my-goto-fields-defclass-defnition ()
+         "Go to fields of `defclass' defnition."
+         (interactive)
+         (my-goto-defclass-beg)
+         (forward-sexp 4)
+         (forward-char -1)
+         (-when-let (sexp (sp-get-enclosing-sexp))
+           (sp-get sexp (goto-char :end-in))))
+
+       (defun my-elisp-in-defclass-p (&optional pt)
+         "Move to PT and return name of function/macros in which stay this sexp."
+         (setq pt (or pt (point)))
+         (save-excursion
+           (goto-char pt)
+           (when (my-goto-defclass-beg)
+             (-when-let (sexp (sp-get-enclosing-sexp))
+               (sp-get sexp (< :beg pt :end))))))
+
+       (defun my-elisp-defclass-name ()
+         "Return name of `defclass' defnition."
+         (interactive)
+         (save-excursion
+           (my-goto-defclass-beg)
+           (forward-sexp 1)
+           (forward-char 1)
+           (sexp-at-point)))
+
+       (defun my-elisp-new-field-of-class ()
+         "Insert new field of Lisp class.
+       Only when in class defnition."
+         (interactive)
+         (when (my-elisp-in-defclass-p)
+           (my-goto-fields-defclass-defnition)
+           (unless (my-current-line-is-empty-p)
+             (newline-and-indent))
+           (yas-expand-snippet
+            (format "(${1:name} :initarg :$1 :accessor %s-$1)"
+                    (my-elisp-defclass-name)))))
+
+       (define-key emacs-lisp-mode-map (kbd "M-RET") 'my-elisp-new-field-of-class)
+
+     #+END_SRC
 
 *** Markdown
     I am use [[https://github.com/jrblevin/markdown-mode/][markdown-mode]] , and for its I am centering code:
@@ -2331,7 +2467,7 @@
         #+END_SRC
 
 **** Linters
-     
+
      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
        (setq flycheck-python-flake8-command "python -m flake8")
@@ -2359,7 +2495,6 @@
          (interactive)
          (setq-local company-backends (cons 'company-dabbrev company-backends))
          )
-
 
        (add-hook 'python-mode-hook 'enable-dabbrev-company-backend)
 
@@ -2453,10 +2588,10 @@
            (add-hook 'haskell-interactive-mode-hook 'company-mode))
 
            #+END_SRC
-           
+
 *** JavaScript (Node.js)
 **** Variables
-     Variable `js/imports-regexp` if regular expression for search imports in JS. 
+     Variable `js/imports-regexp` if regular expression for search imports in JS.
      Defaults to:
 
      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -2465,7 +2600,7 @@
 
        #+END_SRC
 
-     Variable `js/function-or-class-regexp` if regular expression for search imports in JS. 
+     Variable `js/function-or-class-regexp` if regular expression for search imports in JS.
      Defaults to:
 
      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -2552,7 +2687,6 @@
         js2-mode
         js/nav-to-imports)
 
-
         #+END_SRC
 
 *** JSON
@@ -2624,7 +2758,6 @@
            (mhtml-mode . emmet-mode)
            (css-mode . emmet-mode)
            (html-mode . emmet-mode))
-
 
        (use-package helm-emmet
            :ensure t
@@ -2749,9 +2882,9 @@
          #+END_SRC
 ** Helpful
 *** Which Key?
-    
+
     I am use [[https://github.com/justbur/emacs-which-key][which-key]]:
-    
+
     #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
       (use-package which-key
           :ensure t
@@ -2779,7 +2912,7 @@
 
 ** Autocompletion of Commands (HELM)
    I am use [[https://github.com/emacs-helm/helm][HELM]]:
-   
+
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
      (use-package helm
@@ -2791,7 +2924,6 @@
          :bind (:map
                 xah-fly-command-map
                 ("SPC SPC f" . helm-find-files)))
-
 
                 #+END_SRC
 
@@ -2900,9 +3032,7 @@
 
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-
      (setq default-input-method "russian-computer")
-
 
      #+END_SRC
 
@@ -3006,7 +3136,6 @@
 
          #+END_SRC
 
-
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
      (use-package helm-spotify-plus
@@ -3066,7 +3195,38 @@
          (fast-exec/reload-functions-chain))
 
          #+END_SRC
- 
+
+** Kinopoisk
+   I am use [[https://github.com/semenInRussia/emacs-kinopoisk][emacs-kinopoisk]] for management of Films:
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+     (use-package helm-kinopoisk
+         :load-path "~/projects/emacs-kinopoisk")
+
+   #+END_SRC
+
+** Make Broken PPTX File
+   I need to fast make fake and broken PPTX file, so I just make for
+   this Function:
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+     (defun my-new-fake-pptx-file ()
+       "Make this buffer, fake presentation with format (.pptx)."
+       (interactive)
+       (->> "~/broken.pptx" (f-read) (insert))
+       (text-mode))
+
+     (defun fast-exec-fake-pptx-keys ()
+       "Get some useful keymaps of  `fast-exec' for fake-pptx."
+       (fast-exec/some-commands ("New Fake PPTX File" 'my-new-fake-pptx-file)))
+
+     (fast-exec/register-keymap-func 'fast-exec-fake-pptx-keys)
+     (fast-exec/reload-functions-chain)
+
+   #+END_SRC
+
 * Graphic User Interface
 ** Hide ALL
    This is standard stuf
@@ -3102,7 +3262,6 @@
 
     #+END_SRC
 
-
 *** Some other themes
     Also I am use black theme of =magnars=:
 
@@ -3113,7 +3272,6 @@
 
     #+END_SRC
 
-    
 *** Load Theme
     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
@@ -3122,7 +3280,7 @@
     #+END_SRC
 
 ** Numbers of lines
-*** Vars 
+*** Vars
     Var `dont-display-lines-mode` is list of modes,
     for this modes willn't display numbers of lines. Defaults to:
 
@@ -3167,7 +3325,7 @@
 
 *** Modeline for =drag=
     I need to see when keys will readed as =drag=:
-     
+
     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
       (doom-modeline-def-segment drag
@@ -3181,7 +3339,7 @@
     #+END_SRC
 
 *** Disable View of =xah-fly-keys= State
-    
+
     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
       (doom-modeline-def-segment my-matches
         "Display `macro-recoring', `multiple-cursors' and `buffer-size'."
@@ -3228,8 +3386,6 @@
                  (pomidor-time-format " Pom %-Mm")
                  (time (-first 'identity (list break overwork work))))
             (propertize (pomidor--format-time time) 'face face))))
-
-
 
             #+END_SRC
 
@@ -3300,7 +3456,6 @@
 
 ** Fonts
 
-   
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
      (set-face-attribute 'default nil :font "Consolas" :height 250)
@@ -3453,7 +3608,7 @@
 
 ** View Directories
    I am use =dired=:
-   
+
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
      (add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
      #+END_SRC
@@ -3554,7 +3709,6 @@
    I am create own simple system of notes:
 
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
 
      (defgroup my-notes nil
        "My own simple system of notes."
@@ -4035,7 +4189,7 @@
      (fast-exec/reload-functions-chain)
 
    #+END_SRC
-   
+
 ** Copy Content of File as MIPT Solution
    MIPT has bug, when LaTeX's source is too big, source will limited,
    so I need to compess my code, function

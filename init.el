@@ -81,13 +81,21 @@ If FORCE is t, a directory will be deleted recursively."
   "Return t, when current text line starts with P."
   (s-prefix-p p (my-current-line)))
 
+(defun my-current-line-is-empty-p (&optional pt)
+  "Return t, when line on PT is empty."
+  (setq pt (or pt (point)))
+  (->>
+   pt
+   (my-current-line)
+   (s-trim)
+   (string-equal "")))
+
 (defun if-Emacs-org-then-org-babel-tangle ()
   "If current open file is Emacs.org, then `org-babel-tangle`."
   (interactive)
 
   (when (s-equals? (f-filename buffer-file-name) "Emacs.org")
     (org-babel-tangle)))
-
 
 (add-hook 'after-save-hook 'if-Emacs-org-then-org-babel-tangle)
 
@@ -97,7 +105,6 @@ If FORCE is t, a directory will be deleted recursively."
       user-name         "semenInRussia"
       user-os           "Windows" ; "Windows" or "Linux"
       )
-
 
 (defun user-os-windows-p ()
   "If user have os Windows, then return t.
@@ -315,7 +322,6 @@ Instead of KEY will command FUN-NAME"
       (mc/mark-all-words-like-this)
     (mark-whole-buffer)))
 
-
 (defun my-bob-or-mc-align ()
   "If enable `multiple-cursors', then mark then align by regexp, other bob.
 BOB - is `beginning-of-buffer'"
@@ -324,7 +330,6 @@ BOB - is `beginning-of-buffer'"
       (call-interactively 'mc/vertical-align)
     (beginning-of-buffer)))
 
-
 (defun my-eob-or-mc-align-with-space ()
   "If enable `multiple-cursors', then align by spaces, other bob.
 EOB - is `end-of-buffer'"
@@ -332,7 +337,6 @@ EOB - is `end-of-buffer'"
   (if multiple-cursors-mode
       (mc/vertical-align-with-space)
     (end-of-buffer)))
-
 
 (defun my-mc-mark-like-this-or-edit-lines ()
   "If region on some lines, `mc/edit-lines' other `mc/mark-next-like-this'."
@@ -579,7 +583,6 @@ ARG is will be passed to `avy-goto-line'"
   "Move to PT, and clear current line, move back.
 Action of `avy', see `avy-action-yank' for example"
   (save-excursion (goto-char pt) (clear-current-line)))
-
 
 (defun avy-insert-new-line-at-eol ()
   "Move to any line via `avy' and insert new line at end of line."
@@ -1153,7 +1156,6 @@ With prefix arg don't indent."
     (xah-insert-space-before))
   )
 
-
 (define-key xah-fly-command-map (kbd "p") nil)
 (define-key xah-fly-command-map (kbd "p") 'insert-spaces-before-or-to-beginning-of-each-line)
 
@@ -1212,7 +1214,6 @@ With prefix arg don't indent."
 (setq-default standart-indent    4)
 (setq-default lisp-body-indent   4)
 
-
 (defun select-current-line ()
   "Select as region current line."
   (interactive)
@@ -1220,7 +1221,6 @@ With prefix arg don't indent."
   (set-mark (point))
   (end-of-line)
   )
-
 
 (defun indent-line-or-region ()
   "If text selected, then indent it, otherwise indent current line."
@@ -1231,7 +1231,6 @@ With prefix arg don't indent."
       (funcall indent-line-function)
       ))
   )
-
 
 (global-set-key (kbd "RET") 'newline-and-indent)
 (define-key xah-fly-command-map (kbd "q") 'indent-line-or-region)
@@ -1275,6 +1274,89 @@ With prefix arg don't indent."
             xah-fly-command-map
             (kbd "SPC i")
           ',add-import-function)))))
+
+(defvar my-autoformat-functions nil
+  "Current used autoformat functions.")
+
+(defcustom my-autoformat-all-functions '(sentence-capitalization
+                                         ordinals
+                                         transposed-caps)
+  "All my autoformat functions.")
+
+(defun my-use-autoformat-function-p (f)
+  "Return t, when must use F as autoformat function."
+  (-contains-p my-autoformat-functions f))
+
+(defmacro my-use-autoformat-in-mode (mode &rest autoformat-functions)
+  "Add hook to MODE, which enable AUTOFORMAT-FUNCTIONS."
+  (let* ((hook (intern (s-append "-hook" (symbol-name (eval mode)))))
+         (funcs (->>
+                 autoformat-functions
+                 (--map (symbol-name it))
+                 (--map (intern (s-prepend "autoformat-" it))))))
+    `(add-hook ',hook
+               (lambda ()
+                 (setq-local my-autoformat-functions ',funcs)))))
+
+(defmacro my-use-all-autoformat-in-mode (mode)
+  "Use my all autoformat functions in MODE."
+  `(my-use-autoformat-in-mode ,mode ,@my-autoformat-all-functions))
+
+(defun autoformat-sentence-capitalization ()
+  "Auto-capitalize first words of a sentence.
+Either at the beginning of a line, or after a sentence end."
+  (interactive)
+  (when (and (my-use-autoformat-function-p 'autoformat-sentence-capitalization)
+             (not (org-in-src-block-p))
+             (or (save-excursion (backward-char) (bolp))
+                 (looking-back "\*+\\W*.")
+                 (looking-back (concat (sentence-end) "[a-z]"))))
+    (undo-boundary)
+    (capitalize-word -1)))
+
+(defun autoformat-transposed-caps ()
+  "If you write hTe, fixes it to The."
+  (interactive)
+  (when (and (my-use-autoformat-function-p 'autoformat-transposed-caps)
+             (not (org-in-src-block-p))
+             (let ((case-fold-search nil))
+               (looking-back "\\<\\(?1:[a-z]\\)\\(?2:[A-Z]\\)[a-z]+"
+                             (line-beginning-position))))
+    (undo-boundary)
+    (save-excursion
+      (replace-match (upcase (match-string 1)) nil nil nil 1)
+      (replace-match (downcase (match-string 2)) nil nil nil 2))))
+
+(defun autoformat-ordinals ()
+  "Expand ordinal words to superscripted versions in `org-mode'.
+1st to 1^{st}.
+2nd to 2^{nd}
+3rd to 3^{rd}
+4th to 4^{th}"
+  (interactive)
+  (when (and (my-use-autoformat-function-p 'autoformat-ordinals)
+             (not (org-in-src-block-p))
+             (looking-back
+              "\\(?3:\\<\\(?1:[0-9]+\\)\\(?2:st\\|nd\\|rd\\|th\\)\\>\\)\\(?:[[:punct:]]\\|[[:space:]]\\)"
+              (line-beginning-position)))
+    (undo-boundary)
+    (save-excursion
+      (replace-match "\\1^{\\2}" nil nil nil 3))))
+
+(defun my-autoformat ()
+  "Call all autoformat functions."
+  (interactive)
+  (--each my-autoformat-functions
+    (funcall it)))
+
+(define-minor-mode my-autoformat-mode
+    "Toggle `my-autoformat-mode'.  Converts 1st to 1^{st} as you type."
+  :init-value nil
+  (if my-autoformat-mode
+      (add-hook 'post-self-insert-hook #'my-autoformat)
+    (remove-hook 'post-self-insert-hook #'my-autoformat)))
+
+(my-autoformat-mode t)
 
 (use-package latex
     :ensure auctex
@@ -1475,7 +1557,6 @@ With prefix arg don't indent."
       (add-to-list 'company-backends 'company-latex-commands))
     (add-hook 'LaTeX-mode 'my-company-math-setup))
 
-
 (use-package company-auctex
     :ensure t
     :config
@@ -1510,8 +1591,8 @@ With prefix arg don't indent."
      ("s"   . 'org-schedule)
      ("RET" . 'org-open-at-point)))
 
-(defvar my- nil
-  "Return t, when last `my-er-expand-region-or-org-todo' done `org-todo'.")
+(defvar my-last-command-is-org-todo nil
+  "To t, when last `my-er-expand-region-or-org-todo' done `org-todo'.")
 
 (defun my-er-expand-region-or-org-todo ()
   "If need do `org-todo', otherwise do `er/expand-region'."
@@ -1527,6 +1608,8 @@ With prefix arg don't indent."
       (call-interactively #'er/expand-region))))
 
 (add-hook 'org-mode-hook (lambda () (call-interactively 'visual-fill)))
+
+(my-use-all-autoformat-in-mode 'org-mode)
 
 (use-package wikinforg
     :ensure t)
@@ -1556,14 +1639,12 @@ With prefix arg don't indent."
 (add-hook 'org-mode-hook #'turn-on-org-cdlatex-mode)
 
 (use-package package-lint
-    :ensure t
-    )
+    :ensure t)
 
 (use-package flycheck-package
     :ensure t
     :init
-    (flycheck-package-setup)
-    )
+    (flycheck-package-setup))
 
 (use-package emr
     :ensure t
@@ -1594,6 +1675,54 @@ With prefix arg don't indent."
                 ([remap string-edit-at-point] . my-edit-elisp-docstring)))
 
 (setq lisp-body-indent 2)
+
+;;
+
+(defun my-goto-defclass-beg ()
+  "Goto backward defclass."
+  (search-backward-regexp "(\\W*defclass" nil t)
+  (skip-chars-forward "("))
+
+(defun my-goto-fields-defclass-defnition ()
+  "Go to fields of `defclass' defnition."
+  (interactive)
+  (my-goto-defclass-beg)
+  (forward-sexp 4)
+  (forward-char -1)
+  (-when-let (sexp (sp-get-enclosing-sexp))
+    (sp-get sexp (goto-char :end-in))))
+
+(defun my-elisp-in-defclass-p (&optional pt)
+  "Move to PT and return name of function/macros in which stay this sexp."
+  (setq pt (or pt (point)))
+  (save-excursion
+    (goto-char pt)
+    (when (my-goto-defclass-beg)
+      (-when-let (sexp (sp-get-enclosing-sexp))
+        (sp-get sexp (< :beg pt :end))))))
+
+(defun my-elisp-defclass-name ()
+  "Return name of `defclass' defnition."
+  (interactive)
+  (save-excursion
+    (my-goto-defclass-beg)
+    (forward-sexp 1)
+    (forward-char 1)
+    (sexp-at-point)))
+
+(defun my-elisp-new-field-of-class ()
+  "Insert new field of Lisp class.
+Only when in class defnition."
+  (interactive)
+  (when (my-elisp-in-defclass-p)
+    (my-goto-fields-defclass-defnition)
+    (unless (my-current-line-is-empty-p)
+      (newline-and-indent))
+    (yas-expand-snippet
+     (format "(${1:name} :initarg :$1 :accessor %s-$1)"
+             (my-elisp-defclass-name)))))
+
+(define-key emacs-lisp-mode-map (kbd "M-RET") 'my-elisp-new-field-of-class)
 
 (use-package markdown-mode
     :ensure t
@@ -1660,7 +1789,6 @@ With prefix arg don't indent."
   (interactive)
   (setq-local company-backends (cons 'company-dabbrev company-backends))
   )
-
 
 (add-hook 'python-mode-hook 'enable-dabbrev-company-backend)
 
@@ -1807,7 +1935,6 @@ With prefix arg don't indent."
     (mhtml-mode . emmet-mode)
     (css-mode . emmet-mode)
     (html-mode . emmet-mode))
-
 
 (use-package helm-emmet
     :ensure t
@@ -2041,6 +2168,22 @@ With prefix arg don't indent."
        ("Search in Google" 'helm-google)))
     (fast-exec/register-keymap-func 'fast-exec-helm-google-define-keys)
     (fast-exec/reload-functions-chain))
+
+(use-package helm-kinopoisk
+    :load-path "~/projects/emacs-kinopoisk")
+
+(defun my-new-fake-pptx-file ()
+  "Make this buffer, fake presentation with format (.pptx)."
+  (interactive)
+  (->> "~/broken.pptx" (f-read) (insert))
+  (text-mode))
+
+(defun fast-exec-fake-pptx-keys ()
+  "Get some useful keymaps of  `fast-exec' for fake-pptx."
+  (fast-exec/some-commands ("New Fake PPTX File" 'my-new-fake-pptx-file)))
+
+(fast-exec/register-keymap-func 'fast-exec-fake-pptx-keys)
+(fast-exec/reload-functions-chain)
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
