@@ -90,6 +90,11 @@ If FORCE is t, a directory will be deleted recursively."
    (s-trim)
    (string-equal "")))
 
+(defun my-max (list)
+  "Return the max value of LIST, if LIST is empty, then return nil."
+  (when list
+    (-max list)))
+
 (defun if-Emacs-org-then-org-babel-tangle ()
   "If current open file is Emacs.org, then `org-babel-tangle`."
   (interactive)
@@ -125,6 +130,18 @@ Info take from var `user-os`, user must set it."
 
 (use-package yasnippet-snippets
     :ensure t)
+
+(defun yas--fetch (table key)
+  "Fetch templates in TABLE by KEY.
+
+Return a list of cons (NAME . TEMPLATE) where NAME is a
+string and TEMPLATE is a `yas--template' structure."
+  (let* ((key (s-downcase key))
+         (keyhash (yas--table-hash table))
+         (namehash (and keyhash (gethash key keyhash))))
+    (when namehash
+      (yas--filter-templates-by-condition
+       (yas--namehash-templates-alist namehash)))))
 
 (use-package flycheck
     :ensure t
@@ -615,6 +632,8 @@ Action of `avy', see `avy-action-yank' for example"
     :init
     (smartparens-global-mode 1)
     :bind (("RET"       . sp-newline)
+            ("M-("       . 'sp-wrap-round)
+            ("M-{"       . 'sp-wrap-curly)
            :map
            xah-fly-command-map
            (("]"         . 'sp-forward-slurp-sexp)
@@ -630,9 +649,7 @@ Action of `avy', see `avy-action-yank' for example"
             ("SPC SPC 1" . 'sp-split-sexp)
             ("SPC 9"     . 'sp-change-enclosing)
             ("SPC SPC g" . 'sp-kill-hybrid-sexp)
-            ("SPC ="     . 'sp-raise-sexp)
-            ("M-("       . 'sp-wrap-round)
-            ("M-{"       . 'sp-wrap-curly))))
+            ("SPC ="     . 'sp-raise-sexp))))
 
 (require 'smartparens-config)
 
@@ -1576,6 +1593,8 @@ Either at the beginning of a line, or after a sentence end."
               ;; Some Physics Sheet
               "eqv" "\\mathrm{экв}"))
 
+(my-use-all-autoformat-in-mode 'LaTeX-mode)
+
 (use-package org
     :major-mode-map (org-mode)
     :bind
@@ -1624,6 +1643,17 @@ Either at the beginning of a line, or after a sentence end."
     :bind (:map org-mode-map
                 ([remap helm-imenu]
                  . helm-org-in-buffer-headings)))
+
+(use-package org-ql :ensure t)
+(use-package helm-org-ql :ensure t)
+
+(defun fast-exec-org-ql-keys ()
+  "Get some useful keymaps of  `fast-exec' for org-ql."
+  (fast-exec/some-commands
+   ("Search Org Files via Org Query Language" 'org-ql-search)))
+
+(fast-exec/register-keymap-func 'fast-exec-org-ql-keys)
+(fast-exec/reload-functions-chain)
 
 (use-package ox-clip
     :ensure t
@@ -2738,7 +2768,9 @@ If IS-AS-SNIPPET is t, then expand template as YAS snippet"
    (section :initform nil
             :initarg :section
             :accessor my-mipt-task-section)
-   (kind :initform nil :initarg :kind :accessor my-mipt-task-kind)   ; 'control or 'normal
+   (kind :initform nil
+         :initarg :kind
+         :accessor my-mipt-task-kind)   ; 'control or 'normal
    (number  :initform nil
             :initarg :number
             :accessor my-mipt-task-number))
@@ -2833,7 +2865,7 @@ Special variable is `my-mipt-found-task'"
 
 (defun my-mipt-choose-one-of-task-classes (tasks)
   "Take TASKS and choose one of classes."
-  (->> tasks (-map #'my-mipt-task-class) (-max) (my-mipt-read-class)))
+  (->> tasks (-map #'my-mipt-task-class) (my-max) (my-mipt-read-class)))
 
 (defun my-mipt-read-class (&optional default)
   "Read from user class of MIPT task, defaults to DEFAULT."
@@ -2851,7 +2883,7 @@ Special variable is `my-mipt-found-task'"
   (->>
    tasks
    (-map #'my-mipt-task-section)
-   (-max)
+   (my-max)
    (my-mipt-read-section)))
 
 (defun my-mipt-read-section (&optional default)
@@ -2889,12 +2921,12 @@ Special variable is `my-mipt-found-task'"
   "Take TASKS and choose one of classes."
   (->> tasks
        (-map #'my-mipt-task-number)
-       (-max)
+       (my-max)
        (my-mipt-read-number)))
 
 (defun my-mipt-read-number (&optional default)
   "Read from user number of MIPT's task, defaults to DEFAULT."
-  (read-number "Please, type number of MIPT task: " default))
+  (read-number "Please, type number of MIPT task: " (or default 1)))
 
 (defun my-mipt-complete-task (task)
   "Complete all fields of TASK, and return modified TASK."

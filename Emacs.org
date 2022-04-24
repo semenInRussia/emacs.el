@@ -196,6 +196,21 @@
 
     #+END_SRC
 
+*** Work with Lists
+    =dash= has function =-max= which return maximal value from of
+    passed list, but this functions raise error when list is empty, so
+    I writed function =my-Max=:
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (defun my-max (list)
+        "Return the max value of LIST, if LIST is empty, then return nil."
+        (when list
+          (-max list)))
+
+    #+END_SRC
+
+
 ** Auto Tangle This File
 
    #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
@@ -209,7 +224,7 @@
 
      (add-hook 'after-save-hook 'if-Emacs-org-then-org-babel-tangle)
 
-     #+END_SRC
+     #+END_Src
 
 * Info about Me for Emacs
 
@@ -264,6 +279,31 @@
           :ensure t)
 
     #+END_SRC
+
+*** Ignore Case in Snippets' Expansion
+    When I am use =org= first symbol of the sentence will
+    automatically capitalizated, so when I insert /equ/ this will
+    changed to /Equ/, and when I am press =TAB=, instead of expanding
+    snippet (use =yas-expand=), the cursor moved to next position (use
+    =cdlatex-tab=), so I must change this Sheet:
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+
+      (defun yas--fetch (table key)
+        "Fetch templates in TABLE by KEY.
+
+      Return a list of cons (NAME . TEMPLATE) where NAME is a
+      string and TEMPLATE is a `yas--template' structure."
+        (let* ((key (s-downcase key))
+               (keyhash (yas--table-hash table))
+               (namehash (and keyhash (gethash key keyhash))))
+          (when namehash
+            (yas--filter-templates-by-condition
+             (yas--namehash-templates-alist namehash)))))
+
+    #+END_SRC
+
 
 ** Linters
    I am use [[https://www.flycheck.org/en/latest/][flycheck]]:
@@ -916,6 +956,8 @@
           :init
           (smartparens-global-mode 1)
           :bind (("RET"       . sp-newline)
+                  ("M-("       . 'sp-wrap-round)
+                  ("M-{"       . 'sp-wrap-curly)
                  :map
                  xah-fly-command-map
                  (("]"         . 'sp-forward-slurp-sexp)
@@ -931,9 +973,7 @@
                   ("SPC SPC 1" . 'sp-split-sexp)
                   ("SPC 9"     . 'sp-change-enclosing)
                   ("SPC SPC g" . 'sp-kill-hybrid-sexp)
-                  ("SPC ="     . 'sp-raise-sexp)
-                  ("M-("       . 'sp-wrap-round)
-                  ("M-{"       . 'sp-wrap-curly))))
+                  ("SPC ="     . 'sp-raise-sexp))))
 
                   #+END_SRC
 *** Special Configuration for Major Modes
@@ -2116,6 +2156,16 @@
                             "eqv" "\\mathrm{экв}"))
 
      #+END_SRC
+**** Auto Format in LaTeX
+     I am use my own [[*Functions for Auto Format Code]] to auto format in
+     =LaTeX=:
+
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+       (my-use-all-autoformat-in-mode 'LaTeX-mode)
+
+     #+END_SRC
+
 
 *** Org
     I am consider that Org Mode builtin Emacs:
@@ -2195,7 +2245,7 @@
 
      #+END_SRC
 
-**** Navigation
+**** Navigation beetween Org Files
      I am use [[https://github.com/emacs-helm/helm-org][helm-org]] for navigation in Org Mode:
 
      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -2207,6 +2257,25 @@
                         . helm-org-in-buffer-headings)))
 
      #+END_SRC
+
+**** Improvement Navigation beetween Org Files
+     I am use [[https://github.com/alphapapa/org-ql][org-ql]] for smart queries to find my =org= Files:
+
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+       (use-package org-ql :ensure t)
+       (use-package helm-org-ql :ensure t)
+
+       (defun fast-exec-org-ql-keys ()
+         "Get some useful keymaps of  `fast-exec' for org-ql."
+         (fast-exec/some-commands
+          ("Search Org Files via Org Query Language" 'org-ql-search)))
+
+       (fast-exec/register-keymap-func 'fast-exec-org-ql-keys)
+       (fast-exec/reload-functions-chain)
+
+     #+END_SRC
+
 
 **** Copy Org Code for Other Programms (Word, PowerPoint)
      I am use [[https://github.com/jkitchin/ox-clip][ox-clip]]:
@@ -3703,7 +3772,7 @@
      (define-key xah-fly-command-map (kbd "SPC <f9>") #'org-todo-list)
 
      (global-set-key (kbd "<f5>") #'my-open-main-agenda-file)
-   #+END_SRC
+   #+END_Src
 
 ** Notes
    I am create own simple system of notes:
@@ -4012,7 +4081,9 @@
         (section :initform nil
                  :initarg :section
                  :accessor my-mipt-task-section)
-        (kind :initform nil :initarg :kind :accessor my-mipt-task-kind)   ; 'control or 'normal
+        (kind :initform nil
+              :initarg :kind
+              :accessor my-mipt-task-kind)   ; 'control or 'normal
         (number  :initform nil
                  :initarg :number
                  :accessor my-mipt-task-number))
@@ -4107,7 +4178,7 @@
 
      (defun my-mipt-choose-one-of-task-classes (tasks)
        "Take TASKS and choose one of classes."
-       (->> tasks (-map #'my-mipt-task-class) (-max) (my-mipt-read-class)))
+       (->> tasks (-map #'my-mipt-task-class) (my-max) (my-mipt-read-class)))
 
      (defun my-mipt-read-class (&optional default)
        "Read from user class of MIPT task, defaults to DEFAULT."
@@ -4125,7 +4196,7 @@
        (->>
         tasks
         (-map #'my-mipt-task-section)
-        (-max)
+        (my-max)
         (my-mipt-read-section)))
 
      (defun my-mipt-read-section (&optional default)
@@ -4163,12 +4234,12 @@
        "Take TASKS and choose one of classes."
        (->> tasks
             (-map #'my-mipt-task-number)
-            (-max)
+            (my-max)
             (my-mipt-read-number)))
 
      (defun my-mipt-read-number (&optional default)
        "Read from user number of MIPT's task, defaults to DEFAULT."
-       (read-number "Please, type number of MIPT task: " default))
+       (read-number "Please, type number of MIPT task: " (or default 1)))
 
      (defun my-mipt-complete-task (task)
        "Complete all fields of TASK, and return modified TASK."
