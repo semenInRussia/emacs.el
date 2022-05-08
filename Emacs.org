@@ -12,6 +12,218 @@
 
   #+END_SRC
 
+  I'm use followed repositories as a template for my Emacs config:
+
+  - [[https://github.com/jkitchin/scimax/][jkitchin/scimax]] (org mode, and auto format functions)
+  - [[https://github.com/magnars/.emacs.d][magnars/.emacs.d]] (smart insertion, a lot of snippets, and other)
+
+* Table of Contents                                                     :TOC:
+- [[#hi][Hi!]]
+- [[#package-management---base][Package Management - base]]
+  - [[#use-package][use-package]]
+  - [[#packages-not-in-melpaelpaorg-elpa][Packages Not in MELPA/ELPA/ORG-ELPA]]
+    - [[#stranger-packages][Stranger Packages]]
+    - [[#my-packages][My Packages]]
+- [[#writing-this-config][Writing This Config]]
+  - [[#libraries][Libraries]]
+    - [[#s][s]]
+    - [[#f][f]]
+    - [[#dash][Dash]]
+  - [[#my-small-standard-library][My Small Standard Library]]
+    - [[#work-with-files][Work with Files]]
+    - [[#work-with-alists][Work with Alists]]
+    - [[#work-with-strings][Work with Strings]]
+    - [[#work-with-editor][Work with Editor]]
+    - [[#work-with-lists][Work with Lists]]
+  - [[#auto-tangle-this-file][Auto Tangle This File]]
+- [[#info-about-me-for-emacs][Info about Me for Emacs]]
+  - [[#congurlation-me-with-my-birthday][Congurlation me with my Birthday!]]
+- [[#organize-editing][Organize Editing]]
+  - [[#snippets][Snippets]]
+    - [[#some-snippets][Some Snippets]]
+    - [[#ignore-case-in-snippets-expansion][Ignore Case in Snippets' Expansion]]
+  - [[#linters][Linters]]
+  - [[#autocomplete][Autocomplete]]
+    - [[#more-pretty-auto-complete][More Pretty Auto Complete]]
+  - [[#format-all-code][Format All Code]]
+    - [[#i-am-russian][I am Russian!]]
+  - [[#main-keymaps][Main keymaps]]
+    - [[#easy-create-major-modes-maps][Easy Create Major Modes Maps]]
+      - [[#setup-for-major-mode-map][Setup for =:major-mode-map=]]
+      - [[#normalizer-for-major-mode-map][Normalizer for =:major-mode-map=]]
+      - [[#major-mode-maps-handler][=major-mode-map='s Handler]]
+  - [[#fast-executing-command][Fast Executing Command]]
+  - [[#functions-for-define-keys][Functions for Define Keys]]
+  - [[#search][Search]]
+    - [[#search-in-file][Search in File]]
+    - [[#search-in-very-some-file][Search in Very Some File]]
+  - [[#search-and-replace][Search and Replace]]
+  - [[#navigation-beetween-functionsclassesetc][Navigation beetween Functions/Classes/etc.]]
+    - [[#in-project][In Project]]
+  - [[#see-recent-files][See Recent Files]]
+  - [[#smart-commentuncomment][Smart Comment/Uncomment]]
+  - [[#jump-to-defnition][Jump to Defnition]]
+  - [[#multiple-cursors][Multiple Cursors]]
+  - [[#very-fast-jump][Very Fast Jump]]
+  - [[#smart-parens][Smart Parens]]
+    - [[#smartparens][Smartparens]]
+    - [[#special-configuration-for-major-modes][Special Configuration for Major Modes]]
+    - [[#delete-only-parens-without-inner-contents][Delete Only Parens without Inner Contents]]
+  - [[#smart-select-text][Smart Select Text]]
+  - [[#macros][Macros]]
+  - [[#special-strings-as-seperated-buffers][Special Strings as Seperated Buffers]]
+  - [[#transpose][Transpose]]
+    - [[#define-extensible-drag-system][Define Extensible Drag System]]
+    - [[#draggers-of-drag-stuff][Draggers of =drag-stuff=]]
+    - [[#draggers-for-org-mode][Draggers for =org-mode=]]
+  - [[#custom-deleting-text][Custom Deleting Text]]
+  - [[#custom-selecting-text][Custom Selecting Text]]
+  - [[#custom-editing-text][Custom Editing Text]]
+  - [[#custom-navigation][Custom Navigation]]
+  - [[#rectangles][Rectangles]]
+  - [[#indent-settings][Indent Settings]]
+- [[#support-of-languages][Support of Languages]]
+  - [[#functions-for-extending-functional-of-language][Functions for extending functional of language]]
+    - [[#functions-for-navigation][Functions for Navigation]]
+    - [[#functions-for-pretty-view][Functions for Pretty View]]
+    - [[#functions-for-import][Functions for Import]]
+    - [[#functions-for-auto-format-code][Functions for Auto Format Code]]
+  - [[#supported-languages][Supported Languages]]
+    - [[#latex][LaTeX]]
+      - [[#latex--calc][LaTeX + calc]]
+      - [[#preview-latex][Preview Latex]]
+      - [[#fast-navigation-and-insertion-in-latex][Fast Navigation and Insertion in LaTeX]]
+      - [[#insert-pairs-in-latex][Insert Pairs in LaTeX]]
+      - [[#latex-tables][LaTeX Tables]]
+      - [[#variables-for-latex][Variables for LaTeX]]
+      - [[#visual-fill-for-latex][Visual Fill for LaTeX]]
+      - [[#keymaps-for-latex][Keymaps for LaTeX]]
+      - [[#auto-complete-for-latex][Auto Complete for LaTeX]]
+      - [[#auto-activating-snippets-for-latex][Auto Activating Snippets for LaTeX]]
+      - [[#auto-format-in-latex][Auto Format in LaTeX]]
+    - [[#org][Org]]
+      - [[#centering-org][Centering Org]]
+      - [[#auto-format-in-org][Auto Format in Org]]
+      - [[#load-from-wiki][Load from Wiki]]
+      - [[#drag-and-drop-images][Drag and Drop Images]]
+      - [[#navigation-beetween-org-headings-in-buffer][Navigation beetween Org Headings in Buffer]]
+      - [[#improvement-navigation-beetween-org-headings][Improvement Navigation beetween Org Headings]]
+      - [[#copy-org-code-for-other-programms-word-powerpoint][Copy Org Code for Other Programms (Word, PowerPoint)]]
+      - [[#generate-table-of-contents-in-org][Generate Table of Contents in Org]]
+      - [[#org--cdlatex][Org + CDLaTeX]]
+    - [[#elisp][Elisp]]
+      - [[#special-linters][Special Linters]]
+      - [[#refactoring][Refactoring]]
+      - [[#package-manager][Package Manager]]
+      - [[#elisp-format-code][Elisp Format Code]]
+      - [[#modern-documentation][Modern Documentation]]
+      - [[#elisp-docstrings-mode][Elisp Docstrings Mode]]
+      - [[#elisp-indent-code][Elisp Indent Code]]
+      - [[#some-insertion-functions-for-elisp][Some Insertion Functions for Elisp]]
+    - [[#markdown][Markdown]]
+      - [[#create-table-of-contents-in-markdown][Create Table of Contents in Markdown]]
+      - [[#auto-format-in-markdown][Auto Format in markdown]]
+    - [[#python][Python]]
+      - [[#vars][Vars]]
+      - [[#navigation][Navigation]]
+      - [[#linters-1][Linters]]
+      - [[#helping-info][Helping info]]
+      - [[#autocomplete-1][Autocomplete]]
+    - [[#rust][Rust]]
+      - [[#auto-completion-in-rust][Auto Completion in Rust]]
+      - [[#check-errors][Check Errors]]
+    - [[#go-lang][Go Lang]]
+      - [[#add-import][Add Import]]
+    - [[#pdf][PDF]]
+    - [[#haskell][Haskell]]
+      - [[#auto-completion-for-haskell][Auto Completion for Haskell]]
+    - [[#javascript-nodejs][JavaScript (Node.js)]]
+      - [[#variables][Variables]]
+      - [[#repl][Repl]]
+      - [[#linters-2][Linters]]
+      - [[#navigation-1][Navigation]]
+    - [[#json][JSON]]
+    - [[#html][HTML]]
+      - [[#variables-1][Variables]]
+      - [[#web-mode][Web Mode]]
+      - [[#auto-rename-tag][Auto Rename Tag]]
+      - [[#emmet][Emmet]]
+      - [[#paredit-for-html][=Paredit= for HTML]]
+      - [[#auto-complete-for-html][Auto Complete for HTML]]
+    - [[#css][CSS]]
+      - [[#fly-documentation][Fly Documentation]]
+- [[#support-of-some-special-modes][Support of Some Special Modes]]
+  - [[#calc][Calc]]
+- [[#small-organize-tricks][Small Organize Tricks]]
+  - [[#very-small-tricks][Very Small Tricks]]
+  - [[#highlight-git-changes][Highlight Git Changes]]
+  - [[#helpful][Helpful]]
+    - [[#which-key][Which Key?]]
+    - [[#helpful-package][Helpful Package]]
+  - [[#autocompletion-of-commands-helm][Autocompletion of Commands (HELM)]]
+  - [[#command-log][Command Log]]
+  - [[#whitespaces-mode][Whitespaces Mode]]
+  - [[#visual-fill-line-mode][Visual Fill Line Mode]]
+  - [[#auto-fill-paragraphs][Auto Fill Paragraphs]]
+  - [[#scratches][Scratches]]
+  - [[#syntax-subword-mode][Syntax Subword Mode]]
+  - [[#small-pandoc-functions][Small Pandoc Functions]]
+  - [[#i-am-russian-1][I am Russian!]]
+  - [[#cow-say][Cow Say]]
+  - [[#auto-save][Auto Save]]
+  - [[#read-documentation-for-developers][Read Documentation for Developers]]
+  - [[#pomidor][Pomidor]]
+  - [[#pacman][Pacman]]
+  - [[#wikipedia][Wikipedia]]
+  - [[#view-github-stars][View Github Stars]]
+  - [[#easy-generate-gitignore][Easy Generate .gitignore]]
+  - [[#google][Google]]
+  - [[#kinopoisk][Kinopoisk]]
+  - [[#make-broken-pptx-file][Make Broken PPTX File]]
+  - [[#films-management][Films Management]]
+- [[#graphic-user-interface][Graphic User Interface]]
+  - [[#hide-all][Hide ALL]]
+  - [[#color-themes][Color Themes]]
+    - [[#gruber-darker-theme][Gruber Darker Theme]]
+    - [[#some-proffesional-themes][Some Proffesional Themes]]
+    - [[#some-other-themes][Some other themes]]
+    - [[#load-theme][Load Theme]]
+  - [[#numbers-of-lines][Numbers of lines]]
+    - [[#vars-1][Vars]]
+    - [[#enable-and-disable][Enable and Disable]]
+  - [[#modeline][Modeline]]
+    - [[#modeline-for-drag][Modeline for =drag=]]
+    - [[#disable-view-of-xah-fly-keys-state][Disable View of =xah-fly-keys= State]]
+    - [[#watch-time-in-doom-modeline][Watch Time in Doom-Modeline]]
+    - [[#pomidor-in-modeline][Pomidor in Modeline]]
+    - [[#truncate-buffers-name-in-modeline][Truncate Buffer's Name in Modeline]]
+    - [[#enable-modeline][Enable Modeline]]
+  - [[#fonts][Fonts]]
+  - [[#highlight-current-line][Highlight Current Line]]
+  - [[#centering][Centering]]
+  - [[#view-break-page-lines][View Break Page Lines]]
+- [[#developer-environment][Developer Environment]]
+  - [[#projects-management][Projects Management]]
+    - [[#projectile-with-helm][Projectile with Helm]]
+  - [[#regexp-ide][Regexp IDE]]
+  - [[#git][Git]]
+    - [[#fly-view-authors-of-changes][Fly View Authors of Changes]]
+    - [[#undo-with-git][Undo with Git]]
+    - [[#git-major-modes][Git Major Modes]]
+    - [[#genreate-gitignore][Genreate .gitignore]]
+  - [[#view-directories][View Directories]]
+  - [[#run-command][Run Command]]
+    - [[#run-command-recipes][Run Command Recipes]]
+  - [[#projects-with-templates][Projects with Templates]]
+  - [[#snitch][Snitch]]
+    - [[#highlight-todos][Highlight TODOs]]
+    - [[#run-snitch-commands][Run Snitch Commands]]
+  - [[#organization][Organization]]
+  - [[#notes][Notes]]
+- [[#mipt][MIPT]]
+  - [[#management-of-mipt-files][Management of MIPT Files]]
+  - [[#copy-content-of-file-as-mipt-solution][Copy Content of File as MIPT Solution]]
+
 * Package Management - base
 ** use-package
    I am use [[https://github.com/jwiegley/use-package][use-package]]:
@@ -33,7 +245,7 @@
        (package-install 'use-package))
 
      (require 'use-package)
-     #+END_SRC
+  #+END_SRC
 ** Packages Not in MELPA/ELPA/ORG-ELPA
 *** Stranger Packages
 
@@ -41,7 +253,7 @@
 
       (add-to-list 'load-path "~/.emacs.d/lisp")
 
-      #+END_SRC
+    #+END_SRC
 
 *** My Packages
 
@@ -52,7 +264,7 @@
       (add-to-list 'load-path "~/projects/emacs-run-command")
       (add-to-list 'load-path "~/projects/simple-indention.el")
 
-      #+END_SRC
+    #+END_SRC
 
 * Writing This Config
   I am use some packages for simple develop on Emacs Lisp
@@ -118,6 +330,21 @@
         (--filter (f-ext-p it ext))))
 
    #+END_SRC
+*** Work with Alists
+    Function =my-reverse-alist= swap keys and values of taked alist
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (defun my-reverse-alist (alist)
+        "Swap keys and values of ALIST."
+        (--map
+         (cons
+          (cdr it)
+          (car it))
+         alist))
+
+    #+END_SRC
+
 
 *** Work with Strings
     Functions =my-humanize-string= and =my-normalize-string= transform
@@ -152,6 +379,20 @@
          prefixes
          (--some (s-prefix-p it s))))
     #+END_SRC
+
+    Function =my-parts-of-string= take =number= and =string=, and
+    return list of strings with same length:
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (defun my-parts-of-string (n s)
+        "Divide string S to N same parts.'"
+        (->>
+         (my-parts-of-seq n s)
+         (--map (apply #'s-concat it))))
+
+    #+END_SRC
+
 
 *** Work with Editor
     Function =my-current-line= return current line:
@@ -196,10 +437,24 @@
 
     #+END_SRC
 
+    Function =my-all-buffers-with-ext= return list of opened buffers
+    which has extension same with taked:
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (defun my-all-buffers-with-ext (ext)
+        "Get all opened buffers, excluding buffers which has other to EXT extension."
+        (->>
+         (buffer-list)
+         (--filter
+          (f-ext-p (buffer-name it) ext))))
+
+    #+END_SRC
+
 *** Work with Lists
     =dash= has function =-max= which return maximal value from of
     passed list, but this functions raise error when list is empty, so
-    I writed function =my-Max=:
+    I writed function =my-max=:
 
     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
@@ -207,6 +462,43 @@
         "Return the max value of LIST, if LIST is empty, then return nil."
         (when list
           (-max list)))
+
+    #+END_SRC
+
+    Function =my-into-list= take any object and transform it to list:
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+      (defun my-into-list (obj)
+        "Transform OBJ to list.
+      Supoorted types of OBJ:
+      - `string'
+      - `list'"
+        (cl-typecase obj
+          (list obj)
+          (string (my-string-to-list obj))))
+
+      (defun my-string-to-list (s)
+        "Transform S to list of 1 size string."
+        (->>
+         s
+         (string-to-list)
+         (-map #'char-to-string)))
+
+    #+END_SRC
+
+    Function =my-parts-of-seq= take any object and number of wanted
+    lists with type which has support of =my-into-list= and divide
+    list to N lists with same length:
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (defun my-parts-of-seq (n seq)
+        "Divide SEQ to N same parts.
+      SEQ may be one of types which supported in function `my-into-list'"
+        (setq seq (my-into-list seq))
+        (let ((step (/ (length seq) n)))
+          (-partition-in-steps step step seq)))
+
 
     #+END_SRC
 
@@ -303,7 +595,6 @@
              (yas--namehash-templates-alist namehash)))))
 
     #+END_SRC
-
 
 ** Linters
    I am use [[https://www.flycheck.org/en/latest/][flycheck]]:
@@ -433,21 +724,23 @@
        (defun use-package-normalize/:major-mode-map (name keyword args)
          "Normalizer of :major-mode-map for `use-package'."
          (let* (map-name modes)
-           (if (eq (-first-item args) t) ; All by Default
+           (if (eq (-first-item args) t)
                (list (symbol-name name) (list name))
              (cl-typecase (-first-item args)
+               (null nil)
                (list (setq modes (-first-item args)))
                (symbol (setq map-name (symbol-name (-first-item args))))
                (string (setq map-name (-first-item args))))
              (cl-typecase (-second-item args)
-               (list (setq modes (-first-item args)))
-               (symbol (setq map-name (symbol-name (-first-item args))))
-               (string (setq map-name (-first-item args))))
+               (null nil)
+               (list (setq modes (-second-item args)))
+               (symbol (setq map-name (symbol-name (-second-item args))))
+               (string (setq map-name (-second-item args))))
              (list
               (or map-name (symbol-name name))
               modes))))
 
-              #+END_SRC
+    #+END_SRC
 
 **** =major-mode-map='s Handler
      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -1577,10 +1870,46 @@
                 ("SPC k RET" . new-line-in-between)
                 ("SPC SPC s" . open-line-above))
 
-                #+END_SRC
+   #+END_SRC
 
-   #+RESULTS:
-   : open-line-above
+   I am use =SPC b= to change case of current line:
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+     (defun my-change-case-of-current-line ()
+       "Change case of current line to next (see `xah-toggle-letter-case')."
+       (interactive)
+       (save-mark-and-excursion
+         (select-current-line)
+         (xah-toggle-letter-case)))
+
+     (bind-keys
+      :map xah-fly-command-map
+      ("SPC SPC b" . my-change-case-of-current-line)
+      ("b"         . my-toggle-change-case-of-line-or-word-or-selection))
+
+     (defvar my-last-command-is-changed-case-of-current-line
+       nil "In t, when last command change case.")
+
+     (defun my-toggle-change-case-of-line-or-word-or-selection ()
+       "Using one of functions, which change case.
+     List of functions: `xah-toggle-letter-case', `my-change-case-of-current-line'."
+       (interactive)
+       (let* ((change-case-of-line
+               (or
+                (eq last-command 'my-change-case-of-current-line)
+                (and
+                 (eq
+                  last-command
+                  'my-toggle-change-case-of-line-or-word-or-selection)
+                 my-last-command-is-changed-case-of-current-line))))
+         (setq my-last-command-is-changed-case-of-current-line change-case-of-line)
+         (if change-case-of-line
+             (my-change-case-of-current-line)
+           (xah-toggle-letter-case))))
+
+   #+END_SRC
+
 
    And I am press =p= for inserting space, and if I am selected region,  for inserting space
    to beginning of each line:
@@ -1625,6 +1954,37 @@
      (define-key xah-fly-command-map (kbd "p") 'insert-spaces-before-or-to-beginning-of-each-line)
 
      #+END_SRC
+
+     I press =SPC k 6= and Emacs duplicate last text block:
+
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+       (defun my-duplicate-last-bloc ()
+         "Take last text block and insert."
+         (interactive)
+         (->>
+          (buffer-substring (my-point-at-last-block-beg) (point))
+          (s-trim)
+          (s-append "\n")
+          (s-prepend "\n")
+          (insert)))
+
+       (defun my-point-at-last-block-beg ()
+         "Move to beginning of last block and return current position of cursor."
+         (interactive)
+         (save-excursion
+           (cond
+             ((not (re-search-backward "\\w" nil nil)) (point-min))
+             ((re-search-backward "\n[\t\n ]*\n+" nil 1)
+              (skip-chars-backward "\n\t ")
+              (point))
+             (t (point-min)))))
+
+       (bind-keys*
+        :map xah-fly-command-map
+        ("SPC k 6" . my-duplicate-last-bloc))
+     #+END_SRC
+
 
 ** Custom Navigation
    I am press =m= and =.= for go to next, previous sexp:
@@ -1733,7 +2093,7 @@
      (define-key xah-fly-command-map (kbd "SPC .") 'xref-find-definitions)
 
      #+END_SRC
-
+     
 * Support of Languages
 ** Functions for extending functional of language
 *** Functions for Navigation
@@ -1797,9 +2157,8 @@
       (defvar my-autoformat-functions nil
         "Current used autoformat functions.")
 
-      (defcustom my-autoformat-all-functions '(sentence-capitalization
-                                               ordinals
-                                               transposed-caps)
+      (defcustom my-autoformat-all-functions
+        '(sentence-capitalization ordinals transposed-caps)
         "All my autoformat functions.")
 
       (defun my-use-autoformat-function-p (f)
@@ -1808,11 +2167,13 @@
 
       (defmacro my-use-autoformat-in-mode (mode &rest autoformat-functions)
         "Add hook to MODE, which enable AUTOFORMAT-FUNCTIONS."
-        (let* ((hook (intern (s-append "-hook" (symbol-name (eval mode)))))
-               (funcs (->>
-                       autoformat-functions
-                       (--map (symbol-name it))
-                       (--map (intern (s-prepend "autoformat-" it))))))
+        (let* ((hook
+                (intern (s-append "-hook" (symbol-name (eval mode)))))
+               (funcs
+                (->>
+                 autoformat-functions
+                 (--map (symbol-name it))
+                 (--map (intern (s-prepend "autoformat-" it))))))
           `(add-hook ',hook
                      (lambda ()
                        (setq-local my-autoformat-functions ',funcs)))))
@@ -1825,22 +2186,42 @@
         "Auto-capitalize first words of a sentence.
       Either at the beginning of a line, or after a sentence end."
         (interactive)
-        (when (and (my-use-autoformat-function-p 'autoformat-sentence-capitalization)
-                   (not (org-in-src-block-p))
-                   (or (save-excursion (backward-char) (bolp))
-                       (looking-back "\*+\\W*.")
-                       (looking-back (concat (sentence-end) "[a-z]"))))
+        (when (and
+               (my-use-autoformat-function-p 'autoformat-sentence-capitalization)
+               (my-in-text-p)
+               (looking-back "[а-яa-z]")
+               (save-excursion
+                 (forward-char -1)
+                 (or
+                  (looking-back (sentence-end))
+                  (bobp)
+                  (and
+                   (skip-chars-backward " ")
+                   (bolp)
+                   (my-previous-line-is-empty))
+                  (and
+                   (skip-chars-backward " ")
+                   (< (skip-chars-backward "*") 0)
+                   (bolp)))))
           (undo-boundary)
           (capitalize-word -1)))
+
+      (defun my-previous-line-is-empty ()
+        "Move to previous line and return t, when this line is empty.
+      \\(see `my-current-line-is-empty-p')"
+        (forward-line -1)
+        (my-current-line-is-empty-p))
 
       (defun autoformat-transposed-caps ()
         "If you write hTe, fixes it to The."
         (interactive)
-        (when (and (my-use-autoformat-function-p 'autoformat-transposed-caps)
-                   (not (org-in-src-block-p))
-                   (let ((case-fold-search nil))
-                     (looking-back "\\<\\(?1:[a-z]\\)\\(?2:[A-Z]\\)[a-z]+"
-                                   (line-beginning-position))))
+        (when (and
+               (my-use-autoformat-function-p 'autoformat-transposed-caps)
+               (my-in-text-p)
+               (let ((case-fold-search nil))
+                 (looking-back
+                  "\\<\\(?1:[a-zа-я]\\)\\(?2:[A-ZА-Я]\\)[a-zа-я]+"
+                  (line-beginning-position))))
           (undo-boundary)
           (save-excursion
             (replace-match (upcase (match-string 1)) nil nil nil 1)
@@ -1853,20 +2234,23 @@
       3rd to 3^{rd}
       4th to 4^{th}"
         (interactive)
-        (when (and (my-use-autoformat-function-p 'autoformat-ordinals)
-                   (not (org-in-src-block-p))
-                   (looking-back
-                    "\\(?3:\\<\\(?1:[0-9]+\\)\\(?2:st\\|nd\\|rd\\|th\\)\\>\\)\\(?:[[:punct:]]\\|[[:space:]]\\)"
-                    (line-beginning-position)))
+        (when (and
+               (my-use-autoformat-function-p 'autoformat-ordinals)
+               (my-in-text-p)
+               (looking-back
+                "\\(?3:\\<\\(?1:[0-9]+\\)\\(?2:st\\|nd\\|rd\\|th\\)\\>\\)\\(?:[[:punct:]]\\|[[:space:]]\\)"
+                (line-beginning-position)))
           (undo-boundary)
-          (save-excursion
-            (replace-match "\\1^{\\2}" nil nil nil 3))))
+          (save-excursion (replace-match "\\1^{\\2}" nil nil nil 3))))
+
+      (defun my-in-text-p ()
+        "Return t, when cursor has position on common text."
+        (and (not (org-in-src-block-p)) (not (texmathp))))
 
       (defun my-autoformat ()
         "Call all autoformat functions."
         (interactive)
-        (--each my-autoformat-functions
-          (funcall it)))
+        (--each my-autoformat-functions (funcall it)))
 
       (define-minor-mode my-autoformat-mode
           "Toggle `my-autoformat-mode'.  Converts 1st to 1^{st} as you type."
@@ -1886,12 +2270,21 @@
     I am use [[https://github.com/emacsmirror/auctex][auctex]], I am take some configuration from
     [[https://habr.com/ru/company/skillfactory/blog/593999/][this article from HABR]]:
 
+    Main skeleton of my LaTeX configuration is package =tex-mode= with
+    =LaTeX-mode= and =AucTeX=:
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (use-package tex-mode
+          :major-mode-map latex (LaTeX-mode))
+
+    #+END_SRC
+
 **** LaTeX + calc
      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
        (use-package latex
            :ensure auctex
-           :major-mode-map (LaTeX-mode)
            :hook ((LaTeX-mode . prettify-symbols-mode))
            :bind ((:map my-latex-local-map)
                   ("="     . my-calc-simplify-region-copy)
@@ -1910,9 +2303,7 @@
              "Take from BEG to END, simplify this via `calc' and copy as kill."
              (interactive "r")
              (let ((expr (my-calc-simplify (buffer-substring beg end))))
-               (with-temp-buffer
-                 (insert expr)
-                 (copy-region-as-kill (point-min) (point-max)))
+               (kill-new expr)
                (message "coppied: %s" (current-kill 0))))
 
            (defun my-calc-simplify-region-change (beg end)
@@ -1923,9 +2314,9 @@
                (delete-region beg end)
                (insert (my-calc-simplify expr)))))
 
-               #+END_SRC
+      #+END_SRC
 
-**** Preview
+**** Preview Latex
       #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
         (use-package preview
@@ -1944,51 +2335,96 @@
        (use-package cdlatex
            :ensure t
            :hook (LaTeX-mode . turn-on-cdlatex)
+           :defer t
            :bind (:map cdlatex-mode-map ("<tab>" . cdlatex-tab)))
 
        ;; fields
        (use-package cdlatex
            :hook ((cdlatex-tab . yas-expand)
                   (cdlatex-tab . cdlatex-in-yas-field))
-           :config (use-package yasnippet
-                       :bind (:map yas-keymap
-                                   ("<tab>" . yas-next-field-or-cdlatex)
-                                   ("TAB" . yas-next-field-or-cdlatex))
-                       :config (defun cdlatex-in-yas-field
-                                   ()
-                                 ;; Check if we're at the end of the Yas field
-                                 (when-let* ((_ (overlayp yas--active-field-overlay))
-                                             (end (overlay-end yas--active-field-overlay)))
-                                   (if (>= (point) end)
-                                       (let ((s (thing-at-point 'sexp)))
-                                         (unless (and s
-                                                      (assoc
-                                                       (substring-no-properties s)
-                                                       cdlatex-command-alist-comb))
-                                           (yas-next-field-or-maybe-expand)
-                                           t))
-                                     (let (cdlatex-tab-hook minp)
-                                       (setq minp
-                                             (min
-                                              (save-excursion
-                                                (cdlatex-tab)
-                                                (point))
-                                              (overlay-end
-                                               yas--active-field-overlay)))
-                                       (goto-char minp)
-                                       t))))
+           :custom (cdlatex-math-modify-alist
+                    '((?q "\\sqrt" nil t nil nil))))
 
-                       (defun yas-next-field-or-cdlatex nil
-                         (interactive)
-                         "Jump to the next Yas field correctly with cdlatex active."
-                         (if (or
-                              (bound-and-true-p cdlatex-mode)
-                              (bound-and-true-p org-cdlatex-mode))
-                             (cdlatex-tab)
-                           (yas-next-field-or-maybe-expand)))))
-                           #+END_SRC
+       (use-package yasnippet
+           :bind ((:map yas-keymap)
+                  ("<tab>" . yas-next-field-or-cdlatex)
+                  ("TAB" . yas-next-field-or-cdlatex))
+           :config ;nofmt
+           (defun cdlatex-in-yas-field ()
+               (when-let* ((_ (overlayp yas--active-field-overlay))
+                           (end (overlay-end yas--active-field-overlay)))
+                   (if (>= (point) end)
+                       (let ((s (thing-at-point 'sexp)))
+                           (unless (and s
+                                        (assoc
+                                         (substring-no-properties s)
+                                         cdlatex-command-alist-comb))
+                               (yas-next-field-or-maybe-expand)
+                               t))
+                       (let (cdlatex-tab-hook minp)
+                           (setq minp
+                                 (min
+                                  (save-excursion
+                                      (cdlatex-tab)
+                                      (point))
+                                  (overlay-end
+                                   yas--active-field-overlay)))
+                           (goto-char minp)
+                           t))))
 
-**** LaTeX tables
+           (defun yas-next-field-or-cdlatex nil
+               (interactive)
+               "Jump to the next Yas field correctly with cdlatex active."
+               (if (or
+                    (bound-and-true-p cdlatex-mode)
+                    (bound-and-true-p org-cdlatex-mode))
+                   (cdlatex-tab)
+                   (yas-next-field-or-maybe-expand))))
+     #+END_SRC
+
+**** Insert Pairs in LaTeX
+     =CDLaTeX= rebind some keymaps of =smartparens= to more stupid
+     alternatives, so I rebind its back:
+
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+       (use-package tex-mode
+           :after cdlatex
+           :bind
+           ((:map cdlatex-mode-map)
+            ("(" . self-insert-command)
+            (")" . self-insert-command)
+            ("[" . self-insert-command)
+            ("]" . self-insert-command)
+            ("\\" . self-insert-command)))
+
+     #+END_SRC
+
+     Also beacause I am Russian, i need press =;= in =Russian=
+     keyboard and Emacs should insert pairs of dollars and toggle
+     input method
+
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+       (defun my-latex-dollar ()
+         "Insert dollars and toggle input method to russian."
+         (interactive)
+         (when current-input-method (toggle-input-method))
+         (if (use-region-p)
+             (sp-wrap-with-pair "$")
+           (insert "$$")
+           (forward-char -1)))
+
+       (use-package cdlatex
+           :ensure t
+           :bind
+           (:map cdlatex-mode-map)
+           (";" . my-latex-dollar)
+           ("$" . my-latex-dollar))
+
+     #+END_SRC
+
+**** LaTeX Tables
 
      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
@@ -2141,19 +2577,23 @@
 
      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-              (use-package laas
-                  :ensure t
-                  :hook (LaTeX-mode . laas-mode)
-                  :config (aas-set-snippets 'laas-mode
-                            :cond #'texmathp
-                            ;; Some Units
-                            "As" "\\mathrm{А}"
-                            "Vs"  "\\mathrm{В}"
-                            "Oms"  "\\mathrm{Ом}"
-                            "cls" "^\\circ C"
+       (use-package laas
+           :ensure t
+           :hook (LaTeX-mode . laas-mode)
+           :config (aas-set-snippets 'laas-mode
+                     ".," ";"
+                     :cond #'texmathp
+                     ;; Some Units
+                     "As" "\\mathrm{А}"
+                     "Vs"  "\\mathrm{В}"
+                     "Oms"  "\\mathrm{Ом}"
+                     "cls" "^\\circ C"
 
-                            ;; Some Physics Sheet
-                            "eqv" "\\mathrm{экв}"))
+                     ;; Some Physics Sheet
+                     "eqv" "\\mathrm{экв}"
+
+                     ;; Some Cool Symbols
+                     "is" "\\Leftrightarrow"))
 
      #+END_SRC
 **** Auto Format in LaTeX
@@ -2166,9 +2606,8 @@
 
      #+END_SRC
 
-
 *** Org
-    I am consider that Org Mode builtin Emacs:
+    I am consider that Org Mode built in Emacs:
 
     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
@@ -2245,7 +2684,7 @@
 
      #+END_SRC
 
-**** Navigation beetween Org Files
+**** Navigation beetween Org Headings in Buffer
      I am use [[https://github.com/emacs-helm/helm-org][helm-org]] for navigation in Org Mode:
 
      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -2258,13 +2697,28 @@
 
      #+END_SRC
 
-**** Improvement Navigation beetween Org Files
+**** Improvement Navigation beetween Org Headings
      I am use [[https://github.com/alphapapa/org-ql][org-ql]] for smart queries to find my =org= Files:
 
      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-       (use-package org-ql :ensure t)
-       (use-package helm-org-ql :ensure t)
+       (use-package org-ql
+           :ensure t
+           :config
+           (require 'org-ql))
+
+       (use-package helm-org-ql
+           :ensure t
+           :config
+           (global-set-key (kbd "S-<f9>") 'my-view-todos))
+
+       (defun my-view-todos ()
+         "View my todos."
+         (interactive)
+         (org-ql-search
+             (my-all-buffers-with-ext "org")
+             "todo:TODO"
+             :super-groups '((:auto-parent))))
 
        (defun fast-exec-org-ql-keys ()
          "Get some useful keymaps of  `fast-exec' for org-ql."
@@ -2275,7 +2729,6 @@
        (fast-exec/reload-functions-chain)
 
      #+END_SRC
-
 
 **** Copy Org Code for Other Programms (Word, PowerPoint)
      I am use [[https://github.com/jkitchin/ox-clip][ox-clip]]:
@@ -2290,7 +2743,23 @@
 
      #+END_SRC
 
-**** Org + LaTeX
+**** Generate Table of Contents in Org
+     I am use [[https://github.com/snosov1/toc-org][toc-org]].  This cool package helps you to have an
+     up-to-date table of contents in org files.  I just add tag :TOC:
+     to any org heading and after save this file table of contents
+     will automatically updated
+
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+       (use-package toc-org
+           :ensure t
+           :hook (org-mode . toc-org-mode)
+           :custom
+           (toc-org-max-depth 4))
+
+     #+END_SRC
+
+**** Org + CDLaTeX
      In =LaTeX= for navigation and first insertion of commands I am
      use [[https://github.com/cdominik/cdlatex][CDLaTeX]], In =org= I must use it too:
 
@@ -2483,7 +2952,7 @@
                       (setq-local imenu-generic-expression
                                   markdown-imenu-generic-expression))))
 
-                                  #+END_SRC
+    #+END_SRC
 
 **** Create Table of Contents in Markdown
      I am use [[https://github.com/ardumont/markdown-toc][markdown-toc]]:
@@ -2497,6 +2966,17 @@
                   ("t" . 'markdown-toc-generate-or-refresh-toc)))
 
                   #+END_SRC
+
+**** Auto Format in markdown
+     I am use my own [[*Functions for Auto Format Code]] to auto format in
+     =markdown=:
+
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+       (my-use-all-autoformat-in-mode 'markdown-mode)
+       (my-use-all-autoformat-in-mode 'gfm-mode)
+
+     #+END_SRC
 
 *** Python
 **** Vars
@@ -3005,7 +3485,7 @@
          :ensure t)
 
    #+END_SRC
-
+   
 ** Whitespaces Mode
    I am enable whitespaces mode on =prog-mode=:
 
@@ -3115,6 +3595,7 @@
          :custom
          (cowsay-directories '("~/.emacs.d/cows"))
          :config
+         (cowsay-load-cows)
          (defun fast-exec-define-cowsay-keymaps ()
            "Some useful keymaps for `cowsay'/`fast-exec'."
            (fast-exec/some-commands
@@ -3295,6 +3776,80 @@
      (fast-exec/reload-functions-chain)
 
    #+END_SRC
+
+** Films Management
+   I very love see a lot of films, but I forgot films' names every
+   day, so I create most simple management of films.  I have snippet
+   =film=, which add film to current =org= file, which be films'
+   management database and command =my-films-list= which show saved
+   films
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+     (defun my-films-add (film)
+       "Add FILM to current org file, this file is db of films."
+       (interactive (list (my-films--search-new)))
+       (org-meta-return)
+       (insert "MUST-SEE ")
+       (insert (kinopoisk-film-original-name film))
+       (my-org-set-props
+        (name      . (kinopoisk-film-name film))
+        (year      . (kinopoisk-film-year film))
+        (slogan    . (kinopoisk-film-slogan film))
+        (id        . (kinopoisk-film-id film))
+        (rating    . (kinopoisk-film-rating film))
+        (countries . (kinopoisk-film-countries film))))
+
+     (defmacro my-org-set-props (&rest key-and-val)
+       "Set properties of org heading with keys from KEY-AND-VAL and values from it."
+       (->>
+        key-and-val
+        (--map
+         `(org-set-property ,(symbol-name (car it)) (format "%s" ,(cdr it))))
+        (cons 'progn)))
+
+     (defun my-films--search-new ()
+       "Search film from the Internet."
+       (interactive)
+       ;; I know that instead of `flet', I can use `cl-flet', but `cl-flet'
+       ;; redefine funcitons only in body
+       (flet
+           ((helm-kinopoisk--handle-film (film) film))
+         (helm-kinopoisk-search-films)))
+
+     (defun my-films-list ()
+       "List of films saved in films management file."
+       (interactive)
+       (helm
+        :buffer "*saved-films*"
+        :sources
+        '((name       . "List of Saved Films")
+          (candidates . my-films--list-candidates)
+          (action     . helm-kinonpoisk-search-source))))
+
+     (defun my-films--list-candidates ()
+       "Helm candidates for `my-films-list'."
+       (->>
+        (org-ql-query
+          :from (my-all-buffers-with-ext "org")
+          :where '(todo "MUST-SEE")
+          :select #'my-films--from-org-heading)
+        (--map
+         (cons (helm-kinopoisk--format-film-for-display it) it))))
+
+     (defun my-films--from-org-heading ()
+       "Parse org heading at current position to `kinopoisk-film'."
+       (when (my-current-line-prefix-p "*")
+         (kinopoisk-film
+          :id (car (string-to-number (org-property-values "id")))
+          :year (car (org-property-values "year"))
+          :name (car (org-property-values "name")))))
+
+
+   #+END_SRC
+
+   #+RESULTS:
+   : 1
 
 * Graphic User Interface
 ** Hide ALL
@@ -3768,7 +4323,6 @@
        (find-file "~/agenda.org"))
 
      (global-set-key (kbd "<f9>") #'org-agenda)
-     (global-set-key (kbd "S-<f9>") #'org-todo-list)
      (define-key xah-fly-command-map (kbd "SPC <f9>") #'org-todo-list)
 
      (global-set-key (kbd "<f5>") #'my-open-main-agenda-file)
@@ -4081,7 +4635,7 @@
         (section :initform nil
                  :initarg :section
                  :accessor my-mipt-task-section)
-        (kind :initform nil
+        (kind :initform nil ;nofmt
               :initarg :kind
               :accessor my-mipt-task-kind)   ; 'control or 'normal
         (number  :initform nil
@@ -4091,6 +4645,10 @@
 
      (defvar my-mipt-found-task
        (my-mipt-task)
+       "Object of `my-mipt-task', will set automatically when find task.")
+
+     (defvar my-mipt-last-task
+       nil
        "Object of `my-mipt-task', will set automatically when find task.")
 
      (defun my-mipt-task-control-p (task)
@@ -4127,14 +4685,24 @@
          (if (my-mipt-task-control-p task) "-control" ""))
         (f-join my-mipt-dir)))
 
+     (defun my-mipt-last-task ()
+       "Return last opened task via `recentf'."
+       (->>
+        recentf-list
+        (-find #'my-mipt-task-parse)
+        (my-mipt-task-parse)))
+
+     (defun my-mipt-visit-last-task ()
+       "Visit last opened task searched via `my-mipt-last-task'."
+       (interactive)
+       (my-mipt-task-visit (my-mipt-last-task)))
+
      (defun my-mipt-next-task ()
        "Return next task, after last found task."
        (interactive)
-       (let ((next-task my-mipt-found-task))
+       (let ((next-task (my-mipt-last-task)))
          (incf (my-mipt-task-number next-task))
-         (if (interactive-p)
-             (my-mipt-task-visit next-task)
-           next-task)))
+         (if (interactive-p) (my-mipt-task-visit next-task) next-task)))
 
      (defun my-mipt-task-visit (task)
        "Visit file of TASK's solution."
@@ -4163,7 +4731,9 @@
      Special variable is `my-mipt-found-task'"
        (let ((lesson (my-mipt-read-lesson)))
          (setf (my-mipt-task-lesson my-mipt-found-task) lesson)
-         (->> tasks (--filter (string-equal (my-mipt-task-lesson it) lesson)))))
+         (->>
+          tasks
+          (--filter (string-equal (my-mipt-task-lesson it) lesson)))))
 
      (defun my-mipt-read-lesson ()
        "Read from user MIPT's lesson."
@@ -4178,7 +4748,11 @@
 
      (defun my-mipt-choose-one-of-task-classes (tasks)
        "Take TASKS and choose one of classes."
-       (->> tasks (-map #'my-mipt-task-class) (my-max) (my-mipt-read-class)))
+       (->>
+        tasks
+        (-map #'my-mipt-task-class)
+        (my-max)
+        (my-mipt-read-class)))
 
      (defun my-mipt-read-class (&optional default)
        "Read from user class of MIPT task, defaults to DEFAULT."
@@ -4232,10 +4806,11 @@
 
      (defun my-mipt-choose-one-of-task-numbers (tasks)
        "Take TASKS and choose one of classes."
-       (->> tasks
-            (-map #'my-mipt-task-number)
-            (my-max)
-            (my-mipt-read-number)))
+       (->>
+        tasks
+        (-map #'my-mipt-task-number)
+        (my-max)
+        (my-mipt-read-number)))
 
      (defun my-mipt-read-number (&optional default)
        "Read from user number of MIPT's task, defaults to DEFAULT."
@@ -4254,6 +4829,7 @@
        "Get some useful keymaps of  `fast-exec' for MIPT."
        (fast-exec/some-commands
         ("Next MIPT Task" 'my-mipt-next-task)
+        ("Open Last MIPT Task" 'my-mipt-visit-last-task)
         ("Find MIPT Task" 'my-mipt-task-visit)))
 
      (fast-exec/register-keymap-func 'fast-exec-mipt-keys)
@@ -4280,14 +4856,17 @@
     (->>
      source
      (s-replace "\n" " ")
-  I   (s-replace "\\begin{equation}" "\\[")
+     (s-replace "\\begin{equation}" "\\[")
      (s-replace "\\end{equation}" "\\]")
      (s-append "Так как ваш сайт не любит большие решения, ")
-     (s-append "то оно было уменьшено с помощю програмного кода")))
+     (s-append "то оно было уменьшено с помощью программного кода")))
 
   (bind-keys
    :map my-latex-local-map
    ("c" . my-copy-buffer-content-as-mipt-solution))
 
 #+END_SRC
+
+#+RESULTS:
+: my-copy-buffer-content-as-mipt-solution
 

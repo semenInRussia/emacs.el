@@ -49,6 +49,14 @@ If FORCE is t, a directory will be deleted recursively."
    (f-files)
    (--filter (f-ext-p it ext))))
 
+(defun my-reverse-alist (alist)
+  "Swap keys and values of ALIST."
+  (--map
+   (cons
+    (cdr it)
+    (car it))
+   alist))
+
 (defun my-humanize-string (s)
   "Humanize normalized S."
   (->> s (s-replace "-" " ") (s-titleize)))
@@ -67,6 +75,12 @@ If FORCE is t, a directory will be deleted recursively."
   (->>
    prefixes
    (--some (s-prefix-p it s))))
+
+(defun my-parts-of-string (n s)
+  "Divide string S to N same parts.'"
+  (->>
+   (my-parts-of-seq n s)
+   (--map (apply #'s-concat it))))
 
 (defun my-current-line (&optional pos)
         "Return line at POS, POS defaults to `point'."
@@ -90,10 +104,40 @@ If FORCE is t, a directory will be deleted recursively."
    (s-trim)
    (string-equal "")))
 
+(defun my-all-buffers-with-ext (ext)
+  "Get all opened buffers, excluding buffers which has other to EXT extension."
+  (->>
+   (buffer-list)
+   (--filter
+    (f-ext-p (buffer-name it) ext))))
+
 (defun my-max (list)
   "Return the max value of LIST, if LIST is empty, then return nil."
   (when list
     (-max list)))
+
+(defun my-into-list (obj)
+  "Transform OBJ to list.
+Supoorted types of OBJ:
+- `string'
+- `list'"
+  (cl-typecase obj
+    (list obj)
+    (string (my-string-to-list obj))))
+
+(defun my-string-to-list (s)
+  "Transform S to list of 1 size string."
+  (->>
+   s
+   (string-to-list)
+   (-map #'char-to-string)))
+
+(defun my-parts-of-seq (n seq)
+  "Divide SEQ to N same parts.
+SEQ may be one of types which supported in function `my-into-list'"
+  (setq seq (my-into-list seq))
+  (let ((step (/ (length seq) n)))
+    (-partition-in-steps step step seq)))
 
 (defun if-Emacs-org-then-org-babel-tangle ()
   "If current open file is Emacs.org, then `org-babel-tangle`."
@@ -210,16 +254,18 @@ string and TEMPLATE is a `yas--template' structure."
 (defun use-package-normalize/:major-mode-map (name keyword args)
   "Normalizer of :major-mode-map for `use-package'."
   (let* (map-name modes)
-    (if (eq (-first-item args) t) ; All by Default
+    (if (eq (-first-item args) t)
         (list (symbol-name name) (list name))
       (cl-typecase (-first-item args)
+        (null nil)
         (list (setq modes (-first-item args)))
         (symbol (setq map-name (symbol-name (-first-item args))))
         (string (setq map-name (-first-item args))))
       (cl-typecase (-second-item args)
-        (list (setq modes (-first-item args)))
-        (symbol (setq map-name (symbol-name (-first-item args))))
-        (string (setq map-name (-first-item args))))
+        (null nil)
+        (list (setq modes (-second-item args)))
+        (symbol (setq map-name (symbol-name (-second-item args))))
+        (string (setq map-name (-second-item args))))
       (list
        (or map-name (symbol-name name))
        modes))))
@@ -1139,6 +1185,38 @@ With prefix arg don't indent."
            ("SPC k RET" . new-line-in-between)
            ("SPC SPC s" . open-line-above))
 
+(defun my-change-case-of-current-line ()
+  "Change case of current line to next (see `xah-toggle-letter-case')."
+  (interactive)
+  (save-mark-and-excursion
+    (select-current-line)
+    (xah-toggle-letter-case)))
+
+(bind-keys
+ :map xah-fly-command-map
+ ("SPC SPC b" . my-change-case-of-current-line)
+ ("b"         . my-toggle-change-case-of-line-or-word-or-selection))
+
+(defvar my-last-command-is-changed-case-of-current-line
+  nil "In t, when last command change case.")
+
+(defun my-toggle-change-case-of-line-or-word-or-selection ()
+  "Using one of functions, which change case.
+List of functions: `xah-toggle-letter-case', `my-change-case-of-current-line'."
+  (interactive)
+  (let* ((change-case-of-line
+          (or
+           (eq last-command 'my-change-case-of-current-line)
+           (and
+            (eq
+             last-command
+             'my-toggle-change-case-of-line-or-word-or-selection)
+            my-last-command-is-changed-case-of-current-line))))
+    (setq my-last-command-is-changed-case-of-current-line change-case-of-line)
+    (if change-case-of-line
+        (my-change-case-of-current-line)
+      (xah-toggle-letter-case))))
+
 (defun insert-space-before-line ()
   "Saving position, insert space to beginning of current line."
   (interactive)
@@ -1175,6 +1253,31 @@ With prefix arg don't indent."
 
 (define-key xah-fly-command-map (kbd "p") nil)
 (define-key xah-fly-command-map (kbd "p") 'insert-spaces-before-or-to-beginning-of-each-line)
+
+(defun my-duplicate-last-bloc ()
+  "Take last text block and insert."
+  (interactive)
+  (->>
+   (buffer-substring (my-point-at-last-block-beg) (point))
+   (s-trim)
+   (s-append "\n")
+   (s-prepend "\n")
+   (insert)))
+
+(defun my-point-at-last-block-beg ()
+  "Move to beginning of last block and return current position of cursor."
+  (interactive)
+  (save-excursion
+    (cond
+      ((not (re-search-backward "\\w" nil nil)) (point-min))
+      ((re-search-backward "\n[\t\n ]*\n+" nil 1)
+       (skip-chars-backward "\n\t ")
+       (point))
+      (t (point-min)))))
+
+(bind-keys*
+ :map xah-fly-command-map
+ ("SPC k 6" . my-duplicate-last-bloc))
 
 (define-key xah-fly-command-map (kbd "m") 'backward-sexp)
 (define-key xah-fly-command-map (kbd ".") 'forward-sexp)
@@ -1295,9 +1398,8 @@ With prefix arg don't indent."
 (defvar my-autoformat-functions nil
   "Current used autoformat functions.")
 
-(defcustom my-autoformat-all-functions '(sentence-capitalization
-                                         ordinals
-                                         transposed-caps)
+(defcustom my-autoformat-all-functions
+  '(sentence-capitalization ordinals transposed-caps)
   "All my autoformat functions.")
 
 (defun my-use-autoformat-function-p (f)
@@ -1306,11 +1408,13 @@ With prefix arg don't indent."
 
 (defmacro my-use-autoformat-in-mode (mode &rest autoformat-functions)
   "Add hook to MODE, which enable AUTOFORMAT-FUNCTIONS."
-  (let* ((hook (intern (s-append "-hook" (symbol-name (eval mode)))))
-         (funcs (->>
-                 autoformat-functions
-                 (--map (symbol-name it))
-                 (--map (intern (s-prepend "autoformat-" it))))))
+  (let* ((hook
+          (intern (s-append "-hook" (symbol-name (eval mode)))))
+         (funcs
+          (->>
+           autoformat-functions
+           (--map (symbol-name it))
+           (--map (intern (s-prepend "autoformat-" it))))))
     `(add-hook ',hook
                (lambda ()
                  (setq-local my-autoformat-functions ',funcs)))))
@@ -1323,22 +1427,42 @@ With prefix arg don't indent."
   "Auto-capitalize first words of a sentence.
 Either at the beginning of a line, or after a sentence end."
   (interactive)
-  (when (and (my-use-autoformat-function-p 'autoformat-sentence-capitalization)
-             (not (org-in-src-block-p))
-             (or (save-excursion (backward-char) (bolp))
-                 (looking-back "\*+\\W*.")
-                 (looking-back (concat (sentence-end) "[a-z]"))))
+  (when (and
+         (my-use-autoformat-function-p 'autoformat-sentence-capitalization)
+         (my-in-text-p)
+         (looking-back "[а-яa-z]")
+         (save-excursion
+           (forward-char -1)
+           (or
+            (looking-back (sentence-end))
+            (bobp)
+            (and
+             (skip-chars-backward " ")
+             (bolp)
+             (my-previous-line-is-empty))
+            (and
+             (skip-chars-backward " ")
+             (< (skip-chars-backward "*") 0)
+             (bolp)))))
     (undo-boundary)
     (capitalize-word -1)))
+
+(defun my-previous-line-is-empty ()
+  "Move to previous line and return t, when this line is empty.
+\\(see `my-current-line-is-empty-p')"
+  (forward-line -1)
+  (my-current-line-is-empty-p))
 
 (defun autoformat-transposed-caps ()
   "If you write hTe, fixes it to The."
   (interactive)
-  (when (and (my-use-autoformat-function-p 'autoformat-transposed-caps)
-             (not (org-in-src-block-p))
-             (let ((case-fold-search nil))
-               (looking-back "\\<\\(?1:[a-z]\\)\\(?2:[A-Z]\\)[a-z]+"
-                             (line-beginning-position))))
+  (when (and
+         (my-use-autoformat-function-p 'autoformat-transposed-caps)
+         (my-in-text-p)
+         (let ((case-fold-search nil))
+           (looking-back
+            "\\<\\(?1:[a-zа-я]\\)\\(?2:[A-ZА-Я]\\)[a-zа-я]+"
+            (line-beginning-position))))
     (undo-boundary)
     (save-excursion
       (replace-match (upcase (match-string 1)) nil nil nil 1)
@@ -1351,20 +1475,23 @@ Either at the beginning of a line, or after a sentence end."
 3rd to 3^{rd}
 4th to 4^{th}"
   (interactive)
-  (when (and (my-use-autoformat-function-p 'autoformat-ordinals)
-             (not (org-in-src-block-p))
-             (looking-back
-              "\\(?3:\\<\\(?1:[0-9]+\\)\\(?2:st\\|nd\\|rd\\|th\\)\\>\\)\\(?:[[:punct:]]\\|[[:space:]]\\)"
-              (line-beginning-position)))
+  (when (and
+         (my-use-autoformat-function-p 'autoformat-ordinals)
+         (my-in-text-p)
+         (looking-back
+          "\\(?3:\\<\\(?1:[0-9]+\\)\\(?2:st\\|nd\\|rd\\|th\\)\\>\\)\\(?:[[:punct:]]\\|[[:space:]]\\)"
+          (line-beginning-position)))
     (undo-boundary)
-    (save-excursion
-      (replace-match "\\1^{\\2}" nil nil nil 3))))
+    (save-excursion (replace-match "\\1^{\\2}" nil nil nil 3))))
+
+(defun my-in-text-p ()
+  "Return t, when cursor has position on common text."
+  (and (not (org-in-src-block-p)) (not (texmathp))))
 
 (defun my-autoformat ()
   "Call all autoformat functions."
   (interactive)
-  (--each my-autoformat-functions
-    (funcall it)))
+  (--each my-autoformat-functions (funcall it)))
 
 (define-minor-mode my-autoformat-mode
     "Toggle `my-autoformat-mode'.  Converts 1st to 1^{st} as you type."
@@ -1375,9 +1502,11 @@ Either at the beginning of a line, or after a sentence end."
 
 (my-autoformat-mode t)
 
+(use-package tex-mode
+    :major-mode-map latex (LaTeX-mode))
+
 (use-package latex
     :ensure auctex
-    :major-mode-map (LaTeX-mode)
     :hook ((LaTeX-mode . prettify-symbols-mode))
     :bind ((:map my-latex-local-map)
            ("="     . my-calc-simplify-region-copy)
@@ -1396,9 +1525,7 @@ Either at the beginning of a line, or after a sentence end."
       "Take from BEG to END, simplify this via `calc' and copy as kill."
       (interactive "r")
       (let ((expr (my-calc-simplify (buffer-substring beg end))))
-        (with-temp-buffer
-          (insert expr)
-          (copy-region-as-kill (point-min) (point-max)))
+        (kill-new expr)
         (message "coppied: %s" (current-kill 0))))
 
     (defun my-calc-simplify-region-change (beg end)
@@ -1419,48 +1546,77 @@ Either at the beginning of a line, or after a sentence end."
 (use-package cdlatex
     :ensure t
     :hook (LaTeX-mode . turn-on-cdlatex)
+    :defer t
     :bind (:map cdlatex-mode-map ("<tab>" . cdlatex-tab)))
 
 ;; fields
 (use-package cdlatex
     :hook ((cdlatex-tab . yas-expand)
            (cdlatex-tab . cdlatex-in-yas-field))
-    :config (use-package yasnippet
-                :bind (:map yas-keymap
-                            ("<tab>" . yas-next-field-or-cdlatex)
-                            ("TAB" . yas-next-field-or-cdlatex))
-                :config (defun cdlatex-in-yas-field
-                            ()
-                          ;; Check if we're at the end of the Yas field
-                          (when-let* ((_ (overlayp yas--active-field-overlay))
-                                      (end (overlay-end yas--active-field-overlay)))
-                            (if (>= (point) end)
-                                (let ((s (thing-at-point 'sexp)))
-                                  (unless (and s
-                                               (assoc
-                                                (substring-no-properties s)
-                                                cdlatex-command-alist-comb))
-                                    (yas-next-field-or-maybe-expand)
-                                    t))
-                              (let (cdlatex-tab-hook minp)
-                                (setq minp
-                                      (min
-                                       (save-excursion
-                                         (cdlatex-tab)
-                                         (point))
-                                       (overlay-end
-                                        yas--active-field-overlay)))
-                                (goto-char minp)
-                                t))))
+    :custom (cdlatex-math-modify-alist
+             '((?q "\\sqrt" nil t nil nil))))
 
-                (defun yas-next-field-or-cdlatex nil
-                  (interactive)
-                  "Jump to the next Yas field correctly with cdlatex active."
-                  (if (or
-                       (bound-and-true-p cdlatex-mode)
-                       (bound-and-true-p org-cdlatex-mode))
-                      (cdlatex-tab)
-                    (yas-next-field-or-maybe-expand)))))
+(use-package yasnippet
+    :bind ((:map yas-keymap)
+           ("<tab>" . yas-next-field-or-cdlatex)
+           ("TAB" . yas-next-field-or-cdlatex))
+    :config ;nofmt
+    (defun cdlatex-in-yas-field ()
+        (when-let* ((_ (overlayp yas--active-field-overlay))
+                    (end (overlay-end yas--active-field-overlay)))
+            (if (>= (point) end)
+                (let ((s (thing-at-point 'sexp)))
+                    (unless (and s
+                                 (assoc
+                                  (substring-no-properties s)
+                                  cdlatex-command-alist-comb))
+                        (yas-next-field-or-maybe-expand)
+                        t))
+                (let (cdlatex-tab-hook minp)
+                    (setq minp
+                          (min
+                           (save-excursion
+                               (cdlatex-tab)
+                               (point))
+                           (overlay-end
+                            yas--active-field-overlay)))
+                    (goto-char minp)
+                    t))))
+
+    (defun yas-next-field-or-cdlatex nil
+        (interactive)
+        "Jump to the next Yas field correctly with cdlatex active."
+        (if (or
+             (bound-and-true-p cdlatex-mode)
+             (bound-and-true-p org-cdlatex-mode))
+            (cdlatex-tab)
+            (yas-next-field-or-maybe-expand))))
+
+(use-package tex-mode
+    :after cdlatex
+    :bind
+    ((:map cdlatex-mode-map)
+     ("(" . self-insert-command)
+     (")" . self-insert-command)
+     ("[" . self-insert-command)
+     ("]" . self-insert-command)
+     ("\\" . self-insert-command)))
+
+(defun my-latex-dollar ()
+  "Insert dollars and toggle input method to russian."
+  (interactive)
+  (when current-input-method (toggle-input-method))
+  (if (use-region-p)
+      (sp-wrap-with-pair "$")
+    (insert "$$")
+    (forward-char -1)))
+
+(use-package cdlatex
+    :ensure t
+    :bind
+    (:map cdlatex-mode-map)
+    (";" . my-latex-dollar)
+    ("$" . my-latex-dollar))
 
 ;; Array/tabular input with org-tables and cdlatex
 (use-package org-table
@@ -1583,6 +1739,7 @@ Either at the beginning of a line, or after a sentence end."
     :ensure t
     :hook (LaTeX-mode . laas-mode)
     :config (aas-set-snippets 'laas-mode
+              ".," ";"
               :cond #'texmathp
               ;; Some Units
               "As" "\\mathrm{А}"
@@ -1591,7 +1748,10 @@ Either at the beginning of a line, or after a sentence end."
               "cls" "^\\circ C"
 
               ;; Some Physics Sheet
-              "eqv" "\\mathrm{экв}"))
+              "eqv" "\\mathrm{экв}"
+
+              ;; Some Cool Symbols
+              "is" "\\Leftrightarrow"))
 
 (my-use-all-autoformat-in-mode 'LaTeX-mode)
 
@@ -1644,8 +1804,23 @@ Either at the beginning of a line, or after a sentence end."
                 ([remap helm-imenu]
                  . helm-org-in-buffer-headings)))
 
-(use-package org-ql :ensure t)
-(use-package helm-org-ql :ensure t)
+(use-package org-ql
+    :ensure t
+    :config
+    (require 'org-ql))
+
+(use-package helm-org-ql
+    :ensure t
+    :config
+    (global-set-key (kbd "S-<f9>") 'my-view-todos))
+
+(defun my-view-todos ()
+  "View my todos."
+  (interactive)
+  (org-ql-search
+      (my-all-buffers-with-ext "org")
+      "todo:TODO"
+      :super-groups '((:auto-parent))))
 
 (defun fast-exec-org-ql-keys ()
   "Get some useful keymaps of  `fast-exec' for org-ql."
@@ -1660,6 +1835,12 @@ Either at the beginning of a line, or after a sentence end."
     :bind
     ((:map my-org-local-map)
      ("c" . ox-clip-formatted-copy)))
+
+(use-package toc-org
+    :ensure t
+    :hook (org-mode . toc-org-mode)
+    :custom
+    (toc-org-max-depth 4))
 
 (defun turn-on-org-cdlatex-mode ()
   "Turn on `org-cdlatex-mode'."
@@ -1789,6 +1970,9 @@ Only when in class defnition."
     :bind (:map
            my-markdown-mode-local-map
            ("t" . 'markdown-toc-generate-or-refresh-toc)))
+
+(my-use-all-autoformat-in-mode 'markdown-mode)
+(my-use-all-autoformat-in-mode 'gfm-mode)
 
 (setq py/imports-regexp "import\\|from")
 
@@ -2110,6 +2294,7 @@ Only when in class defnition."
     :custom
     (cowsay-directories '("~/.emacs.d/cows"))
     :config
+    (cowsay-load-cows)
     (defun fast-exec-define-cowsay-keymaps ()
       "Some useful keymaps for `cowsay'/`fast-exec'."
       (fast-exec/some-commands
@@ -2214,6 +2399,65 @@ Only when in class defnition."
 
 (fast-exec/register-keymap-func 'fast-exec-fake-pptx-keys)
 (fast-exec/reload-functions-chain)
+
+(defun my-films-add (film)
+  "Add FILM to current org file, this file is db of films."
+  (interactive (list (my-films--search-new)))
+  (org-meta-return)
+  (insert "MUST-SEE ")
+  (insert (kinopoisk-film-original-name film))
+  (my-org-set-props
+   (name      . (kinopoisk-film-name film))
+   (year      . (kinopoisk-film-year film))
+   (slogan    . (kinopoisk-film-slogan film))
+   (id        . (kinopoisk-film-id film))
+   (rating    . (kinopoisk-film-rating film))
+   (countries . (kinopoisk-film-countries film))))
+
+(defmacro my-org-set-props (&rest key-and-val)
+  "Set properties of org heading with keys from KEY-AND-VAL and values from it."
+  (->>
+   key-and-val
+   (--map
+    `(org-set-property ,(symbol-name (car it)) (format "%s" ,(cdr it))))
+   (cons 'progn)))
+
+(defun my-films--search-new ()
+  "Search film from the Internet."
+  (interactive)
+  ;; I know that instead of `flet', I can use `cl-flet', but `cl-flet'
+  ;; redefine funcitons only in body
+  (flet
+      ((helm-kinopoisk--handle-film (film) film))
+    (helm-kinopoisk-search-films)))
+
+(defun my-films-list ()
+  "List of films saved in films management file."
+  (interactive)
+  (helm
+   :buffer "*saved-films*"
+   :sources
+   '((name       . "List of Saved Films")
+     (candidates . my-films--list-candidates)
+     (action     . helm-kinonpoisk-search-source))))
+
+(defun my-films--list-candidates ()
+  "Helm candidates for `my-films-list'."
+  (->>
+   (org-ql-query
+     :from (my-all-buffers-with-ext "org")
+     :where '(todo "MUST-SEE")
+     :select #'my-films--from-org-heading)
+   (--map
+    (cons (helm-kinopoisk--format-film-for-display it) it))))
+
+(defun my-films--from-org-heading ()
+  "Parse org heading at current position to `kinopoisk-film'."
+  (when (my-current-line-prefix-p "*")
+    (kinopoisk-film
+     :id (car (string-to-number (org-property-values "id")))
+     :year (car (org-property-values "year"))
+     :name (car (org-property-values "name")))))
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
@@ -2469,7 +2713,6 @@ See `format-time-string' for see what format string"
   (find-file "~/agenda.org"))
 
 (global-set-key (kbd "<f9>") #'org-agenda)
-(global-set-key (kbd "S-<f9>") #'org-todo-list)
 (define-key xah-fly-command-map (kbd "SPC <f9>") #'org-todo-list)
 
 (global-set-key (kbd "<f5>") #'my-open-main-agenda-file)
@@ -2768,7 +3011,7 @@ If IS-AS-SNIPPET is t, then expand template as YAS snippet"
    (section :initform nil
             :initarg :section
             :accessor my-mipt-task-section)
-   (kind :initform nil
+   (kind :initform nil ;nofmt
          :initarg :kind
          :accessor my-mipt-task-kind)   ; 'control or 'normal
    (number  :initform nil
@@ -2778,6 +3021,10 @@ If IS-AS-SNIPPET is t, then expand template as YAS snippet"
 
 (defvar my-mipt-found-task
   (my-mipt-task)
+  "Object of `my-mipt-task', will set automatically when find task.")
+
+(defvar my-mipt-last-task
+  nil
   "Object of `my-mipt-task', will set automatically when find task.")
 
 (defun my-mipt-task-control-p (task)
@@ -2814,14 +3061,24 @@ If IS-AS-SNIPPET is t, then expand template as YAS snippet"
     (if (my-mipt-task-control-p task) "-control" ""))
    (f-join my-mipt-dir)))
 
+(defun my-mipt-last-task ()
+  "Return last opened task via `recentf'."
+  (->>
+   recentf-list
+   (-find #'my-mipt-task-parse)
+   (my-mipt-task-parse)))
+
+(defun my-mipt-visit-last-task ()
+  "Visit last opened task searched via `my-mipt-last-task'."
+  (interactive)
+  (my-mipt-task-visit (my-mipt-last-task)))
+
 (defun my-mipt-next-task ()
   "Return next task, after last found task."
   (interactive)
-  (let ((next-task my-mipt-found-task))
+  (let ((next-task (my-mipt-last-task)))
     (incf (my-mipt-task-number next-task))
-    (if (interactive-p)
-        (my-mipt-task-visit next-task)
-      next-task)))
+    (if (interactive-p) (my-mipt-task-visit next-task) next-task)))
 
 (defun my-mipt-task-visit (task)
   "Visit file of TASK's solution."
@@ -2850,7 +3107,9 @@ If IS-AS-SNIPPET is t, then expand template as YAS snippet"
 Special variable is `my-mipt-found-task'"
   (let ((lesson (my-mipt-read-lesson)))
     (setf (my-mipt-task-lesson my-mipt-found-task) lesson)
-    (->> tasks (--filter (string-equal (my-mipt-task-lesson it) lesson)))))
+    (->>
+     tasks
+     (--filter (string-equal (my-mipt-task-lesson it) lesson)))))
 
 (defun my-mipt-read-lesson ()
   "Read from user MIPT's lesson."
@@ -2865,7 +3124,11 @@ Special variable is `my-mipt-found-task'"
 
 (defun my-mipt-choose-one-of-task-classes (tasks)
   "Take TASKS and choose one of classes."
-  (->> tasks (-map #'my-mipt-task-class) (my-max) (my-mipt-read-class)))
+  (->>
+   tasks
+   (-map #'my-mipt-task-class)
+   (my-max)
+   (my-mipt-read-class)))
 
 (defun my-mipt-read-class (&optional default)
   "Read from user class of MIPT task, defaults to DEFAULT."
@@ -2919,10 +3182,11 @@ Special variable is `my-mipt-found-task'"
 
 (defun my-mipt-choose-one-of-task-numbers (tasks)
   "Take TASKS and choose one of classes."
-  (->> tasks
-       (-map #'my-mipt-task-number)
-       (my-max)
-       (my-mipt-read-number)))
+  (->>
+   tasks
+   (-map #'my-mipt-task-number)
+   (my-max)
+   (my-mipt-read-number)))
 
 (defun my-mipt-read-number (&optional default)
   "Read from user number of MIPT's task, defaults to DEFAULT."
@@ -2941,6 +3205,7 @@ Special variable is `my-mipt-found-task'"
   "Get some useful keymaps of  `fast-exec' for MIPT."
   (fast-exec/some-commands
    ("Next MIPT Task" 'my-mipt-next-task)
+   ("Open Last MIPT Task" 'my-mipt-visit-last-task)
    ("Find MIPT Task" 'my-mipt-task-visit)))
 
 (fast-exec/register-keymap-func 'fast-exec-mipt-keys)
@@ -2956,10 +3221,10 @@ Special variable is `my-mipt-found-task'"
   (->>
    source
    (s-replace "\n" " ")
-I   (s-replace "\\begin{equation}" "\\[")
+   (s-replace "\\begin{equation}" "\\[")
    (s-replace "\\end{equation}" "\\]")
    (s-append "Так как ваш сайт не любит большие решения, ")
-   (s-append "то оно было уменьшено с помощю програмного кода")))
+   (s-append "то оно было уменьшено с помощью программного кода")))
 
 (bind-keys
  :map my-latex-local-map

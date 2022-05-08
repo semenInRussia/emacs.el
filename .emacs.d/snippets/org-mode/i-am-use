@@ -1,7 +1,7 @@
 # -*- mode: snippet -*-
 # name: I am use ...
 # type: command
-# key: Iau
+# key: iau
 # --
 (insert  "I am use ")
 (org-insert-link-global)
