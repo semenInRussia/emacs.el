@@ -3,11 +3,12 @@
 
 * MIPT and ZMS
 ** TODO Do MIPT Tasks
-   SCHEDULED: <2022-04-27 Ср .+1d>
+   SCHEDULED: <2022-05-17 Вт .+1d>
    :PROPERTIES:
-   :LAST_REPEAT: [2022-04-26 Вт 23:05]
+   :LAST_REPEAT: [2022-05-16 Пн 21:30]
    :END:
 
+   - State "DONE"       from "TODO"       [2022-05-16 Пн 21:30]
    - State "DONE"       from "TODO"       [2022-04-26 Вт 23:05]
    - State "DONE"       from "TODO"       [2022-04-25 Пн 20:56]
    :PROPERTIES:
@@ -17,54 +18,89 @@
    Every day I must do 2 tasks of the MIPT
 
    [[elisp:my-mipt-task-visit][Search MIPT Solution]] or [[elisp:my-mipt-next-task][Next MIPT Task]]
-** TODO Use HELM when find MIPT task (for number of task)
-** TODO Do number from ZMS exam
 
-* Yandex Edu
-** TODO Do tasks from https://123.ya.ru
 * In Emacs
 ** =org=
 ** Developer's Environment
 ** Organize Editing
-*** TODO Auto Capitalize Words In Comments of Languages
-*** TODO Support of curly braces ({}) in =LaTeX=
-*** Auto capitalization in some =LaTeX= commands (sush as \author{|})
-*** TODO Support of \le in =LaTeX=
-*** TODO Add able to insert ; in =LaTeX=
+** Explore new packages
+** Continue develop of 
+*** TODO =emacs-run-command-recipes=
+*** TODO =just=
 * Films
-** TODO Create System Of Films' Management
-** MUST-SEE Sound of Metal
+** MUST-SEE The French Dispatch
    :PROPERTIES:
-   :name:     Звук металла
-   :year:     2019
-   :id:       957883
-   :rating:   73.0
-   :countries: (Бельгия США)
-   :END:
-** MUST-SEE Missionary: Impossible
-   :PROPERTIES:
-   :name:     Миссия невыполнима
-   :year:     2006
-   :id:       305389
-   :rating:   0
-   :countries: (США)
+   :name:     Французский вестник. Приложение к газете «Либерти. Канзас ивнинг сан»
+   :year:     2021
+   :slogan:   nil
+   :id:       1211076
+   :rating:   76.0
+   :countries: (Германия США)
    :END:
 ** MUST-SEE Everything Everywhere All at Once
    :PROPERTIES:
    :name:     Всё везде и сразу
    :year:     2022
+   :slogan:   nil
    :id:       1322324
    :rating:   82.0
    :countries: (США)
    :END:
-# ** MUST-SEE Watch Film "Nicolas Cadge"
+** MUST-SEE Missionary: Impossible
+   :PROPERTIES:
+   :name:     Миссия невыполнима
+   :year:     2006
+   :slogan:   nil
+   :id:       305389
+   :rating:   0
+   :countries: (США)
+   :END:
+** MUST-SEE The Green Mile
+   :PROPERTIES:
+   :name:     Зеленая миля
+   :year:     1999
+   :slogan:   Пол Эджкомб не верил в чудеса. Пока не столкнулся с одним из них
+   :id:       435
+   :rating:   91.0
+   :countries: (США)
+   :END:
+** MUST-SEE Sound of Metal
+   :PROPERTIES:
+   :name:     Звук металла
+   :year:     2019
+   :slogan:   Music was his world. Then silence revealed a new one.
+   :id:       957883
+   :rating:   73.0
+   :countries: (Бельгия США)
+   :END:
+** MUST-SEE The Batman
+   :PROPERTIES:
+   :name:     Бэтмен
+   :year:     2022
+   :slogan:   Unmask The Truth
+   :id:       590286
+   :rating:   79.0
+   :countries: (США)
+   :END:
+** MUST-SEE Borat: Cultural Learnings of America for Make Benefit Glorious Nation of Kazakhstan
+   :PROPERTIES:
+   :name:     Борат
+   :year:     2006
+   :slogan:   Come to Kazakhstan, It's Nice!
+   :id:       102474
+   :rating:   67.0
+   :countries: (Великобритания США)
+   :END:
+
 * GitHub
 ** TODO Do 1 commit per day
-   SCHEDULED: <2022-05-02 Пн .+1d>
+   SCHEDULED: <2022-05-12 Чт .+1d>
    :PROPERTIES:
-   :LAST_REPEAT: [2022-05-01 Вс 23:30]
+   :LAST_REPEAT: [2022-05-11 Ср 16:23]
    :END:
    
+   - State "DONE"       from "TODO"       [2022-05-11 Ср 16:23]
+   - State "DONE"       from "TODO"       [2022-05-09 Пн 12:11]
    - State "DONE"       from "TODO"       [2022-05-01 Вс 23:30]
    - State "DONE"       from "TODO"       [2022-04-26 Вт 21:54]
    - State "DONE"       from "TODO"       [2022-04-26 Вт 21:50]

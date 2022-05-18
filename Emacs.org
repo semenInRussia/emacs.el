@@ -17,7 +17,7 @@
   - [[https://github.com/jkitchin/scimax/][jkitchin/scimax]] (org mode, and auto format functions)
   - [[https://github.com/magnars/.emacs.d][magnars/.emacs.d]] (smart insertion, a lot of snippets, and other)
 
-* Table of Contents                                                     :TOC:
+* Table of Contents                                                    :TOC:
 - [[#hi][Hi!]]
 - [[#package-management---base][Package Management - base]]
   - [[#use-package][use-package]]
@@ -31,10 +31,9 @@
     - [[#dash][Dash]]
   - [[#my-small-standard-library][My Small Standard Library]]
     - [[#work-with-files][Work with Files]]
-    - [[#work-with-alists][Work with Alists]]
     - [[#work-with-strings][Work with Strings]]
-    - [[#work-with-editor][Work with Editor]]
     - [[#work-with-lists][Work with Lists]]
+  - [[#function-for-work-with-the-emacs][Function for work with the Emacs]]
   - [[#auto-tangle-this-file][Auto Tangle This File]]
 - [[#info-about-me-for-emacs][Info about Me for Emacs]]
   - [[#congurlation-me-with-my-birthday][Congurlation me with my Birthday!]]
@@ -58,9 +57,12 @@
     - [[#search-in-file][Search in File]]
     - [[#search-in-very-some-file][Search in Very Some File]]
   - [[#search-and-replace][Search and Replace]]
+    - [[#search-and-replace-in-project][Search and Replace in Project]]
+    - [[#search-and-replace-in-current-buffer][Search and Replace in Current Buffer]]
+  - [[#change-case-of-text][Change Case of Text]]
+  - [[#auto-indent-aggressive][Auto indent (aggressive)]]
   - [[#navigation-beetween-functionsclassesetc][Navigation beetween Functions/Classes/etc.]]
     - [[#in-project][In Project]]
-  - [[#see-recent-files][See Recent Files]]
   - [[#smart-commentuncomment][Smart Comment/Uncomment]]
   - [[#jump-to-defnition][Jump to Defnition]]
   - [[#multiple-cursors][Multiple Cursors]]
@@ -101,14 +103,16 @@
       - [[#auto-complete-for-latex][Auto Complete for LaTeX]]
       - [[#auto-activating-snippets-for-latex][Auto Activating Snippets for LaTeX]]
       - [[#auto-format-in-latex][Auto Format in LaTeX]]
+      - [[#equation-environment-to-split-environment][Equation Environment to Split Environment]]
+      - [[#insert-any-image-at-url-in-latex][Insert any image at URL in LaTeX]]
     - [[#org][Org]]
       - [[#centering-org][Centering Org]]
       - [[#auto-format-in-org][Auto Format in Org]]
       - [[#load-from-wiki][Load from Wiki]]
-      - [[#drag-and-drop-images][Drag and Drop Images]]
-      - [[#navigation-beetween-org-headings-in-buffer][Navigation beetween Org Headings in Buffer]]
+      - [[#drag-and-drop-images-to-org][Drag and Drop Images to Org]]
+      - [[#navigation-beetween-org-headings-in-current-buffer][Navigation beetween Org Headings in Current Buffer]]
       - [[#improvement-navigation-beetween-org-headings][Improvement Navigation beetween Org Headings]]
-      - [[#copy-org-code-for-other-programms-word-powerpoint][Copy Org Code for Other Programms (Word, PowerPoint)]]
+      - [[#paste-link-from-browser][Paste Link from Browser]]
       - [[#generate-table-of-contents-in-org][Generate Table of Contents in Org]]
       - [[#org--cdlatex][Org + CDLaTeX]]
     - [[#elisp][Elisp]]
@@ -169,6 +173,7 @@
   - [[#syntax-subword-mode][Syntax Subword Mode]]
   - [[#small-pandoc-functions][Small Pandoc Functions]]
   - [[#i-am-russian-1][I am Russian!]]
+  - [[#disable-or-enable-modes][Disable or Enable Modes]]
   - [[#cow-say][Cow Say]]
   - [[#auto-save][Auto Save]]
   - [[#read-documentation-for-developers][Read Documentation for Developers]]
@@ -181,6 +186,8 @@
   - [[#kinopoisk][Kinopoisk]]
   - [[#make-broken-pptx-file][Make Broken PPTX File]]
   - [[#films-management][Films Management]]
+  - [[#see-recent-files][See Recent Files]]
+  - [[#take-color-or-face][Take Color or Face]]
 - [[#graphic-user-interface][Graphic User Interface]]
   - [[#hide-all][Hide ALL]]
   - [[#color-themes][Color Themes]]
@@ -197,6 +204,7 @@
     - [[#watch-time-in-doom-modeline][Watch Time in Doom-Modeline]]
     - [[#pomidor-in-modeline][Pomidor in Modeline]]
     - [[#truncate-buffers-name-in-modeline][Truncate Buffer's Name in Modeline]]
+    - [[#no-display-flycheck-in-modeline][No Display =flycheck= in Modeline]]
     - [[#enable-modeline][Enable Modeline]]
   - [[#fonts][Fonts]]
   - [[#highlight-current-line][Highlight Current Line]]
@@ -212,6 +220,7 @@
     - [[#git-major-modes][Git Major Modes]]
     - [[#genreate-gitignore][Genreate .gitignore]]
   - [[#view-directories][View Directories]]
+  - [[#just-run-current-file][Just Run Current File]]
   - [[#run-command][Run Command]]
     - [[#run-command-recipes][Run Command Recipes]]
   - [[#projects-with-templates][Projects with Templates]]
@@ -330,22 +339,6 @@
         (--filter (f-ext-p it ext))))
 
    #+END_SRC
-*** Work with Alists
-    Function =my-reverse-alist= swap keys and values of taked alist
-
-    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-      (defun my-reverse-alist (alist)
-        "Swap keys and values of ALIST."
-        (--map
-         (cons
-          (cdr it)
-          (car it))
-         alist))
-
-    #+END_SRC
-
-
 *** Work with Strings
     Functions =my-humanize-string= and =my-normalize-string= transform
     strings as =print-something-real-noral= to "Print Something Real
@@ -390,64 +383,6 @@
         (->>
          (my-parts-of-seq n s)
          (--map (apply #'s-concat it))))
-
-    #+END_SRC
-
-
-*** Work with Editor
-    Function =my-current-line= return current line:
-
-    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-      (defun my-current-line (&optional pos)
-              "Return line at POS, POS defaults to `point'."
-              (setq pos (or pos (point)))
-              (save-excursion
-                (goto-char pos)
-                (buffer-substring-no-properties
-                 (point-at-bol)
-                 (point-at-eol))))
-
-    #+END_SRC
-
-    Function =my-current-line-prefix-p= take string, and return t when
-    current text line starts with this string:
-
-    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-      (defun my-current-line-prefix-p (p)
-        "Return t, when current text line starts with P."
-        (s-prefix-p p (my-current-line)))
-
-    #+END_SRC
-
-    Function =my-current-line-empty-p= return t, when current line is
-    empty:
-
-    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-      (defun my-current-line-is-empty-p (&optional pt)
-        "Return t, when line on PT is empty."
-        (setq pt (or pt (point)))
-        (->>
-         pt
-         (my-current-line)
-         (s-trim)
-         (string-equal "")))
-
-    #+END_SRC
-
-    Function =my-all-buffers-with-ext= return list of opened buffers
-    which has extension same with taked:
-
-    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-      (defun my-all-buffers-with-ext (ext)
-        "Get all opened buffers, excluding buffers which has other to EXT extension."
-        (->>
-         (buffer-list)
-         (--filter
-          (f-ext-p (buffer-name it) ext))))
 
     #+END_SRC
 
@@ -501,6 +436,16 @@
 
 
     #+END_SRC
+** Function for work with the Emacs
+   I created library =just= which has a lot of power functions for
+   work with Emacs
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+     (use-package just
+         :load-path "~/projects/just/just.el")
+
+   #+END_SRC
 
 
 ** Auto Tangle This File
@@ -664,7 +609,8 @@
           #+END_SRC
 
 ** Format All Code
-   Each programmer need to format code for this I am use [[https://github.com/lassik/emacs-format-all-the-code][format-all]], its support 65 languages:
+   Each programmer need to format code for this I am use [[https://github.com/lassik/emacs-format-all-the-code][format-all]],
+   its support 65 languages:
 
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
@@ -780,6 +726,7 @@
                                              org-agenda
                                              deadgrep
                                              projectile
+                                             package
                                              skeletor
                                              yasnippet
                                              format-all
@@ -820,16 +767,26 @@
 ** Search
 *** Search in File
 
-    I am press ='= for search word:
+    I am press ='= for search anything in current buffer.  I am use
+    [[https://github.com/emacsorphanage/helm-swoop][helm-swoop]], this is interactive way to search any string in
+    buffer.  I'm press =M-j= and I will be can edit all selected
+    things, after I can press (=SPC ;=) for apply all edits.  Also I
+    can press =SPC k '= for search anything in all buffers with same
+    major mode.
 
     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-      (use-package swiper-helm
+      (use-package helm-swoop
           :ensure t
-          :bind (:map xah-fly-command-map
-                      ("'" . swiper-helm)))
+          :bind ((:map xah-fly-command-map)
+                 ("'" . 'helm-swoop)
+                 ("SPC k '" . 'helm-multi-swoop-current-mode)
+                 (:map helm-swoop-map)
+                 ("M-j" . 'helm-swoop-edit)
+                 (:map helm-swoop-edit-map)
+                 ([remap save-buffer] . 'helm-swoop--edit-complete)))
 
-                      #+END_SRC
+    #+END_SRC
 
 *** Search in Very Some File
     I am use [[https://github.com/Wilfred/deadgrep][deadgrep]], because I am love =Rust=:
@@ -847,11 +804,51 @@
 ** Search and Replace
    I am use =SPC r= for replace word in buffer, and =SPC SPC r= for replace word in project:
 
+*** Search and Replace in Project
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (define-key xah-fly-command-map (kbd "SPC SPC r") 'projectile-replace)
+
+    #+END_SRC
+
+*** Search and Replace in Current Buffer
+    I am use [[https://github.com/benma/visual-regexp.el][visual-regexp]].  This is like replace-regexp, but with
+    live visual feedback directly in the buffer.
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (use-package visual-regexp
+          :ensure t
+          :bind ((:map xah-fly-command-map)
+                 ("SPC r" . 'vr/query-replace)))
+
+    #+END_SRC
+
+** Change Case of Text
+   I am use [[https://github.com/akicho8/string-inflection][string-inflection]] for change case of text on cycle
+
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-     (define-key xah-fly-command-map (kbd "SPC SPC r") 'projectile-replace)
+     (use-package string-inflection
+         :ensure t
+         :bind ((:map xah-fly-command-map)
+                ("b" . 'string-inflection-cycle)))
 
-     #+END_SRC
+   #+END_SRC
+
+** Auto indent (aggressive)
+   I am use [[https://github.com/Malabarba/aggressive-indent-mode/][aggressive-indent-mode]].  When I'm press space, all will
+   indented (see [[https://github.com/Malabarba/aggressive-indent-mode/][docs]])
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+
+     (use-package aggressive-indent
+         :ensure t
+         :hook ((emacs-lisp-mode css-mode) . aggressive-indent-mode))
+
+   #+END_SRC
 
 ** Navigation beetween Functions/Classes/etc.
    I am use =imenu= with =Helm= and keymap =SPC SPC SPC=:
@@ -876,20 +873,6 @@
                       ("SPC SPC n" . imenu-anywhere)))
 
                       #+END_SRC
-
-** See Recent Files
-   I am use built in Emacs =recentf-mode= and keymap =SPC k f= for
-   view recentf files, as =SPC f= but add =k=:
-
-   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-     (use-package recentf
-         :config (recentf-mode 69) ; Lol!
-         :bind ((:map xah-fly-command-map)
-                ("SPC k f" . 'recentf-open-files))
-         :hook ((recentf-dialog-mode) . 'xah-fly-insert-mode-activate))
-
-   #+END_SRC
 
 ** Smart Comment/Uncomment
    I am use [[https://github.com/remyferre/comment-dwim-2][comment-dwim-2]]:
@@ -932,7 +915,7 @@
        (interactive)
        (if (use-region-p)
            (call-interactively #'mc/edit-lines)
-         (call-interactively #'helm-buffers-list)))
+         (call-interactively #'helm-multi-files)))
 
      (defun my-mark-all ()
        "If enable `multiple-cursors', then mark all like this, other mark buffer."
@@ -1985,7 +1968,6 @@
         ("SPC k 6" . my-duplicate-last-bloc))
      #+END_SRC
 
-
 ** Custom Navigation
    I am press =m= and =.= for go to next, previous sexp:
 
@@ -2158,7 +2140,7 @@
         "Current used autoformat functions.")
 
       (defcustom my-autoformat-all-functions
-        '(sentence-capitalization ordinals transposed-caps)
+        '(sentence-capitalization)
         "All my autoformat functions.")
 
       (defun my-use-autoformat-function-p (f)
@@ -2211,37 +2193,6 @@
       \\(see `my-current-line-is-empty-p')"
         (forward-line -1)
         (my-current-line-is-empty-p))
-
-      (defun autoformat-transposed-caps ()
-        "If you write hTe, fixes it to The."
-        (interactive)
-        (when (and
-               (my-use-autoformat-function-p 'autoformat-transposed-caps)
-               (my-in-text-p)
-               (let ((case-fold-search nil))
-                 (looking-back
-                  "\\<\\(?1:[a-zа-я]\\)\\(?2:[A-ZА-Я]\\)[a-zа-я]+"
-                  (line-beginning-position))))
-          (undo-boundary)
-          (save-excursion
-            (replace-match (upcase (match-string 1)) nil nil nil 1)
-            (replace-match (downcase (match-string 2)) nil nil nil 2))))
-
-      (defun autoformat-ordinals ()
-        "Expand ordinal words to superscripted versions in `org-mode'.
-      1st to 1^{st}.
-      2nd to 2^{nd}
-      3rd to 3^{rd}
-      4th to 4^{th}"
-        (interactive)
-        (when (and
-               (my-use-autoformat-function-p 'autoformat-ordinals)
-               (my-in-text-p)
-               (looking-back
-                "\\(?3:\\<\\(?1:[0-9]+\\)\\(?2:st\\|nd\\|rd\\|th\\)\\>\\)\\(?:[[:punct:]]\\|[[:space:]]\\)"
-                (line-beginning-position)))
-          (undo-boundary)
-          (save-excursion (replace-match "\\1^{\\2}" nil nil nil 3))))
 
       (defun my-in-text-p ()
         "Return t, when cursor has position on common text."
@@ -2317,16 +2268,40 @@
       #+END_SRC
 
 **** Preview Latex
-      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-        (use-package preview
-            :after latex
-            :bind ((:map my-latex-local-map)
-                   ("p" . org-latex-preview))
-            :config
-            (plist-put org-format-latex-options :scale 1.9))
+     I am use =math-preview= which via [[https://docs.mathjax.org/][MathJax]] preview =LaTeX= source
+     code inline.  Before use =math-preview= you must install external
+     programm via =npm=
 
-      #+END_SRC
+     #+BEGIN_SRC shell
+       npm install -g git+https://gitlab.com/matsievskiysv/math-preview
+     #+END_SRC
+
+
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+       (use-package math-preview
+           :ensure t
+           :custom
+           (math-preview-preprocess-functions
+            (list (lambda (s) (s-concat "{\\color{white}" s "}"))))
+           :bind ((:map my-latex-local-map)
+                  ("p" . 'my-latex-preview)
+                  ("d" . 'math-preview-clear-at-point)))
+
+       (defun my-latex-preview ()
+         "Preview latex fragments combine `org-latex-combine', `math-preview'."
+         (interactive)
+         (if (->> (math-preview--find-gaps (point-min) (point-max))
+                  (--filter (and (>= (point) (car it))
+                                 (< (point) (cdr it))))
+                  (--map (math-preview--search (car it) (cdr it)))
+                  (-flatten)
+                  (--filter (and (>= (point) (car it))
+                                 (< (point) (cdr it)))))
+             (math-preview-at-point)
+           (org-latex-preview)))
+
+     #+END_SRC
 
 **** Fast Navigation and Insertion in LaTeX
 
@@ -2394,6 +2369,8 @@
            ((:map cdlatex-mode-map)
             ("(" . self-insert-command)
             (")" . self-insert-command)
+            ("{" . self-insert-command)
+            ("}" . self-insert-command)
             ("[" . self-insert-command)
             ("]" . self-insert-command)
             ("\\" . self-insert-command)))
@@ -2580,20 +2557,24 @@
        (use-package laas
            :ensure t
            :hook (LaTeX-mode . laas-mode)
-           :config (aas-set-snippets 'laas-mode
-                     ".," ";"
-                     :cond #'texmathp
-                     ;; Some Units
-                     "As" "\\mathrm{А}"
-                     "Vs"  "\\mathrm{В}"
-                     "Oms"  "\\mathrm{Ом}"
-                     "cls" "^\\circ C"
+           :config
+           (aas-set-snippets 'laas-mode
+             ".," ";"
+             :cond #'texmathp
+             ;; Some Units
+             "As" "\\mathrm{А}"
+             "Vs"  "\\mathrm{В}"
+             "Oms"  "\\mathrm{Ом}"
+             "cls" "^\\circ C"
 
-                     ;; Some Physics Sheet
-                     "eqv" "\\mathrm{экв}"
+             ;; Some Physics Sheet
+             "eqv" "\\mathrm{экв}"
 
-                     ;; Some Cool Symbols
-                     "is" "\\Leftrightarrow"))
+             ;; Some Cool Symbols
+             "is" "\\Leftrightarrow"
+             "trg" "\\triangle"
+             "agl" "\\angle"
+             "grd" "^\\circ"))
 
      #+END_SRC
 **** Auto Format in LaTeX
@@ -2602,9 +2583,212 @@
 
      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-       (my-use-all-autoformat-in-mode 'LaTeX-mode)
+       (eval
+        `(my-use-autoformat-in-mode
+          'LaTeX-mode
+          ,@(cons 'latex-capitalize-special-commands my-autoformat-all-functions)))
+
+       (defvar autoformat-latex-capitalize-latex-commands
+         '("author" "title" "date" "part" "subsection" "section" "part" "chapter")
+         "List of regexps which Emacs will automatically capitalize.")
+
+       (defvar autoformat-latex-capitalize-regexps
+         (--map
+          (s-concat "\\\\" it "\\W*{.")
+          autoformat-latex-capitalize-latex-commands)
+         "List of regexps which Emacs will automatically capitalize.")
+
+       (add-to-list 'autoformat-latex-capitalize-regexps "\\\\item\\W+.")
+
+       (defun autoformat-latex-capitalize-special-commands ()
+         "Capitalize last symbol, when its match on special regexp."
+         (interactive)
+         (when (-any #'looking-back autoformat-latex-capitalize-regexps)
+           (undo-boundary)
+           (capitalize-word -1)))
 
      #+END_SRC
+**** Equation Environment to Split Environment
+     I must has funcion which take current equation environment and
+     transformt its to split environment
+
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+       (defun my-latex-equation-to-split ()
+         "Transform LaTeX equation environment to split environment."
+         (interactive)
+         (save-excursion
+           (LaTeX-find-matching-begin)
+           (end-of-line)
+           (push-mark)
+           (LaTeX-find-matching-end)
+           (beginning-of-line)
+           (cdlatex-wrap-environment "split")
+           (indent-region (region-beginning) (region-end))
+           (replace-string "=" "&=" nil (region-beginning) (region-end))
+           (LaTeX-find-matching-begin)
+           (forward-line)
+           (kill-whole-line)
+           (forward-line)
+           (end-of-line)
+           (--dotimes
+               (- (save-excursion
+                    (LaTeX-find-matching-end)
+                    (line-number-at-pos))
+                  (line-number-at-pos))
+             (end-of-line)
+             (insert "\\\\")
+             (forward-line))))
+
+
+       (bind-keys*
+        :map my-latex-local-map
+        ("\\" . my-latex-equation-to-split))
+
+
+     #+END_SRC
+**** Insert any image at URL in LaTeX
+     I am as old user of =Google.Documents= must have command which
+     just insert any image by url, so I create its.  For insert a
+     image at url I bind keymaps to =SPC l i= (insert a image at
+     readed from the minibuffer url) and snippet =uimg= (insert a
+     image from the clipboard)
+
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+       (defun my-latex-insert-img-at-copied-url (&optional image-name)
+         "Insert to current LaTeX buffer image at URL which copied in clipboard.
+       If copied text isn't URL then report the error.  Downloaded file will be called
+       IMAGE-NAME."
+         (interactive)
+         (let ((url (current-kill 0)))
+           (when (interactive-p)
+             (setq image-name
+                   (read-string "Name of downloaded image, please: "
+                                (my-uri-of-url url))))
+           (my-latex-insert-img-at-url url image-name)))
+
+       (defun my-latex-insert-img-at-url (url &optional image-name)
+         "Insert to current latex buffer image at URL, install if need.
+       Downloaded image will be called IMAGE-NAME"
+         (interactive
+          (let* ((url (read-string "Enter URL for image, please: "))
+                 (image-name
+                  (read-string
+                   "Name of downloaded image,  please: "
+                   (my-uri-of-url url))))
+            (list url image-name)))
+         (my-latex-graphics-init)
+         (->>
+          (my-latex-download-image-into-graphicspath url image-name)
+          (my-latex-insert-img-at-path)))
+
+       (defun my-latex-graphics-init ()
+         "Add some stuffs for graphics in LaTeX."
+         (interactive)
+         (my-latex-use-package "graphicx")
+         (unless (my-latex-current-graphicspathes)
+           (my-latex-add-graphicspath "./images/")))
+
+       (defun my-latex-insert-img-at-path (path)
+         "Insert to current latex buffer image at PATH."
+         (->>
+          path
+          (f-base)
+          (format "\\begin{center}
+         \\includegraphics{%s}
+       \\end{center}")
+          (insert)))
+
+       (defun my-latex-download-image-into-graphicspath (url &optional filename)
+         "Download image at URL into graphicspath of current LaTeX buffer.
+       This file has name FILENAME.  Return nil when fail, otherwise return path of
+       downloaded file"
+         (or filename (setq filename (my-uri-of-url)))
+         (let* ((graphicspath (-last-item (my-latex-current-graphicspathes)))
+                (dest (f-join graphicspath filename)))
+           (url-copy-file url dest t)
+           dest))
+
+       (defun my-uri-of-url (url)
+         "Get the URI of URL."
+         (->>
+          url
+          (s-split "/")
+          (-last-item)
+          (s-split "?")
+          (-first-item)))
+
+       (defun my-latex-add-graphicspath (path)
+         "Add to list of current LaTeX file' s graphicpath PATH."
+         (->>
+          (my-latex-current-graphicspathes)
+          (cons path)
+          (my-latex-set-graphicspath)))
+
+       (defun my-latex-set-graphicspath (paths)
+         "Set graphicpath (command \\graphicspath)of current LaTeX buffer to PATHS."
+         (save-excursion
+           (my-latex-goto-graphicspath)
+           (forward-char -1)
+           (sp-get
+               (sp-get-enclosing-sexp)
+             (delete-region :beg-in :end-in)
+             (--each paths (insert (format "{%s}" it))))))
+
+       (defun my-latex-current-graphicspathes ()
+         "Parse from current LaTeX buffer value of \\graphicspath."
+         (save-excursion
+           (my-latex-goto-graphicspath)
+           (forward-char -1)
+           (sp-get
+               (sp-get-enclosing-sexp)
+             (->>
+              (buffer-substring-no-properties :beg-in :end-in)
+              (s-match-strings-all "\{\\([^\\}]*\\)\}")
+              (-map #'-last-item)))))
+
+       (defun my-latex-goto-graphicspath ()
+         "Goto end of LaTeX command for set graphic paths, if isn't exit insert."
+         (goto-char (point-min))
+         (unless (search-forward-regexp "^\\\\graphicspath\\W*\{.*\}\\W*$"  nil t)
+           (search-forward-regexp "\\\\begin\\W*\{\\W*document\\W*\}"  nil t)
+           (forward-line -1)
+           (end-of-line)
+           (newline)
+           (insert "\\graphicspath{}")))
+
+       (defun my-latex-use-package (package &optional options)
+         "Add \\usepackage for PACKAGE with OPTIONS to current LaTeX buffer."
+         (interactive "sPlease, choose package which you need use: ")
+         (unless (my-latex-used-package-p package)
+           (save-excursion
+             (goto-char (point-min))
+             (search-forward-regexp "^\\\\usepackage" nil t)
+             (beginning-of-line)
+             (insert "\\usepackage")
+             (LaTeX-arg-usepackage-insert (list package) options)
+             (LaTeX-newline))))
+
+       (defun my-latex-used-package-p (package)
+         "Return t, when PACKAGE was used in current LaTeX buffer."
+         (-contains-p (my-latex-used-packages) package))
+
+       (defun my-latex-used-packages ()
+         "Parse from current LaTeX buffer, list of used packages."
+         (->>
+          (buffer-string)
+          (s-lines)
+          (--filter (s-prefix-p "\\usepackage" it))
+          (--map
+           (-last-item
+            (s-match "\\\\usepaIckage\\(\\[.*\\]\\)?{\\(.*\\)}" it)))))
+
+       (bind-keys
+        :map my-latex-local-map
+        ("i" . my-latex-insert-img-at-copied-url))
+     #+END_SRC
+
 
 *** Org
     I am consider that Org Mode built in Emacs:
@@ -2672,7 +2856,7 @@
 
      #+END_SRC
 
-**** Drag and Drop Images
+**** Drag and Drop Images to Org
      I am use [[https://github.com/abo-abo/org-download][org-download]] for this:
 
      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -2684,7 +2868,7 @@
 
      #+END_SRC
 
-**** Navigation beetween Org Headings in Buffer
+**** Navigation beetween Org Headings in Current Buffer
      I am use [[https://github.com/emacs-helm/helm-org][helm-org]] for navigation in Org Mode:
 
      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -2730,16 +2914,19 @@
 
      #+END_SRC
 
-**** Copy Org Code for Other Programms (Word, PowerPoint)
-     I am use [[https://github.com/jkitchin/ox-clip][ox-clip]]:
+**** Paste Link from Browser
+     I'm use [[https://github.com/rexim/org-cliplink][org-cliplink]] from cool man [[https://github.com/rexim/org-cliplink][Alexey Kutepov]].  Because I
+     install this package I can copy any link from web-browser, run
+     commnad =org-cliplink= (I'm bind to =SPC l i=) and my clipboard
+     will have a org code to copied link
 
      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-       (use-package ox-clip
+       (use-package org-cliplink
            :ensure t
            :bind
            ((:map my-org-local-map)
-            ("c" . ox-clip-formatted-copy)))
+            ("i" . org-cliplink)))
 
      #+END_SRC
 
@@ -2773,6 +2960,7 @@
        (add-hook 'org-mode-hook #'turn-on-org-cdlatex-mode)
 
      #+END_SRC
+
 
 *** Elisp
 **** Special Linters
@@ -2916,6 +3104,35 @@
        (define-key emacs-lisp-mode-map (kbd "M-RET") 'my-elisp-new-field-of-class)
 
      #+END_SRC
+
+# **** Auto format in Elisp
+#      I am use [[*Functions for Auto Format Code][My own system for Autoformat inspired from Scimax]].  When
+#      I start elisp docstring first letter will automatically
+#      capitalizated
+
+#      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+#        (defun autoformat-elsip-docstring-capitalization ()
+#          "If last symbol is start of Elisp docstring, capitalize its."
+#          (interactive)
+#          (and
+#           (in-string-p)
+#           (not (forward-char -1))
+#           (looking-back "\"")
+#           (progn
+#             (forward-char -1)
+#             (ignore-errors (backward-sexp 3))
+#             t)
+#           (looking-at-p
+#            (regexp-opt '("defun" "defmacro"
+#                          "cl-defun" "cl-defmacro"
+#                          "defun*" "defmacro*"
+#                          "lambda" "-lambda")))
+#           (capitalize-word -1)))
+
+#        (my-use-autoformat-in-mode 'emacs-lisp-mode elsip-docstring-capitalization)
+#      #+END_SRC
+
 
 *** Markdown
     I am use [[https://github.com/jrblevin/markdown-mode/][markdown-mode]] , and for its I am centering code:
@@ -3467,12 +3684,20 @@
      (use-package helm
          :ensure t
          :custom
-         (helm-M-x-fuzzy-match t)
+         (helm-M-x-fuzzy-match        t)
+         (helm-buffers-fuzzy-matching t)
+         (helm-recentf-fuzzy-match    t)
+         (helm-imenu-fuzzy-match      t)
          (helm-autoresize-min-height 20)
-         :init (helm-autoresize-mode 1) (helm-mode 1)
-         :bind (:map
-                xah-fly-command-map
-                ("SPC SPC f" . helm-find-files)))
+         (helm-left-margin-width 2)
+         (helm-buffers-left-margin-width 2)
+         :init
+         (helm-autoresize-mode +1)
+         (helm-mode +1)
+         :bind (("C-h a"     . 'helm-apropos)
+                (:map xah-fly-command-map)
+                ("SPC SPC f" . 'helm-find-files)
+                ("SPC k r"   . 'helm-regexp)))
 
                 #+END_SRC
 
@@ -3584,6 +3809,28 @@
      (setq default-input-method "russian-computer")
 
      #+END_SRC
+
+** Disable or Enable Modes
+   I am use [[https://github.com/istib/helm-mode-manager][helm-mode-manager]], which has functions
+   =helm-switch-major-mode= =helm-enable-minor-mode= and
+   =helm-disable-minor-mode=, I bound that via =fast-exec=
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+     (use-package helm-mode-manager
+         :ensure t
+         :config
+         (defun fast-exec-helm-mode-manager-keys ()
+           "Get some useful keymaps of  `fast-exec' for helm-mode-manager."
+           (fast-exec/some-commands
+            ("Switch Major Mode" 'helm-switch-major-mode)
+            ("Enable Minor Mode" 'helm-enable-minor-mode)
+            ("Disable Minor Mode" 'helm-disable-minor-mode)))
+
+         (fast-exec/register-keymap-func 'fast-exec-helm-mode-manager-keys)
+         (fast-exec/reload-functions-chain))
+
+   #+END_SRC
 
 ** Cow Say
    I am use [[https://github.com/lassik/emacs-cowsay][very serious cowsay]]:
@@ -3730,21 +3977,21 @@
      #+END_SRC
 
 ** Google
-   I am use [[https://github.com/cwhatley/helm-google][helm-google]]:
+   I am use built-in =helm= command =helm-google-suggest=, this
+   command takes some suggestions from the Google, but query may be
+   done in other search engine (for example Wikipedia)
 
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-     (use-package helm-google
-         :ensure t
-         :init
-         (defun fast-exec-helm-google-define-keys ()
-           "Keymaps for `helm-google' and `fast-exec'."
-           (fast-exec/some-commands
-            ("Search in Google" 'helm-google)))
-         (fast-exec/register-keymap-func 'fast-exec-helm-google-define-keys)
-         (fast-exec/reload-functions-chain))
+     (defun fast-exec-helm-net-define-keys ()
+       "Keymaps for `helm-net' and `fast-exec'."
+       (fast-exec/some-commands
+        ("Search via Google" 'helm-google-suggest)))
 
-         #+END_SRC
+     (fast-exec/register-keymap-func 'fast-exec-helm-net-define-keys)
+     (fast-exec/reload-functions-chain)
+
+   #+END_SRC
 
 ** Kinopoisk
    I am use [[https://github.com/semenInRussia/emacs-kinopoisk][emacs-kinopoisk]] for management of Films:
@@ -3810,12 +4057,19 @@
 
      (defun my-films--search-new ()
        "Search film from the Internet."
-       (interactive)
        ;; I know that instead of `flet', I can use `cl-flet', but `cl-flet'
        ;; redefine funcitons only in body
        (flet
            ((helm-kinopoisk--handle-film (film) film))
          (helm-kinopoisk-search-films)))
+
+     (defun my-films--choose-from-top ()
+       "Choose one film from the Kinopoisk top."
+       ;; I know that instead of `flet', I can use `cl-flet', but `cl-flet'
+       ;; redefine funcitons only in body
+       (flet
+           ((helm-kinopoisk--handle-film (film) film))
+         (call-interactively #'helm-kinopoisk-see-films-top)))
 
      (defun my-films-list ()
        "List of films saved in films management file."
@@ -3850,6 +4104,34 @@
 
    #+RESULTS:
    : 1
+
+** See Recent Files
+   I am use built in Emacs =recentf-mode= and keymap =SPC k f= for
+   view recentf files, as =SPC f= but add =k=:
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+     (use-package recentf
+         :config (recentf-mode 69) ; Lol!
+         :bind ((:map xah-fly-command-map)
+                ("SPC k f" . 'recentf-open-files))
+         :hook ((recentf-dialog-mode) . 'xah-fly-insert-mode-activate))
+
+   #+END_SRC
+
+** Take Color or Face
+   I am use built-in helm command =helm-color=. (see [[http://tuhdo.github.io/helm-intro.html][this article]])
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+     (defun fast-exec-helm-colors-keys ()
+       "Get some useful keymaps of  `fast-exec' for helm-colors."
+       (fast-exec/some-commands ("Get Color" 'helm-colors)))
+
+     (fast-exec/register-keymap-func 'fast-exec-helm-colors-keys)
+     (fast-exec/reload-functions-chain)
+
+   #+END_SRC
 
 * Graphic User Interface
 ** Hide ALL
@@ -4034,6 +4316,16 @@
             buffer-info))))
 
             #+END_SRC
+
+*** No Display =flycheck= in Modeline
+    I'm don't love =flycheck= in =modeline=, so I turn off that.
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (setq flycheck-mode-line nil)
+
+    #+END_SRC
+
 *** Enable Modeline
     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
@@ -4237,19 +4529,56 @@
      (add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
      #+END_SRC
 
+** Just Run Current File
+   I am use [[https://github.com/emacsorphanage/quickrun][quickrun]].  [[https://github.com/emacsorphanage/quickrun][Quickrun]] has command which just run current
+   file (without other sheet (with any sheet see [[*Run Command][Run Command]])).  I
+   press =S-f5= in any =major-mode= and current file was runned or
+   compiled
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+     (use-package quickrun
+         :ensure t
+         :bind (("S-<f5>" . quickrun))      ; in section of config *Run
+                                             ; Command, I rebind this key
+                                             ; binding, I'm not delete this
+                                             ; bind, because if section wasn't
+                                             ; load, then all will work normally
+         )
+
+   #+END_SRC
+
 ** Run Command
    I am use [[https://github.com/bard/emacs-run-command][run-command]] for run special commands for special files:
 
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
+     (defvar run-command-last-recipe nil
+       "Last runned recipe of `run-command'.")
+
      (use-package run-command
          :ensure t
          :custom
          (run-command-completion-method 'helm)
-         :bind (:map xah-fly-command-map
-                     ("SPC , c" . run-command)))
+         :bind ((:map xah-fly-command-map)
+                ("SPC , c" . 'run-command)
+                ("S-<f5>"  . 'my-run-last-command))
+         :config
+         (defun run-command--run (command-spec)
+           "Run `COMMAND-SPEC'.  Back end for helm and ivy actions."
+           (message "ok?")
+           (setq-local run-command-last-recipe command-spec)
+           (eval (run-command--from-spec command-spec)))
+         (defun my-run-last-command ()
+           "Run command which was runned last, if commands wasn't run, then `quickrun'."
+           (interactive)
+           (if run-command-last-recipe
+               (run-command--run run-command-last-recipe)
+             (quickrun))))
 
-                     #+END_SRC
+
+
+   #+END_SRC
 
 *** Run Command Recipes
     I am use [[https://github.com/semenInRussia/emacs-run-command-recipes/][run-command-recipes]]:
@@ -4806,11 +5135,14 @@
 
      (defun my-mipt-choose-one-of-task-numbers (tasks)
        "Take TASKS and choose one of classes."
-       (->>
-        tasks
-        (-map #'my-mipt-task-number)
-        (my-max)
-        (my-mipt-read-number)))
+       (let* ((numbers (-map #'my-mipt-task-number tasks))
+              (default (my-max numbers)))
+         (my-completing-read-numbers
+          "Please, choose number of MIPT task: "
+          numbers
+          nil
+          nil
+          default)))
 
      (defun my-mipt-read-number (&optional default)
        "Read from user number of MIPT's task, defaults to DEFAULT."

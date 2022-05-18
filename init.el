@@ -49,14 +49,6 @@ If FORCE is t, a directory will be deleted recursively."
    (f-files)
    (--filter (f-ext-p it ext))))
 
-(defun my-reverse-alist (alist)
-  "Swap keys and values of ALIST."
-  (--map
-   (cons
-    (cdr it)
-    (car it))
-   alist))
-
 (defun my-humanize-string (s)
   "Humanize normalized S."
   (->> s (s-replace "-" " ") (s-titleize)))
@@ -81,35 +73,6 @@ If FORCE is t, a directory will be deleted recursively."
   (->>
    (my-parts-of-seq n s)
    (--map (apply #'s-concat it))))
-
-(defun my-current-line (&optional pos)
-        "Return line at POS, POS defaults to `point'."
-        (setq pos (or pos (point)))
-        (save-excursion
-          (goto-char pos)
-          (buffer-substring-no-properties
-           (point-at-bol)
-           (point-at-eol))))
-
-(defun my-current-line-prefix-p (p)
-  "Return t, when current text line starts with P."
-  (s-prefix-p p (my-current-line)))
-
-(defun my-current-line-is-empty-p (&optional pt)
-  "Return t, when line on PT is empty."
-  (setq pt (or pt (point)))
-  (->>
-   pt
-   (my-current-line)
-   (s-trim)
-   (string-equal "")))
-
-(defun my-all-buffers-with-ext (ext)
-  "Get all opened buffers, excluding buffers which has other to EXT extension."
-  (->>
-   (buffer-list)
-   (--filter
-    (f-ext-p (buffer-name it) ext))))
 
 (defun my-max (list)
   "Return the max value of LIST, if LIST is empty, then return nil."
@@ -138,6 +101,9 @@ SEQ may be one of types which supported in function `my-into-list'"
   (setq seq (my-into-list seq))
   (let ((step (/ (length seq) n)))
     (-partition-in-steps step step seq)))
+
+(use-package just
+    :load-path "~/projects/just/just.el")
 
 (defun if-Emacs-org-then-org-babel-tangle ()
   "If current open file is Emacs.org, then `org-babel-tangle`."
@@ -298,6 +264,7 @@ string and TEMPLATE is a `yas--template' structure."
                                         org-agenda
                                         deadgrep
                                         projectile
+                                        package
                                         skeletor
                                         yasnippet
                                         format-all
@@ -324,10 +291,15 @@ Instead of KEY will command FUN-NAME"
             #',old-def)))
        (define-key ,map ,key #',fun-name))))
 
-(use-package swiper-helm
+(use-package helm-swoop
     :ensure t
-    :bind (:map xah-fly-command-map
-                ("'" . swiper-helm)))
+    :bind ((:map xah-fly-command-map)
+           ("'" . 'helm-swoop)
+           ("SPC k '" . 'helm-multi-swoop-current-mode)
+           (:map helm-swoop-map)
+           ("M-j" . 'helm-swoop-edit)
+           (:map helm-swoop-edit-map)
+           ([remap save-buffer] . 'helm-swoop--edit-complete)))
 
 (use-package deadgrep
     :ensure t
@@ -336,6 +308,20 @@ Instead of KEY will command FUN-NAME"
            ("SPC '" . deadgrep)))
 
 (define-key xah-fly-command-map (kbd "SPC SPC r") 'projectile-replace)
+
+(use-package visual-regexp
+    :ensure t
+    :bind ((:map xah-fly-command-map)
+           ("SPC r" . 'vr/query-replace)))
+
+(use-package string-inflection
+    :ensure t
+    :bind ((:map xah-fly-command-map)
+           ("b" . 'string-inflection-cycle)))
+
+(use-package aggressive-indent
+    :ensure t
+    :hook ((emacs-lisp-mode css-mode) . aggressive-indent-mode))
 
 (use-package imenu
     :custom (imenu-auto-rescan t))
@@ -347,12 +333,6 @@ Instead of KEY will command FUN-NAME"
     :ensure t
     :bind (:map xah-fly-command-map
                 ("SPC SPC n" . imenu-anywhere)))
-
-(use-package recentf
-    :config (recentf-mode 69) ; Lol!
-    :bind ((:map xah-fly-command-map)
-           ("SPC k f" . 'recentf-open-files))
-    :hook ((recentf-dialog-mode) . 'xah-fly-insert-mode-activate))
 
 (use-package comment-dwim-2
     :ensure t
@@ -376,7 +356,7 @@ Instead of KEY will command FUN-NAME"
   (interactive)
   (if (use-region-p)
       (call-interactively #'mc/edit-lines)
-    (call-interactively #'helm-buffers-list)))
+    (call-interactively #'helm-multi-files)))
 
 (defun my-mark-all ()
   "If enable `multiple-cursors', then mark all like this, other mark buffer."
@@ -1399,7 +1379,7 @@ List of functions: `xah-toggle-letter-case', `my-change-case-of-current-line'."
   "Current used autoformat functions.")
 
 (defcustom my-autoformat-all-functions
-  '(sentence-capitalization ordinals transposed-caps)
+  '(sentence-capitalization)
   "All my autoformat functions.")
 
 (defun my-use-autoformat-function-p (f)
@@ -1453,37 +1433,6 @@ Either at the beginning of a line, or after a sentence end."
   (forward-line -1)
   (my-current-line-is-empty-p))
 
-(defun autoformat-transposed-caps ()
-  "If you write hTe, fixes it to The."
-  (interactive)
-  (when (and
-         (my-use-autoformat-function-p 'autoformat-transposed-caps)
-         (my-in-text-p)
-         (let ((case-fold-search nil))
-           (looking-back
-            "\\<\\(?1:[a-zа-я]\\)\\(?2:[A-ZА-Я]\\)[a-zа-я]+"
-            (line-beginning-position))))
-    (undo-boundary)
-    (save-excursion
-      (replace-match (upcase (match-string 1)) nil nil nil 1)
-      (replace-match (downcase (match-string 2)) nil nil nil 2))))
-
-(defun autoformat-ordinals ()
-  "Expand ordinal words to superscripted versions in `org-mode'.
-1st to 1^{st}.
-2nd to 2^{nd}
-3rd to 3^{rd}
-4th to 4^{th}"
-  (interactive)
-  (when (and
-         (my-use-autoformat-function-p 'autoformat-ordinals)
-         (my-in-text-p)
-         (looking-back
-          "\\(?3:\\<\\(?1:[0-9]+\\)\\(?2:st\\|nd\\|rd\\|th\\)\\>\\)\\(?:[[:punct:]]\\|[[:space:]]\\)"
-          (line-beginning-position)))
-    (undo-boundary)
-    (save-excursion (replace-match "\\1^{\\2}" nil nil nil 3))))
-
 (defun my-in-text-p ()
   "Return t, when cursor has position on common text."
   (and (not (org-in-src-block-p)) (not (texmathp))))
@@ -1536,12 +1485,27 @@ Either at the beginning of a line, or after a sentence end."
         (delete-region beg end)
         (insert (my-calc-simplify expr)))))
 
-(use-package preview
-    :after latex
+(use-package math-preview
+    :ensure t
+    :custom
+    (math-preview-preprocess-functions
+     (list (lambda (s) (s-concat "{\\color{white}" s "}"))))
     :bind ((:map my-latex-local-map)
-           ("p" . org-latex-preview))
-    :config
-    (plist-put org-format-latex-options :scale 1.9))
+           ("p" . 'my-latex-preview)
+           ("d" . 'math-preview-clear-at-point)))
+
+(defun my-latex-preview ()
+  "Preview latex fragments combine `org-latex-combine', `math-preview'."
+  (interactive)
+  (if (->> (math-preview--find-gaps (point-min) (point-max))
+           (--filter (and (>= (point) (car it))
+                          (< (point) (cdr it))))
+           (--map (math-preview--search (car it) (cdr it)))
+           (-flatten)
+           (--filter (and (>= (point) (car it))
+                          (< (point) (cdr it)))))
+      (math-preview-at-point)
+    (org-latex-preview)))
 
 (use-package cdlatex
     :ensure t
@@ -1598,6 +1562,8 @@ Either at the beginning of a line, or after a sentence end."
     ((:map cdlatex-mode-map)
      ("(" . self-insert-command)
      (")" . self-insert-command)
+     ("{" . self-insert-command)
+     ("}" . self-insert-command)
      ("[" . self-insert-command)
      ("]" . self-insert-command)
      ("\\" . self-insert-command)))
@@ -1738,22 +1704,211 @@ Either at the beginning of a line, or after a sentence end."
 (use-package laas
     :ensure t
     :hook (LaTeX-mode . laas-mode)
-    :config (aas-set-snippets 'laas-mode
-              ".," ";"
-              :cond #'texmathp
-              ;; Some Units
-              "As" "\\mathrm{А}"
-              "Vs"  "\\mathrm{В}"
-              "Oms"  "\\mathrm{Ом}"
-              "cls" "^\\circ C"
+    :config
+    (aas-set-snippets 'laas-mode
+      ".," ";"
+      :cond #'texmathp
+      ;; Some Units
+      "As" "\\mathrm{А}"
+      "Vs"  "\\mathrm{В}"
+      "Oms"  "\\mathrm{Ом}"
+      "cls" "^\\circ C"
 
-              ;; Some Physics Sheet
-              "eqv" "\\mathrm{экв}"
+      ;; Some Physics Sheet
+      "eqv" "\\mathrm{экв}"
 
-              ;; Some Cool Symbols
-              "is" "\\Leftrightarrow"))
+      ;; Some Cool Symbols
+      "is" "\\Leftrightarrow"
+      "trg" "\\triangle"
+      "agl" "\\angle"
+      "grd" "^\\circ"))
 
-(my-use-all-autoformat-in-mode 'LaTeX-mode)
+(eval
+ `(my-use-autoformat-in-mode
+   'LaTeX-mode
+   ,@(cons 'latex-capitalize-special-commands my-autoformat-all-functions)))
+
+(defvar autoformat-latex-capitalize-latex-commands
+  '("author" "title" "date" "part" "subsection" "section" "part" "chapter")
+  "List of regexps which Emacs will automatically capitalize.")
+
+(defvar autoformat-latex-capitalize-regexps
+  (--map
+   (s-concat "\\\\" it "\\W*{.")
+   autoformat-latex-capitalize-latex-commands)
+  "List of regexps which Emacs will automatically capitalize.")
+
+(add-to-list 'autoformat-latex-capitalize-regexps "\\\\item\\W+.")
+
+(defun autoformat-latex-capitalize-special-commands ()
+  "Capitalize last symbol, when its match on special regexp."
+  (interactive)
+  (when (-any #'looking-back autoformat-latex-capitalize-regexps)
+    (undo-boundary)
+    (capitalize-word -1)))
+
+(defun my-latex-equation-to-split ()
+  "Transform LaTeX equation environment to split environment."
+  (interactive)
+  (save-excursion
+    (LaTeX-find-matching-begin)
+    (end-of-line)
+    (push-mark)
+    (LaTeX-find-matching-end)
+    (beginning-of-line)
+    (cdlatex-wrap-environment "split")
+    (indent-region (region-beginning) (region-end))
+    (replace-string "=" "&=" nil (region-beginning) (region-end))
+    (LaTeX-find-matching-begin)
+    (forward-line)
+    (kill-whole-line)
+    (forward-line)
+    (end-of-line)
+    (--dotimes
+        (- (save-excursion
+             (LaTeX-find-matching-end)
+             (line-number-at-pos))
+           (line-number-at-pos))
+      (end-of-line)
+      (insert "\\\\")
+      (forward-line))))
+
+
+(bind-keys*
+ :map my-latex-local-map
+ ("\\" . my-latex-equation-to-split))
+
+(defun my-latex-insert-img-at-copied-url (&optional image-name)
+  "Insert to current LaTeX buffer image at URL which copied in clipboard.
+If copied text isn't URL then report the error.  Downloaded file will be called
+IMAGE-NAME."
+  (interactive)
+  (let ((url (current-kill 0)))
+    (when (interactive-p)
+      (setq image-name
+            (read-string "Name of downloaded image, please: "
+                         (my-uri-of-url url))))
+    (my-latex-insert-img-at-url url image-name)))
+
+(defun my-latex-insert-img-at-url (url &optional image-name)
+  "Insert to current latex buffer image at URL, install if need.
+Downloaded image will be called IMAGE-NAME"
+  (interactive
+   (let* ((url (read-string "Enter URL for image, please: "))
+          (image-name
+           (read-string
+            "Name of downloaded image,  please: "
+            (my-uri-of-url url))))
+     (list url image-name)))
+  (my-latex-graphics-init)
+  (->>
+   (my-latex-download-image-into-graphicspath url image-name)
+   (my-latex-insert-img-at-path)))
+
+(defun my-latex-graphics-init ()
+  "Add some stuffs for graphics in LaTeX."
+  (interactive)
+  (my-latex-use-package "graphicx")
+  (unless (my-latex-current-graphicspathes)
+    (my-latex-add-graphicspath "./images/")))
+
+(defun my-latex-insert-img-at-path (path)
+  "Insert to current latex buffer image at PATH."
+  (->>
+   path
+   (f-base)
+   (format "\\begin{center}
+  \\includegraphics{%s}
+\\end{center}")
+   (insert)))
+
+(defun my-latex-download-image-into-graphicspath (url &optional filename)
+  "Download image at URL into graphicspath of current LaTeX buffer.
+This file has name FILENAME.  Return nil when fail, otherwise return path of
+downloaded file"
+  (or filename (setq filename (my-uri-of-url)))
+  (let* ((graphicspath (-last-item (my-latex-current-graphicspathes)))
+         (dest (f-join graphicspath filename)))
+    (url-copy-file url dest t)
+    dest))
+
+(defun my-uri-of-url (url)
+  "Get the URI of URL."
+  (->>
+   url
+   (s-split "/")
+   (-last-item)
+   (s-split "?")
+   (-first-item)))
+
+(defun my-latex-add-graphicspath (path)
+  "Add to list of current LaTeX file' s graphicpath PATH."
+  (->>
+   (my-latex-current-graphicspathes)
+   (cons path)
+   (my-latex-set-graphicspath)))
+
+(defun my-latex-set-graphicspath (paths)
+  "Set graphicpath (command \\graphicspath)of current LaTeX buffer to PATHS."
+  (save-excursion
+    (my-latex-goto-graphicspath)
+    (forward-char -1)
+    (sp-get
+        (sp-get-enclosing-sexp)
+      (delete-region :beg-in :end-in)
+      (--each paths (insert (format "{%s}" it))))))
+
+(defun my-latex-current-graphicspathes ()
+  "Parse from current LaTeX buffer value of \\graphicspath."
+  (save-excursion
+    (my-latex-goto-graphicspath)
+    (forward-char -1)
+    (sp-get
+        (sp-get-enclosing-sexp)
+      (->>
+       (buffer-substring-no-properties :beg-in :end-in)
+       (s-match-strings-all "\{\\([^\\}]*\\)\}")
+       (-map #'-last-item)))))
+
+(defun my-latex-goto-graphicspath ()
+  "Goto end of LaTeX command for set graphic paths, if isn't exit insert."
+  (goto-char (point-min))
+  (unless (search-forward-regexp "^\\\\graphicspath\\W*\{.*\}\\W*$"  nil t)
+    (search-forward-regexp "\\\\begin\\W*\{\\W*document\\W*\}"  nil t)
+    (forward-line -1)
+    (end-of-line)
+    (newline)
+    (insert "\\graphicspath{}")))
+
+(defun my-latex-use-package (package &optional options)
+  "Add \\usepackage for PACKAGE with OPTIONS to current LaTeX buffer."
+  (interactive "sPlease, choose package which you need use: ")
+  (unless (my-latex-used-package-p package)
+    (save-excursion
+      (goto-char (point-min))
+      (search-forward-regexp "^\\\\usepackage" nil t)
+      (beginning-of-line)
+      (insert "\\usepackage")
+      (LaTeX-arg-usepackage-insert (list package) options)
+      (LaTeX-newline))))
+
+(defun my-latex-used-package-p (package)
+  "Return t, when PACKAGE was used in current LaTeX buffer."
+  (-contains-p (my-latex-used-packages) package))
+
+(defun my-latex-used-packages ()
+  "Parse from current LaTeX buffer, list of used packages."
+  (->>
+   (buffer-string)
+   (s-lines)
+   (--filter (s-prefix-p "\\usepackage" it))
+   (--map
+    (-last-item
+     (s-match "\\\\usepaIckage\\(\\[.*\\]\\)?{\\(.*\\)}" it)))))
+
+(bind-keys
+ :map my-latex-local-map
+ ("i" . my-latex-insert-img-at-copied-url))
 
 (use-package org
     :major-mode-map (org-mode)
@@ -1830,11 +1985,11 @@ Either at the beginning of a line, or after a sentence end."
 (fast-exec/register-keymap-func 'fast-exec-org-ql-keys)
 (fast-exec/reload-functions-chain)
 
-(use-package ox-clip
+(use-package org-cliplink
     :ensure t
     :bind
     ((:map my-org-local-map)
-     ("c" . ox-clip-formatted-copy)))
+     ("i" . org-cliplink)))
 
 (use-package toc-org
     :ensure t
@@ -2236,12 +2391,20 @@ Only when in class defnition."
 (use-package helm
     :ensure t
     :custom
-    (helm-M-x-fuzzy-match t)
+    (helm-M-x-fuzzy-match        t)
+    (helm-buffers-fuzzy-matching t)
+    (helm-recentf-fuzzy-match    t)
+    (helm-imenu-fuzzy-match      t)
     (helm-autoresize-min-height 20)
-    :init (helm-autoresize-mode 1) (helm-mode 1)
-    :bind (:map
-           xah-fly-command-map
-           ("SPC SPC f" . helm-find-files)))
+    (helm-left-margin-width 2)
+    (helm-buffers-left-margin-width 2)
+    :init
+    (helm-autoresize-mode +1)
+    (helm-mode +1)
+    :bind (("C-h a"     . 'helm-apropos)
+           (:map xah-fly-command-map)
+           ("SPC SPC f" . 'helm-find-files)
+           ("SPC k r"   . 'helm-regexp)))
 
 (use-package command-log-mode
     :ensure t)
@@ -2288,6 +2451,19 @@ Only when in class defnition."
 (fast-exec/reload-functions-chain)
 
 (setq default-input-method "russian-computer")
+
+(use-package helm-mode-manager
+    :ensure t
+    :config
+    (defun fast-exec-helm-mode-manager-keys ()
+      "Get some useful keymaps of  `fast-exec' for helm-mode-manager."
+      (fast-exec/some-commands
+       ("Switch Major Mode" 'helm-switch-major-mode)
+       ("Enable Minor Mode" 'helm-enable-minor-mode)
+       ("Disable Minor Mode" 'helm-disable-minor-mode)))
+
+    (fast-exec/register-keymap-func 'fast-exec-helm-mode-manager-keys)
+    (fast-exec/reload-functions-chain))
 
 (use-package cowsay
     :ensure t
@@ -2374,15 +2550,13 @@ Only when in class defnition."
 ;;     (fast-exec/register-keymap-func 'fast-exec-define-helm-gitignore-keys)
 ;;     (fast-exec/reload-functions-chain)))
 
-(use-package helm-google
-    :ensure t
-    :init
-    (defun fast-exec-helm-google-define-keys ()
-      "Keymaps for `helm-google' and `fast-exec'."
-      (fast-exec/some-commands
-       ("Search in Google" 'helm-google)))
-    (fast-exec/register-keymap-func 'fast-exec-helm-google-define-keys)
-    (fast-exec/reload-functions-chain))
+(defun fast-exec-helm-net-define-keys ()
+  "Keymaps for `helm-net' and `fast-exec'."
+  (fast-exec/some-commands
+   ("Search via Google" 'helm-google-suggest)))
+
+(fast-exec/register-keymap-func 'fast-exec-helm-net-define-keys)
+(fast-exec/reload-functions-chain)
 
 (use-package helm-kinopoisk
     :load-path "~/projects/emacs-kinopoisk")
@@ -2424,12 +2598,19 @@ Only when in class defnition."
 
 (defun my-films--search-new ()
   "Search film from the Internet."
-  (interactive)
   ;; I know that instead of `flet', I can use `cl-flet', but `cl-flet'
   ;; redefine funcitons only in body
   (flet
       ((helm-kinopoisk--handle-film (film) film))
     (helm-kinopoisk-search-films)))
+
+(defun my-films--choose-from-top ()
+  "Choose one film from the Kinopoisk top."
+  ;; I know that instead of `flet', I can use `cl-flet', but `cl-flet'
+  ;; redefine funcitons only in body
+  (flet
+      ((helm-kinopoisk--handle-film (film) film))
+    (call-interactively #'helm-kinopoisk-see-films-top)))
 
 (defun my-films-list ()
   "List of films saved in films management file."
@@ -2458,6 +2639,19 @@ Only when in class defnition."
      :id (car (string-to-number (org-property-values "id")))
      :year (car (org-property-values "year"))
      :name (car (org-property-values "name")))))
+
+(use-package recentf
+    :config (recentf-mode 69) ; Lol!
+    :bind ((:map xah-fly-command-map)
+           ("SPC k f" . 'recentf-open-files))
+    :hook ((recentf-dialog-mode) . 'xah-fly-insert-mode-activate))
+
+(defun fast-exec-helm-colors-keys ()
+  "Get some useful keymaps of  `fast-exec' for helm-colors."
+  (fast-exec/some-commands ("Get Color" 'helm-colors)))
+
+(fast-exec/register-keymap-func 'fast-exec-helm-colors-keys)
+(fast-exec/reload-functions-chain)
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
@@ -2559,6 +2753,8 @@ See `format-time-string' for see what format string"
      (s-truncate
       durand-buffer-name-max
       buffer-info))))
+
+(setq flycheck-mode-line nil)
 
 (defvar my-modeline-ignored-modes '(company-mode))
 
@@ -2668,12 +2864,37 @@ See `format-time-string' for see what format string"
 
 (add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
 
+(use-package quickrun
+    :ensure t
+    :bind (("S-<f5>" . quickrun))      ; in section of config *Run
+                                        ; Command, I rebind this key
+                                        ; binding, I'm not delete this
+                                        ; bind, because if section wasn't
+                                        ; load, then all will work normally
+    )
+
+(defvar run-command-last-recipe nil
+  "Last runned recipe of `run-command'.")
+
 (use-package run-command
     :ensure t
     :custom
     (run-command-completion-method 'helm)
-    :bind (:map xah-fly-command-map
-                ("SPC , c" . run-command)))
+    :bind ((:map xah-fly-command-map)
+           ("SPC , c" . 'run-command)
+           ("S-<f5>"  . 'my-run-last-command))
+    :config
+    (defun run-command--run (command-spec)
+      "Run `COMMAND-SPEC'.  Back end for helm and ivy actions."
+      (message "ok?")
+      (setq-local run-command-last-recipe command-spec)
+      (eval (run-command--from-spec command-spec)))
+    (defun my-run-last-command ()
+      "Run command which was runned last, if commands wasn't run, then `quickrun'."
+      (interactive)
+      (if run-command-last-recipe
+          (run-command--run run-command-last-recipe)
+        (quickrun))))
 
 (use-package run-command-recipes
     :ensure t
@@ -3182,11 +3403,14 @@ Special variable is `my-mipt-found-task'"
 
 (defun my-mipt-choose-one-of-task-numbers (tasks)
   "Take TASKS and choose one of classes."
-  (->>
-   tasks
-   (-map #'my-mipt-task-number)
-   (my-max)
-   (my-mipt-read-number)))
+  (let* ((numbers (-map #'my-mipt-task-number tasks))
+         (default (my-max numbers)))
+    (my-completing-read-numbers
+     "Please, choose number of MIPT task: "
+     numbers
+     nil
+     nil
+     default)))
 
 (defun my-mipt-read-number (&optional default)
   "Read from user number of MIPT's task, defaults to DEFAULT."
