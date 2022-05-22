@@ -38,20 +38,21 @@
 - [[#info-about-me-for-emacs][Info about Me for Emacs]]
   - [[#congurlation-me-with-my-birthday][Congurlation me with my Birthday!]]
 - [[#organize-editing][Organize Editing]]
-  - [[#snippets][Snippets]]
-    - [[#some-snippets][Some Snippets]]
-    - [[#ignore-case-in-snippets-expansion][Ignore Case in Snippets' Expansion]]
-  - [[#linters][Linters]]
-  - [[#autocomplete][Autocomplete]]
-    - [[#more-pretty-auto-complete][More Pretty Auto Complete]]
-  - [[#format-all-code][Format All Code]]
-    - [[#i-am-russian][I am Russian!]]
   - [[#main-keymaps][Main keymaps]]
     - [[#easy-create-major-modes-maps][Easy Create Major Modes Maps]]
       - [[#setup-for-major-mode-map][Setup for =:major-mode-map=]]
       - [[#normalizer-for-major-mode-map][Normalizer for =:major-mode-map=]]
       - [[#major-mode-maps-handler][=major-mode-map='s Handler]]
   - [[#fast-executing-command][Fast Executing Command]]
+  - [[#snippets][Snippets]]
+    - [[#some-snippets][Some Snippets]]
+    - [[#ignore-case-in-snippets-expansion][Ignore Case in Snippets' Expansion]]
+    - [[#quick-way-to-change-defnition-of-snippet][Quick Way to Change Defnition of Snippet]]
+  - [[#linters][Linters]]
+  - [[#autocomplete][Autocomplete]]
+    - [[#more-pretty-auto-complete][More Pretty Auto Complete]]
+  - [[#format-all-code][Format All Code]]
+    - [[#i-am-russian][I am Russian!]]
   - [[#functions-for-define-keys][Functions for Define Keys]]
   - [[#search][Search]]
     - [[#search-in-file][Search in File]]
@@ -84,6 +85,7 @@
   - [[#custom-navigation][Custom Navigation]]
   - [[#rectangles][Rectangles]]
   - [[#indent-settings][Indent Settings]]
+  - [[#quick-navigation-between-2-buffers][Quick Navigation Between 2 Buffers]]
 - [[#support-of-languages][Support of Languages]]
   - [[#functions-for-extending-functional-of-language][Functions for extending functional of language]]
     - [[#functions-for-navigation][Functions for Navigation]]
@@ -443,10 +445,9 @@
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
      (use-package just
-         :load-path "~/projects/just/just.el")
+         :load-path "~/projects/just/")
 
    #+END_SRC
-
 
 ** Auto Tangle This File
 
@@ -492,139 +493,6 @@
          #+END_SRC
 
 * Organize Editing
-** Snippets
-   I am use [[https://github.com/joaotavora/yasnippet][yasnippet]]:
-
-   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-     (use-package yasnippet
-         :ensure t
-         :init
-         (yas-global-mode 1)
-         :custom
-         (yas-snippet-dirs '("~/.emacs.d/snippets"))
-         (yas-wrap-around-region t))
-
-    #+END_SRC
-
-*** Some Snippets
-    I am use [[https://github.com/AndreaCrotti/yasnippet-snippets][yasnippet-snippets]].  This is default collection of
-    snippets for [[https://github.com/joaotavora/yasnippet][yasnippet]]:
-
-    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-      (use-package yasnippet-snippets
-          :ensure t)
-
-    #+END_SRC
-
-*** Ignore Case in Snippets' Expansion
-    When I am use =org= first symbol of the sentence will
-    automatically capitalizated, so when I insert /equ/ this will
-    changed to /Equ/, and when I am press =TAB=, instead of expanding
-    snippet (use =yas-expand=), the cursor moved to next position (use
-    =cdlatex-tab=), so I must change this Sheet:
-
-    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-
-      (defun yas--fetch (table key)
-        "Fetch templates in TABLE by KEY.
-
-      Return a list of cons (NAME . TEMPLATE) where NAME is a
-      string and TEMPLATE is a `yas--template' structure."
-        (let* ((key (s-downcase key))
-               (keyhash (yas--table-hash table))
-               (namehash (and keyhash (gethash key keyhash))))
-          (when namehash
-            (yas--filter-templates-by-condition
-             (yas--namehash-templates-alist namehash)))))
-
-    #+END_SRC
-
-** Linters
-   I am use [[https://www.flycheck.org/en/latest/][flycheck]]:
-
-   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-     (use-package flycheck
-         :ensure t
-         :config
-         '(custom-set-variables
-           '(flycheck-display-errors-function
-             #'flycheck-pos-tip-error-messages))
-         (global-flycheck-mode 1))
-
-         #+END_SRC
-
-** Autocomplete
-   I am use [[http://company-mode.github.io][company-mode]], I am set delay beetween typing text and viewing hints to
-   0.8 seconds:
-
-   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-     (use-package company
-         :ensure t
-         :custom
-         (company-idle-delay                 0.3)
-         (company-minimum-prefix-length      2)
-         (company-show-numbers               t)
-         (company-tooltip-limit              15)
-         (company-tooltip-align-annotations  t)
-         (company-tooltip-flip-when-above    t)
-         (company-dabbrev-ignore-case        nil)
-         :config
-         (add-to-list 'company-backends 'company-keywords)
-         (global-company-mode 1))
-
-         #+END_SRC
-
-   And for =yasnippet= I am use code from [[https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names][this]] stackexchange:
-
-   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-     (defvar company-mode/enable-yas t
-       "Enable yasnippet for all backends.")
-
-     (defun company-mode/backend-with-yas (backend)
-       (if (or (not company-mode/enable-yas)
-               (and (listp backend) (member 'company-yasnippet backend)))
-           backend
-         (append (if (consp backend) backend (list backend))
-                 '(:with company-yasnippet))))
-
-     (setq company-backends
-           (mapcar #'company-mode/backend-with-yas company-backends))
-
-           #+END_SRC
-
-*** More Pretty Auto Complete
-    I am use popular [[https://github.com/sebastiencs/company-box][company-box]]:
-
-    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-      (use-package company-box
-          :ensure t
-          :hook (company-mode . company-box-mode))
-
-          #+END_SRC
-
-** Format All Code
-   Each programmer need to format code for this I am use [[https://github.com/lassik/emacs-format-all-the-code][format-all]],
-   its support 65 languages:
-
-   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-     (use-package format-all
-         :ensure t)
-
-         #+END_SRC
-
-*** I am Russian!
-    I am need to use russian letters as english in key hots:
-
-    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-    #+END_SRC
-
 ** Main keymaps
    I am use [[https://github.com/xahlee/xah-fly-keys][xah-fly-keys]], this as VIM, but keymaps created for keyboard (in VIM keymaps created for easy remember):
 
@@ -650,6 +518,7 @@
       (defun my-local-major-mode-map-run ()
         "Run `my-local-major-mode-map'."
         (interactive)
+        (which-key-show-full-keymap my-local-major-mode-map)
         (set-transient-map my-local-major-mode-map))
 
       (define-key xah-fly-command-map (kbd "SPC l") 'my-local-major-mode-map-run)
@@ -740,6 +609,154 @@
      (define-key xah-fly-command-map (kbd "=") 'fast-exec/exec)
 
      #+END_SRC
+** Snippets
+   I am use [[https://github.com/joaotavora/yasnippet][yasnippet]]:
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+     (use-package yasnippet
+         :ensure t
+         :init
+         (yas-global-mode 1)
+         :custom
+         (yas-snippet-dirs '("~/.emacs.d/snippets"))
+         (yas-wrap-around-region t))
+
+    #+END_SRC
+
+*** Some Snippets
+    I am use [[https://github.com/AndreaCrotti/yasnippet-snippets][yasnippet-snippets]].  This is default collection of
+    snippets for [[https://github.com/joaotavora/yasnippet][yasnippet]]:
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (use-package yasnippet-snippets
+          :ensure t)
+
+    #+END_SRC
+
+*** Ignore Case in Snippets' Expansion
+    When I am use =org= first symbol of the sentence will
+    automatically capitalizated, so when I insert /equ/ this will
+    changed to /Equ/, and when I am press =TAB=, instead of expanding
+    snippet (use =yas-expand=), the cursor moved to next position (use
+    =cdlatex-tab=), so I must change this Sheet:
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+
+      (defun yas--fetch (table key)
+        "Fetch templates in TABLE by KEY.
+
+      Return a list of cons (NAME . TEMPLATE) where NAME is a
+      string and TEMPLATE is a `yas--template' structure."
+        (let* ((key (s-downcase key))
+               (keyhash (yas--table-hash table))
+               (namehash (and keyhash (gethash key keyhash))))
+          (when namehash
+            (yas--filter-templates-by-condition
+             (yas--namehash-templates-alist namehash)))))
+
+    #+END_SRC
+
+*** Quick Way to Change Defnition of Snippet
+    I must have command which read from the minibuffer (with
+    completing) name of a snippet after visit file of snippet's
+    defnition.  I bound it to a keymap from the =fast-exec=
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (defun fast-exec-my-yas-keys ()
+        "Get some useful keymaps of  `fast-exec' for my-yas."
+        (fast-exec/some-commands ("Yasnippet Edit Snippet" 'yas-visit-snippet-file)))
+
+      (fast-exec/register-keymap-func 'fast-exec-my-yas-keys)
+      (fast-exec/reload-functions-chain)
+
+    #+END_SRC
+
+** Linters
+   I am use [[https://www.flycheck.org/en/latest/][flycheck]]:
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+     (use-package flycheck
+         :ensure t
+         :config
+         '(custom-set-variables
+           '(flycheck-display-errors-function
+             #'flycheck-pos-tip-error-messages))
+         (global-flycheck-mode 1))
+
+         #+END_SRC
+
+** Autocomplete
+   I am use [[http://company-mode.github.io][company-mode]], I am set delay beetween typing text and viewing hints to
+   0.8 seconds:
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+     (use-package company
+         :ensure t
+         :custom
+         (company-idle-delay                 0.3)
+         (company-minimum-prefix-length      2)
+         (company-show-numbers               t)
+         (company-tooltip-limit              15)
+         (company-tooltip-align-annotations  t)
+         (company-tooltip-flip-when-above    t)
+         (company-dabbrev-ignore-case        nil)
+         :config
+         (add-to-list 'company-backends 'company-keywords)
+         (global-company-mode 1))
+
+         #+END_SRC
+
+   And for =yasnippet= I am use code from [[https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names][this]] stackexchange:
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+     (defvar company-mode/enable-yas t
+       "Enable yasnippet for all backends.")
+
+     (defun company-mode/backend-with-yas (backend)
+       (if (or (not company-mode/enable-yas)
+               (and (listp backend) (member 'company-yasnippet backend)))
+           backend
+         (append (if (consp backend) backend (list backend))
+                 '(:with company-yasnippet))))
+
+     (setq company-backends
+           (mapcar #'company-mode/backend-with-yas company-backends))
+
+           #+END_SRC
+
+*** More Pretty Auto Complete
+    I am use popular [[https://github.com/sebastiencs/company-box][company-box]]:
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (use-package company-box
+          :ensure t
+          :hook (company-mode . company-box-mode))
+
+          #+END_SRC
+
+** Format All Code
+   Each programmer need to format code for this I am use [[https://github.com/lassik/emacs-format-all-the-code][format-all]],
+   its support 65 languages:
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+     (use-package format-all
+         :ensure t)
+
+         #+END_SRC
+
+*** I am Russian!
+    I am need to use russian letters as english in key hots:
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+    #+END_SRC
 
 ** Functions for Define Keys
 
@@ -1578,7 +1595,7 @@
          (interactive "d")
          (and
           (not (org-in-src-block-p))
-          (my-current-line-prefix-p "*")))
+          (just-line-prefix-p "*")))
 
        (defun my-drag-org-heading-right ()
          "Drag Org's heading to right."
@@ -2076,6 +2093,26 @@
 
      #+END_SRC
      
+** Quick Navigation Between 2 Buffers
+   This like on =C-tab= in your web-browser or on =M-tab= in a lot of
+   OS.  I bind it to =SPC k l=
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+     (defun my-visit-last-opened-buffer ()
+       "Visit buffer which was opened recently."
+       (interactive)
+       (->>
+        (buffer-list)
+        (-second-item)
+        (switch-to-buffer)))
+
+     (bind-keys
+      :map xah-fly-command-map
+      ("SPC k l" . my-visit-last-opened-buffer))
+
+   #+END_SRC
+
 * Support of Languages
 ** Functions for extending functional of language
 *** Functions for Navigation
@@ -2190,9 +2227,9 @@
 
       (defun my-previous-line-is-empty ()
         "Move to previous line and return t, when this line is empty.
-      \\(see `my-current-line-is-empty-p')"
+      \\(see `just-line-is-whitespaces-p')"
         (forward-line -1)
-        (my-current-line-is-empty-p))
+        (just-line-is-whitespaces-p))
 
       (defun my-in-text-p ()
         "Return t, when cursor has position on common text."
@@ -2260,10 +2297,11 @@
            (defun my-calc-simplify-region-change (beg end)
              "Get from BEG to END change this via `calc' and yank instead of region."
              (interactive "r")
-             (let ((expr (buffer-substring beg end)))
+             (let* ((expr (buffer-substring beg end))
+                    (simplified (my-calc-simplify expr)))
                (goto-char beg)
                (delete-region beg end)
-               (insert (my-calc-simplify expr)))))
+               (insert simplified))))
 
       #+END_SRC
 
@@ -2302,6 +2340,33 @@
            (org-latex-preview)))
 
      #+END_SRC
+
+     Also I can press =SPC l v= and Emacs preview fragment of LaTeX in
+     other buffer
+
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+       (use-package math-preview
+           :ensure t
+           :config
+           (defun my-latex-preview-in-other-window ()
+             "Preview fragment of LaTeX source at point in seperated window."
+             (interactive)
+             (let ((source
+                    (save-mark-and-excursion
+                      (xah-select-block)
+                      (buffer-substring (region-beginning) (region-end)))))
+               (switch-to-buffer-other-window "*my-latex-preview*")
+               (delete-region (point-min) (point-max))
+               (LaTeX-mode)
+               (insert source)
+               (math-preview-region (point-min) (point-max))))
+           :bind
+           ((:map my-latex-local-map)
+            ("v" . 'my-latex-preview-in-other-window)))
+
+     #+END_SRC
+
 
 **** Fast Navigation and Insertion in LaTeX
 
@@ -2617,29 +2682,34 @@
        (defun my-latex-equation-to-split ()
          "Transform LaTeX equation environment to split environment."
          (interactive)
+         (-let (((beg end) (my-latex-env-beg-and-end)))
+           (save-excursion
+             (replace-string "=" "&=" nil beg end)
+             (just-for-each-line* beg end
+               (print (just-text-at-line))
+               (when (just-call-on-next-line* (just-line-prefix-p "&=" nil t))
+                 (end-of-line)
+                 (insert "\\\\"))))))
+
+       (defun my-latex-env-beg-and-end ()
+         "Mark as region of the LaTeX environment."
          (save-excursion
            (LaTeX-find-matching-begin)
            (end-of-line)
-           (push-mark)
+           (forward-char)
+           (push-mark nil nil t)
            (LaTeX-find-matching-end)
            (beginning-of-line)
-           (cdlatex-wrap-environment "split")
-           (indent-region (region-beginning) (region-end))
-           (replace-string "=" "&=" nil (region-beginning) (region-end))
-           (LaTeX-find-matching-begin)
-           (forward-line)
-           (kill-whole-line)
-           (forward-line)
-           (end-of-line)
-           (--dotimes
-               (- (save-excursion
-                    (LaTeX-find-matching-end)
-                    (line-number-at-pos))
-                  (line-number-at-pos))
-             (end-of-line)
-             (insert "\\\\")
-             (forward-line))))
+           (forward-char -1)
+           (list (region-beginning) (region-end))))
 
+       (defun my-latex-wrap-environment (beg end environment)
+         "Wrap the region from BEG to END into ENVIRONMENT.
+
+       If the environment is not given, ask for it using completion."
+         (just-mark-region beg end)
+         (cdlatex-wrap-environment environment)
+         (indent-region (region-beginning) (region-end)))
 
        (bind-keys*
         :map my-latex-local-map
@@ -2900,7 +2970,7 @@
          "View my todos."
          (interactive)
          (org-ql-search
-             (my-all-buffers-with-ext "org")
+             (just-buffers-with-ext "org")
              "todo:TODO"
              :super-groups '((:auto-parent))))
 
@@ -3095,7 +3165,7 @@
          (interactive)
          (when (my-elisp-in-defclass-p)
            (my-goto-fields-defclass-defnition)
-           (unless (my-current-line-is-empty-p)
+           (unless (just-line-is-whitespaces-p)
              (newline-and-indent))
            (yas-expand-snippet
             (format "(${1:name} :initarg :$1 :accessor %s-$1)"
@@ -3608,7 +3678,8 @@
            (dolist (hook (list 'web-mode-hook 'css-mode-hook))
              (add-hook hook 'css-eldoc-enable)))
 
-             #+END_SRC
+     #+END_SRC
+
 * Support of Some Special Modes
 ** Calc
    I am use built-in emacs =calc=, I disable =xah-fly-keys= when run
@@ -4093,7 +4164,7 @@
 
      (defun my-films--from-org-heading ()
        "Parse org heading at current position to `kinopoisk-film'."
-       (when (my-current-line-prefix-p "*")
+       (when (just-line-prefix-p "*")
          (kinopoisk-film
           :id (car (string-to-number (org-property-values "id")))
           :year (car (org-property-values "year"))
@@ -5137,7 +5208,7 @@
        "Take TASKS and choose one of classes."
        (let* ((numbers (-map #'my-mipt-task-number tasks))
               (default (my-max numbers)))
-         (my-completing-read-numbers
+         (just-completing-read-numbers
           "Please, choose number of MIPT task: "
           numbers
           nil

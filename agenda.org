@@ -1,19 +1,17 @@
 #+TODO: TODO | DONE
 #+TODO: MUST-SEE |
 
-* MIPT and ZMS
+* MIPT
 ** TODO Do MIPT Tasks
    SCHEDULED: <2022-05-17 Вт .+1d>
    :PROPERTIES:
    :LAST_REPEAT: [2022-05-16 Пн 21:30]
+   :STYLE:    habit
    :END:
 
    - State "DONE"       from "TODO"       [2022-05-16 Пн 21:30]
    - State "DONE"       from "TODO"       [2022-04-26 Вт 23:05]
    - State "DONE"       from "TODO"       [2022-04-25 Пн 20:56]
-   :PROPERTIES:
-   :STYLE:    habit
-   :END:
 
    Every day I must do 2 tasks of the MIPT
 
@@ -23,9 +21,13 @@
 ** =org=
 ** Developer's Environment
 ** Organize Editing
+*** TODO Capitalize first letter of line after head line in =org-mode=
+*** TODO When duplicate a text block remove extra empty lines
+*** TODO Create or find a =LaTeX= style file for Kulikova
 ** Explore new packages
 ** Continue develop of 
 *** TODO =emacs-run-command-recipes=
+*** TODO Remake of =fast-exec=
 *** TODO =just=
 * Films
 ** MUST-SEE The French Dispatch
@@ -91,14 +93,24 @@
    :rating:   67.0
    :countries: (Великобритания США)
    :END:
+** MUST-SEE Les fugitifs
+   :PROPERTIES:
+   :name:     Беглецы
+   :year:     1986
+   :slogan:   The oddest «odd couple» from «Les Comperes» are back in a gag-filled comic masterpiece of role reversal and farcical misadventure
+   :id:       20897
+   :rating:   79.0
+   :countries: (Франция)
+   :END:
 
 * GitHub
 ** TODO Do 1 commit per day
-   SCHEDULED: <2022-05-12 Чт .+1d>
+   SCHEDULED: <2022-05-19 Чт .+1d>
    :PROPERTIES:
-   :LAST_REPEAT: [2022-05-11 Ср 16:23]
+   :LAST_REPEAT: [2022-05-18 Ср 20:59]
    :END:
    
+   - State "DONE"       from "TODO"       [2022-05-18 Ср 20:59]
    - State "DONE"       from "TODO"       [2022-05-11 Ср 16:23]
    - State "DONE"       from "TODO"       [2022-05-09 Пн 12:11]
    - State "DONE"       from "TODO"       [2022-05-01 Вс 23:30]

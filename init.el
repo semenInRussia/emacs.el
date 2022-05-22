@@ -103,7 +103,7 @@ SEQ may be one of types which supported in function `my-into-list'"
     (-partition-in-steps step step seq)))
 
 (use-package just
-    :load-path "~/projects/just/just.el")
+    :load-path "~/projects/just/")
 
 (defun if-Emacs-org-then-org-babel-tangle ()
   "If current open file is Emacs.org, then `org-babel-tangle`."
@@ -130,73 +130,6 @@ Info take from var `user-os`, user must set it."
 (if (s-equals? (format-time-string "%Y-%m-%d") user-birthday)
     (animate-birthday-present))
 
-(use-package yasnippet
-    :ensure t
-    :init
-    (yas-global-mode 1)
-    :custom
-    (yas-snippet-dirs '("~/.emacs.d/snippets"))
-    (yas-wrap-around-region t))
-
-(use-package yasnippet-snippets
-    :ensure t)
-
-(defun yas--fetch (table key)
-  "Fetch templates in TABLE by KEY.
-
-Return a list of cons (NAME . TEMPLATE) where NAME is a
-string and TEMPLATE is a `yas--template' structure."
-  (let* ((key (s-downcase key))
-         (keyhash (yas--table-hash table))
-         (namehash (and keyhash (gethash key keyhash))))
-    (when namehash
-      (yas--filter-templates-by-condition
-       (yas--namehash-templates-alist namehash)))))
-
-(use-package flycheck
-    :ensure t
-    :config
-    '(custom-set-variables
-      '(flycheck-display-errors-function
-        #'flycheck-pos-tip-error-messages))
-    (global-flycheck-mode 1))
-
-(use-package company
-    :ensure t
-    :custom
-    (company-idle-delay                 0.3)
-    (company-minimum-prefix-length      2)
-    (company-show-numbers               t)
-    (company-tooltip-limit              15)
-    (company-tooltip-align-annotations  t)
-    (company-tooltip-flip-when-above    t)
-    (company-dabbrev-ignore-case        nil)
-    :config
-    (add-to-list 'company-backends 'company-keywords)
-    (global-company-mode 1))
-
-(defvar company-mode/enable-yas t
-  "Enable yasnippet for all backends.")
-
-(defun company-mode/backend-with-yas (backend)
-  (if (or (not company-mode/enable-yas)
-          (and (listp backend) (member 'company-yasnippet backend)))
-      backend
-    (append (if (consp backend) backend (list backend))
-            '(:with company-yasnippet))))
-
-(setq company-backends
-      (mapcar #'company-mode/backend-with-yas company-backends))
-
-(use-package company-box
-    :ensure t
-    :hook (company-mode . company-box-mode))
-
-(use-package format-all
-    :ensure t)
-
-
-
 (use-package xah-fly-keys
     :config
   (xah-fly-keys-set-layout "qwerty")
@@ -211,6 +144,7 @@ string and TEMPLATE is a `yas--template' structure."
 (defun my-local-major-mode-map-run ()
   "Run `my-local-major-mode-map'."
   (interactive)
+  (which-key-show-full-keymap my-local-major-mode-map)
   (set-transient-map my-local-major-mode-map))
 
 (define-key xah-fly-command-map (kbd "SPC l") 'my-local-major-mode-map-run)
@@ -276,6 +210,80 @@ string and TEMPLATE is a `yas--template' structure."
 (fast-exec/initialize)
 
 (define-key xah-fly-command-map (kbd "=") 'fast-exec/exec)
+
+(use-package yasnippet
+    :ensure t
+    :init
+    (yas-global-mode 1)
+    :custom
+    (yas-snippet-dirs '("~/.emacs.d/snippets"))
+    (yas-wrap-around-region t))
+
+(use-package yasnippet-snippets
+    :ensure t)
+
+(defun yas--fetch (table key)
+  "Fetch templates in TABLE by KEY.
+
+Return a list of cons (NAME . TEMPLATE) where NAME is a
+string and TEMPLATE is a `yas--template' structure."
+  (let* ((key (s-downcase key))
+         (keyhash (yas--table-hash table))
+         (namehash (and keyhash (gethash key keyhash))))
+    (when namehash
+      (yas--filter-templates-by-condition
+       (yas--namehash-templates-alist namehash)))))
+
+(defun fast-exec-my-yas-keys ()
+  "Get some useful keymaps of  `fast-exec' for my-yas."
+  (fast-exec/some-commands ("Yasnippet Edit Snippet" 'yas-visit-snippet-file)))
+
+(fast-exec/register-keymap-func 'fast-exec-my-yas-keys)
+(fast-exec/reload-functions-chain)
+
+(use-package flycheck
+    :ensure t
+    :config
+    '(custom-set-variables
+      '(flycheck-display-errors-function
+        #'flycheck-pos-tip-error-messages))
+    (global-flycheck-mode 1))
+
+(use-package company
+    :ensure t
+    :custom
+    (company-idle-delay                 0.3)
+    (company-minimum-prefix-length      2)
+    (company-show-numbers               t)
+    (company-tooltip-limit              15)
+    (company-tooltip-align-annotations  t)
+    (company-tooltip-flip-when-above    t)
+    (company-dabbrev-ignore-case        nil)
+    :config
+    (add-to-list 'company-backends 'company-keywords)
+    (global-company-mode 1))
+
+(defvar company-mode/enable-yas t
+  "Enable yasnippet for all backends.")
+
+(defun company-mode/backend-with-yas (backend)
+  (if (or (not company-mode/enable-yas)
+          (and (listp backend) (member 'company-yasnippet backend)))
+      backend
+    (append (if (consp backend) backend (list backend))
+            '(:with company-yasnippet))))
+
+(setq company-backends
+      (mapcar #'company-mode/backend-with-yas company-backends))
+
+(use-package company-box
+    :ensure t
+    :hook (company-mode . company-box-mode))
+
+(use-package format-all
+    :ensure t)
+
+
 
 (defmacro define-key-when (fun-name map key def pred)
   "Define to KEY in MAP DEF when PRED return t or run old command.
@@ -934,7 +942,7 @@ Is used in `my-drag-stuff-down'.")
   (interactive "d")
   (and
    (not (org-in-src-block-p))
-   (my-current-line-prefix-p "*")))
+   (just-line-prefix-p "*")))
 
 (defun my-drag-org-heading-right ()
   "Drag Org's heading to right."
@@ -1340,6 +1348,18 @@ List of functions: `xah-toggle-letter-case', `my-change-case-of-current-line'."
 
 (define-key xah-fly-command-map (kbd "SPC .") 'xref-find-definitions)
 
+(defun my-visit-last-opened-buffer ()
+  "Visit buffer which was opened recently."
+  (interactive)
+  (->>
+   (buffer-list)
+   (-second-item)
+   (switch-to-buffer)))
+
+(bind-keys
+ :map xah-fly-command-map
+ ("SPC k l" . my-visit-last-opened-buffer))
+
 (defmacro add-nav-to-imports-for-language (language to-imports-function)
   "Bind `TO-IMPORTS-FUNCTION` to `LANGUAGE`-map."
   `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
@@ -1429,9 +1449,9 @@ Either at the beginning of a line, or after a sentence end."
 
 (defun my-previous-line-is-empty ()
   "Move to previous line and return t, when this line is empty.
-\\(see `my-current-line-is-empty-p')"
+\\(see `just-line-is-whitespaces-p')"
   (forward-line -1)
-  (my-current-line-is-empty-p))
+  (just-line-is-whitespaces-p))
 
 (defun my-in-text-p ()
   "Return t, when cursor has position on common text."
@@ -1480,10 +1500,11 @@ Either at the beginning of a line, or after a sentence end."
     (defun my-calc-simplify-region-change (beg end)
       "Get from BEG to END change this via `calc' and yank instead of region."
       (interactive "r")
-      (let ((expr (buffer-substring beg end)))
+      (let* ((expr (buffer-substring beg end))
+             (simplified (my-calc-simplify expr)))
         (goto-char beg)
         (delete-region beg end)
-        (insert (my-calc-simplify expr)))))
+        (insert simplified))))
 
 (use-package math-preview
     :ensure t
@@ -1506,6 +1527,25 @@ Either at the beginning of a line, or after a sentence end."
                           (< (point) (cdr it)))))
       (math-preview-at-point)
     (org-latex-preview)))
+
+(use-package math-preview
+    :ensure t
+    :config
+    (defun my-latex-preview-in-other-window ()
+      "Preview fragment of LaTeX source at point in seperated window."
+      (interactive)
+      (let ((source
+             (save-mark-and-excursion
+               (xah-select-block)
+               (buffer-substring (region-beginning) (region-end)))))
+        (switch-to-buffer-other-window "*my-latex-preview*")
+        (delete-region (point-min) (point-max))
+        (LaTeX-mode)
+        (insert source)
+        (math-preview-region (point-min) (point-max))))
+    :bind
+    ((:map my-latex-local-map)
+     ("v" . 'my-latex-preview-in-other-window)))
 
 (use-package cdlatex
     :ensure t
@@ -1750,29 +1790,34 @@ Either at the beginning of a line, or after a sentence end."
 (defun my-latex-equation-to-split ()
   "Transform LaTeX equation environment to split environment."
   (interactive)
+  (-let (((beg end) (my-latex-env-beg-and-end)))
+    (save-excursion
+      (replace-string "=" "&=" nil beg end)
+      (just-for-each-line* beg end
+        (print (just-text-at-line))
+        (when (just-call-on-next-line* (just-line-prefix-p "&=" nil t))
+          (end-of-line)
+          (insert "\\\\"))))))
+
+(defun my-latex-env-beg-and-end ()
+  "Mark as region of the LaTeX environment."
   (save-excursion
     (LaTeX-find-matching-begin)
     (end-of-line)
-    (push-mark)
+    (forward-char)
+    (push-mark nil nil t)
     (LaTeX-find-matching-end)
     (beginning-of-line)
-    (cdlatex-wrap-environment "split")
-    (indent-region (region-beginning) (region-end))
-    (replace-string "=" "&=" nil (region-beginning) (region-end))
-    (LaTeX-find-matching-begin)
-    (forward-line)
-    (kill-whole-line)
-    (forward-line)
-    (end-of-line)
-    (--dotimes
-        (- (save-excursion
-             (LaTeX-find-matching-end)
-             (line-number-at-pos))
-           (line-number-at-pos))
-      (end-of-line)
-      (insert "\\\\")
-      (forward-line))))
+    (forward-char -1)
+    (list (region-beginning) (region-end))))
 
+(defun my-latex-wrap-environment (beg end environment)
+  "Wrap the region from BEG to END into ENVIRONMENT.
+
+If the environment is not given, ask for it using completion."
+  (just-mark-region beg end)
+  (cdlatex-wrap-environment environment)
+  (indent-region (region-beginning) (region-end)))
 
 (bind-keys*
  :map my-latex-local-map
@@ -1973,7 +2018,7 @@ downloaded file"
   "View my todos."
   (interactive)
   (org-ql-search
-      (my-all-buffers-with-ext "org")
+      (just-buffers-with-ext "org")
       "todo:TODO"
       :super-groups '((:auto-parent))))
 
@@ -2082,7 +2127,7 @@ Only when in class defnition."
   (interactive)
   (when (my-elisp-in-defclass-p)
     (my-goto-fields-defclass-defnition)
-    (unless (my-current-line-is-empty-p)
+    (unless (just-line-is-whitespaces-p)
       (newline-and-indent))
     (yas-expand-snippet
      (format "(${1:name} :initarg :$1 :accessor %s-$1)"
@@ -2634,7 +2679,7 @@ Only when in class defnition."
 
 (defun my-films--from-org-heading ()
   "Parse org heading at current position to `kinopoisk-film'."
-  (when (my-current-line-prefix-p "*")
+  (when (just-line-prefix-p "*")
     (kinopoisk-film
      :id (car (string-to-number (org-property-values "id")))
      :year (car (org-property-values "year"))
@@ -3405,7 +3450,7 @@ Special variable is `my-mipt-found-task'"
   "Take TASKS and choose one of classes."
   (let* ((numbers (-map #'my-mipt-task-number tasks))
          (default (my-max numbers)))
-    (my-completing-read-numbers
+    (just-completing-read-numbers
      "Please, choose number of MIPT task: "
      numbers
      nil
