@@ -3,12 +3,13 @@
 
 * MIPT
 ** TODO Do MIPT Tasks
-   SCHEDULED: <2022-05-17 Вт .+1d>
+   SCHEDULED: <2022-05-23 Пн .+1d>
    :PROPERTIES:
-   :LAST_REPEAT: [2022-05-16 Пн 21:30]
+   :LAST_REPEAT: [2022-05-22 Вс 21:59]
    :STYLE:    habit
    :END:
 
+   - State "DONE"       from "TODO"       [2022-05-22 Вс 21:59]
    - State "DONE"       from "TODO"       [2022-05-16 Пн 21:30]
    - State "DONE"       from "TODO"       [2022-04-26 Вт 23:05]
    - State "DONE"       from "TODO"       [2022-04-25 Пн 20:56]
@@ -21,23 +22,29 @@
 ** =org=
 ** Developer's Environment
 ** Organize Editing
-*** TODO Capitalize first letter of line after head line in =org-mode=
-*** TODO When duplicate a text block remove extra empty lines
-*** TODO Create or find a =LaTeX= style file for Kulikova
+*** TODO Create or find a =LaTeX= style package for Kulikova
 ** Explore new packages
 ** Continue develop of 
+*** TODO Update documentation of contributing in =emacs-run-command-recipes=
 *** TODO =emacs-run-command-recipes=
-*** TODO Remake of =fast-exec=
-*** TODO =just=
 * Films
-** MUST-SEE The French Dispatch
+** MUST-SEE The Green Mile
    :PROPERTIES:
-   :name:     Французский вестник. Приложение к газете «Либерти. Канзас ивнинг сан»
-   :year:     2021
-   :slogan:   nil
-   :id:       1211076
-   :rating:   76.0
-   :countries: (Германия США)
+   :name:     Зеленая миля
+   :year:     1999
+   :slogan:   Пол Эджкомб не верил в чудеса. Пока не столкнулся с одним из них
+   :id:       435
+   :rating:   91.0
+   :countries: (США)
+   :END:
+** MUST-SEE The Batman
+   :PROPERTIES:
+   :name:     Бэтмен
+   :year:     2022
+   :slogan:   Unmask The Truth
+   :id:       590286
+   :rating:   79.0
+   :countries: (США)
    :END:
 ** MUST-SEE Everything Everywhere All at Once
    :PROPERTIES:
@@ -46,24 +53,6 @@
    :slogan:   nil
    :id:       1322324
    :rating:   82.0
-   :countries: (США)
-   :END:
-** MUST-SEE Missionary: Impossible
-   :PROPERTIES:
-   :name:     Миссия невыполнима
-   :year:     2006
-   :slogan:   nil
-   :id:       305389
-   :rating:   0
-   :countries: (США)
-   :END:
-** MUST-SEE The Green Mile
-   :PROPERTIES:
-   :name:     Зеленая миля
-   :year:     1999
-   :slogan:   Пол Эджкомб не верил в чудеса. Пока не столкнулся с одним из них
-   :id:       435
-   :rating:   91.0
    :countries: (США)
    :END:
 ** MUST-SEE Sound of Metal
@@ -75,13 +64,13 @@
    :rating:   73.0
    :countries: (Бельгия США)
    :END:
-** MUST-SEE The Batman
+** MUST-SEE Missionary: Impossible
    :PROPERTIES:
-   :name:     Бэтмен
-   :year:     2022
-   :slogan:   Unmask The Truth
-   :id:       590286
-   :rating:   79.0
+   :name:     Миссия невыполнима
+   :year:     2006
+   :slogan:   nil
+   :id:       305389
+   :rating:   0
    :countries: (США)
    :END:
 ** MUST-SEE Borat: Cultural Learnings of America for Make Benefit Glorious Nation of Kazakhstan
@@ -93,7 +82,7 @@
    :rating:   67.0
    :countries: (Великобритания США)
    :END:
-** MUST-SEE Les fugitifs
+I** MUST-SEE Les fugitifs
    :PROPERTIES:
    :name:     Беглецы
    :year:     1986
@@ -105,11 +94,17 @@
 
 * GitHub
 ** TODO Do 1 commit per day
-   SCHEDULED: <2022-05-19 Чт .+1d>
    :PROPERTIES:
-   :LAST_REPEAT: [2022-05-18 Ср 20:59]
+   :LAST_REPEAT: [2022-05-24 Вт 17:27]
+   :END:
+   - State "DONE"       from "TODO"       [2022-05-24 Вт 17:27]
+   - State "DONE"       from "TODO"       [2022-05-23 Пн 22:44]
+   SCHEDULED: <2022-05-25 Ср .+1d>
+   :PROPERTIES:
+   :LAST_REPEAT: [2022-05-22 Вс 21:58]
    :END:
    
+   - State "DONE"       from "TODO"       [2022-05-22 Вс 21:58]
    - State "DONE"       from "TODO"       [2022-05-18 Ср 20:59]
    - State "DONE"       from "TODO"       [2022-05-11 Ср 16:23]
    - State "DONE"       from "TODO"       [2022-05-09 Пн 12:11]

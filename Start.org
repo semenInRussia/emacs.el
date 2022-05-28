@@ -11,7 +11,7 @@
           | |       | | | |   / __| | |/ / | |
           | |  ____  | |_| | | (__  |   <  |_|
           |________| |_____| \____| |__|\| |_|
-
+           
 [[elisp:(helm-projectile-switch-project)][Open Project]]
 [[elisp:org-todo-list][See TODOs]]
 [[elisp:(dired "~/projects")][Open Directory of Projects]]

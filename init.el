@@ -144,7 +144,6 @@ Info take from var `user-os`, user must set it."
 (defun my-local-major-mode-map-run ()
   "Run `my-local-major-mode-map'."
   (interactive)
-  (which-key-show-full-keymap my-local-major-mode-map)
   (set-transient-map my-local-major-mode-map))
 
 (define-key xah-fly-command-map (kbd "SPC l") 'my-local-major-mode-map-run)
@@ -426,11 +425,11 @@ EOB - is `end-of-buffer'"
 
 (use-package avy
     :ensure t
-    :custom (avy-background t)
-    (avy-translate-char-function #'translate-char-from-russian)
+    :custom
+    (avy-background t)
     :bind ((:map xah-fly-command-map)
-           ("n"     . nil) ; by default this is `isearch', so i turn
-           ;; this to keymap
+           ("n"     . nil)              ;by default this is `isearch', so i turn
+                                        ;this to keymap
            ("n n"   . 'avy-goto-char)
            ("n v"   . 'avy-yank-word)
            ("n x"   . 'avy-teleport-word)
@@ -457,38 +456,6 @@ EOB - is `end-of-buffer'"
            ("n k x" . 'avy-move-line)
            ("n k c" . 'avy-kill-ring-save-whole-line)
            ("n k d" . 'avy-kill-whole-line)))
-
-(defun translate-char-from-russian (russian-char)
-  "Translate RUSSIAN-CHAR to corresponding char on qwerty keyboard.
-I am use йцукенг russian keyboard."
-  (cl-case russian-char
-    (?й ?q)
-    (?ц ?w)
-    (?у ?e)
-    (?к ?r)
-    (?е ?t)
-    (?н ?y)
-    (?г ?u)
-    (?ш ?i)
-    (?щ ?o)
-    (?з ?p)
-    (?ф ?a)
-    (?ы ?s)
-    (?в ?d)
-    (?а ?f)
-    (?п ?g)
-    (?р ?h)
-    (?о ?j)
-    (?л ?k)
-    (?д ?l)
-    (?я ?z)
-    (?ч ?x)
-    (?с ?c)
-    (?м ?v)
-    (?и ?b)
-    (?т ?n)
-    (?ь ?m)
-    (t russian-char)))
 
 (defun avy-goto-word-1-with-action (char action &optional arg beg end symbol)
   "Jump to the currently visible CHAR at a word start.
@@ -742,6 +709,9 @@ Action of `avy', see `avy-action-yank' for example"
     :ensure t
     :bind (:map xah-fly-command-map
                 ("SPC `" . string-edit-at-point)))
+
+(use-package eldoc
+    :custom ((eldoc-idle-delay 0.01)))
 
 (defun my-drag-stuff-left-char ()
   "Drag char to left."
@@ -1242,30 +1212,38 @@ List of functions: `xah-toggle-letter-case', `my-change-case-of-current-line'."
 (define-key xah-fly-command-map (kbd "p") nil)
 (define-key xah-fly-command-map (kbd "p") 'insert-spaces-before-or-to-beginning-of-each-line)
 
-(defun my-duplicate-last-bloc ()
+(defun my-duplicate-last-block ()
   "Take last text block and insert."
   (interactive)
+  (while (looking-back "[\n\t ]") (delete-backward-char 1))
   (->>
-   (buffer-substring (my-point-at-last-block-beg) (point))
+   (buffer-substring
+    (my-point-at-last-block-beg) (my-point-at-last-block-end))
    (s-trim)
    (s-append "\n")
-   (s-prepend "\n")
+   (s-prepend "\n\n")
    (insert)))
 
 (defun my-point-at-last-block-beg ()
-  "Move to beginning of last block and return current position of cursor."
+  "Return the position of beginning of last block."
   (interactive)
   (save-excursion
-    (cond
-      ((not (re-search-backward "\\w" nil nil)) (point-min))
-      ((re-search-backward "\n[\t\n ]*\n+" nil 1)
-       (skip-chars-backward "\n\t ")
-       (point))
-      (t (point-min)))))
+    (if (re-search-backward "\n[\t\n ]*\n+" nil 1)
+        (progn
+          (skip-chars-backward "\n\t "))
+      (goto-char (point-min)))
+    (point)))
+
+(defun my-point-at-last-block-end ()
+  "Return the position of last block's end."
+  (interactive)
+  (save-excursion
+    (re-search-forward "\n[\t\n ]*\n+" nil 1)
+    (point)))
 
 (bind-keys*
  :map xah-fly-command-map
- ("SPC k 6" . my-duplicate-last-bloc))
+ ("SPC k 6" . my-duplicate-last-block))
 
 (define-key xah-fly-command-map (kbd "m") 'backward-sexp)
 (define-key xah-fly-command-map (kbd ".") 'forward-sexp)
@@ -1353,12 +1331,21 @@ List of functions: `xah-toggle-letter-case', `my-change-case-of-current-line'."
   (interactive)
   (->>
    (buffer-list)
-   (-second-item)
+   (cdr)
+   (--find (not (my--visit-last-opened-buffer-ignore-p it)))
    (switch-to-buffer)))
+
+(defun my--visit-last-opened-buffer-ignore-p (buffer)
+  "Take object of BUFFER and return nil when don't need visit its."
+  (->>
+   buffer
+   (buffer-name)
+   (s-trim)
+   (string-equal "*Minibuf-1*")))
 
 (bind-keys
  :map xah-fly-command-map
- ("SPC k l" . my-visit-last-opened-buffer))
+ ("SPC 0" . my-visit-last-opened-buffer))
 
 (defmacro add-nav-to-imports-for-language (language to-imports-function)
   "Bind `TO-IMPORTS-FUNCTION` to `LANGUAGE`-map."
@@ -1410,14 +1397,30 @@ List of functions: `xah-toggle-letter-case', `my-change-case-of-current-line'."
   "Add hook to MODE, which enable AUTOFORMAT-FUNCTIONS."
   (let* ((hook
           (intern (s-append "-hook" (symbol-name (eval mode)))))
+         (fun-name
+          (->>
+           mode
+           (eval)
+           (symbol-name)
+           (s-prepend "my-autoformat-set-functions-for-")
+           (intern)))
          (funcs
           (->>
            autoformat-functions
            (--map (symbol-name it))
            (--map (intern (s-prepend "autoformat-" it))))))
-    `(add-hook ',hook
-               (lambda ()
-                 (setq-local my-autoformat-functions ',funcs)))))
+    `(progn
+       (defun ,fun-name ()
+         "Add autoformat special functions for mode."
+         (interactive)
+         (setq-local my-autoformat-functions ',funcs))
+       (add-hook ',hook ',fun-name))))
+
+(defmacro my-also-use-autoformat-in-mode (mode &rest autoformat-functions)
+  "Add hook to MODE, which enable AUTOFORMAT-FUNCTIONS plus default functions."
+  `(my-use-autoformat-in-mode ,mode
+                              ,@(-concat autoformat-functions
+                                         my-autoformat-all-functions)))
 
 (defmacro my-use-all-autoformat-in-mode (mode)
   "Use my all autoformat functions in MODE."
@@ -1428,14 +1431,12 @@ List of functions: `xah-toggle-letter-case', `my-change-case-of-current-line'."
 Either at the beginning of a line, or after a sentence end."
   (interactive)
   (when (and
-         (my-use-autoformat-function-p 'autoformat-sentence-capitalization)
          (my-in-text-p)
          (looking-back "[а-яa-z]")
          (save-excursion
            (forward-char -1)
            (or
             (looking-back (sentence-end))
-            (bobp)
             (and
              (skip-chars-backward " ")
              (bolp)
@@ -1449,13 +1450,14 @@ Either at the beginning of a line, or after a sentence end."
 
 (defun my-previous-line-is-empty ()
   "Move to previous line and return t, when this line is empty.
-\\(see `just-line-is-whitespaces-p')"
-  (forward-line -1)
-  (just-line-is-whitespaces-p))
+See `just-line-is-whitespaces-p'"
+  (just-call-on-prev-line 'just-line-is-whitespaces-p))
 
 (defun my-in-text-p ()
   "Return t, when cursor has position on common text."
-  (and (not (org-in-src-block-p)) (not (texmathp))))
+  (and
+   (not (org-in-src-block-p))
+   (not (texmathp))))
 
 (defun my-autoformat ()
   "Call all autoformat functions."
@@ -1463,7 +1465,7 @@ Either at the beginning of a line, or after a sentence end."
   (--each my-autoformat-functions (funcall it)))
 
 (define-minor-mode my-autoformat-mode
-    "Toggle `my-autoformat-mode'.  Converts 1st to 1^{st} as you type."
+    "Toggle `my-autoformat-mode'."
   :init-value nil
   (if my-autoformat-mode
       (add-hook 'post-self-insert-hook #'my-autoformat)
@@ -1513,7 +1515,15 @@ Either at the beginning of a line, or after a sentence end."
      (list (lambda (s) (s-concat "{\\color{white}" s "}"))))
     :bind ((:map my-latex-local-map)
            ("p" . 'my-latex-preview)
-           ("d" . 'math-preview-clear-at-point)))
+           ("d" . 'math-preview-clear-at-point))
+    :config
+    (defun fast-exec-math-preview-keys ()
+      "Get some useful keymaps of  `fast-exec' for math-preview."
+      (fast-exec/some-commands
+       ("Preview All Latex Fragments" 'math-preview-all)))
+
+    (fast-exec/register-keymap-func 'fast-exec-math-preview-keys)
+    (fast-exec/reload-functions-chain))
 
 (defun my-latex-preview ()
   "Preview latex fragments combine `org-latex-combine', `math-preview'."
@@ -1790,17 +1800,23 @@ Either at the beginning of a line, or after a sentence end."
 (defun my-latex-equation-to-split ()
   "Transform LaTeX equation environment to split environment."
   (interactive)
-  (-let (((beg end) (my-latex-env-beg-and-end)))
-    (save-excursion
-      (replace-string "=" "&=" nil beg end)
-      (just-for-each-line* beg end
-        (print (just-text-at-line))
-        (when (just-call-on-next-line* (just-line-prefix-p "&=" nil t))
-          (end-of-line)
-          (insert "\\\\"))))))
+  (save-excursion
+    (my-latex-wrap-environment
+     (my-latex-env-beg)
+     (my-latex-env-end)
+     "split")
+    (replace-string "=" "&=" nil
+                    (my-latex-env-beg)
+                    (my-latex-env-end))
+    (just-for-each-line*
+        (my-latex-env-beg)
+        (my-latex-env-end)
+      (when (just-call-on-next-line* (just-line-prefix-p "&=" nil t))
+        (end-of-line)
+        (insert "\\\\")))))
 
 (defun my-latex-env-beg-and-end ()
-  "Mark as region of the LaTeX environment."
+  "Return as cons beginning and end of current LaTeX environment."
   (save-excursion
     (LaTeX-find-matching-begin)
     (end-of-line)
@@ -1809,7 +1825,19 @@ Either at the beginning of a line, or after a sentence end."
     (LaTeX-find-matching-end)
     (beginning-of-line)
     (forward-char -1)
-    (list (region-beginning) (region-end))))
+    (cons (region-beginning) (region-end))))
+
+(defun my-latex-env-beg ()
+  "Return point at beginning of current LaTeX environment."
+  (car (my-latex-env-beg-and-end)))
+
+(defun my-latex-env-end ()
+  "Return point at end of current LaTeX environment."
+  (cdr (my-latex-env-beg-and-end)))
+
+(defun my-latex-env-beg ()
+  "Return point at beginning of current LaTeX environment."
+  (car (my-latex-env-beg-and-end)))
 
 (defun my-latex-wrap-environment (beg end environment)
   "Wrap the region from BEG to END into ENVIRONMENT.
@@ -1988,7 +2016,22 @@ downloaded file"
 
 (add-hook 'org-mode-hook (lambda () (call-interactively 'visual-fill)))
 
-(my-use-all-autoformat-in-mode 'org-mode)
+(my-use-autoformat-in-mode
+ 'org-mode
+ org-sentence-capitalization)
+
+(defun autoformat-org-sentence-capitalization ()
+  "Capitalize first letter of sentence in `org-mode'."
+  (interactive)
+  (autoformat-sentence-capitalization)
+  (when (and
+         (just-call-on-prev-line* (just-line-prefix-p "*"))
+         (save-excursion
+           (forward-char -1)
+           (skip-chars-backward " ")
+           (bolp)))
+    (undo-boundary)
+    (capitalize-word -1)))
 
 (use-package wikinforg
     :ensure t)
@@ -2171,8 +2214,24 @@ Only when in class defnition."
            my-markdown-mode-local-map
            ("t" . 'markdown-toc-generate-or-refresh-toc)))
 
-(my-use-all-autoformat-in-mode 'markdown-mode)
-(my-use-all-autoformat-in-mode 'gfm-mode)
+(my-also-use-autoformat-in-mode 'markdown-mode
+                                markdown-capitalize-heading-line)
+(my-also-use-autoformat-in-mode 'gfm-mode
+                                markdown-capitalize-heading-line)
+
+(defun autoformat-markdown-capitalize-heading-line ()
+  "Capitalize first letter of a heading line (lines which started with #)."
+  (when (and (just-line-prefix-p "#") (my-markdown-first-letter-of-heading))
+    (undo-boundary)
+    (capitalize-word -1)))
+
+(defun my-markdown-first-letter-of-heading ()
+  "Get t, when backward character is first letter of current markdown heading."
+  (save-excursion
+    (forward-char -1)
+    (skip-chars-backward " ")
+    (skip-chars-backward "#")
+    (bolp)))
 
 (setq py/imports-regexp "import\\|from")
 
@@ -3340,11 +3399,22 @@ If IS-AS-SNIPPET is t, then expand template as YAS snippet"
   (my-mipt-task-visit (my-mipt-last-task)))
 
 (defun my-mipt-next-task ()
-  "Return next task, after last found task."
+  "Return the next task, after the last found task.
+
+When run interactively visit that task."
   (interactive)
   (let ((next-task (my-mipt-last-task)))
     (incf (my-mipt-task-number next-task))
     (if (interactive-p) (my-mipt-task-visit next-task) next-task)))
+
+(defun my-mipt-prev-task ()
+  "Return previous task, before the last found task.
+
+When run interactively visit that task."
+  (interactive)
+  (let ((prev-task (my-mipt-last-task)))
+    (decf (my-mipt-task-number prev-task))
+    (if (interactive-p) (my-mipt-task-visit prev-task) prev-task)))
 
 (defun my-mipt-task-visit (task)
   "Visit file of TASK's solution."
@@ -3474,6 +3544,7 @@ Special variable is `my-mipt-found-task'"
   "Get some useful keymaps of  `fast-exec' for MIPT."
   (fast-exec/some-commands
    ("Next MIPT Task" 'my-mipt-next-task)
+   ("Previous MIPT Task" 'my-mipt-prev-task)
    ("Open Last MIPT Task" 'my-mipt-visit-last-task)
    ("Find MIPT Task" 'my-mipt-task-visit)))
 
