@@ -1,0 +1,25 @@
+# -*- mode: snippet -*-
+# name: russian-skeleton
+# key: !rus
+
+# --
+\\documentclass{${1:$$(yas-choose-value latex-documentclasses)}}
+
+\\usepackage[russian]{babel}
+\\usepackage[utf8]{inputenc}
+
+\usepackage{geometry} % Меняем поля страницы
+\geometry{left=2cm} % левое поле
+\geometry{right=1.5cm} % правое поле
+\geometry{top=1cm} % верхнее поле
+\geometry{bottom=2cm} % нижнее поле
+
+\\usepackage{graphicx}
+\\usepackage{hyperref}
+\\usepackage{fancyhdr}
+
+\\title{$2}
+
+\\begin{document}
+$0
+\\end{document}

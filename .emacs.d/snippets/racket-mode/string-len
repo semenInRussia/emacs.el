@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: string-len
+# key: slen
+# --
+(string-length $0)

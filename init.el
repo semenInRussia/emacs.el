@@ -102,6 +102,38 @@ SEQ may be one of types which supported in function `my-into-list'"
   (let ((step (/ (length seq) n)))
     (-partition-in-steps step step seq)))
 
+(defun my-goto-lisp-sexp-begin (start-name)
+  "Go to backward beginning of Lisp sexp which start with START-NAME."
+  (when (search-backward-regexp
+         (rx "(" (zero-or-more whitespace) (regexp start-name))
+         nil t)
+    (skip-chars-forward "(")))
+
+(defun my-in-lisp-sexp-p (start-name &optional pt)
+  "Get t, When cursor at PT placed in Lisp sexp which start with START-NAME."
+  (setq pt (or pt (point)))
+  (save-excursion
+    (goto-char pt)
+    (when (my-goto-lisp-sexp-begin start-name)
+      (-when-let
+          (sexp (sp-get-enclosing-sexp))
+        (sp-get sexp (< :beg pt :end))))))
+
+(defun prime-p (n)
+  "Return non-nil, when N is prime."
+  ;; `n' has divisors greater than 1 and `n'
+  (> (length (divisors-of n)) 2))
+
+(defun divisors-of (n)
+  "Return divisors of N."
+  (->>
+   n
+   (-iota)
+   (cdr)                                ; ignore zero
+   (--filter (= (% n it) 0))
+   (cons n)
+   (-rotate 2)))
+
 (use-package just
     :load-path "~/projects/just/")
 
@@ -1217,29 +1249,20 @@ List of functions: `xah-toggle-letter-case', `my-change-case-of-current-line'."
   (interactive)
   (while (looking-back "[\n\t ]") (delete-backward-char 1))
   (->>
-   (buffer-substring
-    (my-point-at-last-block-beg) (my-point-at-last-block-end))
+   (buffer-substring (my-point-at-last-block-beg) (point))
    (s-trim)
    (s-append "\n")
    (s-prepend "\n\n")
-   (insert)))
+   (insert))
+  (goto-char (my-point-at-last-block-beg)))
 
 (defun my-point-at-last-block-beg ()
   "Return the position of beginning of last block."
   (interactive)
   (save-excursion
     (if (re-search-backward "\n[\t\n ]*\n+" nil 1)
-        (progn
-          (skip-chars-backward "\n\t "))
-      (goto-char (point-min)))
-    (point)))
-
-(defun my-point-at-last-block-end ()
-  "Return the position of last block's end."
-  (interactive)
-  (save-excursion
-    (re-search-forward "\n[\t\n ]*\n+" nil 1)
-    (point)))
+        (match-end 0)
+      (point-min))))
 
 (bind-keys*
  :map xah-fly-command-map
@@ -1436,6 +1459,7 @@ Either at the beginning of a line, or after a sentence end."
          (save-excursion
            (forward-char -1)
            (or
+            (bobp)
             (looking-back (sentence-end))
             (and
              (skip-chars-backward " ")
@@ -2178,6 +2202,96 @@ Only when in class defnition."
 
 (define-key emacs-lisp-mode-map (kbd "M-RET") 'my-elisp-new-field-of-class)
 
+(use-package racket-mode
+    :ensure t
+    :hook (racket-mode . racket-xp-mode) ; this is enable some useful functions
+    :config
+    (add-to-list
+     'flycheck-disabled-checkers
+     'racket))
+
+(defcustom my-racket-meta-return-functions
+  '()
+  "List of functions for M-ret in racket.
+Each function should return t, if it should be called and should stop next
+calls of functions."
+  :type '(repeat function))
+
+(defun my-racket-meta-return ()
+  "Try use one of M-ret functions for racket.
+Depends on `my-racket-meta-return-functions'."
+  (interactive)
+  (unless (-find #'funcall my-racket-meta-return-functions)
+    (message "Sorry, function not found!")))
+
+(define-key racket-mode-map (kbd "M-RET") 'my-racket-meta-return)
+
+(defun my-racket-meta-return-let ()
+  "Add a binding to the let expression of the Racket.
+One of `my-racket-meta-return-functions'"
+  (when (my-in-lisp-sexp-p "let")
+    (my-goto-lisp-sexp-begin "let")
+    (search-forward "(." nil t)
+    (sp-get (sp-get-sexp)
+      (goto-char :end-in)
+      (newline-and-indent)
+      (insert "[]")
+      (forward-char -1)
+      t)))
+
+(add-to-list 'my-racket-meta-return-functions #'my-racket-meta-return-let)
+
+(defun my-racket-meta-return-test-case ()
+  "Add a test case to current test module in racket.
+One of `my-racket-meta-return-functions'"
+  (when (my-in-lisp-sexp-p "module\+\\W*test")
+    (my-goto-lisp-sexp-begin "module\+\\W*test")
+    (forward-char -1)
+    (sp-get (sp-get-sexp) (goto-char :end-in))
+    (newline-and-indent)
+    (insert "(check-equal? )")
+    (forward-char -1)
+    t))
+
+(add-to-list 'my-racket-meta-return-functions #'my-racket-meta-return-test-case)
+
+(defcustom my-racket-meta-return-cond-clauses-expression-names
+  '("cond" "match" "define/match")
+  "List of the racket expressions names in which should work `M-ret' function."
+  :type '(repeat string))
+
+(defun my-racket-meta-return-cond-clauses ()
+  "Add new clause to racket expression which has syntax like on `cond'.
+
+One of `my-racket-meta-return-functions'.
+
+List of racket expressions in which this function should work:
+
+- `cond'
+- `match'
+- `define/match'"
+  (interactive)
+  (--when-let (-find
+               #'my-in-lisp-sexp-p
+               my-racket-meta-return-cond-clauses-expression-names)
+    (my-goto-lisp-sexp-begin it)
+    (forward-char -1)
+    (forward-sexp)
+    (forward-char -1)
+    (newline-and-indent)
+    (insert "[]")
+    (forward-char -1)
+    t))
+
+(add-to-list
+ 'my-racket-meta-return-functions
+ 'my-racket-meta-return-cond-clauses)
+
+(use-package scribble-mode
+    :ensure t)
+
+(my-use-all-autoformat-in-mode 'scribble-mode)
+
 (use-package markdown-mode
     :ensure t
     :major-mode-map t
@@ -2517,10 +2631,17 @@ Only when in class defnition."
 
 (add-hook 'change-major-mode-hook 'visual-line-mode)
 
+(defcustom my-aggresive-fill-paragraph-modes
+  '(org-mode
+    markdown-mode
+    LaTeX-mode)
+  "List of major modes in which `aggressive-fill-paragraph' should work."
+  :type '(repeat symbol))
+
 (use-package aggressive-fill-paragraph
     :ensure t
     :config
-    (afp-setup-recommended-hooks))
+    (add-hook 'text-mode-hook #'aggressive-fill-paragraph-mode))
 
 (use-package scratch
     :ensure t
@@ -2582,6 +2703,18 @@ Only when in class defnition."
        ("Cow Say Region..."  'cowsay-region)
        ("Cow Say and Insert" 'cowsay-replace-region)
        ("Cow Say Load Cows"  'cowsay-load-cows)))
+
+    (defun cowsay--prompt-for-cow (&rest _ignored)
+      "Read any cow name from the minibuffer."
+      (let ((default (cowsay--get-default-cow)))
+        (completing-read
+         "Cow: "
+         cowsay-cows
+         nil t
+         default
+         'cowsay-cow-history
+         default)))
+
     (fast-exec/register-keymap-func 'fast-exec-define-cowsay-keymaps)
     (fast-exec/reload-functions-chain))
 
@@ -2773,7 +2906,7 @@ Only when in class defnition."
 (add-to-list 'custom-theme-load-path
              "~/.emacs.d/themes")
 
-(load-theme 'doom-monokai-classic t)
+(load-theme 'gruber-darker t)
 
 (setq dont-display-lines-modes
       '(org-mode
@@ -2910,15 +3043,30 @@ See `format-time-string' for see what format string"
     (global-page-break-lines-mode 38))
 
 (use-package projectile
+    :ensure t
     :custom
-  (projectile-project-search-path '("~/projects/"))
-  (projectile-completion-system 'helm)
-  :init (projectile-mode 1)
-  :bind
-  (("S-<f5>" . projectile-test-project)
-   ("<f5>"   . projectile-run-project)))
+    (projectile-project-search-path '("~/projects/"))
+    (projectile-completion-system 'helm)
+    (projectile-project-root-functions '(projectile-root-local
+                                         my-project-root))
+    :init (projectile-mode 1))
 
-(projectile-mode 1)
+(defun my-project-root (&optional dir)
+  (->>
+   projectile-known-projects
+   (--filter
+    (s-starts-with? (f-full it)
+                    (f-full dir)))
+   (--max-by (> (f-depth it) (f-depth other)))))
+
+(defun projectile-root-local (dir)
+  "A simple wrapper around `projectile-project-root'.
+
+Return value at `projectile-project-root' when DIR is nil, otherwise return nil"
+  (unless dir
+    projectile-project-root))
+
+(projectile-acquire-root)
 
 (use-package helm-projectile
     :ensure t
@@ -2967,6 +3115,71 @@ See `format-time-string' for see what format string"
   (fast-exec/reload-functions-chain))
 
 (add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
+
+(use-package dired
+    :bind ((:map dired-mode-map)
+           ("k" . 'next-line)
+           ("i" . 'previous-line)
+           ("RET" . 'dired-find-file)
+           ("t" . 'dired-mark)
+           ("y" . 'dired-unmark)
+           ("SPC" . nil)                ; from command at space to empty prefix
+           ("SPC y" . 'dired-unmark-all-marks)
+           ("f" . 'my-dired-rename)
+           ("SPC w" . 'my-dired-move)
+           ("SPC ." . 'my-dired-goto-parent-dir)
+           ("'" . 'helm-find-files))
+    :config
+    (add-hook 'dired-mode-hook 'xah-fly-insert-mode-activate))
+
+(defmacro my-define-dired-command-taking-file (name args docstring &rest body)
+  "Define the command from function which take a 1 argument: filename."
+  (declare (indent 2))
+  `(defun ,name ()
+     (interactive)
+     ,docstring
+     (funcall
+      (lambda ,args ,@body)
+      (my-dired-filename-at-line))))
+
+(my-define-dired-command-taking-file my-dired-rename
+    (from)
+  "Rename file at point from FROM to other name readed from the minibuffer."
+  (let ((to (my-rename-file from)))
+    (revert-buffer)
+    (my-dired-goto-file to)))
+
+(defun my-dired-goto-file (file)
+  "Go to line of `dired' buffer describing FILE."
+  (goto-char (point-min))
+  (search-forward (f-base to)))
+
+(defun my-rename-file (file)
+  "Change name of FILE to new readed from the minibuffer name.
+
+Return new name of FILE"
+  (let* ((new-name-of-file
+          (read-string "New name, please: " (f-filename from)))
+         (to (f-join (f-dirname from) new-name-of-file)))
+    (f-move from to)
+    to))
+
+(defalias 'dired-do-rename 'my-dired-move)
+
+(defun my-dired-filename-at-line ()
+  "Get filename of file at dired object at current point."
+  (f-join (dired-current-directory) (my-dired-name-of-file-at-line)))
+
+(defun my-dired-name-of-file-at-line ()
+  "Get name of file at dired object at current point."
+  (->> (just-text-at-line) (s-split " ") (-last-item)))
+
+(defun my-dired-goto-parent-dir ()
+  "Navigate to parent directory of current dired directory."
+  (interactive)
+  (let ((parent (f-parent (dired-current-directory))))
+    (kill-buffer)
+    (dired parent)))
 
 (use-package quickrun
     :ensure t
@@ -3388,10 +3601,11 @@ If IS-AS-SNIPPET is t, then expand template as YAS snippet"
 
 (defun my-mipt-last-task ()
   "Return last opened task via `recentf'."
-  (->>
-   recentf-list
-   (-find #'my-mipt-task-parse)
-   (my-mipt-task-parse)))
+  (-some->>
+      recentf-list
+    (-concat (-keep #'buffer-file-name (buffer-list)))
+    (-first #'my-mipt-task-parse)
+    (my-mipt-task-parse)))
 
 (defun my-mipt-visit-last-task ()
   "Visit last opened task searched via `my-mipt-last-task'."

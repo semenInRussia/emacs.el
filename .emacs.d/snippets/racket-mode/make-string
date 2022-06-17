@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: make-string
+# key: ms
+# --
+(make-string $0)

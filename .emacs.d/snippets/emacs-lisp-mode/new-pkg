@@ -4,7 +4,7 @@
 # --
 ;;; `(f-filename buffer-file-name)` --- ${2:Package summary} -*- lexical-binding: t; -*-
 
-;; Copyright (C) `(format-time-string "%Y")` Free Software Foundation, Inc.
+;; Copyright (C) `(format-time-string "%Y")` `(or (ignore-errors user-name) "$6")`
 
 ;; Author: `(or (ignore-errors user-name) "$6")` <`(or (ignore-errors user-mail-address) "$6")`>
 ;; Version: ${3:0.0.1}
@@ -25,7 +25,8 @@
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-$5{;; $6}
+
+;; $2.
 
 ;;; Code:
 $0

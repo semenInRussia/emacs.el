@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: vals
+# key: vals
+# --
+(values $0)

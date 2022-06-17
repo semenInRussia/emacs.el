@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: skeleton
+# key: !
+# --
+#lang racket/base
+
+$0

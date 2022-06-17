@@ -3,7 +3,21 @@
 # key: src
 # --
 
-#+BEGIN_SRC ${1:$$(yas-choose-value '("groovy" "awk" "C" "cpp" "calc" "shell" "clojure" "comint" "css" "D" "ditaa" "emacs-lisp" "eshell" "F90" "forth" "gnuplot" "screen" "sed" "dot" "haskell" "java" "julia" "latex" "ly" "lisp" "lua" "makefile" "matlab" "max" "js" "ocaml" "octave" "org" "perl" "plantuml" "processing" "python" "R" "sql" "ruby" "sass" "scheme" "sqlite" "abc" "arduino" "asymptote" "coq" "ebnf" "fomus" "hledger" "io" "J" "ledger" "mathematica" "mathomatic" "csharp" "vbnet" "oz" "mscgen" "php" "picolisp" "redis" "shen" "smiles" "spice" "stan" "stata" "sclang" "tcl" "vala" "eukleides" "M-x list-packages" "M-x package-menu-filter" "ob-" "org-babel-load-languages" "R" "emacs-lisp" "org-contrib/babel/ob-template.el" "ob-template.el" "org-babel-execute:template" "vars" "result-params" "full-body" "let" "org-babel-execute:template" "org-babel-template-initiate-session" "org-babel-execute:template" "org-babel-comint")
+#+BEGIN_SRC ${1:$$(yas-choose-value '("groovy" "awk" "C" "cpp" "calc"
+"shell" "clojure" "comint" "css" "D" "ditaa" "emacs-lisp" "eshell"
+"F90" "forth" "gnuplot" "screen" "sed" "dot" "haskell" "java" "julia"
+"latex" "ly" "lisp" "lua" "makefile" "matlab" "max" "js" "ocaml"
+"octave" "org" "perl" "plantuml" "processing" "python" "R" "sql"
+"ruby" "sass" "scheme" "sqlite" "abc" "arduino" "asymptote" "coq"
+"ebnf" "fomus" "hledger" "io" "J" "ledger" "mathematica" "mathomatic"
+"csharp" "vbnet" "oz" "mscgen" "php" "picolisp" "redis" "shen"
+"smiles" "spice" "stan" "stata" "sclang" "tcl" "vala" "eukleides"
+"M-x list-packages" "M-x package-menu-filter" "ob-"
+"org-babel-load-languages" "R" "emacs-lisp"
+"org-contrib/babel/ob-template.el" "ob-template.el"
+"org-babel-execute:template" "vars" "result-params" "full-body" "let"
+"org-babel-execute:template" "org-babel-template-initiate-session"
+"org-babel-execute:template" "org-babel-comint" "racket")
  )} ${2::tangle ${3:~/init.el}}
 $0
 #+END_SRC

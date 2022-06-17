@@ -19,14 +19,13 @@
    [[elisp:my-mipt-task-visit][Search MIPT Solution]] or [[elisp:my-mipt-next-task][Next MIPT Task]]
 
 * In Emacs
-** =org=
 ** Developer's Environment
+*** TODO Add template of the =skeletor= for the =Racket=
 ** Organize Editing
-*** TODO Create or find a =LaTeX= style package for Kulikova
 ** Explore new packages
 ** Continue develop of 
-*** TODO Update documentation of contributing in =emacs-run-command-recipes=
 *** TODO =emacs-run-command-recipes=
+
 * Films
 ** MUST-SEE The Green Mile
    :PROPERTIES:
@@ -94,16 +93,15 @@ I** MUST-SEE Les fugitifs
 
 * GitHub
 ** TODO Do 1 commit per day
+   SCHEDULED: <2022-06-05 Вс .+1d>
    :PROPERTIES:
-   :LAST_REPEAT: [2022-05-24 Вт 17:27]
+   :LAST_REPEAT: [2022-06-04 Сб 22:42]
    :END:
+   - State "DONE"       from "TODO"       [2022-06-04 Сб 22:42]
+   - State "DONE"       from "TODO"       [2022-06-01 Ср 23:08]
+   - State "DONE"       from "TODO"       [2022-05-31 Вт 18:45]
    - State "DONE"       from "TODO"       [2022-05-24 Вт 17:27]
    - State "DONE"       from "TODO"       [2022-05-23 Пн 22:44]
-   SCHEDULED: <2022-05-25 Ср .+1d>
-   :PROPERTIES:
-   :LAST_REPEAT: [2022-05-22 Вс 21:58]
-   :END:
-   
    - State "DONE"       from "TODO"       [2022-05-22 Вс 21:58]
    - State "DONE"       from "TODO"       [2022-05-18 Ср 20:59]
    - State "DONE"       from "TODO"       [2022-05-11 Ср 16:23]

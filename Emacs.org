@@ -2,7 +2,7 @@
 #+AUTHOR: semenInRussia
 
 * Hi!
-  Hello, This is configuration of Emacs from semenInRussia!
+  Hello, This is configuration of Emacs from =semenInRussia=!
 
   My moto is "Good Luck!", so my homepage is "Good Luck":
 
@@ -33,6 +33,8 @@
     - [[#work-with-files][Work with Files]]
     - [[#work-with-strings][Work with Strings]]
     - [[#work-with-lists][Work with Lists]]
+    - [[#work-with-lisp-sexps][Work with Lisp Sexps]]
+    - [[#work-with-math][Work with Math]]
   - [[#function-for-work-with-the-emacs][Function for work with the Emacs]]
   - [[#auto-tangle-this-file][Auto Tangle This File]]
 - [[#info-about-me-for-emacs][Info about Me for Emacs]]
@@ -127,6 +129,9 @@
       - [[#elisp-docstrings-mode][Elisp Docstrings Mode]]
       - [[#elisp-indent-code][Elisp Indent Code]]
       - [[#some-insertion-functions-for-elisp][Some Insertion Functions for Elisp]]
+    - [[#racket][Racket]]
+      - [[#smart-insertion-in-racket-m-ret][Smart Insertion in Racket (=M-ret=)]]
+      - [[#scribble-the-racket-documentation-tool][Scribble: The Racket Documentation Tool]]
     - [[#markdown][Markdown]]
       - [[#create-table-of-contents-in-markdown][Create Table of Contents in Markdown]]
       - [[#auto-format-in-markdown][Auto Format in markdown]]
@@ -223,6 +228,7 @@
     - [[#git-major-modes][Git Major Modes]]
     - [[#genreate-gitignore][Genreate .gitignore]]
   - [[#view-directories][View Directories]]
+    - [[#my-keymaps-for-dired][My Keymaps for Dired]]
   - [[#just-run-current-file][Just Run Current File]]
   - [[#run-command][Run Command]]
     - [[#run-command-recipes][Run Command Recipes]]
@@ -438,6 +444,52 @@
           (-partition-in-steps step step seq)))
 
     #+END_SRC
+*** Work with Lisp Sexps
+    Without commentaries, just see below to the source code.
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (defun my-goto-lisp-sexp-begin (start-name)
+        "Go to backward beginning of Lisp sexp which start with START-NAME."
+        (when (search-backward-regexp
+               (rx "(" (zero-or-more whitespace) (regexp start-name))
+               nil t)
+          (skip-chars-forward "(")))
+
+      (defun my-in-lisp-sexp-p (start-name &optional pt)
+        "Get t, When cursor at PT placed in Lisp sexp which start with START-NAME."
+        (setq pt (or pt (point)))
+        (save-excursion
+          (goto-char pt)
+          (when (my-goto-lisp-sexp-begin start-name)
+            (-when-let
+                (sexp (sp-get-enclosing-sexp))
+              (sp-get sexp (< :beg pt :end))))))
+
+    #+END_SRC
+*** Work with Math
+    I am create some functions for work with divisors.  It's very
+    useful, because I am "mathist" and now I can just fast run
+    function in Emacs and know result
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+      (defun prime-p (n)
+        "Return non-nil, when N is prime."
+        ;; `n' has divisors greater than 1 and `n'
+        (> (length (divisors-of n)) 2))
+
+      (defun divisors-of (n)
+        "Return divisors of N."
+        (->>
+         n
+         (-iota)
+         (cdr)                                ; ignore zero
+         (--filter (= (% n it) 0))
+         (cons n)
+         (-rotate 2)))
+    #+END_SRC
+
+
 ** Function for work with the Emacs
    I created library =just= which has a lot of power functions for
    work with Emacs
@@ -1336,7 +1388,6 @@
 
 #+END_SRC
 
-
 ** Transpose
    For example I am press =SPC TAB o=, then current word will moved to
    right, but again press this hard key sequence is hard, so I am
@@ -1941,29 +1992,20 @@
          (interactive)
          (while (looking-back "[\n\t ]") (delete-backward-char 1))
          (->>
-          (buffer-substring
-           (my-point-at-last-block-beg) (my-point-at-last-block-end))
+          (buffer-substring (my-point-at-last-block-beg) (point))
           (s-trim)
           (s-append "\n")
           (s-prepend "\n\n")
-          (insert)))
+          (insert))
+         (goto-char (my-point-at-last-block-beg)))
 
        (defun my-point-at-last-block-beg ()
          "Return the position of beginning of last block."
          (interactive)
          (save-excursion
            (if (re-search-backward "\n[\t\n ]*\n+" nil 1)
-               (progn
-                 (skip-chars-backward "\n\t "))
-             (goto-char (point-min)))
-           (point)))
-
-       (defun my-point-at-last-block-end ()
-         "Return the position of last block's end."
-         (interactive)
-         (save-excursion
-           (re-search-forward "\n[\t\n ]*\n+" nil 1)
-           (point)))
+               (match-end 0)
+             (point-min))))
 
        (bind-keys*
         :map xah-fly-command-map
@@ -2221,6 +2263,7 @@
                (save-excursion
                  (forward-char -1)
                  (or
+                  (bobp)
                   (looking-back (sentence-end))
                   (and
                    (skip-chars-backward " ")
@@ -3248,6 +3291,201 @@
 #        (my-use-autoformat-in-mode 'emacs-lisp-mode elsip-docstring-capitalization)
 #      #+END_SRC
 
+*** Racket
+    I am use [[https://www.racket-mode.com][racket-mode]] for =racket=.  Because checker for =racket=
+    so slow, I disable it.
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (use-package racket-mode
+          :ensure t
+          :hook (racket-mode . racket-xp-mode) ; this is enable some useful functions
+          :config
+          (add-to-list
+           'flycheck-disabled-checkers
+           'racket))
+
+    #+END_SRC
+
+**** Smart Insertion in Racket (=M-ret=)
+     I create small system of smart insertion in =racket= inspired by
+     =org-meta-return=
+
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+       (defcustom my-racket-meta-return-functions
+         '()
+         "List of functions for M-ret in racket.
+       Each function should return t, if it should be called and should stop next
+       calls of functions."
+         :type '(repeat function))
+
+       (defun my-racket-meta-return ()
+         "Try use one of M-ret functions for racket.
+       Depends on `my-racket-meta-return-functions'."
+         (interactive)
+         (unless (-find #'funcall my-racket-meta-return-functions)
+           (message "Sorry, function not found!")))
+
+       (define-key racket-mode-map (kbd "M-RET") 'my-racket-meta-return)
+
+     #+END_SRC
+
+***** Smart insertion in Racket: let bindings
+      The =racket= has the macros for bindings values to identifiers.
+      If you are a normal programmer, then you should know followed
+      syntax:
+
+      #+BEGIN_SRC racket
+        (let ([a 1]
+              [b 2]
+              [c 3])
+          (+ a b c))
+      #+END_SRC
+
+      Without =M-ret= add new binding isn't fast thing, but with
+      =my-racket-meta-return= you should just press =M-ret=
+
+      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+        (defun my-racket-meta-return-let ()
+          "Add a binding to the let expression of the Racket.
+        One of `my-racket-meta-return-functions'"
+          (when (my-in-lisp-sexp-p "let")
+            (my-goto-lisp-sexp-begin "let")
+            (search-forward "(." nil t)
+            (sp-get (sp-get-sexp)
+              (goto-char :end-in)
+              (newline-and-indent)
+              (insert "[]")
+              (forward-char -1)
+              t)))
+
+        (add-to-list 'my-racket-meta-return-functions #'my-racket-meta-return-let)
+
+      #+END_SRC
+
+
+***** Smart insertion in Racket: test cases
+      Each cool programmer of 21th century should use tests.  Racket
+      also has tests.  See to following example of =racket= tests:
+
+      #+BEGIN_SRC racket
+        (module+ test
+          (require rackunit)
+          (check-equal? (+ 1 2) 3)
+          (check-equal? (+ 1) 1)
+          (check-equal? (+ 1 2 3 4) 10))
+      #+END_SRC
+
+      If you should add a =check-equal?= expression to this test, u
+      should:
+
+      1. Move to end of current =check-equal?= expression.  In
+         previous example each =check-equal?= isn't multiline, but
+         multiline =check-equal?= also corrent, so Move to end of
+         current =check-equal?= expression no always easy
+      2. Type =(check-equal?= and space
+
+      With =my-racket-meta-return= you should:
+
+      1. Press =M-ret=
+
+      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+        (defun my-racket-meta-return-test-case ()
+          "Add a test case to current test module in racket.
+        One of `my-racket-meta-return-functions'"
+          (when (my-in-lisp-sexp-p "module\+\\W*test")
+            (my-goto-lisp-sexp-begin "module\+\\W*test")
+            (forward-char -1)
+            (sp-get (sp-get-sexp) (goto-char :end-in))
+            (newline-and-indent)
+            (insert "(check-equal? )")
+            (forward-char -1)
+            t))
+
+        (add-to-list 'my-racket-meta-return-functions #'my-racket-meta-return-test-case)
+      #+END_SRC
+
+      #+RESULTS:
+      | my-racket-meta-return-test-case | my-racket-meta-return-cond-clauses |
+
+***** Smart insertion in Racket: =cond= and =match= and other clauses
+      The Racket Programming Language has the macro called =cond= and
+      =match=, each programmer of the racket for add a new clause to a
+      =cond= sexp should:
+
+      1. Move cursor to the end of current =cond= clause
+      2. Press =ret= for inserting new line
+      3. Press [ for inserting []
+
+      But with =racket-meta-return= you should just press =M-ret=.
+      Also the =Racket= has some other expressions which has syntax
+      like on syntax of the =cond=, see to the followed list
+
+      - =define/match=
+      - =let=
+
+      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+        (defcustom my-racket-meta-return-cond-clauses-expression-names
+          '("cond" "match" "define/match")
+          "List of the racket expressions names in which should work `M-ret' function."
+          :type '(repeat string))
+
+        (defun my-racket-meta-return-cond-clauses ()
+          "Add new clause to racket expression which has syntax like on `cond'.
+
+        One of `my-racket-meta-return-functions'.
+
+        List of racket expressions in which this function should work:
+
+        - `cond'
+        - `match'
+        - `define/match'"
+          (interactive)
+          (--when-let (-find
+                       #'my-in-lisp-sexp-p
+                       my-racket-meta-return-cond-clauses-expression-names)
+            (my-goto-lisp-sexp-begin it)
+            (forward-char -1)
+            (forward-sexp)
+            (forward-char -1)
+            (newline-and-indent)
+            (insert "[]")
+            (forward-char -1)
+            t))
+
+        (add-to-list
+         'my-racket-meta-return-functions
+         'my-racket-meta-return-cond-clauses)
+      #+END_SRC
+
+      #+RESULTS:
+      | my-racket-meta-return-cond-clauses |
+
+**** Scribble: The Racket Documentation Tool
+     I am use [[https://docs.racket-lang.org/scribble/][scribble]].  The =scribble= is special for =racket=
+     documentation tool, each racket package documentated via
+     =scribble=.
+
+     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+       (use-package scribble-mode
+           :ensure t)
+
+     #+END_SRC
+
+***** Auto Format in Scribble
+      I am use my autoformat system, which I am taked from [[https://github.com/jkitchin/scimax/][scimax]]
+
+      #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+        (my-use-all-autoformat-in-mode 'scribble-mode)
+
+      #+END_SRC
+
+
 *** Markdown
     I am use [[https://github.com/jrblevin/markdown-mode/][markdown-mode]] , and for its I am centering code:
 
@@ -3407,7 +3645,7 @@
            :hook ((rust-mode  . racer-mode)
                   (racer-mode . eldoc-mode)))
 
-                  #+END_SRC
+     #+END_SRC
 **** Check Errors
      I am use [[https://github.com/flycheck/flycheck-rust][flycheck-rust]]:
 
@@ -3418,7 +3656,7 @@
            :config
            (flycheck-rust-setup))
 
-           #+END_SRC
+     #+END_SRC
 
 *** Go Lang
     I am use [[https://github.com/dominikh/go-mode.el][go-mode]]:
@@ -3861,14 +4099,26 @@
      #+END_SRC
 
 ** Auto Fill Paragraphs
-   I am enable [[https://github.com/davidshepherd7/aggressive-fill-paragraph-mode/][aggressive-fill-paragraph-mode]]:
+   I am enable [[https://github.com/davidshepherd7/aggressive-fill-paragraph-mode/][aggressive-fill-paragraph-mode]].  This is mean that when
+   I am press to space, current text paragraph automatically will be
+   filled.  But, not each major mode want to has enabled
+   =aggressive-fill-paragraph-mode=, so I create variable
+   =my-aggresive-fill-paragraph-modes= which contais list of major
+   modes in which =aggressive-fill-paragraph-mode= should be enabled
 
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+     (defcustom my-aggresive-fill-paragraph-modes
+       '(org-mode
+         markdown-mode
+         LaTeX-mode)
+       "List of major modes in which `aggressive-fill-paragraph' should work."
+       :type '(repeat symbol))
 
      (use-package aggressive-fill-paragraph
          :ensure t
          :config
-         (afp-setup-recommended-hooks))
+         (add-hook 'text-mode-hook #'aggressive-fill-paragraph-mode))
 
    #+END_SRC
 
@@ -3981,6 +4231,18 @@
             ("Cow Say Region..."  'cowsay-region)
             ("Cow Say and Insert" 'cowsay-replace-region)
             ("Cow Say Load Cows"  'cowsay-load-cows)))
+
+         (defun cowsay--prompt-for-cow (&rest _ignored)
+           "Read any cow name from the minibuffer."
+           (let ((default (cowsay--get-default-cow)))
+             (completing-read
+              "Cow: "
+              cowsay-cows
+              nil t
+              default
+              'cowsay-cow-history
+              default)))
+
          (fast-exec/register-keymap-func 'fast-exec-define-cowsay-keymaps)
          (fast-exec/reload-functions-chain))
 
@@ -4290,7 +4552,9 @@
    #+END_SRC
 
 *** Some Proffesional Themes
-    I am use [[https://github.com/doomemacs/themes][doom-themes]]:
+    I am use the [[https://github.com/doomemacs/themes][doom-themes]].  It's part of the [[https://github.com/doomemacs/doomemacs][doomemacs]] which contains
+    the 20+ themes
+
     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
       (use-package doom-themes
@@ -4311,7 +4575,7 @@
 *** Load Theme
     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-      (load-theme 'doom-monokai-classic t)
+      (load-theme 'gruber-darker t)
 
     #+END_SRC
 
@@ -4542,16 +4806,30 @@
    #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
 
      (use-package projectile
+         :ensure t
          :custom
-       (projectile-project-search-path '("~/projects/"))
-       (projectile-completion-system 'helm)
-       :init (projectile-mode 1)
-       :bind
-       (("S-<f5>" . projectile-test-project)
-        ("<f5>"   . projectile-run-project)))
+         (projectile-project-search-path '("~/projects/"))
+         (projectile-completion-system 'helm)
+         (projectile-project-root-functions '(projectile-root-local
+                                              my-project-root))
+         :init (projectile-mode 1))
 
-     (projectile-mode 1)
+     (defun my-project-root (&optional dir)
+       (->>
+        projectile-known-projects
+        (--filter
+         (s-starts-with? (f-full it)
+                         (f-full dir)))
+        (--max-by (> (f-depth it) (f-depth other)))))
 
+     (defun projectile-root-local (dir)
+       "A simple wrapper around `projectile-project-root'.
+
+     Return value at `projectile-project-root' when DIR is nil, otherwise return nil"
+       (unless dir
+         projectile-project-root))
+
+     (projectile-acquire-root)
      #+END_SRC
 
      #+RESULTS:
@@ -4657,7 +4935,77 @@
 
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
      (add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
-     #+END_SRC
+   #+END_SRC
+
+*** My Keymaps for Dired
+
+    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+      (use-package dired
+          :bind ((:map dired-mode-map)
+                 ("k" . 'next-line)
+                 ("i" . 'previous-line)
+                 ("RET" . 'dired-find-file)
+                 ("t" . 'dired-mark)
+                 ("y" . 'dired-unmark)
+                 ("SPC" . nil)                ; from command at space to empty prefix
+                 ("SPC y" . 'dired-unmark-all-marks)
+                 ("f" . 'my-dired-rename)
+                 ("SPC w" . 'my-dired-move)
+                 ("SPC ." . 'my-dired-goto-parent-dir)
+                 ("'" . 'helm-find-files))
+          :config
+          (add-hook 'dired-mode-hook 'xah-fly-insert-mode-activate))
+
+      (defmacro my-define-dired-command-taking-file (name args docstring &rest body)
+        "Define the command from function which take a 1 argument: filename."
+        (declare (indent 2))
+        `(defun ,name ()
+           (interactive)
+           ,docstring
+           (funcall
+            (lambda ,args ,@body)
+            (my-dired-filename-at-line))))
+
+      (my-define-dired-command-taking-file my-dired-rename
+          (from)
+        "Rename file at point from FROM to other name readed from the minibuffer."
+        (let ((to (my-rename-file from)))
+          (revert-buffer)
+          (my-dired-goto-file to)))
+
+      (defun my-dired-goto-file (file)
+        "Go to line of `dired' buffer describing FILE."
+        (goto-char (point-min))
+        (search-forward (f-base to)))
+
+      (defun my-rename-file (file)
+        "Change name of FILE to new readed from the minibuffer name.
+
+      Return new name of FILE"
+        (let* ((new-name-of-file
+                (read-string "New name, please: " (f-filename from)))
+               (to (f-join (f-dirname from) new-name-of-file)))
+          (f-move from to)
+          to))
+
+      (defalias 'dired-do-rename 'my-dired-move)
+
+      (defun my-dired-filename-at-line ()
+        "Get filename of file at dired object at current point."
+        (f-join (dired-current-directory) (my-dired-name-of-file-at-line)))
+
+      (defun my-dired-name-of-file-at-line ()
+        "Get name of file at dired object at current point."
+        (->> (just-text-at-line) (s-split " ") (-last-item)))
+
+      (defun my-dired-goto-parent-dir ()
+        "Navigate to parent directory of current dired directory."
+        (interactive)
+        (let ((parent (f-parent (dired-current-directory))))
+          (kill-buffer)
+          (dired parent)))
+    #+END_SRC
 
 ** Just Run Current File
    I am use [[https://github.com/emacsorphanage/quickrun][quickrun]].  [[https://github.com/emacsorphanage/quickrun][Quickrun]] has command which just run current
@@ -4718,7 +5066,7 @@
           :config
           (run-command-recipes-use-all))
 
-          #+END_SRC
+    #+END_SRC
 ** Projects with Templates
    I am use [[https://github.com/chrisbarrett/skeletor.el][skeletor]] for creating new projects by temlate:
 
@@ -5144,10 +5492,11 @@
 
      (defun my-mipt-last-task ()
        "Return last opened task via `recentf'."
-       (->>
-        recentf-list
-        (-find #'my-mipt-task-parse)
-        (my-mipt-task-parse)))
+       (-some->>
+           recentf-list
+         (-concat (-keep #'buffer-file-name (buffer-list)))
+         (-first #'my-mipt-task-parse)
+         (my-mipt-task-parse)))
 
      (defun my-mipt-visit-last-task ()
        "Visit last opened task searched via `my-mipt-last-task'."

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: (when ...)
+# key: w
+# --
+(when ${1:(${2:predicate})} $0)

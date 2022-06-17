@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: display
+# key: disp
+# --
+(display $0)
