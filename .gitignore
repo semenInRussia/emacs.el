@@ -1,6 +1,7 @@
 .#*
-.cask/
 .mc-lists.el
+/.emacs.d/.cask
+/.emacs.d/.mc-lists.el
 /.emacs.d/elpa/
 /.emacs.d/emacs-cowsay/
 /.emacs.d/eshell/
@@ -16,8 +17,8 @@
 /.emacs.d/request/
 /.emacs.d/server/
 /.emacs.d/transient/
-/.emacs.d/url/
 /.emacs.d/var/
+/.emacs.d/url/
 /Adobe
 /CodeBlocks
 /MiKTeX

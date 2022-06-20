@@ -115,6 +115,22 @@ SEQ may be one of types which supported in function `my-into-list'"
          nil t)
     (skip-chars-forward "(")))
 
+(defun my-goto-lisp-sexp-end (start-name)
+  "Go to end of the backward Lisp sexp which start with START-NAME.
+End of Lisp sexp is point before the last closed paren"
+  (my-goto-lisp-sexp-begin start-name)
+  (forward-char -1)
+  (sp-get (sp-get-sexp)
+    (goto-char :end-in)))
+
+(defun my-mark-lisp-sexp-inner (start-name)
+  "Mark the inner of the Lisp sexp which start with function START-NAME."
+  (my-goto-lisp-sexp-begin start-name)
+  (forward-char -1)
+  (sp-get (sp-get-sexp)
+    (just-mark-region :beg-in
+                      :end-in)))
+
 (defun my-in-lisp-sexp-p (start-name &optional pt)
   "Get t, When cursor at PT placed in Lisp sexp which start with START-NAME."
   (setq pt (or pt (point)))
@@ -286,6 +302,11 @@ string and TEMPLATE is a `yas--template' structure."
         #'flycheck-pos-tip-error-messages))
     (global-flycheck-mode 1))
 
+(defun turn-off-flycheck ()
+  "Disable `flycheck-mode' locally for current buffer."
+  (interactive)
+  (flycheck-mode 0))
+
 (use-package company
     :ensure t
     :custom
@@ -364,9 +385,22 @@ Instead of KEY will command FUN-NAME"
     :bind ((:map xah-fly-command-map)
            ("b" . 'string-inflection-cycle)))
 
+(defcustom my-aggresive-indent-in-modes '(racket-mode
+                                          css-mode
+                                          emacs-lisp-mode
+                                          eshell-mode)
+  "List of major modes in which should work `aggressive-indent-mode'."
+  :type '(repeat symbol))
+
 (use-package aggressive-indent
     :ensure t
-    :hook ((emacs-lisp-mode css-mode) . aggressive-indent-mode))
+    :init
+    (--each my-aggresive-indent-in-modes
+      (add-hook (->> it
+                     (symbol-name)
+                     (s-append "-hook")
+                     (intern))
+                #'aggressive-indent-mode)))
 
 (use-package imenu
     :custom (imenu-auto-rescan t))
@@ -2210,12 +2244,21 @@ Only when in class defnition."
 
 (use-package racket-mode
     :ensure t
-    :hook (racket-mode . racket-xp-mode) ; this is enable some useful functions
     :defer t
     :config
-    (add-to-list
-     'flycheck-disabled-checkers
-     'racket))
+
+    ;; this is enable some useful functions
+    (add-hook 'racket-mode-hook #'racket-xp-mode)
+
+    ;; `flycheck' is very slow, and
+    ;;`racket-xp-mode' also highlight errors, so i disable `flycheck' for
+    ;; the Racket
+    (add-hook 'racket-mode-hook #'turn-off-flycheck)
+
+    ;; fix a bug
+    (setq racket-xp-mode-hook nil)
+
+    (require 'racket-mode))
 
 (defcustom my-racket-meta-return-functions
   '()
@@ -2293,6 +2336,25 @@ List of racket expressions in which this function should work:
 (add-to-list
  'my-racket-meta-return-functions
  'my-racket-meta-return-cond-clauses)
+
+(defun my-racket-meta-return-contracted ()
+  "Add new argument form to the expression of the Racket `contracted'."
+  (interactive)
+  (when (my-in-lisp-sexp-p "contracted")
+    (my-goto-lisp-sexp-end "contracted")
+    (newline)
+    (insert "[]")
+    (my-mark-lisp-sexp-inner "contracted")
+    (align-regexp
+     (region-beginning)
+     (region-end)
+     "\\[[^ ]+ *\\( \\)[^ ]")
+    (beginning-of-line-text)
+    (forward-char 1)
+    t))
+
+(add-to-list 'my-racket-meta-return-functions
+             #'my-racket-meta-return-contracted)
 
 (use-package scribble-mode
     :ensure t)
@@ -3067,7 +3129,8 @@ See `format-time-string' for see what format string"
   "A simple wrapper around `projectile-project-root'.
 
 Return value at `projectile-project-root' when DIR is nil, otherwise return nil"
-  (unless dir projectile-project-root))
+  (unless dir
+    projectile-project-root))
 
 (defun projectile-project-files (root)
   "Return filenames list of the project at ROOT, with caching!."
@@ -3089,10 +3152,10 @@ Return value at `projectile-project-root' when DIR is nil, otherwise return nil"
   (--reduce-from
    (cond
      ((my-matches-with-one-of-p it regexps)
-      m
+      (message "Ignore %s" it)
       acc)
      ((f-directory-p it)
-      (append acc (my-files-of-root-match-with-regexps it regexps)))
+      (append acc (my-files-of-root-not-match-with-regexps it regexps)))
      (t
       (cons it acc)))
    nil
@@ -3132,19 +3195,22 @@ If the project not contains .gitignore file, then return nil"
     (when (f-exists-p path)
       path)))
 
-(defun my-regexp-from-gitignore-pattern (regexp root-of-gitignore)
+(defun my-regexp-from-gitignore-pattern (regexp gitignore-root)
   "From REGEXP of .gitignore file to real Elisp regular expression.
 
-ROOT-OF-GITIGNORE directory is directory which contains .gitginore file."
+GITIGNORE-ROOT directory is directory which contains .gitginore file."
   ;; TODO Don't ignore files in project, which has same name with ignored
   ;; directory
-  (-->
-   regexp
-   (my-gitignore-rx-to-el it)
-   (if (s-prefix-p "/" it)
-       (f-join root-of-gitignore (s-chop-prefix "/" it))
-     (s-concat ".*/" it))
-   (s-chop-suffix "/" it)))
+  (let ((gitignore-root (f-full gitignore-root)))
+    (-->
+     regexp
+     (my-gitignore-rx-to-el it)
+     (s-chop-suffix "/" it)
+     (s-prepend
+      (if (s-prefix-p "/" it)
+          (s-chop-suffix "/" gitignore-root)
+        ".*/")
+      it))))
 
 (defun my-gitignore-rx-to-el (regexp)
   "Transform REGEXP with regexp syntax as in .gitignore file to Elisp regexp."
@@ -3161,13 +3227,8 @@ ROOT-OF-GITIGNORE directory is directory which contains .gitginore file."
 (defun projectile-project-files-clear-cache (root)
   "Function `projectile-project-files' is cached, clear this cache for ROOT."
   (interactive (list (projectile-acquire-root)))
-  (remhash root
+  (remhash (f-full root)
            my-project-files-hash))
-
-(defun my-helm-projectile-find-file-update ()
-  "Update function for `helm-projectile-find-file'."
-  (projectile-project-files-clear-cache (projectile-acquire-root))
-  (helm-update))
 
 (use-package projectile
     :ensure t
@@ -3176,15 +3237,21 @@ ROOT-OF-GITIGNORE directory is directory which contains .gitginore file."
     (projectile-completion-system 'helm)
     (projectile-project-root-functions
      '(projectile-root-local my-project-root))
-    :bind ((:map helm-projectile-find-file-map)
-           ("S-<f5>" . 'my-helm-projectile-find-file-update))
     :init                               ;nofmt
     (projectile-mode 1))
 
+(defun my-helm-projectile-find-file-update ()
+  "Update function for `helm-projectile-find-file'."
+  (interactive)
+  (projectile-project-files-clear-cache (projectile-acquire-root))
+  (helm-update))
+
 (use-package helm-projectile
     :ensure t
-    :bind (:map xah-fly-command-map
-                ("SPC j" . 'helm-projectile-find-file)))
+    :bind ((:map xah-fly-command-map)
+           ("SPC j" . 'helm-projectile-find-file)
+           (:map helm-projectile-find-file-map)
+           ("M-<f5>" . 'my-helm-projectile-find-file-update)))
 
 (use-package regex-tool
     :ensure t

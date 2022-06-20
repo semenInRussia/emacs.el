@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: define-struct
+# key: defs
+# --
+(define-struct $1 ($0))
