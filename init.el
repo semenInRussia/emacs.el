@@ -30,6 +30,12 @@
 
 (use-package dash :ensure t :init (global-dash-fontify-mode 1))
 
+(use-package pcache
+    :ensure t)
+
+(use-package pcre2el
+    :ensure t)
+
 (defun my-try-delete (path &optional force)
   "If PATH is exists isn't exists, then just do nothing, otherwise delete PATH.
 
@@ -2205,6 +2211,7 @@ Only when in class defnition."
 (use-package racket-mode
     :ensure t
     :hook (racket-mode . racket-xp-mode) ; this is enable some useful functions
+    :defer t
     :config
     (add-to-list
      'flycheck-disabled-checkers
@@ -2641,7 +2648,8 @@ List of racket expressions in which this function should work:
 (use-package aggressive-fill-paragraph
     :ensure t
     :config
-    (add-hook 'text-mode-hook #'aggressive-fill-paragraph-mode))
+    (--each my-aggresive-fill-paragraph-modes
+      (add-hook it #'aggressive-fill-paragraph-mode)))
 
 (use-package scratch
     :ensure t
@@ -3042,31 +3050,136 @@ See `format-time-string' for see what format string"
     :init
     (global-page-break-lines-mode 38))
 
-(use-package projectile
-    :ensure t
-    :custom
-    (projectile-project-search-path '("~/projects/"))
-    (projectile-completion-system 'helm)
-    (projectile-project-root-functions '(projectile-root-local
-                                         my-project-root))
-    :init (projectile-mode 1))
+(defvar my-project-files-hash (make-hash-table :test 'equal))
+
+(defcustom my-project-gitignore-default-patterns
+  '(".git/" "*.exe")
+  "Patterns in .gitignore sytax style which should be ignore by default."
+  :type '(repeat string))
 
 (defun my-project-root (&optional dir)
   (->>
    projectile-known-projects
-   (--filter
-    (s-starts-with? (f-full it)
-                    (f-full dir)))
+   (--filter (s-starts-with? (f-full it) (f-full dir)))
    (--max-by (> (f-depth it) (f-depth other)))))
 
 (defun projectile-root-local (dir)
   "A simple wrapper around `projectile-project-root'.
 
 Return value at `projectile-project-root' when DIR is nil, otherwise return nil"
-  (unless dir
-    projectile-project-root))
+  (unless dir projectile-project-root))
 
-(projectile-acquire-root)
+(defun projectile-project-files (root)
+  "Return filenames list of the project at ROOT, with caching!."
+  (let ((root (f-full root)))
+    (unless (gethash root my-project-files-hash)
+      (puthash root
+               (my-no-cache-project-files root)
+               my-project-files-hash))
+    (gethash root my-project-files-hash)))
+
+(defun my-no-cache-project-files (root)
+  "Return filenames list of the project at ROOT, without caching."
+  (my-files-of-root-not-match-with-regexps
+   root
+   (my-project-gitignore-regexps root)))
+
+(defun my-files-of-root-not-match-with-regexps (root regexps)
+  "Return files list of ROOT each of it don't match with one of REGEXPS."
+  (--reduce-from
+   (cond
+     ((my-matches-with-one-of-p it regexps)
+      m
+      acc)
+     ((f-directory-p it)
+      (append acc (my-files-of-root-match-with-regexps it regexps)))
+     (t
+      (cons it acc)))
+   nil
+   (f-entries root)))
+
+(defun my-matches-with-one-of-p (str regexps)
+  "Return t, when one of REGEXPS has match with STR."
+  (--some (s-matches-p it str) regexps))
+
+(defun my-project-gitignore-regexps (root)
+  "Return list of regexp from .gitignore file of project at ROOT."
+  (--map
+   (my-regexp-from-gitignore-pattern it root)
+   (my-project-gitignore-patterns root)))
+
+(defun my-project-gitignore-patterns (root)
+  "Get patterns list with syntax of .gitignore files for the project at ROOT."
+  (append (my-project-specific-gitignore-patterns root)
+          my-project-gitignore-default-patterns))
+
+(defun my-project-specific-gitignore-patterns (root)
+  "Parse .gitignore file of project at ROOT into list of ignored patterns."
+  (--when-let (my-project-gitignore root)
+    (->>
+     it
+     (f-read)
+     (s-lines)
+     (--remove (or
+                (string-equal "" it)
+                (my-gitignore-comment-line-p it))))))
+
+(defun my-project-gitignore (root)
+  "Return path to .gitignore file of the project at ROOT.
+
+If the project not contains .gitignore file, then return nil"
+  (let ((path (f-join root ".gitignore")))
+    (when (f-exists-p path)
+      path)))
+
+(defun my-regexp-from-gitignore-pattern (regexp root-of-gitignore)
+  "From REGEXP of .gitignore file to real Elisp regular expression.
+
+ROOT-OF-GITIGNORE directory is directory which contains .gitginore file."
+  ;; TODO Don't ignore files in project, which has same name with ignored
+  ;; directory
+  (-->
+   regexp
+   (my-gitignore-rx-to-el it)
+   (if (s-prefix-p "/" it)
+       (f-join root-of-gitignore (s-chop-prefix "/" it))
+     (s-concat ".*/" it))
+   (s-chop-suffix "/" it)))
+
+(defun my-gitignore-rx-to-el (regexp)
+  "Transform REGEXP with regexp syntax as in .gitignore file to Elisp regexp."
+  (->>
+   regexp
+   (s-replace "*" "[^/]*")
+   (s-replace "\\" "")
+   (s-replace "." "\\.")))
+
+(defun my-gitignore-comment-line-p (line)
+  "Return non-nil, when LINE of .gitignore file source is commented."
+  (s-prefix-p "#" (s-trim line)))
+
+(defun projectile-project-files-clear-cache (root)
+  "Function `projectile-project-files' is cached, clear this cache for ROOT."
+  (interactive (list (projectile-acquire-root)))
+  (remhash root
+           my-project-files-hash))
+
+(defun my-helm-projectile-find-file-update ()
+  "Update function for `helm-projectile-find-file'."
+  (projectile-project-files-clear-cache (projectile-acquire-root))
+  (helm-update))
+
+(use-package projectile
+    :ensure t
+    :custom                             ;nofmt
+    (projectile-project-search-path '("~/projects/"))
+    (projectile-completion-system 'helm)
+    (projectile-project-root-functions
+     '(projectile-root-local my-project-root))
+    :bind ((:map helm-projectile-find-file-map)
+           ("S-<f5>" . 'my-helm-projectile-find-file-update))
+    :init                               ;nofmt
+    (projectile-mode 1))
 
 (use-package helm-projectile
     :ensure t
@@ -3120,6 +3233,7 @@ Return value at `projectile-project-root' when DIR is nil, otherwise return nil"
     :bind ((:map dired-mode-map)
            ("k" . 'next-line)
            ("i" . 'previous-line)
+           ("l" . 'dired-find-file)
            ("RET" . 'dired-find-file)
            ("t" . 'dired-mark)
            ("y" . 'dired-unmark)
