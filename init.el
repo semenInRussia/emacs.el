@@ -3137,7 +3137,7 @@ See `format-time-string' for see what format string"
                     (with-helm-current-buffer
                       (let ((root (f-full (projectile-project-root))))
                         (--map
-                         (s-chop-prefix root (f-full it))
+                         (cons (s-chop-prefix root (f-full it)) it)
                          (projectile-current-project-files))))))
     :filtered-candidate-transformer
     (lambda (files _source)
