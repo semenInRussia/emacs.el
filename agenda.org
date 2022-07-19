@@ -22,6 +22,8 @@
 ** Developer's Environment
 *** TODO Don't ignore files in project, which has same name with ignored directory
 ** Organize Editing
+*** TODO Run main file of project via =run-command-reicpes=
+*** TODO Make each item of project file list more short
 ** Explore new packages
 ** Continue develop of 
 *** TODO =emacs-run-command-recipes=

@@ -178,7 +178,7 @@
   - [[#command-log][Command Log]]
   - [[#whitespaces-mode][Whitespaces Mode]]
   - [[#visual-fill-line-mode][Visual Fill Line Mode]]
-  - [[#auto-fill-paragraphs][Auto Fill Paragraphs]]
+  - [[#auto-fill-paragraphs-aggressive][Auto Fill Paragraphs (aggressive)]]
   - [[#scratches][Scratches]]
   - [[#syntax-subword-mode][Syntax Subword Mode]]
   - [[#small-pandoc-functions][Small Pandoc Functions]]
@@ -2213,7 +2213,7 @@
         buffer
         (buffer-name)
         (s-trim)
-        (string-equal "*Minibuf-1*")))
+        (s-prefix-p "*Minibuf")))
 
      (bind-keys
       :map xah-fly-command-map
@@ -3383,9 +3383,7 @@
           (add-hook 'racket-mode-hook #'turn-off-flycheck)
 
           ;; fix a bug
-          (setq racket-xp-mode-hook nil)
-
-          (require 'racket-mode))
+          (setq racket-xp-mode-hook nil))
 
     #+END_SRC
 
@@ -3409,7 +3407,8 @@
          (unless (-find #'funcall my-racket-meta-return-functions)
            (message "Sorry, function not found!")))
 
-       (define-key racket-mode-map (kbd "M-RET") 'my-racket-meta-return)
+       (with-eval-after-load 'racket-mode
+         (define-key racket-mode-map (kbd "M-RET") 'my-racket-meta-return))
 
      #+END_SRC
 
@@ -4190,15 +4189,18 @@
          (helm-autoresize-min-height 20)
          (helm-left-margin-width 2)
          (helm-buffers-left-margin-width 2)
-         :init
-         (helm-autoresize-mode +1)
-         (helm-mode +1)
          :bind (("C-h a"     . 'helm-apropos)
                 (:map xah-fly-command-map)
                 ("SPC SPC f" . 'helm-find-files)
-                ("SPC k r"   . 'helm-regexp)))
+                ("SPC k r"   . 'helm-regexp))
 
-                #+END_SRC
+         :init
+         (helm-autoresize-mode +1)
+         (helm-mode +1)
+         ;; this fix one bug
+         (defvar helm-completion-style nil))
+
+   #+END_SRC
 
 ** Command Log
    I am use [[https://github.com/lewang/command-log-mode][command-log-mode]]:
@@ -4228,7 +4230,7 @@
 
      #+END_SRC
 
-** Auto Fill Paragraphs
+** Auto Fill Paragraphs (aggressive)
    I am enable [[https://github.com/davidshepherd7/aggressive-fill-paragraph-mode/][aggressive-fill-paragraph-mode]].  This is mean that when
    I am press to space, current text paragraph automatically will be
    filled.  But, not each major mode want to has enabled
@@ -4249,7 +4251,13 @@
          :ensure t
          :config
          (--each my-aggresive-fill-paragraph-modes
-           (add-hook it #'aggressive-fill-paragraph-mode)))
+           (add-hook
+            (->>
+             it
+             (symbol-name)
+             (s-append "-hook")
+             (intern))
+            #'aggressive-fill-paragraph-mode)))
 
    #+END_SRC
 
@@ -4361,7 +4369,7 @@
             ("Cow Say String..."  'cowsay-string)
             ("Cow Say Region..."  'cowsay-region)
             ("Cow Say and Insert" 'cowsay-replace-region)
-            ("Cow Say Load Cows"  'cowsay-load-cows)))
+            ("Load Cows"  'cowsay-load-cows)))
 
          (defun cowsay--prompt-for-cow (&rest _ignored)
            "Read any cow name from the minibuffer."
@@ -4377,7 +4385,7 @@
          (fast-exec/register-keymap-func 'fast-exec-define-cowsay-keymaps)
          (fast-exec/reload-functions-chain))
 
-         #+END_SRC
+   #+END_SRC
 
 ** Auto Save
    I am use [[https://github.com/bbatsov/super-save][super-save]]:
@@ -4943,6 +4951,44 @@
        "Patterns in .gitignore sytax style which should be ignore by default."
        :type '(repeat string))
 
+     (defvar helm-source-projectile-files-list
+       (helm-build-sync-source "Projectile files"
+         :before-init-hook (lambda ()
+                             (add-hook 'helm-after-update-hook #'helm-projectile--move-to-real)
+                             (add-hook 'helm-cleanup-hook #'helm-projectile--remove-move-to-real))
+         :candidates (lambda ()
+                       (when (projectile-project-p)
+                         (with-helm-current-buffer
+                           (let ((root (f-full (projectile-project-root))))
+                             (--map
+                              (s-chop-prefix root (f-full it))
+                              (projectile-current-project-files))))))
+         :filtered-candidate-transformer
+         (lambda (files _source)
+           (with-helm-current-buffer
+             (let* ((root (projectile-project-root))
+                    (file-at-root (file-relative-name (expand-file-name helm-pattern root))))
+               (if (or (string-empty-p helm-pattern)
+                       (assoc helm-pattern files))
+                   files
+                 (if (equal helm-pattern file-at-root)
+                     (cl-acons (helm-ff-prefix-filename helm-pattern nil t)
+                               (expand-file-name helm-pattern)
+                               files)
+                   (cl-pairlis (list (helm-ff-prefix-filename helm-pattern nil t)
+                                     (helm-ff-prefix-filename file-at-root nil t))
+                               (list (expand-file-name helm-pattern)
+                                     (expand-file-name helm-pattern root))
+                               files))))))
+         :fuzzy-match helm-projectile-fuzzy-match
+         :keymap helm-projectile-find-file-map
+         :help-message 'helm-ff-help-message
+         :mode-line helm-read-file-name-mode-line-string
+         :action helm-projectile-file-actions
+         :persistent-action #'helm-projectile-file-persistent-action
+         :persistent-help "Preview file")
+       "Helm source definition for Projectile files.")
+
      (defun my-project-root (&optional dir)
        (->>
         projectile-known-projects
@@ -4955,6 +5001,17 @@
      Return value at `projectile-project-root' when DIR is nil, otherwise return nil"
        (unless dir
          projectile-project-root))
+
+     (use-package projectile
+         :ensure t
+         :custom                             ;nofmt
+         (projectile-project-search-path '("~/projects/"))
+         (projectile-completion-system 'helm)
+         (projectile-project-root-functions
+          '(projectile-root-local my-project-root))
+         (projectile-enable-caching nil)
+         :init                               ;nofmt
+         (projectile-mode 1))
 
      (defun projectile-project-files (root)
        "Return filenames list of the project at ROOT, with caching!."
@@ -5053,17 +5110,6 @@
        (interactive (list (projectile-acquire-root)))
        (remhash (f-full root)
                 my-project-files-hash))
-
-     (use-package projectile
-         :ensure t
-         :custom                             ;nofmt
-         (projectile-project-search-path '("~/projects/"))
-         (projectile-completion-system 'helm)
-         (projectile-project-root-functions
-          '(projectile-root-local my-project-root))
-         :init                               ;nofmt
-         (projectile-mode 1))
-
      #+END_SRC
 
 *** Projectile with Helm
@@ -5182,20 +5228,20 @@
 
       (use-package dired
           :bind ((:map dired-mode-map)
-                 ("k" . 'next-line)
-                 ("i" . 'previous-line)
-                 ("l" . 'dired-find-file)
-                 ("RET" . 'dired-find-file)
-                 ("t" . 'dired-mark)
-                 ("y" . 'dired-unmark)
-                 ("SPC" . nil)                ; from command at space to empty prefix
+                 ("k"     . 'next-line)
+                 ("i"     . 'previous-line)
+                 ("l"     . 'dired-find-file)
+                 ("RET"   . 'dired-find-file)
+                 ("t"     . 'dired-mark)
+                 ("y"     . 'dired-unmark)
+                 ("SPC"   . nil)                ; make command at space empty prefix
                  ("SPC y" . 'dired-unmark-all-marks)
-                 ("f" . 'my-dired-rename)
-                 ("SPC w" . 'my-dired-move)
-                 ("SPC ." . 'my-dired-goto-parent-dir)
-                 ("'" . 'helm-find-files))
-          :config
-          (add-hook 'dired-mode-hook 'xah-fly-insert-mode-activate))
+                 ("f"     . 'my-dired-rename)
+                 ("w"     . 'my-dired-move)
+                 ("j"     . 'my-dired-goto-parent-dir)
+                 ("'"     . 'helm-find-files)
+                 ("SPC g" . 'my-dired-delete))
+          :config (add-hook 'dired-mode-hook 'xah-fly-insert-mode-activate))
 
       (defmacro my-define-dired-command-taking-file (name args docstring &rest body)
         "Define the command from function which take a 1 argument: filename."
@@ -5205,7 +5251,16 @@
            ,docstring
            (funcall
             (lambda ,args ,@body)
-            (my-dired-filename-at-line))))
+            (my-dired-filename-at-line))
+           (revert-buffer)))
+
+      (defun my-dired-filename-at-line ()
+        "Get filename of file at dired object at current point."
+        (f-join (dired-current-directory) (my-dired-name-of-file-at-line)))
+
+      (defun my-dired-name-of-file-at-line ()
+        "Get name of file at dired object at current point."
+        (-last-item (s-split " " (just-text-at-line))))
 
       (my-define-dired-command-taking-file my-dired-rename
           (from)
@@ -5231,13 +5286,10 @@
 
       (defalias 'dired-do-rename 'my-dired-move)
 
-      (defun my-dired-filename-at-line ()
-        "Get filename of file at dired object at current point."
-        (f-join (dired-current-directory) (my-dired-name-of-file-at-line)))
-
-      (defun my-dired-name-of-file-at-line ()
-        "Get name of file at dired object at current point."
-        (->> (just-text-at-line) (s-split " ") (-last-item)))
+      (my-define-dired-command-taking-file my-dired-delete
+          (from)
+        "Delete file at dired object at current position of the cursor."
+        (f-delete from))
 
       (defun my-dired-goto-parent-dir ()
         "Navigate to parent directory of current dired directory."
@@ -5245,6 +5297,7 @@
         (let ((parent (f-parent (dired-current-directory))))
           (kill-buffer)
           (dired parent)))
+
     #+END_SRC
 
 ** Just Run Current File
@@ -5271,28 +5324,31 @@
 
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-     (defvar run-command-last-recipe nil
-       "Last runned recipe of `run-command'.")
-
      (use-package run-command
          :ensure t
          :custom
          (run-command-completion-method 'helm)
+
          :bind ((:map xah-fly-command-map)
                 ("SPC , c" . 'run-command)
                 ("S-<f5>"  . 'my-run-last-command))
+
          :config
          (defun run-command--run (command-spec)
            "Run `COMMAND-SPEC'.  Back end for helm and ivy actions."
            (message "ok?")
            (setq-local run-command-last-recipe command-spec)
            (eval (run-command--from-spec command-spec)))
+
          (defun my-run-last-command ()
            "Run command which was runned last, if commands wasn't run, then `quickrun'."
            (interactive)
            (if run-command-last-recipe
                (run-command--run run-command-last-recipe)
-             (quickrun))))
+             (message "NOT FOUND!")))
+
+         (defvar run-command-last-recipe nil
+           "Last runned recipe of `run-command'."))
 
    #+END_SRC
 
