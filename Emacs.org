@@ -5110,6 +5110,16 @@
        (interactive (list (projectile-acquire-root)))
        (remhash (f-full root)
                 my-project-files-hash))
+
+     (defun projectile-files-with-string (string directory)
+       "Return a list of all files containing STRING in DIRECTORY.
+
+     Use only the Emacs lisp"
+       (->>
+        directory
+        (projectile-project-files)
+        (--filter
+         (s-contains-p string (f-read it)))))
      #+END_SRC
 
 *** Projectile with Helm

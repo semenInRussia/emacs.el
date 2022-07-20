@@ -3287,6 +3287,16 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
   (remhash (f-full root)
            my-project-files-hash))
 
+(defun projectile-files-with-string (string directory)
+  "Return a list of all files containing STRING in DIRECTORY.
+
+Use only the Emacs lisp"
+  (->>
+   directory
+   (projectile-project-files)
+   (--filter
+    (s-contains-p string (f-read it)))))
+
 (defun my-helm-projectile-find-file-update ()
   "Update function for `helm-projectile-find-file'."
   (interactive)
