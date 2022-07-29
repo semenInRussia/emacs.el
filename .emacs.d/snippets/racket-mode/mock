@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: mock
+# key: mck
+# --
+(define $1
+  (void))

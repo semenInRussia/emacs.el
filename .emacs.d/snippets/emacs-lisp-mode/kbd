@@ -1,7 +1,6 @@
 # -*- mode: snippet -*-
 # contributor: Xah Lee (XahLee.org)
-# name: goto-char
-# key: goto-char
-# key: gc
+# name: kbd
+# key: kbd
 # --
-(goto-char $0)
+(kbd "$0")

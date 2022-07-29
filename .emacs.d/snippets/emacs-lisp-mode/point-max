@@ -1,5 +1,6 @@
 # -*- mode: snippet -*-
+# contributor: Xah Lee (XahLee.org)
 # name: point-max
-# key: pmx
+# key: point-max
 # --
 (point-max)

@@ -1,34 +1,56 @@
 #+TODO: TODO | DONE
-#+TODO: MUST-SEE |
+#+TODO: MUST-SEE | SAW
+#+TODO: FAIL | GOAL DONE
 
-* MIPT
-** TODO Do MIPT Tasks
+* Habbits
+
+** FAIL Do MIPT Tasks
    SCHEDULED: <2022-05-23 Пн .+1d>
+     :PROPERTIES:
+     :LAST_REPEAT: [2022-05-22 Вс 21:59]
+     :STYLE:    habit
+     :END:
+
+     Every day I must do 2 tasks of the MIPT
+
+     [[elisp:my-mipt-task-visit][Search MIPT Solution]] or [[elisp:my-mipt-next-task][Next MIPT Task]]
+
+** FAIL Do 1 commit per day
+   SCHEDULED: <2022-07-30 Сб .+1d>
    :PROPERTIES:
-   :LAST_REPEAT: [2022-05-22 Вс 21:59]
    :STYLE:    habit
+   :LAST_REPEAT: [2022-07-29 Пт 20:31]
    :END:
 
-   - State "DONE"       from "TODO"       [2022-05-22 Вс 21:59]
-   - State "DONE"       from "TODO"       [2022-05-16 Пн 21:30]
-   - State "DONE"       from "TODO"       [2022-04-26 Вт 23:05]
-   - State "DONE"       from "TODO"       [2022-04-25 Пн 20:56]
+   - State "GOAL"       from "FAIL"       [2022-07-29 Пт 20:31]
+* Planes
 
-   Every day I must do 2 tasks of the MIPT
+** Planes on Week
 
-   [[elisp:my-mipt-task-visit][Search MIPT Solution]] or [[elisp:my-mipt-next-task][Next MIPT Task]]
+**** TODO =racket-mmanager=
+**** TODO =emacs-run-command-recipes=
+**** TODO Don't ignore files in project, which has same name with ignored directory
+**** TODO Run the main file of the project in =run-command-reicpes=
+**** TODO Make LaTeX document class for ГОСТ
 
-* In Emacs
-** Developer's Environment
-*** TODO Don't ignore files in project, which has same name with ignored directory
-** Organize Editing
-*** TODO Run main file of project via =run-command-reicpes=
-*** TODO Make each item of project file list more short
-** Explore new packages
-** Continue develop of 
-*** TODO =emacs-run-command-recipes=
+** Planes on Day
+
+*** TODO 1. -> \item{|} in =LaTeX=
+*** TODO Outline cycle mode in =LaTeX= (see =habr=)
+*** DONE Make organization system
 
 * Films
+
+** MUST-SEE Better Call Saul
+   :PROPERTIES:
+   :name:     Лучше звоните Солу
+   :year:     2015
+   :slogan:   Make the call
+   :id:       796660
+   :rating:   82.0
+   :countries: (США)
+   :END:
+
 ** MUST-SEE The Green Mile
    :PROPERTIES:
    :name:     Зеленая миля
@@ -45,15 +67,6 @@
    :slogan:   Unmask The Truth
    :id:       590286
    :rating:   79.0
-   :countries: (США)
-   :END:
-** MUST-SEE Everything Everywhere All at Once
-   :PROPERTIES:
-   :name:     Всё везде и сразу
-   :year:     2022
-   :slogan:   nil
-   :id:       1322324
-   :rating:   82.0
    :countries: (США)
    :END:
 ** MUST-SEE Sound of Metal
@@ -92,27 +105,21 @@ I** MUST-SEE Les fugitifs
    :rating:   79.0
    :countries: (Франция)
    :END:
-
-* GitHub
-** TODO Do 1 commit per day
-   SCHEDULED: <2022-06-05 Вс .+1d>
+** MUST-SEE Thor: Love and Thunder
    :PROPERTIES:
-   :LAST_REPEAT: [2022-06-04 Сб 22:42]
+   :name:     Тор: Любовь и гром
+   :year:     2022
+   :slogan:   Not every god has a plan.
+   :id:       1282688
+   :rating:   65.0
+   :countries: (Австралия США)
    :END:
-   - State "DONE"       from "TODO"       [2022-06-04 Сб 22:42]
-   - State "DONE"       from "TODO"       [2022-06-01 Ср 23:08]
-   - State "DONE"       from "TODO"       [2022-05-31 Вт 18:45]
-   - State "DONE"       from "TODO"       [2022-05-24 Вт 17:27]
-   - State "DONE"       from "TODO"       [2022-05-23 Пн 22:44]
-   - State "DONE"       from "TODO"       [2022-05-22 Вс 21:58]
-   - State "DONE"       from "TODO"       [2022-05-18 Ср 20:59]
-   - State "DONE"       from "TODO"       [2022-05-11 Ср 16:23]
-   - State "DONE"       from "TODO"       [2022-05-09 Пн 12:11]
-   - State "DONE"       from "TODO"       [2022-05-01 Вс 23:30]
-   - State "DONE"       from "TODO"       [2022-04-26 Вт 21:54]
-   - State "DONE"       from "TODO"       [2022-04-26 Вт 21:50]
-   - State "DONE"       from "TODO"       [2022-04-24 Вс 20:39]
+** MUST-SEE Doctor Strange in the Multiverse of Madness
    :PROPERTIES:
-   :STYLE:    habit
+   :name:     Доктор Стрэндж: В мультивселенной безумия
+   :year:     2022
+   :slogan:   Enter a new dimension of Strange.
+   :id:       1219909
+   :rating:   67.0
+   :countries: (США)
    :END:
-   

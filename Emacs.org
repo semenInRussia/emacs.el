@@ -30,7 +30,7 @@
     - [[#f][f]]
     - [[#dash][Dash]]
     - [[#caching][Caching]]
-    - [[#from-modern-synktax-of-regexps-to-emacs-lisp-syntax][From Modern SynKtax of Regexps to Emacs Lisp Syntax]]
+    - [[#api-for-org-mode][API for =org-mode=]]
   - [[#my-small-standard-library][My Small Standard Library]]
     - [[#work-with-files][Work with Files]]
     - [[#work-with-strings][Work with Strings]]
@@ -322,24 +322,15 @@
     #+END_SRC
 
 
-*** From Modern SynKtax of Regexps to Emacs Lisp Syntax
-    I am use [[https://github.com/joddie/pcre2el][pcre2el]], this small library transform, for example, this:
 
-    #+BEGIN_EXAMPLE
-    print.*
-    #+END_EXAMPLE
-
-    To this:
-
-    #+BEGIN_EXAMPLE
-    print\\..*
-    #+END_EXAMPLE
+*** API for =org-mode=
+    I am use [[https://github.com/ndwarshuis/org-ml][org-ml]] --- a functional API for =org-mode= inspired by
+    @magnars's dash.el and s.el libraries.
 
     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-      (use-package pcre2el
+      (use-package org-ml
           :ensure t)
-
     #+END_SRC
 
 
@@ -3123,17 +3114,7 @@
            (require 'org-ql))
 
        (use-package helm-org-ql
-           :ensure t
-           :config
-           (global-set-key (kbd "S-<f9>") 'my-view-todos))
-
-       (defun my-view-todos ()
-         "View my todos."
-         (interactive)
-         (org-ql-search
-             (just-buffers-with-ext "org")
-             "todo:TODO"
-             :super-groups '((:auto-parent))))
+           :ensure t)
 
        (defun fast-exec-org-ql-keys ()
          "Get some useful keymaps of  `fast-exec' for org-ql."
@@ -4714,7 +4695,13 @@
 *** Load Theme
     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-      (load-theme 'gruber-darker t)
+      ;; See `doom-themes' (list of themes at starting comments)
+
+      ;; List of my favorite themes:
+      ;; - `gruber-darker'
+      ;; - `doom-monokai-classic'
+
+      (load-theme 'doom-monokai-pro t)
 
     #+END_SRC
 
@@ -4951,44 +4938,6 @@
        "Patterns in .gitignore sytax style which should be ignore by default."
        :type '(repeat string))
 
-     (defvar helm-source-projectile-files-list
-       (helm-build-sync-source "Projectile files"
-         :before-init-hook (lambda ()
-                             (add-hook 'helm-after-update-hook #'helm-projectile--move-to-real)
-                             (add-hook 'helm-cleanup-hook #'helm-projectile--remove-move-to-real))
-         :candidates (lambda ()
-                       (when (projectile-project-p)
-                         (with-helm-current-buffer
-                           (let ((root (f-full (projectile-project-root))))
-                             (--map
-                              (cons (s-chop-prefix root (f-full it)) it)
-                              (projectile-current-project-files))))))
-         :filtered-candidate-transformer
-         (lambda (files _source)
-           (with-helm-current-buffer
-             (let* ((root (projectile-project-root))
-                    (file-at-root (file-relative-name (expand-file-name helm-pattern root))))
-               (if (or (string-empty-p helm-pattern)
-                       (assoc helm-pattern files))
-                   files
-                 (if (equal helm-pattern file-at-root)
-                     (cl-acons (helm-ff-prefix-filename helm-pattern nil t)
-                               (expand-file-name helm-pattern)
-                               files)
-                   (cl-pairlis (list (helm-ff-prefix-filename helm-pattern nil t)
-                                     (helm-ff-prefix-filename file-at-root nil t))
-                               (list (expand-file-name helm-pattern)
-                                     (expand-file-name helm-pattern root))
-                               files))))))
-         :fuzzy-match helm-projectile-fuzzy-match
-         :keymap helm-projectile-find-file-map
-         :help-message 'helm-ff-help-message
-         :mode-line helm-read-file-name-mode-line-string
-         :action helm-projectile-file-actions
-         :persistent-action #'helm-projectile-file-persistent-action
-         :persistent-help "Preview file")
-       "Helm source definition for Projectile files.")
-
      (defun my-project-root (&optional dir)
        (->>
         projectile-known-projects
@@ -5001,17 +4950,6 @@
      Return value at `projectile-project-root' when DIR is nil, otherwise return nil"
        (unless dir
          projectile-project-root))
-
-     (use-package projectile
-         :ensure t
-         :custom                             ;nofmt
-         (projectile-project-search-path '("~/projects/"))
-         (projectile-completion-system 'helm)
-         (projectile-project-root-functions
-          '(projectile-root-local my-project-root))
-         (projectile-enable-caching nil)
-         :init                               ;nofmt
-         (projectile-mode 1))
 
      (defun projectile-project-files (root)
        "Return filenames list of the project at ROOT, with caching!."
@@ -5120,18 +5058,24 @@
         (projectile-project-files)
         (--filter
          (s-contains-p string (f-read it)))))
+
+     (use-package projectile
+         :ensure t
+         :custom                             ;nofmt
+         (projectile-project-search-path '("~/projects/"))
+         (projectile-completion-system 'helm)
+         (projectile-project-root-functions
+          '(projectile-root-local my-project-root))
+         (projectile-enable-caching nil)
+         :init                               ;nofmt
+         (projectile-mode 1))
+
      #+END_SRC
 
 *** Projectile with Helm
     I am use offical [[https://github.com/bbatsov/helm-projectile][helm-projectile]] I am press =SPC j= and find file in current project:
 
     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-      (defun my-helm-projectile-find-file-update ()
-        "Update function for `helm-projectile-find-file'."
-        (interactive)
-        (projectile-project-files-clear-cache (projectile-acquire-root))
-        (helm-update))
 
       (use-package helm-projectile
           :ensure t
@@ -5140,7 +5084,72 @@
                  (:map helm-projectile-find-file-map)
                  ("M-<f5>" . 'my-helm-projectile-find-file-update)))
 
+      (defun my-helm-projectile-find-file-update ()
+        "Update function for `helm-projectile-find-file'."
+        (interactive)
+        (projectile-project-files-clear-cache (projectile-acquire-root))
+        (helm-update))
+
+      (setq helm-projectile-find-file-map
+            (let ((map (copy-keymap helm-find-files-map)))
+              (helm-projectile-define-key
+                  map
+                  (kbd "C-c f") #'helm-projectile-dired-files-new-action
+                  (kbd "C-c a") #'helm-projectile-dired-files-add-action
+                  (kbd "M-e") #'helm-projectile-switch-to-shell
+                  (kbd "M-.") #'helm-projectile-ff-etags-select-action
+                  (kbd "M-!")
+                  #'helm-projectile-find-files-eshell-command-on-file-action)
+              (define-key map (kbd "<left>") #'helm-previous-source)
+              (define-key map (kbd "<right>") #'helm-next-source)
+              (dolist (cmd '(helm-find-files-up-one-level
+                             helm-find-files-down-last-level))
+                (substitute-key-definition cmd nil map))
+              map))
+
+      (setq
+       helm-source-projectile-files-list
+       (helm-build-sync-source "Projectile files"
+         :before-init-hook
+         (lambda ()
+           (add-hook 'helm-after-update-hook #'helm-projectile--move-to-real)
+           (add-hook 'helm-cleanup-hook #'helm-projectile--remove-move-to-real))
+         :candidates
+         (lambda ()
+           (when (projectile-project-p)
+             (with-helm-current-buffer
+               (let ((root (f-full (projectile-project-root))))
+                 (--map
+                  (cons (s-chop-prefix root (f-full it)) it)
+                  (projectile-current-project-files))))))
+         :filtered-candidate-transformer
+         (lambda (files _source)
+           (with-helm-current-buffer
+             (let* ((root (projectile-project-root))
+                    (file-at-root
+                     (file-relative-name (expand-file-name helm-pattern root))))
+               (if (or (string-empty-p helm-pattern)
+                       (assoc helm-pattern files))
+                   files
+                 (if (equal helm-pattern file-at-root)
+                     (cl-acons (helm-ff-prefix-filename helm-pattern nil t)
+                               (expand-file-name helm-pattern)
+                               files)
+                   (cl-pairlis (list (helm-ff-prefix-filename helm-pattern nil t)
+                                     (helm-ff-prefix-filename file-at-root nil t))
+                               (list (expand-file-name helm-pattern)
+                                     (expand-file-name helm-pattern root))
+                               files))))))
+         :fuzzy-match helm-projectile-fuzzy-match
+         :keymap helm-projectile-find-file-map
+         :help-message 'helm-ff-help-message
+         :mode-line helm-read-file-name-mode-line-string
+         :action helm-projectile-file-actions
+         :persistent-action #'helm-projectile-file-persistent-action
+         :persistent-help "Preview file"))
+
     #+END_SRC
+
 
 ** Regexp IDE
    I am use [[https://github.com/jwiegley/regex-tool][regex-tool]] for testing regexp in Emacs
@@ -5250,8 +5259,16 @@
                  ("w"     . 'my-dired-move)
                  ("j"     . 'my-dired-goto-parent-dir)
                  ("'"     . 'helm-find-files)
-                 ("SPC g" . 'my-dired-delete))
+                 ("SPC g" . 'my-dired-delete)
+                 ("SPC a" . my-dired-mark-all-files))
           :config (add-hook 'dired-mode-hook 'xah-fly-insert-mode-activate))
+
+      (defun my-dired-mark-all-files ()
+        "Mark all file in `dired'."
+        (interactive)
+        (save-excursion
+          (beginning-of-buffer)
+          (dired-mark 1)))
 
       (defmacro my-define-dired-command-taking-file (name args docstring &rest body)
         "Define the command from function which take a 1 argument: filename."
@@ -5294,12 +5311,16 @@
           (f-move from to)
           to))
 
-      (defalias 'dired-do-rename 'my-dired-move)
+      (defun my-dired-move ()
+        "Move file of current directory of `dired' at the point."
+        (interactive)
+        (dired-do-rename)
+        (dired-do-delete))
 
       (my-define-dired-command-taking-file my-dired-delete
-          (from)
+          (file)
         "Delete file at dired object at current position of the cursor."
-        (f-delete from))
+        (f-delete file))
 
       (defun my-dired-goto-parent-dir ()
         "Navigate to parent directory of current dired directory."
@@ -5426,17 +5447,61 @@
 
    #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-     (setq org-agenda-files '("~/agenda.org"))
+     (defun my-agenda-plan-new-day ()
+       "Switch to the new day in my organization system."
+       (interactive)
+       (my-org-delete-done-and-saw-headings)
+       (my-org-habits-todo-state-to-goal))
+
+     (defun my-org-delete-done-and-saw-headings ()
+       "Delete all org headings which has label done."
+       (org-ql-query :where '(or (todo "DONE") (todo "SAW"))
+                     :from (current-buffer)
+                     :select #'my-org-delete-heading))
+
+     (defun my-org-delete-heading ()
+       "Delete text of `org-mode' heading at the point."
+       (-->
+        (org-ml-parse-headline-at (point))
+        (org-ml-get-all-properties it)
+        (delete-region (plist-get it :begin) (plist-get it :end))))
+
+     (defun my-org-habits-todo-states-to-goal ()
+       (org-ql-query :where 'habit
+                     :from (current-buffer)
+                     :select #'my-org-todo-state-to-goal))
+
+     (defun my-org-todo-state-to-goal ()
+       "Change todo state of `org-mode' heading at the cursor to GOAL."
+       (org-ml-update-headline-at* (point)
+         (org-ml-set-property :todo-keyword "GOAL" it)))
+
+     (defun my-view-todos ()
+       "View my todos."
+       (interactive)
+       (org-ql-search
+           (just-buffers-with-ext "org")
+           "todo:TODO"
+         :super-groups '((:auto-parent))))
 
      (defun my-open-main-agenda-file ()
-       "Open \"~/agenda.org\"."
+       "Open agenda.org."
        (interactive)
        (find-file "~/agenda.org"))
 
-     (global-set-key (kbd "<f9>") #'org-agenda)
-     (define-key xah-fly-command-map (kbd "SPC <f9>") #'org-todo-list)
+     (defun fast-exec-agenda-keys ()
+       "Get some useful keymaps of  `fast-exec' for agenda."
+       (fast-exec/some-commands ("Plane New Day" 'my-agenda-plan-new-day)))
 
-     (global-set-key (kbd "<f5>") #'my-open-main-agenda-file)
+     (fast-exec/register-keymap-func 'fast-exec-agenda-keys)
+     (fast-exec/reload-functions-chain)
+
+     (bind-keys
+      ("<f9>" . org-agenda)
+      ("S-<f9>" . my-view-todos)
+      :map xah-fly-command-map
+      ("SPC <f9>" . my-view-todos)
+      ("SPC i p" . my-open-main-agenda-file))
    #+END_Src
 
 ** Notes
@@ -5725,7 +5790,7 @@
      (fast-exec/register-keymap-func 'fast-exec-my-notes-keys)
      (fast-exec/reload-functions-chain)
      #+END_SRC
-
+     
 * MIPT
 ** Management of MIPT Files
    I am make homework of [[https://mipt.ru][MIPT]], so I make small script, which create
@@ -5913,7 +5978,7 @@
               (is-normal
                (if is-was-normal-tasks
                    (y-or-n-p "Your task normal? ")
-                 (not (y-or-n-p "Your task control? ")))))
+I                 (not (y-or-n-p "Your task control? ")))))
          (if is-normal 'normal 'control)))
 
      (defun my-mipt-read-kind (&optional default)
