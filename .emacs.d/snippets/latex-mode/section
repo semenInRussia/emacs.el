@@ -1,7 +1,7 @@
 # -*- mode: snippet -*-
 # contributor: semenInRussia
 # name: section
-# key: sec
+# key: sn
 # --
 \section${1:*}{${2:name}}
 $0
