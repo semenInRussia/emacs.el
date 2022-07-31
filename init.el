@@ -777,6 +777,26 @@ Action of `avy', see `avy-action-yank' for example"
 
 (define-key xah-fly-command-map (kbd "SPC RET") 'kmacro-call-macro-or-apply-to-lines)
 
+(defun outline-show-all-or-entry ()
+  "If call once, use `outline-show-entry', twice call `outline-show-all'."
+  (interactive)
+  (if (equal last-command this-command)
+      (outline-show-all)
+    (outline-show-entry)))
+
+(defun outline-hide-all-or-entry ()
+  "If call once, use `outline-hide-entry', twice call `outline-hide-all'."
+  (interactive)
+  (if (equal last-command this-command)
+      (outline-hide-other)
+    (outline-hide-entry)))
+
+(use-package outline
+    :ensure t
+    :bind ((:map outline-minor-mode-map)
+           ("<backtab>" . 'outline-hide-all-or-entry)
+           ("C-<tab>" . 'outline-show-all-or-entry)))
+
 (use-package string-edit
     :ensure t
     :bind (:map xah-fly-command-map
@@ -1468,10 +1488,9 @@ List of functions: `xah-toggle-letter-case', `my-change-case-of-current-line'."
            (s-prepend "my-autoformat-set-functions-for-")
            (intern)))
          (funcs
-          (->>
-           autoformat-functions
-           (--map (symbol-name it))
-           (--map (intern (s-prepend "autoformat-" it))))))
+          (--map
+           (intern (s-prepend "autoformat-" (symbol-name it)))
+           autoformat-functions)))
     `(progn
        (defun ,fun-name ()
          "Add autoformat special functions for mode."
@@ -1526,7 +1545,8 @@ See `just-line-is-whitespaces-p'"
 (defun my-autoformat ()
   "Call all autoformat functions."
   (interactive)
-  (--each my-autoformat-functions (funcall it)))
+  (--each my-autoformat-functions
+    (funcall it)))
 
 (define-minor-mode my-autoformat-mode
     "Toggle `my-autoformat-mode'."
@@ -1625,7 +1645,8 @@ See `just-line-is-whitespaces-p'"
     :ensure t
     :hook (LaTeX-mode . turn-on-cdlatex)
     :defer t
-    :bind (:map cdlatex-mode-map ("<tab>" . cdlatex-tab)))
+    :bind ((:map cdlatex-mode-map)
+           ("<tab>" . cdlatex-tab)))
 
 ;; fields
 (use-package cdlatex
@@ -1796,6 +1817,8 @@ See `just-line-is-whitespaces-p'"
                     'LaTeX-mode-hook))
   (add-hook mode (lambda () (call-interactively 'visual-fill))))
 
+(add-hook 'LaTeX-mode-hook 'outline-minor-mode)
+
 (use-package latex
     :major-mode-map (TeX-mode LaTeX-mode tex-mode latex-mode)
     :bind ((:map LaTeX-mode-map)
@@ -1819,10 +1842,10 @@ See `just-line-is-whitespaces-p'"
     :ensure t
     :hook (LaTeX-mode . laas-mode)
     :config
-    (aas-set-snippets 'laas-mode
-      ".," ";"
+    (aas-set-snippets
+        'laas-mode
       :cond #'texmathp
-      ;; Some Units
+      ;; Some Physics Units
       "As" "\\mathrm{А}"
       "Vs"  "\\mathrm{В}"
       "Oms"  "\\mathrm{Ом}"
@@ -1832,7 +1855,6 @@ See `just-line-is-whitespaces-p'"
       "eqv" "\\mathrm{экв}"
 
       ;; Some Cool Symbols
-      "is" "\\Leftrightarrow"
       "trg" "\\triangle"
       "agl" "\\angle"
       "grd" "^\\circ"))
@@ -1840,7 +1862,9 @@ See `just-line-is-whitespaces-p'"
 (eval
  `(my-use-autoformat-in-mode
    'LaTeX-mode
-   ,@(cons 'latex-capitalize-special-commands my-autoformat-all-functions)))
+   ,@(append '(latex-capitalize-special-commands
+               latex-expand-to-list-item)
+             my-autoformat-all-functions)))
 
 (defvar autoformat-latex-capitalize-latex-commands
   '("author" "title" "date" "part" "subsection" "section" "part" "chapter")
@@ -1860,6 +1884,60 @@ See `just-line-is-whitespaces-p'"
   (when (-any #'looking-back autoformat-latex-capitalize-regexps)
     (undo-boundary)
     (capitalize-word -1)))
+
+(defun autoformat-latex-expand-to-list-item ()
+  "Try expand fragments sush as 1. or - to LaTeX list items."
+  (cond
+    ((autoformat-latex-expand-to-enumerated-list-item-p)
+     (autoformat-latex-expand-to-enumerated-list-item))
+    ((autoformat-latex-expand-to-itemized-list-item-p)
+     (autoformat-latex-expand-to-itemized-list-item))))
+
+(defcustom autoformat-latex-enumerated-list-items-triggers
+  '("[0-9]*\\. ")
+  "List of regepxs which should be expanded to LaTeX enumerated list item.
+
+Will be expanded only on matching in empty line and not in math"
+  :type '(repeat string))
+
+(defcustom autoformat-latex-itemized-list-items-triggers
+  '("- "
+    "\\* ")
+  "List of regepxs which should be expanded to LaTeX itemized list item.
+
+Will be expanded only on matching in empty line and not in math"
+  :type '(repeat string))
+
+(defun autoformat-latex-expand-to-enumerated-list-item-p ()
+  "Get t, when autoformat should expand text to the enumerated LaTeX list."
+  (my-one-of-regexps-looking-back-on-bol
+   autoformat-latex-enumerated-list-items-triggers))
+
+(defun autoformat-latex-expand-to-itemized-list-item-p ()
+  "Get t, when autoformat should expand text to the itemized LaTeX list."
+  (my-one-of-regexps-looking-back-on-bol
+   autoformat-latex-itemized-list-items-triggers))
+
+(defun my-one-of-regexps-looking-back-on-bol (regexps)
+  "Get t, when one of REGEXPS matchs with text from current point to bol."
+  (->>
+   regexps
+   (--map (concat "^ *" it))
+   (-some 'looking-back)))
+
+(defun autoformat-latex-expand-to-enumerated-list-item ()
+  "Expand, for example, 1. to the LaTeX enumerated list item."
+  (clear-current-line)
+  (if (string-equal (LaTeX-current-environment) "enumerated")
+      (LaTeX-insert-item)
+    (LaTeX-env-item "enumerated")))
+
+(defun autoformat-latex-expand-to-itemized-list-item ()
+  "Expand, for example, 1. to the LaTeX itemized list item."
+  (clear-current-line)
+  (if (string-equal (LaTeX-current-environment) "itemize")
+      (LaTeX-insert-item)
+    (LaTeX-env-item "itemize")))
 
 (defun my-latex-equation-to-split ()
   "Transform LaTeX equation environment to split environment."
@@ -3522,7 +3600,7 @@ Return new name of FILE"
   "Switch to the new day in my organization system."
   (interactive)
   (my-org-delete-done-and-saw-headings)
-  (my-org-habits-todo-state-to-goal))
+  (my-org-habits-todo-states-to-goal))
 
 (defun my-org-delete-done-and-saw-headings ()
   "Delete all org headings which has label done."

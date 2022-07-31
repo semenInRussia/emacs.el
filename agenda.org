@@ -4,25 +4,25 @@
 
 * Habbits
 
-** FAIL Do MIPT Tasks
-   SCHEDULED: <2022-05-23 Пн .+1d>
-     :PROPERTIES:
-     :LAST_REPEAT: [2022-05-22 Вс 21:59]
-     :STYLE:    habit
-     :END:
+** GOAL Do MIPT Tasks
+SCHEDULED: <2022-05-23 Пн .+1d>
+:PROPERTIES:
+:LAST_REPEAT: [2022-05-22 Вс 21:59]
+:STYLE:    habit
+:END:
 
-     Every day I must do 2 tasks of the MIPT
+Every day I must do 2 tasks of the MIPT
 
-     [[elisp:my-mipt-task-visit][Search MIPT Solution]] or [[elisp:my-mipt-next-task][Next MIPT Task]]
+[[elisp:my-mipt-task-visit][Search MIPT Solution]] or [[elisp:my-mipt-next-task][Next MIPT Task]]
 
-** FAIL Do 1 commit per day
-   SCHEDULED: <2022-07-30 Сб .+1d>
-   :PROPERTIES:
-   :STYLE:    habit
-   :LAST_REPEAT: [2022-07-29 Пт 20:31]
-   :END:
+** GOAL Do 1 commit per day
+SCHEDULED: <2022-07-31 Вс .+1d>
+:PROPERTIES:
+:STYLE:    habit
+:LAST_REPEAT: [2022-07-30 Сб 19:25]
+:END:
 
-   - State "GOAL"       from "FAIL"       [2022-07-29 Пт 20:31]
+- State "GOAL"       from "FAIL"       [2022-07-29 Пт 20:31]
 * Planes
 
 ** Planes on Week
@@ -31,14 +31,12 @@
 **** TODO =emacs-run-command-recipes=
 **** TODO Don't ignore files in project, which has same name with ignored directory
 **** TODO Run the main file of the project in =run-command-reicpes=
-**** TODO Make LaTeX document class for ГОСТ
+**** TODO Make =LaTeX= document class for ГОСТ
+**** TODO Add new key bindings for =dired=
+**** TODO Rename some commands in =Racket= recipe of =run-command-recipes=
 
 ** Planes on Day
-
-*** TODO 1. -> \item{|} in =LaTeX=
-*** TODO Outline cycle mode in =LaTeX= (see =habr=)
-*** DONE Make organization system
-
+   
 * Films
 
 ** MUST-SEE Better Call Saul
