@@ -6,8 +6,7 @@
 (defun my-is-item-of-org-list-p ()
 "Return t, when current line is item of list."
 (->>
-(my-current-line)
-(s-trim-left)
+(just-text-at-line nil t)
 (my-one-of-prefixes-p '("+" "-"))))
 
 (if (my-is-item-of-org-list-p)
