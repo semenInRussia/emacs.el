@@ -3,40 +3,124 @@
 #+TODO: FAIL | GOAL DONE
 
 * Habbits
-
-** GOAL Do MIPT Tasks
-SCHEDULED: <2022-05-23 Пн .+1d>
-:PROPERTIES:
-:LAST_REPEAT: [2022-05-22 Вс 21:59]
-:STYLE:    habit
-:END:
-
-Every day I must do 2 tasks of the MIPT
-
-[[elisp:my-mipt-task-visit][Search MIPT Solution]] or [[elisp:my-mipt-next-task][Next MIPT Task]]
-
-** GOAL Do 1 commit per day
-SCHEDULED: <2022-07-31 Вс .+1d>
-:PROPERTIES:
-:STYLE:    habit
-:LAST_REPEAT: [2022-07-30 Сб 19:25]
-:END:
-
-- State "GOAL"       from "FAIL"       [2022-07-29 Пт 20:31]
 * Planes
 
-** Planes on Week
+** Targets on Week
+*** TODO Do =zms=
+    SCHEDULED: <2022-08-08 Пн -30d>
+    
 
-**** TODO =racket-mmanager=
-**** TODO =emacs-run-command-recipes=
-**** TODO Don't ignore files in project, which has same name with ignored directory
-**** TODO Run the main file of the project in =run-command-reicpes=
-**** TODO Make =LaTeX= document class for ГОСТ
-**** TODO Add new key bindings for =dired=
-**** TODO Rename some commands in =Racket= recipe of =run-command-recipes=
+*** TODO =racket-mmanager=
+*** TODO =emacs-run-command-recipes=
 
-** Planes on Day
-   
+    
+*** TODO explore the =org-tempo=                                        :org:
+
+*** TODO explore the =org-publish=                                      :org:
+
+*** TODO explore the =org-export=                                       :org:
+    Also use some themes for exporting to the =html=
+
+*** TODO change the setup for the =org-mode=                            :org:
+
+    - [ ] =folded= to =overview=
+    - [ ] =indented=
+    - [ ] =with-inline-images=
+
+*** TODO explore the =org-speed-commands=                               :org:
+
+*** TODO bind to /[tab]/, instead of /"\t"/
+
+*** TODO use =org-crypt= for the crypting notes of the category /passwords/ :org:
+
+*** TODO explore the =xetex=                                          :latex:
+
+*** TODO new org captures for inserting new planes on day/week          :org:
+
+*** TODO Instead of the deleting DONE headlines, arhieving              :org:
+
+*** TODO visit /Suggestion to keep your Org files tidy/                 :org:
+
+*** TODO fix count of words/chars in the =mode-line=
+
+*** TODO remove dependicies from the =s= library in the =run-command-recipes= :run_command_recipes:
+
+*** TODO see on the =org-store-link=                                    :org:
+
+*** TODO change =directory-abbrev-alist=                              :dired:
+
+*** TODO explore the =which-function-mode=
+
+*** TODO change actions of the function at the /SPC k SPC/ key
+
+*** TODO change =dired-create-dirs=                                   :dired:
+    
+*** TODO change =lpr-{command,switches}=                              :dired:
+
+*** TODO update =org-preview-latex=                               :org:latex:
+    
+*** TODO Add able to the renaming of file which has space in the name :dired:
+
+*** TODO Add =zms= files management system
+    All =zms= file being in the special directory.  This special
+    directory has some subdirectories which look like to the following
+    thing:
+
+    #+BEGIN_EXAMPLE
+    1-Fun-Logic
+    #+END_EXAMPLE
+
+    Here 1 means that the section is first section of =zms=, and
+    "Fun-Logic" means that these section has name "Fun-Logic"
+
+    Each of subdirectories has some files and yet another
+    subdirectory.  First and second files are files named "Theory.pdf"
+    and "Tasks.pdf" which I should download from the [[http://distmath.ru/][offical site]] of
+    =zms=, third file named "Solution.tex" it's should compose each
+    =LaTeX= file of the subdirectory into one document.  Subdirectory
+    should be named "solutions" and contains a lot of =LaTeX= files,
+    each of these files describe solution of the task and has name
+    look like this followed:
+
+    #+BEGIN_EXAMPLE
+    1.tex
+    #+END_EXAMPLE
+
+    Here 1 is the number of task.
+
+    I should has able to
+
+    1. Create new section via function =zms-new-section=, this should
+       create new directories and "Section.tex" file by template
+    2. Create new task via function =zms-new-section=, this should
+       insert new instruction into the "Section.tex" file
+
+*** TODO fix the =org-refile=                                           :org:
+*** TODO Run the main file of the project in =run-command-reicpes= :run_command_recipes:
+*** TODO See on the =simple-indentation=                  :simple_indentaion:
+*** TODO Make =LaTeX= document class for ГОСТ                         :latex:
+*** TODO add support of the =org-export= to the =run-command-recipes= :run_command_recipes:
+
+** Targets on Day
+
+*** DONE Don't remove the DONE =org-mode= headings of the "Target on Week" subtree
+*** DONE Don't ignore files in project, which has same name with ignored directory
+    SCHEDULED: <2022-08-08 Пн>
+*** DONE Fix comments and source code in =emacs-run-command-recipes=
+*** DONE use keys *j*, *i*, *k* and *l* instead of the arrows
+
+*** DONE Abbrevs
+Add some abbrevs to the =aas= for the =org-mode=
+
+- [X] explore the
+- [X] miscellaneous
+- [X] I am use
+
+*** DONE autocapitalize on "* TODO |" in the =org-mode=
+
+*** DONE change the local map of the =org-mode=
+*** DONE in the =my-autoformat=: if the last char isn't letter, the don't capitalize the last word
+
 * Films
 
 ** MUST-SEE Better Call Saul

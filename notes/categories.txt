@@ -1,3 +1,4 @@
+emacs
 cool-texts
 physics
 passwords

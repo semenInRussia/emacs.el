@@ -264,6 +264,11 @@ Info take from var `user-os`, user must set it."
 
 (define-key xah-fly-command-map (kbd "=") 'fast-exec/exec)
 
+(use-package aas
+    :ensure t
+    :config
+    (aas-global-mode))
+
 (use-package yasnippet
     :ensure t
     :init
@@ -271,9 +276,6 @@ Info take from var `user-os`, user must set it."
     :custom
     (yas-snippet-dirs '("~/.emacs.d/snippets"))
     (yas-wrap-around-region t))
-
-(use-package yasnippet-snippets
-    :ensure t)
 
 (defun yas--fetch (table key)
   "Fetch templates in TABLE by KEY.
@@ -2129,49 +2131,204 @@ downloaded file"
     :major-mode-map (org-mode)
     :bind
     ((:map xah-fly-command-map)
-     ("1"   . 'my-er-expand-region-or-org-todo)
+     ("SPC z" . 'org-capture)
      (:map my-org-local-map)
+
+     ;; Insert anything
+     ("l" . 'org-insert-link)
+     ("s" . 'org-schedule)
+     ("d" . 'org-deadline)
+     ("i" . 'my-org-insert-image)
+     ("u" . 'my-org-insert-img-at-url)
+
+     ;; Manipulations with a subtree
+     ("c" . 'org-copy-subtree)
+     ("x" . 'org-cut-subtree)
+     ("6" . 'org-mark-subtree)
+     ("w" . 'my-org-clear-subtree)
+     ([tab] . 'org-refile)
+     ("1" . 'org-todo)
+     (";" . 'org-set-tags-command)
+     ("a" . 'org-archive-subtree)
+     ("z" . 'org-toggle-comment)
+
+     ;; Org Babel
+     ("b t" . 'org-babel-tangle)
+     ("b f" . 'org-babel-tangle-file)
+     ("b e" . 'org-babel-execute)
+
+     ;; Manipulations with a table
+     ("t n" . 'org-table-create-or-convert-from-region)
+     ("=" . 'org-table-eval-formula)
+     ("t f" . 'my-org-table-eval-formula-in-field)
+     ("t i" . 'org-table-import)
+     ("t e" . 'org-table-export)
+     ("t g" . 'org-table-recalculate)
+     ("-" . 'org-table-insert-hline)
+     ;; sum
+     ("+" . 'org-table-sum)
+     ("t +" . 'org-table-sum)
+     ("t s" . 'org-table-sum)
+     ;;
+     ("t o" . 'org-table-toggle-coordinate-overlays)
+
+     ;; Export
+     ("p" . 'org-publish)
+     ("e" . 'org-export-dispatch)
+
+     ;; Context Commands
+     ("g" . 'org-ctrl-c-ctrl-c)
+     ("'" . 'org-edit-special)
+     ;; other being in the `org-mode-map' section
+
+     ;; Miscellaneous
+     ("j" . 'org-latex-preview)
      ("SPC" . 'org-toggle-checkbox)
-     ("'"   . 'org-edit-special)
-     ("l"   . 'org-insert-link)
-     ("t"   . 'org-babel-tangle)
-     ("p"   . 'org-latex-preview)
-     ("1"   . 'org-todo)
-     ("s"   . 'org-schedule)
-     ("RET" . 'org-open-at-point)))
+     ("RET" . 'org-open-at-point)
+     ("r" . 'my-org-schedule-to-today)
+     ("/" . 'org-sparse-tree)
 
-(defvar my-last-command-is-org-todo nil
-  "To t, when last `my-er-expand-region-or-org-todo' done `org-todo'.")
+     (:map org-mode-map)
+     ;; Here continoue of the Context Commands...
+     ;; M-
+     ("M-j" . 'org-metaleft)
+     ("M-i" . 'org-metaup)
+     ("M-k" . 'org-metadown)
+     ("M-l" . 'org-metaright)
+     ;; M-S-
+     ("M-S-j" . 'org-shiftmetaleft)
+     ("M-S-i" . 'org-shiftmetaup)
+     ("M-S-k" . 'org-shiftmetadown)
+     ("M-S-l" . 'org-shiftmetaright)
+     ;; C-S-
+     ("C-S-j" . 'org-shiftcontrolleft)
+     ("C-S-i" . 'org-shiftcontrolup)
+     ("C-S-k" . 'org-shiftcontroldown)
+     ("C-S-l" . 'org-shiftcontrolright)))
 
-(defun my-er-expand-region-or-org-todo ()
-  "If need do `org-todo', otherwise do `er/expand-region'."
+(defun my-org-clear-subtree ()
+  "Kill subtree at the position, and activate insertion mode."
+  (org-cut-subtree)
+  (xah-fly-insert-mode-activate))
+
+(defun my-org-table-eval-formula-in-field ()
+  "Eval formula with `orgtbl-mode' syntax for the current field of the table."
   (interactive)
-  (let ((is-org-todo (or
-                       (eq last-command #'org-todo)
-                       (and
-                        (eq last-command this-command)
-                        my-last-command-is-org-todo))))
-    (setq my-last-command-is-org-todo is-org-todo)
-    (if is-org-todo
-        (call-interactively #'org-todo)
-      (call-interactively #'er/expand-region))))
+  (org-table-eval-formula '(4)))
+
+(defun my-org-schedule-to-today ()
+  "Scheduale a `org-mode' heading to today."
+  (interactive)
+  (org-schedule t (format-time-string "%Y-%m-%d")))
+
+(defun my-org-insert-image (filename &optional caption)
+  "Insert a image with FILENAME.
+
+By default, caption for the image don't inserts, but if CAPTION is a
+string, then define caption of the image to the CAPTION.
+
+In the interactive, If the region is active, the FILENAME will be text
+in the region."
+  (interactive
+   (list (my-org-read-image-filename) (my-org-read-image-caption)))
+  (just-ensure-empty-line)
+  (when caption ;nofmt
+    (insert "#+CAPTION: " caption)
+    (newline))
+  (insert "[[" filename "]]"))
+
+(defun my-org-read-image-filename ()
+  "Read a image filename.
+
+If the region is active, then return text in the region as filename, otherwise
+return filename readed from the minibuffer."
+  (or
+   (just-text-in-region)
+   (read-file-name "Please, choose image to insert: ")))
+
+(defun my-org-read-image-caption ()
+  "Read a image caption from the minibuffer.
+
+If the user insert any caption, return its, otherwise return nil."
+  (let ((caption (read-string "Caption for the image, please: ")))
+    (unless (s-blank-p caption) caption)))
+
+(defcustom my-org-default-images-dir "./images/"
+  "Default directory for images of a `org-mode' document."
+  :type 'string)
+
+(defun my-org-insert-img-at-url (url &optional new-file-name images-dir caption)
+  "Insert org image at URL, download it into IMAGES-DIR with name NEW-FILE-NAME.
+
+If the region is active return it, otherwise read URL from the minibuffer.
+If caption isn't empty string, then insert image with the caption CAPTION."
+  (interactive
+   (my--org-insert-img-at-url-get-arguments))
+  (or images-dir (setq images-dir my-org-default-images-dir))
+  (let ((new-filename (f-join images-dir new-file-name)))
+    (my-download url new-filename)
+    (my-org-insert-image new-filename caption)))
+
+(defun my--org-insert-img-at-url-get-arguments ()
+  "Get arguments from the user for `my-org-insert-img-at-url'."
+  (let* ((url (my-org-read-image-url))
+         (new-file-name (my-org-read-new-image-at-url-file-name url))
+         (images-dir (my-org-read-images-dir))
+         (caption (my-org-read-image-caption)))
+    (list url new-file-name images-dir caption)))
+
+(defun my-org-read-images-dir ()
+  "Read directory path for downloading of the image."
+  (read-directory-name "Image will download into directory:"
+                       my-org-default-images-dir))
+
+(defun my-org-read-image-url ()
+  "Read an URL to an image from the user.
+
+If the region is active return it, otherwise read URL from the minibuffer."
+  (or
+   (just-text-in-region)
+   (read-string "URL of the image, please: ")))
+
+(defun my-org-read-new-image-at-url-file-name (url)
+  "Read from the minibuffer new file name for the image at URL."
+  (read-string "Image will be downloaded with name: "
+               (my-uri-of-url url)))
+
+(defun my-download (url new-filename)
+  "Download file at URL as file with NEW-FILENAME."
+  (make-directory (f-dirname new-filename) t)
+  (url-copy-file url new-filename t))
 
 (add-hook 'org-mode-hook (lambda () (call-interactively 'visual-fill)))
+
+(add-hook 'org-mode-hook 'aas-activate-for-major-mode)
+
+(aas-set-snippets 'org-mode
+  "exthe" "explore the"
+  "misc " "miscellaneous"
+  "Iau" "I am use")
 
 (my-use-autoformat-in-mode
  'org-mode
  org-sentence-capitalization)
 
+(defvar autoformat-org-line-for-capitalization-regexp
+  (rx line-start
+      (optional
+       (1+ "*") (1+ " ")
+       (optional (or "TODO" "DONE") (1+ " ")))
+      letter)
+  "Regular expression indicates the necessary of the last word capitalization.")
+
 (defun autoformat-org-sentence-capitalization ()
-  "Capitalize first letter of sentence in `org-mode'."
+  "Capitalize first letter of a sentence in the `org-mode'."
   (interactive)
   (autoformat-sentence-capitalization)
   (when (and
-         (just-call-on-prev-line* (just-line-prefix-p "*"))
-         (save-excursion
-           (forward-char -1)
-           (skip-chars-backward " ")
-           (bolp)))
+         (or (just-line-prefix-p "*")
+             (just-call-on-prev-line* (just-line-prefix-p "*")))
+         (looking-back autoformat-org-line-for-capitalization-regexp))
     (undo-boundary)
     (capitalize-word -1)))
 
@@ -3202,19 +3359,20 @@ See `format-time-string' for see what format string"
   :type '(repeat string))
 
 (defun my-project-root (&optional dir)
+  (or dir (setq dir default-directory))
   (->>
    projectile-known-projects
    (--filter (s-starts-with? (f-full it) (f-full dir)))
    (--max-by (> (f-depth it) (f-depth other)))))
 
-(defun projectile-root-local (dir)
+(defun my-projectile-root-local (dir)
   "A simple wrapper around `projectile-project-root'.
 
 Return value at `projectile-project-root' when DIR is nil, otherwise return nil"
   (unless dir
     projectile-project-root))
 
-(defun projectile-project-files (root)
+(defun my-projectile-project-files (root)
   "Return filenames list of the project at ROOT, with caching!."
   (let ((root (f-full root)))
     (unless (gethash root my-project-files-hash)
@@ -3312,10 +3470,8 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
   (remhash (f-full root)
            my-project-files-hash))
 
-(defun projectile-files-with-string (string directory)
-  "Return a list of all files containing STRING in DIRECTORY.
-
-Use only the Emacs lisp"
+(defun my-projectile-files-with-string (string directory)
+  "Return a list of all files containing STRING in DIRECTORY."
   (->>
    directory
    (projectile-project-files)
@@ -3331,6 +3487,10 @@ Use only the Emacs lisp"
      '(projectile-root-local my-project-root))
     (projectile-enable-caching nil)
     :init                               ;nofmt
+    (defalias 'projectile-project-files 'my-projectile-project-files)
+    (defalias 'projectile-root-local 'my-projectile-root-local)
+    (defalias 'project-root 'my-project-root)
+    (defalias 'projectile-files-with-string 'my-projectile-files-with-string)
     (projectile-mode 1))
 
 (use-package helm-projectile
@@ -3449,20 +3609,36 @@ Use only the Emacs lisp"
 
 (use-package dired
     :bind ((:map dired-mode-map)
-           ("k"     . 'next-line)
-           ("i"     . 'previous-line)
-           ("l"     . 'dired-find-file)
-           ("RET"   . 'dired-find-file)
-           ("t"     . 'dired-mark)
-           ("y"     . 'dired-unmark)
-           ("SPC"   . nil)                ; make command at space empty prefix
-           ("SPC y" . 'dired-unmark-all-marks)
-           ("f"     . 'my-dired-rename)
-           ("w"     . 'my-dired-move)
-           ("j"     . 'my-dired-goto-parent-dir)
-           ("'"     . 'helm-find-files)
-           ("SPC g" . 'my-dired-delete)
-           ("SPC a" . my-dired-mark-all-files))
+           ("SPC"     . nil)                ; make command at space empty prefix
+           ;; Navigation
+           ("k"       . 'next-line)
+           ("i"       . 'previous-line)
+           ("n"       . 'dired-avy)
+
+           ;; Open file
+           ("l"       . 'dired-find-file)
+           ("RET"     . 'dired-find-file)
+           ("o"       . 'dired-find-file-other-window)
+           ("j"       . 'my-dired-goto-parent-dir)
+
+           ;; Manipulation with file(s)
+           ("SPC g"   . 'my-dired-delete)
+           ("f"       . 'my-dired-rename)
+           ("SPC TAB" . 'my-dired-move)
+           ("s"       . 'my-dired-new-file)
+
+           ;; Mark files
+           ("t"       . 'dired-mark)
+           ("SPC y"   . 'dired-unmark-all-marks)
+           ("SPC a"   . 'my-dired-mark-all-files)
+
+           ;; Misc.
+           ("y"       . 'dired-undo)
+           ("'"       . 'helm-find-files)
+
+           ;; Key bindings which not change your commands
+           ("a"       . 'xah-fly-M-x)
+           (","       . 'xah-next-window-or-frame))
     :config (add-hook 'dired-mode-hook 'xah-fly-insert-mode-activate))
 
 (defun my-dired-mark-all-files ()
@@ -3516,8 +3692,7 @@ Return new name of FILE"
 (defun my-dired-move ()
   "Move file of current directory of `dired' at the point."
   (interactive)
-  (dired-do-rename)
-  (dired-do-delete))
+  (dired-do-rename))
 
 (my-define-dired-command-taking-file my-dired-delete
     (file)
@@ -3530,6 +3705,16 @@ Return new name of FILE"
   (let ((parent (f-parent (dired-current-directory))))
     (kill-buffer)
     (dired parent)))
+
+(defun my-dired-new-file (filename)
+  "Create file with FILENAME in the directory which opened in the dired buffer."
+  (interactive "sName of new file, please: ")
+  (find-file (f-join (dired-current-directory) filename)))
+
+(defun dired-avy ()
+  "Version of `avy' for the `dired'."
+  (interactive)
+  (avy-goto-line))
 
 (use-package quickrun
     :ensure t
@@ -3599,39 +3784,19 @@ Return new name of FILE"
 (defun my-agenda-plan-new-day ()
   "Switch to the new day in my organization system."
   (interactive)
-  (my-org-delete-done-and-saw-headings)
+  (my-org-archieve-done-and-saw-headings)
   (my-org-habits-todo-states-to-goal))
 
-(defun my-org-delete-done-and-saw-headings ()
-  "Delete all org headings which has label done."
+(defun my-org-archieve-done-and-saw-headings ()
+  "Archieve all `org-mode' headings which has the label done."
   (org-ql-query :where '(or (todo "DONE") (todo "SAW"))
                 :from (current-buffer)
-                :select #'my-org-delete-heading))
-
-(defun my-org-delete-heading ()
-  "Delete text of `org-mode' heading at the point."
-  (-->
-   (org-ml-parse-headline-at (point))
-   (org-ml-get-all-properties it)
-   (delete-region (plist-get it :begin) (plist-get it :end))))
-
-(defun my-org-habits-todo-states-to-goal ()
-  (org-ql-query :where 'habit
-                :from (current-buffer)
-                :select #'my-org-todo-state-to-goal))
+                :select #'org-archive-subtree-default))
 
 (defun my-org-todo-state-to-goal ()
   "Change todo state of `org-mode' heading at the cursor to GOAL."
   (org-ml-update-headline-at* (point)
     (org-ml-set-property :todo-keyword "GOAL" it)))
-
-(defun my-view-todos ()
-  "View my todos."
-  (interactive)
-  (org-ql-search
-      (just-buffers-with-ext "org")
-      "todo:TODO"
-    :super-groups '((:auto-parent))))
 
 (defun my-open-main-agenda-file ()
   "Open agenda.org."
@@ -3645,12 +3810,61 @@ Return new name of FILE"
 (fast-exec/register-keymap-func 'fast-exec-agenda-keys)
 (fast-exec/reload-functions-chain)
 
+(setq org-agenda-files '("~/agenda.org"))
+
 (bind-keys
  ("<f9>" . org-agenda)
- ("S-<f9>" . my-view-todos)
+ ("S-<f9>" . org-agenda-list)
  :map xah-fly-command-map
- ("SPC <f9>" . my-view-todos)
+ ("SPC <f9>" . org-agenda-list)
  ("SPC i p" . my-open-main-agenda-file))
+
+(defun my-add-org-subtree-to-targets-on-day ()
+  "Add  a `org-mode' subtree at the point to the targets on day."
+  (interactive)
+  (let ((subtree-text (my-delete-and-get-text-of-org-subtree)))
+    (my-goto-targets-on-day)
+    (newline)
+    (insert subtree-text)
+    (delete-char -1)
+    (beginning-of-line)
+    (my-org-headline-set-todo-keyword "TODO")
+    (org-schedule t (format-time-string "%Y-%m-%d"))))
+
+(defun my-goto-targets-on-day ()
+  "Visit `org-mode' subtree of the targets on day."
+  (my-open-main-agenda-file)
+  (beginning-of-buffer)
+  (search-forward "* Targets on Day")
+  (forward-char))
+
+(defun my-delete-and-get-text-of-org-subtree (&optional pt)
+  "Parse a `org-mode' subtree at the PT, delete it and return text of subtree."
+  (or pt (setq pt (point)))
+  (let* ((node (org-ml-parse-subtree-at pt))
+         (node-beg (org-ml-get-property :begin node))
+         (node-end (org-ml-get-property :end node))
+         (node-text (buffer-substring node-beg node-end)))
+    (--each (->>
+             node
+             (-second-item)
+             (-partition-all 2)
+             (-map 'car))
+      (print it))
+    (delete-region node-beg node-end)
+    node-text))
+
+(defun my-org-headline-set-todo-keyword (new-keyword &optional pt)
+  "Set todo keyword of a headline at PT to NEW-KEYWORD.
+
+PT defaults to the current `point'"
+  (or pt (setq pt (point)))
+  (org-ml-update-subtree-at* pt
+    (org-ml-set-property :todo-keyword new-keyword it)))
+
+(bind-keys
+ :map xah-fly-command-map
+ ("SPC i a" . my-add-org-subtree-to-targets-on-day))
 
 (defgroup my-notes nil
   "My own simple system of notes."
@@ -3933,234 +4147,234 @@ If IS-AS-SNIPPET is t, then expand template as YAS snippet"
 (fast-exec/register-keymap-func 'fast-exec-my-notes-keys)
 (fast-exec/reload-functions-chain)
 
-(defcustom my-mipt-dir "c:/Users/hrams/Documents/mfti-solutions"
-       "Path to directory in which will saved solutions of MIPT tasks.")
+(defcustom my-mipt-dir "c:/Users/hrams/Documents/mipt"
+  "Path to the directory in which will be saved all MIPT solutions.")
 
-     (defcustom my-mipt-lessons '("f" "m") "Lessons of MIPT.")
+(defcustom my-mipt-lessons '("f" "m") "Lessons of MIPT.")
 
-     (defclass my-mipt-task ()
-       ((class :initform nil :initarg :class :accessor my-mipt-task-class)
-        (lesson :initform nil
-                :initarg :lesson
-                :accessor my-mipt-task-lesson)
-        (section :initform nil
-                 :initarg :section
-                 :accessor my-mipt-task-section)
-        (kind :initform nil ;nofmt
-              :initarg :kind
-              :accessor my-mipt-task-kind)   ; 'control or 'normal
-        (number  :initform nil
-                 :initarg :number
-                 :accessor my-mipt-task-number))
-       "Object for task of MIPT.")
+(defclass my-mipt-task ()
+  ((class :initform nil :initarg :class :accessor my-mipt-task-class)
+   (lesson :initform nil
+           :initarg :lesson
+           :accessor my-mipt-task-lesson)
+   (section :initform nil
+            :initarg :section
+            :accessor my-mipt-task-section)
+   (kind :initform nil ;nofmt
+         :initarg :kind
+         :accessor my-mipt-task-kind)   ; 'control or 'normal
+   (number  :initform nil
+            :initarg :number
+            :accessor my-mipt-task-number))
+  "Object for task of MIPT.")
 
-     (defvar my-mipt-found-task
-       (my-mipt-task)
-       "Object of `my-mipt-task', will set automatically when find task.")
+(defvar my-mipt-found-task
+  (my-mipt-task)
+  "Object of `my-mipt-task', will set automatically when find task.")
 
-     (defvar my-mipt-last-task
-       nil
-       "Object of `my-mipt-task', will set automatically when find task.")
+(defvar my-mipt-last-task
+  nil
+  "Object of `my-mipt-task', will set automatically when find task.")
 
-     (defun my-mipt-task-control-p (task)
-       "Return t, when TASK is control."
-       (eq (my-mipt-task-kind task) 'control))
+(defun my-mipt-task-control-p (task)
+  "Return t, when TASK is control."
+  (eq (my-mipt-task-kind task) 'control))
 
-     (defun my-mipt-task-normal-p (task)
-       "Return t, when TASK is normal, no control."
-       (not (my-mipt-task-control-p task)))
+(defun my-mipt-task-normal-p (task)
+  "Return t, when TASK is normal, no control."
+  (not (my-mipt-task-control-p task)))
 
-     (defun my-mipt-task-parse (filename)
-       "Parse from FILENAME MIPT task."
-       (when (s-matches-p ".+-.-.+-.+\\(-control\\)?\\.tex" filename)
-         (-let*
-             ((base (f-base (f-no-ext filename)))
-              ((class lesson section num is-control)
-               (s-split "-" base)))
-           (my-mipt-task
-            :class (string-to-number class)
-            :lesson lesson
-            :section (string-to-number section)
-            :number (string-to-number num)
-            :kind (if (stringp is-control) 'control 'normal)))))
+(defun my-mipt-task-parse (filename)
+  "Parse from FILENAME MIPT task."
+  (when (s-matches-p ".+-.-.+-.+\\(-control\\)?\\.tex" filename)
+    (-let*
+        ((base (f-base (f-no-ext filename)))
+         ((class lesson section num is-control)
+          (s-split "-" base)))
+      (my-mipt-task
+       :class (string-to-number class)
+       :lesson lesson
+       :section (string-to-number section)
+       :number (string-to-number num)
+       :kind (if (stringp is-control) 'control 'normal)))))
 
-     (defun my-mipt-task-path (task)
-       "Get path to TASK's solution."
-       (->>
-        (format
-         "%s-%s-%s-%s%s.tex"
-         (my-mipt-task-class task)
-         (my-mipt-task-lesson task)
-         (my-mipt-task-section task)
-         (my-mipt-task-number task)
-         (if (my-mipt-task-control-p task) "-control" ""))
-        (f-join my-mipt-dir)))
+(defun my-mipt-task-path (task)
+  "Get path to TASK's solution."
+  (->>
+   (format
+    "%s-%s-%s-%s%s.tex"
+    (my-mipt-task-class task)
+    (my-mipt-task-lesson task)
+    (my-mipt-task-section task)
+    (my-mipt-task-number task)
+    (if (my-mipt-task-control-p task) "-control" ""))
+   (f-join my-mipt-dir)))
 
-     (defun my-mipt-last-task ()
-       "Return last opened task via `recentf'."
-       (-some->>
-           recentf-list
-         (-concat (-keep #'buffer-file-name (buffer-list)))
-         (-first #'my-mipt-task-parse)
-         (my-mipt-task-parse)))
+(defun my-mipt-last-task ()
+  "Return last opened task via `recentf'."
+  (-some->>
+      recentf-list
+    (-concat (-keep #'buffer-file-name (buffer-list)))
+    (-first #'my-mipt-task-parse)
+    (my-mipt-task-parse)))
 
-     (defun my-mipt-visit-last-task ()
-       "Visit last opened task searched via `my-mipt-last-task'."
-       (interactive)
-       (my-mipt-task-visit (my-mipt-last-task)))
+(defun my-mipt-visit-last-task ()
+  "Visit last opened task searched via `my-mipt-last-task'."
+  (interactive)
+  (my-mipt-task-visit (my-mipt-last-task)))
 
-     (defun my-mipt-next-task ()
-       "Return the next task, after the last found task.
-
-     When run interactively visit that task."
-       (interactive)
-       (let ((next-task (my-mipt-last-task)))
-         (incf (my-mipt-task-number next-task))
-         (if (interactive-p) (my-mipt-task-visit next-task) next-task)))
-
-     (defun my-mipt-prev-task ()
-       "Return previous task, before the last found task.
+(defun my-mipt-next-task ()
+  "Return the next task, after the last found task.
 
      When run interactively visit that task."
-       (interactive)
-       (let ((prev-task (my-mipt-last-task)))
-         (decf (my-mipt-task-number prev-task))
-         (if (interactive-p) (my-mipt-task-visit prev-task) prev-task)))
+  (interactive)
+  (let ((next-task (my-mipt-last-task)))
+    (incf (my-mipt-task-number next-task))
+    (if (interactive-p) (my-mipt-task-visit next-task) next-task)))
 
-     (defun my-mipt-task-visit (task)
-       "Visit file of TASK's solution."
-       (interactive (list (my-mipt-find-task)))
-       (->> task (my-mipt-task-path) (find-file)))
+(defun my-mipt-prev-task ()
+  "Return previous task, before the last found task.
 
-     (defun my-mipt-all-tasks ()
-       "Return all mipt tasks in special dir `my-mipt-dir'."
-       (->> my-mipt-dir (f-files) (-keep #'my-mipt-task-parse)))
+     When run interactively visit that task."
+  (interactive)
+  (let ((prev-task (my-mipt-last-task)))
+    (decf (my-mipt-task-number prev-task))
+    (if (interactive-p) (my-mipt-task-visit prev-task) prev-task)))
 
-     (defun my-mipt-find-task ()
-       "Find task of MIPT from created."
-       (interactive)
-       (setq my-mipt-found-task (my-mipt-task))
-       (->>
-        (my-mipt-all-tasks)
-        (my-mipt--find-lesson-from-tasks)
-        (my-mipt--find-class-from-tasks)
-        (my-mipt--find-section-from-tasks)
-        (my-mipt--find-kind-from-tasks)
-        (my-mipt--find-number-from-tasks))
-       (my-mipt-complete-task my-mipt-found-task))
+(defun my-mipt-task-visit (task)
+  "Visit file of TASK's solution."
+  (interactive (list (my-mipt-find-task)))
+  (->> task (my-mipt-task-path) (find-file)))
 
-     (defun my-mipt--find-lesson-from-tasks (tasks)
-       "From TASKS find lesson, save in special variable, and return filtered TASKS.
+(defun my-mipt-all-tasks ()
+  "Return all mipt tasks in special dir `my-mipt-dir'."
+  (->> my-mipt-dir (f-files) (-keep #'my-mipt-task-parse)))
+
+(defun my-mipt-find-task ()
+  "Find task of MIPT from created."
+  (interactive)
+  (setq my-mipt-found-task (my-mipt-task))
+  (->>
+   (my-mipt-all-tasks)
+   (my-mipt--find-lesson-from-tasks)
+   (my-mipt--find-class-from-tasks)
+   (my-mipt--find-section-from-tasks)
+   (my-mipt--find-kind-from-tasks)
+   (my-mipt--find-number-from-tasks))
+  (my-mipt-complete-task my-mipt-found-task))
+
+(defun my-mipt--find-lesson-from-tasks (tasks)
+  "From TASKS find lesson, save in special variable, and return filtered TASKS.
      Special variable is `my-mipt-found-task'"
-       (let ((lesson (my-mipt-read-lesson)))
-         (setf (my-mipt-task-lesson my-mipt-found-task) lesson)
-         (->>
-          tasks
-          (--filter (string-equal (my-mipt-task-lesson it) lesson)))))
+  (let ((lesson (my-mipt-read-lesson)))
+    (setf (my-mipt-task-lesson my-mipt-found-task) lesson)
+    (->>
+     tasks
+     (--filter (string-equal (my-mipt-task-lesson it) lesson)))))
 
-     (defun my-mipt-read-lesson ()
-       "Read from user MIPT's lesson."
-       (completing-read "Choose one of MIPT lessons, please: " my-mipt-lessons))
+(defun my-mipt-read-lesson ()
+  "Read from user MIPT's lesson."
+  (completing-read "Choose one of MIPT lessons, please: " my-mipt-lessons))
 
-     (defun my-mipt--find-class-from-tasks (tasks)
-       "From TASKS find class, save in special variable, and return filtered TASKS.
+(defun my-mipt--find-class-from-tasks (tasks)
+  "From TASKS find class, save in special variable, and return filtered TASKS.
      Special variable is `my-mipt-found-task'"
-       (let* ((class (my-mipt-choose-one-of-task-classes tasks)))
-         (setf (my-mipt-task-class my-mipt-found-task) class)
-         (->> tasks (--filter (= (my-mipt-task-class it) class)))))
+  (let* ((class (my-mipt-choose-one-of-task-classes tasks)))
+    (setf (my-mipt-task-class my-mipt-found-task) class)
+    (->> tasks (--filter (= (my-mipt-task-class it) class)))))
 
-     (defun my-mipt-choose-one-of-task-classes (tasks)
-       "Take TASKS and choose one of classes."
-       (->>
-        tasks
-        (-map #'my-mipt-task-class)
-        (my-max)
-        (my-mipt-read-class)))
+(defun my-mipt-choose-one-of-task-classes (tasks)
+  "Take TASKS and choose one of classes."
+  (->>
+   tasks
+   (-map #'my-mipt-task-class)
+   (my-max)
+   (my-mipt-read-class)))
 
-     (defun my-mipt-read-class (&optional default)
-       "Read from user class of MIPT task, defaults to DEFAULT."
-       (read-number "Choose one of MIPT classes, please: " default))
+(defun my-mipt-read-class (&optional default)
+  "Read from user class of MIPT task, defaults to DEFAULT."
+  (read-number "Choose one of MIPT classes, please: " default))
 
-     (defun my-mipt--find-section-from-tasks (tasks)
-       "From TASKS find section, save in special variable, and return filtered TASKS.
+(defun my-mipt--find-section-from-tasks (tasks)
+  "From TASKS find section, save in special variable, and return filtered TASKS.
      Special variable is `my-mipt-found-task'"
-       (let* ((section (my-mipt-choose-one-of-task-sections tasks)))
-         (setf (my-mipt-task-section my-mipt-found-task) section)
-         (->> tasks (--filter (= (my-mipt-task-section it) section)))))
+  (let* ((section (my-mipt-choose-one-of-task-sections tasks)))
+    (setf (my-mipt-task-section my-mipt-found-task) section)
+    (->> tasks (--filter (= (my-mipt-task-section it) section)))))
 
-     (defun my-mipt-choose-one-of-task-sections (tasks)
-       "Take TASKS and choose one of sections."
-       (->>
-        tasks
-        (-map #'my-mipt-task-section)
-        (my-max)
-        (my-mipt-read-section)))
+(defun my-mipt-choose-one-of-task-sections (tasks)
+  "Take TASKS and choose one of sections."
+  (->>
+   tasks
+   (-map #'my-mipt-task-section)
+   (my-max)
+   (my-mipt-read-section)))
 
-     (defun my-mipt-read-section (&optional default)
-       "Read from user section of MIPT task, defaults to DEFAULT."
-       (read-number "Enter section of MIPT task, please: " default))
+(defun my-mipt-read-section (&optional default)
+  "Read from user section of MIPT task, defaults to DEFAULT."
+  (read-number "Enter section of MIPT task, please: " default))
 
-     (defun my-mipt--find-kind-from-tasks (tasks)
-       "From TASKS find kind, save in special variable, and return filtered TASKS.
+(defun my-mipt--find-kind-from-tasks (tasks)
+  "From TASKS find kind, save in special variable, and return filtered TASKS.
      Special variable is `my-mipt-found-task'"
-       (let ((kind (my-mipt-choose-one-of-task-kinds tasks)))
-         (setf (my-mipt-task-kind my-mipt-found-task) kind)
-         (->> tasks (--filter (eq (my-mipt-task-kind it) kind)))))
+  (let ((kind (my-mipt-choose-one-of-task-kinds tasks)))
+    (setf (my-mipt-task-kind my-mipt-found-task) kind)
+    (->> tasks (--filter (eq (my-mipt-task-kind it) kind)))))
 
-     (defun my-mipt-choose-one-of-task-kinds (tasks)
-       "Take TASKS and choose one of kinds."
-       (let* ((is-was-normal-tasks (-any #'my-mipt-task-normal-p tasks))
-              (is-normal
-               (if is-was-normal-tasks
-                   (y-or-n-p "Your task normal? ")
-I                 (not (y-or-n-p "Your task control? ")))))
-         (if is-normal 'normal 'control)))
+(defun my-mipt-choose-one-of-task-kinds (tasks)
+  "Take TASKS and choose one of kinds."
+  (let* ((is-was-normal-tasks (-any #'my-mipt-task-normal-p tasks))
+         (is-normal
+          (if is-was-normal-tasks
+              (y-or-n-p "Your task normal? ")
+            I                 (not (y-or-n-p "Your task control? ")))))
+    (if is-normal 'normal 'control)))
 
-     (defun my-mipt-read-kind (&optional default)
-       "Read from user kind of MIPT task, defaults to DEFAULT."
-       (if (y-or-n-p "Your task normal? ") 'normal 'control))
+(defun my-mipt-read-kind (&optional default)
+  "Read from user kind of MIPT task, defaults to DEFAULT."
+  (if (y-or-n-p "Your task normal? ") 'normal 'control))
 
-     (defun my-mipt--find-number-from-tasks (tasks)
-       "From TASKS find number, save in special variable, and return filtered TASKS.
+(defun my-mipt--find-number-from-tasks (tasks)
+  "From TASKS find number, save in special variable, and return filtered TASKS.
      Special variable is `my-mipt-found-task'"
-       (let* ((number (my-mipt-choose-one-of-task-numbers tasks)))
-         (setf (my-mipt-task-number my-mipt-found-task) number)
-         (->> tasks (--filter (= (my-mipt-task-number it) number)))))
+  (let* ((number (my-mipt-choose-one-of-task-numbers tasks)))
+    (setf (my-mipt-task-number my-mipt-found-task) number)
+    (->> tasks (--filter (= (my-mipt-task-number it) number)))))
 
-     (defun my-mipt-choose-one-of-task-numbers (tasks)
-       "Take TASKS and choose one of classes."
-       (let* ((numbers (-map #'my-mipt-task-number tasks))
-              (default (my-max numbers)))
-         (just-completing-read-numbers
-          "Please, choose number of MIPT task: "
-          numbers
-          nil
-          nil
-          default)))
+(defun my-mipt-choose-one-of-task-numbers (tasks)
+  "Take TASKS and choose one of classes."
+  (let* ((numbers (-map #'my-mipt-task-number tasks))
+         (default (my-max numbers)))
+    (just-completing-read-numbers
+     "Please, choose number of MIPT task: "
+     numbers
+     nil
+     nil
+     default)))
 
-     (defun my-mipt-read-number (&optional default)
-       "Read from user number of MIPT's task, defaults to DEFAULT."
-       (read-number "Please, type number of MIPT task: " (or default 1)))
+(defun my-mipt-read-number (&optional default)
+  "Read from user number of MIPT's task, defaults to DEFAULT."
+  (read-number "Please, type number of MIPT task: " (or default 1)))
 
-     (defun my-mipt-complete-task (task)
-       "Complete all fields of TASK, and return modified TASK."
-       (my-mipt-task
-        :class (or (my-mipt-task-class task) (my-mipt-read-class))
-        :lesson (or (my-mipt-task-lesson task) (my-mipt-read-lesson))
-        :section (or (my-mipt-task-section task) (my-mipt-read-section))
-        :kind (or (my-mipt-task-kind task) (my-mipt-read-kind))
-        :number (or (my-mipt-task-number task) (my-mipt-read-number))))
+(defun my-mipt-complete-task (task)
+  "Complete all fields of TASK, and return modified TASK."
+  (my-mipt-task
+   :class (or (my-mipt-task-class task) (my-mipt-read-class))
+   :lesson (or (my-mipt-task-lesson task) (my-mipt-read-lesson))
+   :section (or (my-mipt-task-section task) (my-mipt-read-section))
+   :kind (or (my-mipt-task-kind task) (my-mipt-read-kind))
+   :number (or (my-mipt-task-number task) (my-mipt-read-number))))
 
-     (defun fast-exec-mipt-keys ()
-       "Get some useful keymaps of  `fast-exec' for MIPT."
-       (fast-exec/some-commands
-        ("Next MIPT Task" 'my-mipt-next-task)
-        ("Previous MIPT Task" 'my-mipt-prev-task)
-        ("Open Last MIPT Task" 'my-mipt-visit-last-task)
-        ("Find MIPT Task" 'my-mipt-task-visit)))
+(defun fast-exec-mipt-keys ()
+  "Get some useful keymaps of  `fast-exec' for MIPT."
+  (fast-exec/some-commands
+   ("Next MIPT Task" 'my-mipt-next-task)
+   ("Previous MIPT Task" 'my-mipt-prev-task)
+   ("Open Last MIPT Task" 'my-mipt-visit-last-task)
+   ("Find MIPT Task" 'my-mipt-task-visit)))
 
-     (fast-exec/register-keymap-func 'fast-exec-mipt-keys)
-     (fast-exec/reload-functions-chain)
+(fast-exec/register-keymap-func 'fast-exec-mipt-keys)
+(fast-exec/reload-functions-chain)
 
 (defun my-copy-buffer-content-as-mipt-solution ()
   "Take content of current buffer, compress it and copy its."
