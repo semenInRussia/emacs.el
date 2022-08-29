@@ -40,4 +40,5 @@
 \#*
 auto-save-list/
 devdocs/
-/notes
+/zms
+*.org_archive
