@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: multicolumn
+# key: mc
+# --
+\multicolumn{${1:cols}}{${2:c}}{$0}

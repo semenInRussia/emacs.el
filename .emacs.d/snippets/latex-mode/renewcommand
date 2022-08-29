@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: renewcommand
+# key: rnc
+# --
+\renewcommand{\\${1:name}}{$0}

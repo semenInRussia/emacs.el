@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: newcounter
+# key: ncr
+# --
+\newcounter{${1:name}}

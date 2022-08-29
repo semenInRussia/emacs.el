@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: maketitle
+# key: mt
+# --
+\maketitle
