@@ -3464,15 +3464,16 @@ I am use my autoformat system, which I am taked from [[https://github.com/jkitch
    'org-mode
    org-sentence-capitalization)
 
-  (defvar autoformat-org-non-text-line-prefix (rx
-                                               (or (1+ "*") "-" (1+ digit))
-                                               (1+ " ")))
+  (defvar autoformat-org-non-text-line-prefix
+    (rx (or (1+ "*")                      ; heading
+            (seq (0+ " ")
+                 "-"))                  ; itemized list item
+        (1+ " ")))
 
   (defvar autoformat-org-line-for-capitalization-regexp
     (rx line-start
         (optional
-         (eval autoformat-org-non-text-line-prefix)
-         (1+ " ")
+         (regexp autoformat-org-non-text-line-prefix)
          (optional (or "TODO" "DONE") (1+ " ")))
         letter)
     "Regular expression indicates the necessary of the last word capitalization.")
@@ -3482,17 +3483,17 @@ I am use my autoformat system, which I am taked from [[https://github.com/jkitch
     (interactive)
     (autoformat-sentence-capitalization)
     (when (and
-           (autoformat-org-at-non-text-p)
+           (autoformat-org-at-non-text-line-p)
            (looking-back autoformat-org-line-for-capitalization-regexp))
       (undo-boundary)
       (capitalize-word -1)))
 
-  (defun autoformat-org-at-non-text-p ()
+  (defun autoformat-org-at-non-text-line-p ()
     "Return t, when the cursor being at non-text position for `org-mode'."
     (or
-     (just-line-prefix-p autoformat-org-non-text-line-prefix)
+     (just-line-regexp-prefix-p autoformat-org-non-text-line-prefix)
      (just-call-on-prev-line*
-      (just-line-prefix-p autoformat-org-non-text-line-prefix t))))
+      (just-line-regexp-prefix-p autoformat-org-non-text-line-prefix))))
       #+END_SRC
 
 **** Load from Wiki
