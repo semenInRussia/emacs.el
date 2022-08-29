@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: center
-# key: cntr
+# key: cr
 # --
 \begin{center}
   $0

@@ -1,5 +1,7 @@
 # -*- mode: snippet -*-
-# name: German quotes
-# key: gqq
+# name: quote
+# key: quote
 # --
-\glqq{}$0\grqq{}
+\begin{quote}
+$0
+\end{quote}

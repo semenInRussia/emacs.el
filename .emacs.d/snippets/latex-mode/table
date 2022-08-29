@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: table
-# key: tbl
+# key: t
 # --
 \begin{table}
   \centering

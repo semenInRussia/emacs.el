@@ -2,4 +2,5 @@
 # name: test
 # key: test
 # --
-(test $0)
+(module+ test
+  $0)
