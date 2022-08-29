@@ -80,6 +80,26 @@ If FORCE is t, a directory will be deleted recursively."
    (my-parts-of-seq n s)
    (--map (apply #'s-concat it))))
 
+(defcustom my-url-prefixes
+  '("http://"
+    "https://"
+    "file://")
+  "List of the prefixes which indicates that string is a URL."
+  :type '(repeat string))
+
+(defun my-url-p (s)
+  "Return t, when S is a url."
+  (my-one-of-prefixes-p my-url-prefixes s))
+
+(defun my-regexp-prefix-p (prefix s)
+  "Return t when the regexp PREFIX matches with S as prefix."
+  (-some->>
+      s
+    (s-matched-positions-all prefix)
+    (-first-item)
+    (car)                                ; the beginning of the matched position
+    (= 0)))
+
 (defun my-max (list)
   "Return the max value of LIST, if LIST is empty, then return nil."
   (when list
@@ -140,6 +160,22 @@ End of Lisp sexp is point before the last closed paren"
       (-when-let
           (sexp (sp-get-enclosing-sexp))
         (sp-get sexp (< :beg pt :end))))))
+
+(defun my-read-image-url ()
+  "Read the URL of a image from the user.
+
+If copied text is a URL, then return.  If region is active, then return a text
+in the region.  Otherwise, read a URL from the minibuffer."
+  (or
+   (my-url-from-kill-ring)
+   (just-text-in-region)
+   (read-string "Enter URL for image, please: ")))
+
+(defun my-url-from-kill-ring ()
+  "If the last element of the kill ring is a URL, get it, otherwise get nil."
+  (let ((copied (-first-item kill-ring)))
+    (when (my-url-p copied)
+      copied)))
 
 (defun prime-p (n)
   "Return non-nil, when N is prime."
@@ -707,8 +743,8 @@ Action of `avy', see `avy-action-yank' for example"
     :init
     (smartparens-global-mode 1)
     :bind (("RET"       . sp-newline)
-            ("M-("       . 'sp-wrap-round)
-            ("M-{"       . 'sp-wrap-curly)
+           ("M-("       . 'sp-wrap-round)
+           ("M-{"       . 'sp-wrap-curly)
            :map
            xah-fly-command-map
            (("]"         . 'sp-forward-slurp-sexp)
@@ -1345,14 +1381,14 @@ List of functions: `xah-toggle-letter-case', `my-change-case-of-current-line'."
 (define-key-when
     my-copy-rectangle-or-copy-line
     xah-fly-command-map
-    "c"
+  "c"
   'copy-rectangle-as-kill
   'rectangle-mark-mode-p)
 
 (define-key-when
     my-kill-rectangle-or-delete-char
     xah-fly-command-map
-    "d"
+  "d"
   'kill-rectangle
   'rectangle-mark-mode-p)
 
@@ -1663,35 +1699,35 @@ See `just-line-is-whitespaces-p'"
            ("TAB" . yas-next-field-or-cdlatex))
     :config ;nofmt
     (defun cdlatex-in-yas-field ()
-        (when-let* ((_ (overlayp yas--active-field-overlay))
-                    (end (overlay-end yas--active-field-overlay)))
-            (if (>= (point) end)
-                (let ((s (thing-at-point 'sexp)))
-                    (unless (and s
-                                 (assoc
-                                  (substring-no-properties s)
-                                  cdlatex-command-alist-comb))
-                        (yas-next-field-or-maybe-expand)
-                        t))
-                (let (cdlatex-tab-hook minp)
-                    (setq minp
-                          (min
-                           (save-excursion
-                               (cdlatex-tab)
-                               (point))
-                           (overlay-end
-                            yas--active-field-overlay)))
-                    (goto-char minp)
-                    t))))
+      (when-let* ((_ (overlayp yas--active-field-overlay))
+                  (end (overlay-end yas--active-field-overlay)))
+        (if (>= (point) end)
+            (let ((s (thing-at-point 'sexp)))
+              (unless (and s
+                           (assoc
+                            (substring-no-properties s)
+                            cdlatex-command-alist-comb))
+                (yas-next-field-or-maybe-expand)
+                t))
+          (let (cdlatex-tab-hook minp)
+            (setq minp
+                  (min
+                   (save-excursion
+                     (cdlatex-tab)
+                     (point))
+                   (overlay-end
+                    yas--active-field-overlay)))
+            (goto-char minp)
+            t))))
 
     (defun yas-next-field-or-cdlatex nil
-        (interactive)
-        "Jump to the next Yas field correctly with cdlatex active."
-        (if (or
-             (bound-and-true-p cdlatex-mode)
-             (bound-and-true-p org-cdlatex-mode))
-            (cdlatex-tab)
-            (yas-next-field-or-maybe-expand))))
+      (interactive)
+      "Jump to the next Yas field correctly with cdlatex active."
+      (if (or
+           (bound-and-true-p cdlatex-mode)
+           (bound-and-true-p org-cdlatex-mode))
+          (cdlatex-tab)
+        (yas-next-field-or-maybe-expand))))
 
 (use-package tex-mode
     :after cdlatex
@@ -1890,14 +1926,14 @@ See `just-line-is-whitespaces-p'"
 (defun autoformat-latex-expand-to-list-item ()
   "Try expand fragments sush as 1. or - to LaTeX list items."
   (cond
-    ((autoformat-latex-expand-to-enumerated-list-item-p)
-     (autoformat-latex-expand-to-enumerated-list-item))
+    ((autoformat-latex-expand-to-enumerate-list-item-p)
+     (autoformat-latex-expand-to-enumerate-list-item))
     ((autoformat-latex-expand-to-itemized-list-item-p)
      (autoformat-latex-expand-to-itemized-list-item))))
 
-(defcustom autoformat-latex-enumerated-list-items-triggers
+(defcustom autoformat-latex-enumerate-list-items-triggers
   '("[0-9]*\\. ")
-  "List of regepxs which should be expanded to LaTeX enumerated list item.
+  "List of regepxs which should be expanded to LaTeX enumerate list item.
 
 Will be expanded only on matching in empty line and not in math"
   :type '(repeat string))
@@ -1910,10 +1946,10 @@ Will be expanded only on matching in empty line and not in math"
 Will be expanded only on matching in empty line and not in math"
   :type '(repeat string))
 
-(defun autoformat-latex-expand-to-enumerated-list-item-p ()
-  "Get t, when autoformat should expand text to the enumerated LaTeX list."
+(defun autoformat-latex-expand-to-enumerate-list-item-p ()
+  "Get t, when autoformat should expand text to the enumerate LaTeX list."
   (my-one-of-regexps-looking-back-on-bol
-   autoformat-latex-enumerated-list-items-triggers))
+   autoformat-latex-enumerate-list-items-triggers))
 
 (defun autoformat-latex-expand-to-itemized-list-item-p ()
   "Get t, when autoformat should expand text to the itemized LaTeX list."
@@ -1927,12 +1963,12 @@ Will be expanded only on matching in empty line and not in math"
    (--map (concat "^ *" it))
    (-some 'looking-back)))
 
-(defun autoformat-latex-expand-to-enumerated-list-item ()
-  "Expand, for example, 1. to the LaTeX enumerated list item."
+(defun autoformat-latex-expand-to-enumerate-list-item ()
+  "Expand, for example, 1. to the LaTeX enumerate list item."
   (clear-current-line)
-  (if (string-equal (LaTeX-current-environment) "enumerated")
+  (if (string-equal (LaTeX-current-environment) "enumerate")
       (LaTeX-insert-item)
-    (LaTeX-env-item "enumerated")))
+    (LaTeX-env-item "enumerate")))
 
 (defun autoformat-latex-expand-to-itemized-list-item ()
   "Expand, for example, 1. to the LaTeX itemized list item."
@@ -1995,32 +2031,72 @@ If the environment is not given, ask for it using completion."
  :map my-latex-local-map
  ("\\" . my-latex-equation-to-split))
 
-(defun my-latex-insert-img-at-copied-url (&optional image-name)
-  "Insert to current LaTeX buffer image at URL which copied in clipboard.
-If copied text isn't URL then report the error.  Downloaded file will be called
-IMAGE-NAME."
-  (interactive)
-  (let ((url (current-kill 0)))
-    (when (interactive-p)
-      (setq image-name
-            (read-string "Name of downloaded image, please: "
-                         (my-uri-of-url url))))
-    (my-latex-insert-img-at-url url image-name)))
+(defun my-latex-insert-image (filename &optional caption placement width centering)
+  "Insert image with FILENAME with LaTeX syntax into current buffer.
 
-(defun my-latex-insert-img-at-url (url &optional image-name)
-  "Insert to current latex buffer image at URL, install if need.
-Downloaded image will be called IMAGE-NAME"
-  (interactive
-   (let* ((url (read-string "Enter URL for image, please: "))
-          (image-name
-           (read-string
-            "Name of downloaded image,  please: "
-            (my-uri-of-url url))))
-     (list url image-name)))
+By default, caption won't be inserted, but if CAPTION is a string image will
+has caption CAPTION.
+
+Image will inserted with LaTeX environment figure and command
+\\includegraphics, so you can change PLACEMENT and WIDTH of the inserted
+image, PLACEMENT defaults to \"h\", WIDTH defaults to the original image width.
+
+If CENTERING is non-nil, then image will be centered via \\centering"
+  (interactive (my--get-arguments-for-latex-insert-image))
   (my-latex-graphics-init)
-  (->>
-   (my-latex-download-image-into-graphicspath url image-name)
-   (my-latex-insert-img-at-path)))
+  (my-latex-insert-figure-environment placement)
+  (when centering (insert "\\centering"))
+  (my-latex-insert-includegraphics filename width)
+  (my-latex-insert-caption caption))
+
+(defun my--get-arguments-for-latex-insert-image ()
+  "Read from the minibuffer arguments for the `my-latex-insert-image'."
+  (my-latex-ensure-has-graphicspath)
+  (let* ((graphicspath (-last-item (my-latex-current-graphicspathes)))
+         (filename
+          (s-chop-prefix
+           (f-slash graphicspath)
+           (read-file-name "Choose image, please: " graphicspath)))
+         (caption (my-latex-read-caption))
+         (width (my-latex-read-width))
+         (placement (my-latex-read-placement))
+         (centering (my-latex-read-centering)))
+    (list filename caption placement width centering)))
+
+(defun my-latex-read-caption ()
+  "Read from the minibuffer a caption for the LaTeX.
+
+If the user typed nothing, then return nil"
+  (let ((typed (read-string "Caption, please: ")))
+    (unless (s-blank? typed) typed)))
+
+(defun my-latex-read-width ()
+  "Read a LaTeX width from the minibuffer.
+
+If the user typed nothing, then return nil"
+  (let ((typed (read-string "Width, please: ")))
+    (unless (s-blank? typed) typed)))
+
+(defun my-latex-read-placement ()
+  "Read a LaTeX placement from the minibuffer.
+
+If the user typed nothing, then return nil"
+  (let ((typed
+         (read-string "Placement, please (some chars of h t b p ! H): ")))
+    (unless (s-blank? typed) typed)))
+
+(defun my-latex-read-centering ()
+  "Return t, when the user need to centering of the LaTeX block."
+  (y-or-n-p "Centering or no? "))
+
+(defun my-latex-ensure-has-graphicspath ()
+  "Ensure that current LaTeX buffer has \\graphicspath{}.
+
+If now current LaTeX buffer hasn't \\graphicspath{}, read new graphicspath from
+the minibuffer."
+  (unless (my-latex-current-graphicspathes)
+    (my-latex-add-graphicspath
+     (read-directory-name "Dirictory of the saved images, please: "))))
 
 (defun my-latex-graphics-init ()
   "Add some stuffs for graphics in LaTeX."
@@ -2028,35 +2104,6 @@ Downloaded image will be called IMAGE-NAME"
   (my-latex-use-package "graphicx")
   (unless (my-latex-current-graphicspathes)
     (my-latex-add-graphicspath "./images/")))
-
-(defun my-latex-insert-img-at-path (path)
-  "Insert to current latex buffer image at PATH."
-  (->>
-   path
-   (f-base)
-   (format "\\begin{center}
-  \\includegraphics{%s}
-\\end{center}")
-   (insert)))
-
-(defun my-latex-download-image-into-graphicspath (url &optional filename)
-  "Download image at URL into graphicspath of current LaTeX buffer.
-This file has name FILENAME.  Return nil when fail, otherwise return path of
-downloaded file"
-  (or filename (setq filename (my-uri-of-url)))
-  (let* ((graphicspath (-last-item (my-latex-current-graphicspathes)))
-         (dest (f-join graphicspath filename)))
-    (url-copy-file url dest t)
-    dest))
-
-(defun my-uri-of-url (url)
-  "Get the URI of URL."
-  (->>
-   url
-   (s-split "/")
-   (-last-item)
-   (s-split "?")
-   (-first-item)))
 
 (defun my-latex-add-graphicspath (path)
   "Add to list of current LaTeX file' s graphicpath PATH."
@@ -2079,35 +2126,44 @@ downloaded file"
   "Parse from current LaTeX buffer value of \\graphicspath."
   (save-excursion
     (my-latex-goto-graphicspath)
-    (forward-char -1)
-    (sp-get
-        (sp-get-enclosing-sexp)
-      (->>
-       (buffer-substring-no-properties :beg-in :end-in)
-       (s-match-strings-all "\{\\([^\\}]*\\)\}")
-       (-map #'-last-item)))))
+    (-when-let
+        (ok (sp-get-sexp t))
+      (sp-get ok
+        (->>
+         (buffer-substring-no-properties :beg-in :end-in)
+         (s-match-strings-all
+          (rx "{" (group (0+ (not "}"))) "}"))
+         (-map #'-last-item))))))
 
 (defun my-latex-goto-graphicspath ()
   "Goto end of LaTeX command for set graphic paths, if isn't exit insert."
   (goto-char (point-min))
-  (unless (search-forward-regexp "^\\\\graphicspath\\W*\{.*\}\\W*$"  nil t)
-    (search-forward-regexp "\\\\begin\\W*\{\\W*document\\W*\}"  nil t)
+  (unless (search-forward-regexp "^\\\\graphicspath"  nil t)
+    (search-forward-regexp "\\usepackage.*{graphicspath}"  nil t)
     (forward-line -1)
     (end-of-line)
     (newline)
-    (insert "\\graphicspath{}")))
+    (insert "\\graphicspath{}"))
+  (end-of-line))
 
 (defun my-latex-use-package (package &optional options)
   "Add \\usepackage for PACKAGE with OPTIONS to current LaTeX buffer."
   (interactive "sPlease, choose package which you need use: ")
   (unless (my-latex-used-package-p package)
     (save-excursion
-      (goto-char (point-min))
-      (search-forward-regexp "^\\\\usepackage" nil t)
+      (my-latex-goto-use-package-source)
       (beginning-of-line)
       (insert "\\usepackage")
       (LaTeX-arg-usepackage-insert (list package) options)
       (LaTeX-newline))))
+
+(defun my-latex-goto-use-package-source ()
+  "Go to the place of the LaTeX source code where shoud be inserted usepackage."
+  (interactive)
+  (goto-char (point-min))
+  (unless (search-forward-regexp "^\\\\usepackage" nil t)
+    (search-forward-regexp "^\\\\begin{document}" nil t))
+  (beginning-of-line))
 
 (defun my-latex-used-package-p (package)
   "Return t, when PACKAGE was used in current LaTeX buffer."
@@ -2121,11 +2177,67 @@ downloaded file"
    (--filter (s-prefix-p "\\usepackage" it))
    (--map
     (-last-item
-     (s-match "\\\\usepaIckage\\(\\[.*\\]\\)?{\\(.*\\)}" it)))))
+     (s-match "\\\\usepackage\\(\\[.*\\]\\)?{\\(.*\\)}" it)))))
+
+(defun my-latex-insert-figure-environment (placement)
+  "Insert the LaTeX environment figure into current buffer with PLACEMENT."
+  (or placement (setq placement "h"))
+  (LaTeX-insert-environment "figure" (format "{%s}" placement)))
+
+(defun my-latex-insert-includegraphics (filename &optional width)
+  "Insert the \\includegraphics LaTeX command which include FILENAME.
+
+If WIDTH is non-nil, then insert WIDTH as the optional argument width to the
+\\includegraphics command."
+  (just-ensure-empty-line)
+  (insert "\\includegraphics")
+  (when width (insert "[width=" width "]"))
+  (insert "{" filename "}"))
+
+(defun my-latex-insert-caption (caption-string)
+  "If CAPTION-STRING is non-nil, then insert a caption for with LaTeX syntax."
+  (unless caption-string
+    (just-ensure-empty-line)
+    (insert "\\caption{" caption-string "}")))
+
+(defun my-latex-insert-img-at-url (url &optional image-name)
+  "Insert to current latex buffer image at URL, install if need.
+Downloaded image will be called IMAGE-NAME"
+  (interactive
+   (let* ((url (my-read-image-url))
+          (image-name
+           (read-string "Name of downloaded image, please: "
+                        (my-uri-of-url url))))
+     (list url image-name)))
+  (my-latex-graphics-init)
+  (->>
+   (my-latex-download-image-into-graphicspath url image-name)
+   (my-latex-insert-img-at-path)))
+
+(defun my-latex-download-image-into-graphicspath (url &optional filename)
+  "Download image at URL into graphicspath of current LaTeX buffer.
+This file has name FILENAME.  Return nil when fail, otherwise return path of
+downloaded file"
+  (or filename (setq filename (my-uri-of-url)))
+  (let* ((graphicspath (-last-item (my-latex-current-graphicspathes)))
+         (dest (f-join graphicspath filename)))
+    (url-copy-file url dest t)
+    dest))
+
+(defun my-uri-of-url (url)
+  "Get the URI of URL."
+  (->>
+   url
+   (s-split "/")
+   (-last-item)
+   (s-split "?")
+   (-first-item)))
 
 (bind-keys
  :map my-latex-local-map
- ("i" . my-latex-insert-img-at-copied-url))
+ ("n" . my-latex-use-package)
+ ("u" . my-latex-insert-img-at-url)
+ ("v" . my-latex-insert-img-at-copied-url))
 
 (use-package org
     :major-mode-map (org-mode)
@@ -2263,15 +2375,15 @@ If the user insert any caption, return its, otherwise return nil."
 If the region is active return it, otherwise read URL from the minibuffer.
 If caption isn't empty string, then insert image with the caption CAPTION."
   (interactive
-   (my--org-insert-img-at-url-get-arguments))
+   (my--get-arguments-for-org-insert-img-at-url))
   (or images-dir (setq images-dir my-org-default-images-dir))
   (let ((new-filename (f-join images-dir new-file-name)))
     (my-download url new-filename)
     (my-org-insert-image new-filename caption)))
 
-(defun my--org-insert-img-at-url-get-arguments ()
+(defun my--get-arguments-for-org-insert-img-at-url ()
   "Get arguments from the user for `my-org-insert-img-at-url'."
-  (let* ((url (my-org-read-image-url))
+  (let* ((url (my-read-image-url))
          (new-file-name (my-org-read-new-image-at-url-file-name url))
          (images-dir (my-org-read-images-dir))
          (caption (my-org-read-image-caption)))
@@ -2281,14 +2393,6 @@ If caption isn't empty string, then insert image with the caption CAPTION."
   "Read directory path for downloading of the image."
   (read-directory-name "Image will download into directory:"
                        my-org-default-images-dir))
-
-(defun my-org-read-image-url ()
-  "Read an URL to an image from the user.
-
-If the region is active return it, otherwise read URL from the minibuffer."
-  (or
-   (just-text-in-region)
-   (read-string "URL of the image, please: ")))
 
 (defun my-org-read-new-image-at-url-file-name (url)
   "Read from the minibuffer new file name for the image at URL."
@@ -2313,10 +2417,15 @@ If the region is active return it, otherwise read URL from the minibuffer."
  'org-mode
  org-sentence-capitalization)
 
+(defvar autoformat-org-non-text-line-prefix (rx
+                                             (or (1+ "*") "-" (1+ digit))
+                                             (1+ " ")))
+
 (defvar autoformat-org-line-for-capitalization-regexp
   (rx line-start
       (optional
-       (1+ "*") (1+ " ")
+       (eval autoformat-org-non-text-line-prefix)
+       (1+ " ")
        (optional (or "TODO" "DONE") (1+ " ")))
       letter)
   "Regular expression indicates the necessary of the last word capitalization.")
@@ -2326,11 +2435,17 @@ If the region is active return it, otherwise read URL from the minibuffer."
   (interactive)
   (autoformat-sentence-capitalization)
   (when (and
-         (or (just-line-prefix-p "*")
-             (just-call-on-prev-line* (just-line-prefix-p "*")))
+         (autoformat-org-at-non-text-p)
          (looking-back autoformat-org-line-for-capitalization-regexp))
     (undo-boundary)
     (capitalize-word -1)))
+
+(defun autoformat-org-at-non-text-p ()
+  "Return t, when the cursor being at non-text position for `org-mode'."
+  (or
+   (just-line-prefix-p autoformat-org-non-text-line-prefix)
+   (just-call-on-prev-line*
+    (just-line-prefix-p autoformat-org-non-text-line-prefix t))))
 
 (use-package wikinforg
     :ensure t)
@@ -2373,6 +2488,12 @@ If the region is active return it, otherwise read URL from the minibuffer."
     :hook (org-mode . toc-org-mode)
     :custom
     (toc-org-max-depth 4))
+
+(use-package org
+    :custom
+  (org-startup-folded t)
+  (org-startup-indented t)
+  (org-startup-with-inline-images t))
 
 (defun turn-on-org-cdlatex-mode ()
   "Turn on `org-cdlatex-mode'."
@@ -3240,15 +3361,15 @@ numbers of lines, otherwise don't display."
 (use-package doom-modeline :ensure t)
 
 (doom-modeline-def-segment drag
-  (when (my-last-command-is-dragged-stuff-p)
-    (propertize
-     " DRG "
-     'face (if (doom-modeline--active)
-               'doom-modeline-panel
-             'mode-line-inactive))))
+    (when (my-last-command-is-dragged-stuff-p)
+      (propertize
+       " DRG "
+       'face (if (doom-modeline--active)
+                 'doom-modeline-panel
+               'mode-line-inactive))))
 
 (doom-modeline-def-segment my-matches
-  "Display `macro-recoring', `multiple-cursors' and `buffer-size'."
+    "Display `macro-recoring', `multiple-cursors' and `buffer-size'."
   (let ((meta (concat (doom-modeline--macro-recording)
                       (doom-modeline--multiple-cursors))))
     (or (and (not (equal meta "")) meta)
@@ -3487,18 +3608,20 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
      '(projectile-root-local my-project-root))
     (projectile-enable-caching nil)
     :init                               ;nofmt
-    (defalias 'projectile-project-files 'my-projectile-project-files)
-    (defalias 'projectile-root-local 'my-projectile-root-local)
-    (defalias 'project-root 'my-project-root)
-    (defalias 'projectile-files-with-string 'my-projectile-files-with-string)
     (projectile-mode 1))
 
 (use-package helm-projectile
     :ensure t
-    :bind ((:map xah-fly-command-map)
-           ("SPC j" . 'helm-projectile-find-file)
-           (:map helm-projectile-find-file-map)
-           ("M-<f5>" . 'my-helm-projectile-find-file-update)))
+    :bind
+    ((:map xah-fly-command-map)
+     ("SPC j" . 'helm-projectile-find-file)
+     (:map helm-projectile-find-file-map)
+     ("M-<f5>" . 'my-helm-projectile-find-file-update))
+    :init
+    (defalias 'projectile-project-files 'my-projectile-project-files)
+    (defalias 'projectile-root-local 'my-projectile-root-local)
+    (defalias 'project-root 'my-project-root)
+    (defalias 'projectile-files-with-string 'my-projectile-files-with-string))
 
 (defun my-helm-projectile-find-file-update ()
   "Update function for `helm-projectile-find-file'."
@@ -3784,19 +3907,11 @@ Return new name of FILE"
 (defun my-agenda-plan-new-day ()
   "Switch to the new day in my organization system."
   (interactive)
-  (my-org-archieve-done-and-saw-headings)
-  (my-org-habits-todo-states-to-goal))
+  (my-org-archive-done-and-saw-headings))
 
-(defun my-org-archieve-done-and-saw-headings ()
+(defun my-org-archive-done-and-saw-headings ()
   "Archieve all `org-mode' headings which has the label done."
-  (org-ql-query :where '(or (todo "DONE") (todo "SAW"))
-                :from (current-buffer)
-                :select #'org-archive-subtree-default))
-
-(defun my-org-todo-state-to-goal ()
-  "Change todo state of `org-mode' heading at the cursor to GOAL."
-  (org-ml-update-headline-at* (point)
-    (org-ml-set-property :todo-keyword "GOAL" it)))
+  (org-map-entries 'org-archive-subtree "/+DONE" 'file))
 
 (defun my-open-main-agenda-file ()
   "Open agenda.org."
@@ -3865,6 +3980,20 @@ PT defaults to the current `point'"
 (bind-keys
  :map xah-fly-command-map
  ("SPC i a" . my-add-org-subtree-to-targets-on-day))
+
+(use-package org
+    :custom
+  (org-capture-templates
+   '(("d"
+      "Target on Day"
+      entry
+      (file+headline "~/agenda.org" "Targets on Day")
+      "* TODO %?\n  SCHEDULED: %t\n  %i\n  %a")
+     ("w"
+      "Target on Week"
+      entry
+      (file+headline "~/agenda.org" "Targets on Week")
+      "* TODO %?\n  %i\n  %a"))))
 
 (defgroup my-notes nil
   "My own simple system of notes."
@@ -4394,3 +4523,256 @@ If IS-AS-SNIPPET is t, then expand template as YAS snippet"
 (bind-keys
  :map my-latex-local-map
  ("c" . my-copy-buffer-content-as-mipt-solution))
+
+(defcustom my-zms-compile-command
+  (s-concat
+   "pdflatex "
+   "-interaction nonstopmode -file-line-error "
+   "--output-directory=\"{output-directory}\" "
+   "\"{solution.tex}\"")
+  "Command which compile Solution.tex file of the ZMS section.
+
+{solution.tex} will be replaced with path to Solution.tex file of the ZMS
+section"
+  :type 'string)
+
+(defcustom my-zms-directory "~/zms"
+  "Path to the directory in which will be saved files of the ZMS."
+  :type 'string)
+
+(defcustom my-zms-view-solution-latex "\\inputtask{./solutions/%s.tex}"
+  "LaTeX source code which should view solution of the ZMS task."
+  :type 'string)
+
+(defcustom my-zms-section-template-directory "~/zms/_template/"
+  "Path to the directory which will be temlate for the section of the ZMS."
+  :type 'string)
+
+(defcustom my-zms-section-solutions-relatieve-path "solutions/"
+  "Path relatieve with the section subdirectory to the task solutions files."
+  :type 'string)
+
+(defclass my-zms-section ()
+  ((name :initarg :name :accessor my-zms-section-name)
+   (number :initarg :number :accessor my-zms-section-number))
+  "Section of the zms.")
+
+(defun my-zms-new-section (section-name)
+  "New section called SECTION-NAME of the ZMS tasks, solutions and other."
+  (interactive "sName of the ZMS section, please: ")
+  (my-zms-section-save (my-zms-next-section-called section-name)))
+
+(defun my-zms-delete-section (section)
+  "Delete SECTION of the ZMS tasks, solutions and other."
+  (interactive (list (my-zms-read-section)))
+  (->
+   section
+   (my-zms-section-path)
+   (f-delete t)))
+
+(defun my-zms-section-save (section)
+  "Save the ZMS SECTION into the file system."
+  (f-copy my-zms-section-template-directory
+          (my-zms-section-path section)))
+
+(defun my-zms-section-path (section)
+  "Return path to the directory of the ZMS section SECTION."
+  (->> section (my-zms-section-dirname) (f-join my-zms-directory)))
+
+(defun my-zms-section-dirname (section)
+  "Return name of the directory for the ZMS SECTION."
+  (format "%s-%s"
+          (my-zms-section-number section)
+          (my-normalize-string (my-zms-section-name section))))
+
+(defun my-zms-next-section-called (section-name)
+  "Return a object of the `my-zms-section' called SECTION-NAME.
+
+Number will be automatically initialized, depends on the previous sections."
+  (my-zms-section
+   :name section-name
+   :number (my-zms-next-section-number)))
+
+(defun my-zms-next-section-number ()
+  "Return number of the next ZMS section."
+  (--if-let (my-zms-last-section) (1+ (my-zms-section-number it)) 1))
+
+(defun my-zms-last-section ()
+  "Return the last section (section with greatest number) of the ZMS sections."
+  (-some->>
+      (my-zms-sections)
+    (-max-by (-on '> 'my-zms-section-number))))
+
+(defun my-zms-sections ()
+  "Return list of the all ZMS sections."
+  (->>
+   (my-zms-sections-dirs-names)
+   (-map 'my-zms-section-dirname-to-section)))
+
+(defun my-zms-sections-dirs-names ()
+  "Return list of the names of the dirictories of the all ZMS sections."
+  (->>
+   my-zms-directory
+   (f-directories)
+   (-map 'f-base)
+   (--remove (s-prefix-p "_" it))))
+
+(defun my-zms-section-dirname-to-section (section-dirname)
+  "Convert ZMS SECTION-DIRNAME to an object of the `my-zms-section'."
+  (let* ((dirname-parts
+          (s-split " " (my-humanize-string section-dirname)))
+         (number (string-to-number (car dirname-parts)))
+         (name (s-join " " (cdr dirname-parts))))
+    (my-zms-section :name name :number number)))
+
+(defun my-zms-new-solution-in-current-section ()
+  (interactive)
+  (my-zms-new-solution (my-zms-current-section)))
+
+(defun my-zms-new-solution (section)
+  "Create a new LaTeX file into subdir of the ZMS SECTION dir named solutions."
+  (interactive (list (my-zms-read-section)))
+  (let ((task-number (my-zms-section-next-solution-number section)))
+    (my-zms-insert-solution-to-solution.tex section task-number)
+    (my-zms-find-solution section task-number)))
+
+(defun my-zms-insert-solution-to-solution.tex (section number)
+  "Insert a command viewing solution with NUMBER to Solution.tex of SECTION."
+  (find-file (my-zms-section-solution.tex-path section))
+  (save-excursion
+    (end-of-buffer)
+    (forward-line -1)
+    (end-of-line)
+    (newline)
+    (insert (format my-zms-view-solution-latex number))
+    (newline)))
+
+(defun my-zms-find-solution (section number)
+  "Find/visit file of the ZMS SECTION solution with NUMBER file."
+  (interactive
+   (list
+    (my-zms-read-section)
+    (read-number "Number of the solution, please:")))
+  (find-file (my-zms-section-solution-number-to-path section number)))
+
+(defun my-zms-delete-solution (section number)
+  "Find/visit file of the ZMS SECTION solution with NUMBER file."
+  (interactive
+   (list
+    (my-zms-read-section)
+    (read-number "Number of the solution, please:")))
+  (delete-file (my-zms-section-solution-number-to-path section number)))
+
+(defun my-zms-read-section ()
+  "Read ZMS SECTION from the user."
+  (helm
+   :prompt "Choose section of the ZMS: "
+   :sources '((name . "zms-sections")
+              (candidates . my--zms-read-section-candidates)
+              (action . (("Choose" . identity))))))
+
+(defun my--zms-read-section-candidates ()
+  "Candidates for the `my-zms-read-section' function."
+  (->>
+   (my-zms-sections)
+   (--map (cons (my-zms-format-section it) it))))
+
+(defun my-zms-format-section (section)
+  "Format SECTION of the ZMS to a string."
+  (format "%s. %s"
+          (my-zms-section-number section)
+          (my-zms-section-name section)))
+
+(defun my-zms-section-next-solution-number (section)
+  "Return number of the next task solution of the ZMS SECTION."
+  (--if-let (my-zms-section-last-solution-number section) (1+ it) 1))
+
+(defun my-zms-section-solution-number-to-path (section number)
+  "Return path to the task solution of the ZMS SECTION with NUMBER."
+  (f-join
+   (my-zms-section-solutions-path section)
+   (format "%s.tex" number)))
+
+(defun my-zms-section-last-solution-number (section)
+  "Return number of the last task solution of the SECTION."
+  (->>
+   section
+   (my-zms-section-solutions-path)
+   (f-files)
+   (--map (string-to-number (f-base it)))
+   (my-max)))
+
+(defun my-zms-section-solutions-path (section)
+  "Return path to the subdirectory with solutions of the SECTION subdir."
+  (f-join
+   (my-zms-section-path section)
+   my-zms-section-solutions-relatieve-path))
+
+(defun my-zms-section-solution.tex-path (section)
+  "Return path to the Solution.tex file of the ZMS SECTION."
+  (f-join
+   (my-zms-section-path section)
+   "Solution.tex"))
+
+(defun my-zms-current-section ()
+  "Get either ZMS session placed in the current directory or last created."
+  (or
+   (my-zms-path-to-section default-directory)
+   (my-zms-last-section)))
+
+(defun my-zms-path-to-section (path)
+  "Convert PATH to a file of the ZMS SECTION to an object of `my-zms-section'."
+  (and
+   (my-zms-path-p path)
+   (->>
+    (f-full path)
+    (s-chop-prefix (f-full my-zms-directory))
+    (s-split "/")
+    (car)
+    (my-zms-section-dirname-to-section))))
+
+(defun my-zms-path-p (&optional path)
+  (or path (setq path (buffer-file-name)))
+  (s-starts-with-p (f-full my-zms-directory) (f-full path)))
+
+(defun fast-exec-zms-keys ()
+  "Get some useful keymaps of  `fast-exec' for zms."
+  (fast-exec/some-commands
+   ("New ZMS Task Solution"     'my-zms-new-solution)
+   ("Forward ZMS Task Solution" 'my-zms-new-solution-in-current-section)
+   ("New ZMS Section"           'my-zms-new-section)
+   ("Delete ZMS Section"        'my-zms-delete-section)
+   ("Delete ZMS Task Solution"  'my-zms-delete-solution)))
+
+(fast-exec/register-keymap-func 'fast-exec-zms-keys)
+(fast-exec/reload-functions-chain)
+
+(defun my-zms-run-command-recipe ()
+  "Recipe of `run-command' for ZMS."
+  (when (my-zms-path-p)
+    (list
+     (list
+      :command-name "zms-compile-section"
+      :display "Compile Section.tex file of the ZMS section via `pdflatex'"
+      :command-line (my-zms--get-compile-command)
+      :working-dir (my-zms-section-path (my-zms-current-section))))))
+
+(defun my-zms--get-compile-command ()
+  "Get command for compiling of the section file Solution.tex.
+
+See `my-zms-compile-command'"
+  (->>
+   my-zms-compile-command
+   (s-replace "{solution.tex}"
+              (my-zms-section-solution.tex-path (my-zms-current-section)))
+   (s-replace "{output-directory}"
+              (my-zms-section-output-path (my-zms-current-section)))))
+
+(defun my-zms-section-output-path (section)
+  "Get path to the output directory of compiling Solution.tex file of SECTION."
+  (->
+   section
+   (my-zms-section-path)
+   (f-join "destination")))
+
+(add-to-list 'run-command-recipes 'my-zms-run-command-recipe)

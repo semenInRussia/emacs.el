@@ -3,47 +3,33 @@
 #+TODO: FAIL | GOAL DONE
 
 * Habbits
+  
 * Planes
 
 ** Targets on Week
-*** TODO Do =zms=
-    SCHEDULED: <2022-08-08 Пн -30d>
-    
-
+*** TODO Add a cool keymap to =LaTeX=
+*** TODO Explore =xenops=                                             :latex:
+*** TODO Add a automatic management of the spaces to =LaTeX=
 *** TODO =racket-mmanager=
+*** TODO Rebind the binding of =dired= /'/
 *** TODO =emacs-run-command-recipes=
-
-    
-*** TODO explore the =org-tempo=                                        :org:
-
-*** TODO explore the =org-publish=                                      :org:
-
-*** TODO explore the =org-export=                                       :org:
-    Also use some themes for exporting to the =html=
-
-*** TODO change the setup for the =org-mode=                            :org:
-
-    - [ ] =folded= to =overview=
-    - [ ] =indented=
-    - [ ] =with-inline-images=
-
-*** TODO explore the =org-speed-commands=                               :org:
-
+*** TODO Bind command to /SPC l q/ in =org-mode=
 *** TODO bind to /[tab]/, instead of /"\t"/
-
 *** TODO use =org-crypt= for the crypting notes of the category /passwords/ :org:
 
 *** TODO explore the =xetex=                                          :latex:
 
-*** TODO new org captures for inserting new planes on day/week          :org:
-
-*** TODO Instead of the deleting DONE headlines, arhieving              :org:
-
 *** TODO visit /Suggestion to keep your Org files tidy/                 :org:
-
+*** TODO remove dependicies from the =s= library in the =run-command-recipes= :run_command_recipes:
 *** TODO fix count of words/chars in the =mode-line=
 
-*** TODO remove dependicies from the =s= library in the =run-command-recipes= :run_command_recipes:
+*** TODO Fix aggresive fill pargaraph mode in the =LaTeX=
+    Disable on the:
+
+    #+BEGIN_EXAMPLE
+    \author{jdej}
+    \date{dje |}
+    #+END_EXAMPLE
 
 *** TODO see on the =org-store-link=                                    :org:
 
@@ -54,76 +40,59 @@
 *** TODO change actions of the function at the /SPC k SPC/ key
 
 *** TODO change =dired-create-dirs=                                   :dired:
-    
+
 *** TODO change =lpr-{command,switches}=                              :dired:
 
 *** TODO update =org-preview-latex=                               :org:latex:
-    
+
 *** TODO Add able to the renaming of file which has space in the name :dired:
 
-*** TODO Add =zms= files management system
-    All =zms= file being in the special directory.  This special
-    directory has some subdirectories which look like to the following
-    thing:
-
-    #+BEGIN_EXAMPLE
-    1-Fun-Logic
-    #+END_EXAMPLE
-
-    Here 1 means that the section is first section of =zms=, and
-    "Fun-Logic" means that these section has name "Fun-Logic"
-
-    Each of subdirectories has some files and yet another
-    subdirectory.  First and second files are files named "Theory.pdf"
-    and "Tasks.pdf" which I should download from the [[http://distmath.ru/][offical site]] of
-    =zms=, third file named "Solution.tex" it's should compose each
-    =LaTeX= file of the subdirectory into one document.  Subdirectory
-    should be named "solutions" and contains a lot of =LaTeX= files,
-    each of these files describe solution of the task and has name
-    look like this followed:
-
-    #+BEGIN_EXAMPLE
-    1.tex
-    #+END_EXAMPLE
-
-    Here 1 is the number of task.
-
-    I should has able to
-
-    1. Create new section via function =zms-new-section=, this should
-       create new directories and "Section.tex" file by template
-    2. Create new task via function =zms-new-section=, this should
-       insert new instruction into the "Section.tex" file
+*** TODO Add binding to /SPC x/ for the =dired=                       :dired:
 
 *** TODO fix the =org-refile=                                           :org:
 *** TODO Run the main file of the project in =run-command-reicpes= :run_command_recipes:
+*** TODO Add able to to the transposing of the =LaTeX= list items     :latex:
 *** TODO See on the =simple-indentation=                  :simple_indentaion:
+*** TODO explore the =org-tempo=                                        :org:
+*** TODO explore the =org-publish=                                      :org:
+
+*** TODO explore the =org-export=                                       :org:
+    Also use some themes for exporting to the =html=
+
+*** TODO explore the =org-speed-commands=                               :org:
+
 *** TODO Make =LaTeX= document class for ГОСТ                         :latex:
 *** TODO add support of the =org-export= to the =run-command-recipes= :run_command_recipes:
-
+*** TODO In =just-doc= change view of non-taked arguments functions
+  
+  [[file:~/projects/just/README.md::Contributing]]
 ** Targets on Day
 
-*** DONE Don't remove the DONE =org-mode= headings of the "Target on Week" subtree
-*** DONE Don't ignore files in project, which has same name with ignored directory
-    SCHEDULED: <2022-08-08 Пн>
-*** DONE Fix comments and source code in =emacs-run-command-recipes=
-*** DONE use keys *j*, *i*, *k* and *l* instead of the arrows
+*** DONE new org captures for inserting new planes on day/week          :org:
+    SCHEDULED: <2022-08-25 Чт>
+*** DONE change the setup for the =org-mode=                          :org:
+    SCHEDULED: <2022-08-25 Чт>
 
-*** DONE Abbrevs
-Add some abbrevs to the =aas= for the =org-mode=
+- [ ] =folded= to =overview=
+- [ ] =indented=
+- [ ] =with-inline-images=
 
-- [X] explore the
-- [X] miscellaneous
-- [X] I am use
-
-*** DONE autocapitalize on "* TODO |" in the =org-mode=
-
-*** DONE change the local map of the =org-mode=
-*** DONE in the =my-autoformat=: if the last char isn't letter, the don't capitalize the last word
-
+*** DONE Auto capitalize on "- |" in a =org-mode= buffer
+    SCHEDULED: <2022-08-29 Пн>
+*** TODO Do =zms=
+    SCHEDULED: <2022-08-16>
 * Films
 
-** MUST-SEE Better Call Saul
+** SAW The Shawshank Redemption
+   :PROPERTIES:
+   :name:     Побег из Шоушенка
+   :year:     1994
+   :slogan:   Страх - это кандалы. Надежда - это свобода
+   :id:       326
+   :rating:   91.0
+   :countries: (США)
+   :END:
+** SAW Better Call Saul
    :PROPERTIES:
    :name:     Лучше звоните Солу
    :year:     2015
@@ -133,6 +102,15 @@ Add some abbrevs to the =aas= for the =org-mode=
    :countries: (США)
    :END:
 
+** MUST-SEE Elvis
+   :PROPERTIES:
+   :name:     Элвис
+   :year:     2022
+   :slogan:   The Man. The Legend. The King of Rock & Roll.
+   :id:       1179041
+   :rating:   75.0
+   :countries: (Австралия США)
+   :END:
 ** MUST-SEE The Green Mile
    :PROPERTIES:
    :name:     Зеленая миля
@@ -169,24 +147,6 @@ Add some abbrevs to the =aas= for the =org-mode=
    :rating:   0
    :countries: (США)
    :END:
-** MUST-SEE Borat: Cultural Learnings of America for Make Benefit Glorious Nation of Kazakhstan
-   :PROPERTIES:
-   :name:     Борат
-   :year:     2006
-   :slogan:   Come to Kazakhstan, It's Nice!
-   :id:       102474
-   :rating:   67.0
-   :countries: (Великобритания США)
-   :END:
-I** MUST-SEE Les fugitifs
-   :PROPERTIES:
-   :name:     Беглецы
-   :year:     1986
-   :slogan:   The oddest «odd couple» from «Les Comperes» are back in a gag-filled comic masterpiece of role reversal and farcical misadventure
-   :id:       20897
-   :rating:   79.0
-   :countries: (Франция)
-   :END:
 ** MUST-SEE Thor: Love and Thunder
    :PROPERTIES:
    :name:     Тор: Любовь и гром
@@ -204,4 +164,22 @@ I** MUST-SEE Les fugitifs
    :id:       1219909
    :rating:   67.0
    :countries: (США)
+   :END:
+** MUST-SEE Borat: Cultural Learnings of America for Make Benefit Glorious Nation of Kazakhstan
+   :PROPERTIES:
+   :name:     Борат
+   :year:     2006
+   :slogan:   Come to Kazakhstan, It's Nice!
+   :id:       102474
+   :rating:   67.0
+   :countries: (Великобритания США)
+   :END:
+** SAW Les fugitifs
+   :PROPERTIES:
+   :name:     Беглецы
+   :year:     1986
+   :slogan:   The oddest «odd couple» from «Les Comperes» are back in a gag-filled comic masterpiece of role reversal and farcical misadventure
+   :id:       20897
+   :rating:   79.0
+   :countries: (Франция)
    :END:
