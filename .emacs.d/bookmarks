@@ -4,7 +4,7 @@
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
 (("org-capture-last-stored"
  (filename . "~/agenda.org")
- (front-context-string . "*** TODO Auto ca")
- (rear-context-string . "D: <2022-08-16>\n")
- (position . 2917))
+ (front-context-string . "*** TODO CDLaTeX")
+ (rear-context-string . " не занимать}]]\n")
+ (position . 3138))
 )
