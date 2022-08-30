@@ -11,9 +11,7 @@
 *** TODO Explore =xenops=                                             :latex:
 *** TODO Add a automatic management of the spaces to =LaTeX=
 *** TODO =racket-mmanager=
-*** TODO Rebind the binding of =dired= /'/
 *** TODO =emacs-run-command-recipes=
-*** TODO Bind command to /SPC l q/ in =org-mode=
 *** TODO bind to /[tab]/, instead of /"\t"/
 *** TODO use =org-crypt= for the crypting notes of the category /passwords/ :org:
 
@@ -33,21 +31,9 @@
 
 *** TODO see on the =org-store-link=                                    :org:
 
-*** TODO change =directory-abbrev-alist=                              :dired:
-
 *** TODO explore the =which-function-mode=
 
-*** TODO change actions of the function at the /SPC k SPC/ key
-
-*** TODO change =dired-create-dirs=                                   :dired:
-
-*** TODO change =lpr-{command,switches}=                              :dired:
-
 *** TODO update =org-preview-latex=                               :org:latex:
-
-*** TODO Add able to the renaming of file which has space in the name :dired:
-
-*** TODO Add binding to /SPC x/ for the =dired=                       :dired:
 
 *** TODO fix the =org-refile=                                           :org:
 *** TODO Run the main file of the project in =run-command-reicpes= :run_command_recipes:
@@ -66,7 +52,6 @@
 *** TODO In =just-doc= change view of non-taked arguments functions
   
   [[file:~/projects/just/README.md::Contributing]]
-*** TODO Complete system of =LaTeX= commands insertion=
 *** TODO Add \underline command for =LaTeX=
   
 *** TODO Delete weird links in =org-capture= templates
@@ -79,19 +64,26 @@
   [[file:~/notes/passwords/obit.org::+TITLE: OBIT]]
 ** Targets on Day
 
-*** DONE new org captures for inserting new planes on day/week          :org:
-    SCHEDULED: <2022-08-25 Чт>
-*** DONE change the setup for the =org-mode=                          :org:
-    SCHEDULED: <2022-08-25 Чт>
+*** DONE Add binding to /SPC x/ for the =dired=                     :dired:
+SCHEDULED: <2022-08-30 Вт>
 
-- [ ] =folded= to =overview=
-- [ ] =indented=
-- [ ] =with-inline-images=
+*** TODO change =directory-abbrev-alist=                              :dired:
+SCHEDULED: <2022-08-30 Вт>
 
-*** DONE Auto capitalize on "- |" in a =org-mode= buffer
-    SCHEDULED: <2022-08-29 Пн>
+*** DONE Add able to the renaming of file which has space in the name :dired:
+SCHEDULED: <2022-08-30 Вт>
+
+*** DONE change =lpr-{command,switches}=                            :dired:
+SCHEDULED: <2022-08-30 Вт>
+
+*** TODO Bind command to /SPC l q/ in =org-mode=
+SCHEDULED: <2022-08-30 Вт>
+*** TODO Template of =org-capture= for the film
+SCHEDULED: <2022-08-30 Вт>
+*** DONE Rebind the binding of =dired= /'/
+SCHEDULED: <2022-08-30 Вт>
 *** TODO Do =zms=
-    SCHEDULED: <2022-08-16>
+SCHEDULED: <2022-08-16>
 * Films
 
 ** SAW The Shawshank Redemption

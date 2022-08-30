@@ -4038,10 +4038,14 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
 (use-package dired
     :bind ((:map dired-mode-map)
            ("SPC"     . nil)                ; make command at space empty prefix
+
            ;; Navigation
            ("k"       . 'next-line)
            ("i"       . 'previous-line)
            ("n"       . 'dired-avy)
+           ("SPC h"   . 'beginning-of-buffer)
+           ("SPC n"   . 'end-of-buffer)
+           ("'"       . 'dired-isearch-filenames)
 
            ;; Open file
            ("l"       . 'dired-find-file)
@@ -4051,6 +4055,7 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
 
            ;; Manipulation with file(s)
            ("SPC g"   . 'my-dired-delete)
+           ("SPC x"   . 'my-dired-delete-all-files)
            ("f"       . 'my-dired-rename)
            ("SPC TAB" . 'my-dired-move)
            ("s"       . 'my-dired-new-file)
@@ -4062,18 +4067,18 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
 
            ;; Misc.
            ("y"       . 'dired-undo)
-           ("'"       . 'helm-find-files)
 
            ;; Key bindings which not change your commands
            ("a"       . 'xah-fly-M-x)
            (","       . 'xah-next-window-or-frame))
+    :custom ((lpr-command "PDFToPrinter")) ; Command for printing file
     :config (add-hook 'dired-mode-hook 'xah-fly-insert-mode-activate))
 
 (defun my-dired-mark-all-files ()
   "Mark all file in `dired'."
   (interactive)
   (save-excursion
-    (beginning-of-buffer)
+    (goto-char (point-min))
     (dired-mark 1)))
 
 (defmacro my-define-dired-command-taking-file (name args docstring &rest body)
@@ -4084,12 +4089,8 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
      ,docstring
      (funcall
       (lambda ,args ,@body)
-      (my-dired-filename-at-line))
+      (dired-get-filename))
      (revert-buffer)))
-
-(defun my-dired-filename-at-line ()
-  "Get filename of file at dired object at current point."
-  (f-join (dired-current-directory) (my-dired-name-of-file-at-line)))
 
 (defun my-dired-name-of-file-at-line ()
   "Get name of file at dired object at current point."
@@ -4138,6 +4139,13 @@ Return new name of FILE"
   "Create file with FILENAME in the directory which opened in the dired buffer."
   (interactive "sName of new file, please: ")
   (find-file (f-join (dired-current-directory) filename)))
+
+(defun my-dired-delete-all-files ()
+  "Delete all files from the directory of the `dired' buffer."
+  (interactive)
+  (--each (f-entries (dired-current-directory))
+    (f-delete it t))
+  (revert-buffer))
 
 (defun dired-avy ()
   "Version of `avy' for the `dired'."
