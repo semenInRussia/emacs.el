@@ -11,7 +11,7 @@ My moto is "Good Luck!", so my homepage is "Good Luck":
   (setq initial-buffer-choice "~/Start.org")
 
   #+END_SRC
-  
+
 I'm use followed repositories as a template for my Emacs config:
 
   - [[https://github.com/jkitchin/scimax/][jkitchin/scimax]] (org mode, and auto format functions)
@@ -104,6 +104,7 @@ I'm use followed repositories as a template for my Emacs config:
     - [[#latex][LaTeX]]
       - [[#latex--calc][LaTeX + calc]]
       - [[#preview-latex][Preview Latex]]
+      - [[#insertion-of-commands-of-latex-from-the-source-code][Insertion of commands of LaTeX from the Source Code]]
       - [[#fast-navigation-and-insertion-in-latex][Fast Navigation and Insertion in LaTeX]]
       - [[#insert-pairs-in-latex][Insert Pairs in LaTeX]]
       - [[#latex-tables][LaTeX Tables]]
@@ -329,8 +330,6 @@ lisp [[https://github.com/sigma/pcache][pcache]].
       :ensure t)
 
       #+END_SRC
-
-
 
 *** API for =org-mode=
 I am use [[https://github.com/ndwarshuis/org-ml][org-ml]] --- a functional API for =org-mode= inspired by
@@ -1517,7 +1516,6 @@ organization of buffer text.  I am use built-in the Emacs =outline=
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-
   (defun outline-show-all-or-entry ()
     "If call once, use `outline-show-entry', twice call `outline-show-all'."
     (interactive)
@@ -2491,7 +2489,7 @@ Main skeleton of my LaTeX configuration is package =tex-mode= with
   (use-package tex-mode
       :major-mode-map latex (LaTeX-mode))
 
-      #+END_SRC
+#+END_SRC
 
 **** LaTeX + calc
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -2500,7 +2498,7 @@ Main skeleton of my LaTeX configuration is package =tex-mode= with
       :ensure auctex
       :hook ((LaTeX-mode . prettify-symbols-mode))
       :bind ((:map my-latex-local-map)
-             ("="     . my-calc-simplify-region-copy)
+             (="     . my-calc-simplify-region-copy)
              ("f"     . my-calc-simplify-region-change))
       :config (require 'calc-lang)
       (defun my-calc-simplify (expr)
@@ -2528,7 +2526,7 @@ Main skeleton of my LaTeX configuration is package =tex-mode= with
           (delete-region beg end)
           (insert simplified))))
 
-          #+END_SRC
+#+END_SRC
 
 **** Preview Latex
 
@@ -2538,14 +2536,14 @@ programm via =npm=
 
 #+BEGIN_SRC shell
   npm install -g git+https://gitlab.com/matsievskiysv/math-preview
-  #+END_SRC
+#+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
   (use-package math-preview
       :ensure t
       :custom
       (math-preview-preprocess-functions
-       (list (lambda (s) (s-concat "{\\color{white}" s "}"))))
+       (list (lambda (s) (s-concat "{\\color{white}" s "}""))))
       :bind ((:map my-latex-local-map)
              ("p" . 'my-latex-preview)
              ("d" . 'math-preview-clear-at-point))
@@ -2598,6 +2596,429 @@ other buffer
        ("v" . 'my-latex-preview-in-other-window)))
 
        #+END_SRC
+
+**** Insertion of commands of LaTeX from the Source Code
+
+***** LaTeX core
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (defvar my-latex-insert-at-start-arg-type 'optional
+    "Type of argument (optional or required) which will be inserted at start.")
+
+  (defun my-latex-insert-command (name &rest args)
+    "Insert a LaTeX command named NAME with required arguments ARGS.
+
+  Each arg of ARGS will be inserted as string, which will be taked with function
+  `format' and the argument string is \"%s\"
+
+  If one of ARGS is nil, then don't insert it.  If one of ARGS is `alist', then
+  insert it by the following form (see `my-latex-format-for-arg' for understand of
+  formating):
+
+  key1=val1,key2=val2
+
+  If you need to use optional arguments, add to ARGS the keyword `:optional' and
+  each element after it will be inserted as optional argument."
+    (insert "\\" name)
+    (my-latex--insert-args args))
+
+  (defun my-latex--insert-args (args)
+    "Insert ARGS as LaTeX arguments.
+
+  See `my-latex-insert-command' for understand of ARGS"
+    (-let (((required optional)
+            (my-latex-optional-and-required-args args)))
+      (case my-latex-insert-at-start-arg-type
+        ((optional)
+         (my-latex--insert-optional-args optional)
+         (my-latex--insert-required-args required))
+        ((required)
+         (my-latex--insert-required-args required)
+         (my-latex--insert-optional-args optional)))))
+
+  (defun my-latex--insert-optional-args (optional)
+    "Insert list OPTIONAL as optional LaTeX arguments."
+    (--each optional
+      (when it
+        (my-latex-insert-optional-arg it))))
+
+  (defun my-latex--insert-required-args (required)
+    "Insert list REQUIRED as required LaTeX arguments."
+    (--each required
+      (when it
+        (my-latex-insert-required-arg it))))
+
+  (defun my-latex-optional-and-required-args (args)
+    "Split ARGS to 2 lists: required and optional arguments.
+
+  Optional arguments are elements of ARGS after the `:optional' keyword, required
+  are rest"
+    (let* ((break-index (-elem-index :optional args)))
+      (case break-index
+        ((nil)
+         (list args nil))
+        ((0)
+         (list nil (cdr args)))           ; here cdr ignore
+                                          ; the first element of args: :optional
+        (t
+         (list
+          (-slice args 0 break-index)
+          (-slice args (1+ break-index)))))))
+
+  (defun my-latex-insert-required-arg (val)
+    "Insert VAL as an LaTeX required argument."
+    (insert "{" (my-latex-format-for-arg val) "}"))
+
+  (defun my-latex-insert-optional-arg (val)
+    "Insert VAL as an LaTeX optional argument."
+    (insert "[" (my-latex-format-for-arg val) "]"))
+
+  (defun my-latex-format-for-arg (val)
+    "Format VAL as string for inserting of an LaTeX argument."
+    (cond
+      ((my-alist-p val)
+       (->>
+        val
+        (--keep
+         (when (cdr it)
+           (format "%s=%s" (car it) (cdr it))))
+        (s-join ",")))
+      (val
+       (format "%s" val))))
+
+  (defun my-alist-p (obj)
+    "Return t, when OBJ is `alist'."
+    (and
+     (listp obj)
+     (not (null obj))
+     (consp (car obj))))
+
+  (defun my-latex-insert-single-line-command (command &rest args)
+    "Insert the LaTeX command named COMMAND with ARGS.
+
+  This version of `my-latex-insert-command', so see `my-latex-insert-command'"
+    (just-ensure-empty-line)
+    (apply 'my-latex-insert-command command args))
+
+  (defun my-latex-insert-env (name &rest args)
+    "Insert the LaTeX environment named NAME with ARGS.
+
+  See `my-latex-insert-command' for understand of use ARGS"
+    (my-latex-insert-command "begin" name)
+    (my-latex--insert-args args)
+    (newline)
+    (insert "  ")
+    (save-excursion
+      (newline)
+      (my-latex-insert-command "end" name)))
+
+  (add-hook 'latex-mode-hook 'aas-activate-for-major-mode)
+
+  (defun my-latex-expand-define-function (key fun)
+    "Bind call of FUN at KEY in the LaTeX.
+
+  FUN will be called when the user press KEY and dot"
+    (aas-set-snippets 'latex-mode
+      (s-concat key ".") fun))
+
+  (defmacro my-latex-expand-define (key name args &rest body)
+    "Bind evaluation of BODY at KEY in LaTeX, define function with NAME and ARGS.
+
+  BODY will be evaluated when the user press KEY and dot"
+    (declare (indent 3))
+    `(progn
+       (defun ,name ,args
+         ,@body)
+       (my-latex-expand-define-function ,key ',name)))
+
+#+END_SRC
+
+***** LaTeX Graphics
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (defun my-latex-ensure-has-graphicspath ()
+    "Ensure that current LaTeX buffer has \\graphicspath{}.
+
+  If now current LaTeX buffer hasn't \\graphicspath{}, read new graphicspath from
+  the minibuffer."
+    (unless (my-latex-current-graphicspathes)
+      (my-latex-add-graphicspath
+       (read-directory-name "Dirictory of the saved images, please: "))))
+
+  (defun my-latex-graphics-init ()
+    "Add some stuffs for graphics in LaTeX."
+    (interactive)
+    (my-latex-use-package "graphicx")
+    (my-latex-ensure-has-graphicspath)
+    (--each (my-latex-current-graphicspathes) (f-mkdir (f-full it))))
+
+  (defun my-latex-add-graphicspath (path)
+    "Add to list of current LaTeX file' s graphicpath PATH."
+    (->>
+     (my-latex-current-graphicspathes)
+     (cons path)
+     (my-latex-set-graphicspath)))
+
+  (defun my-latex-set-graphicspath (paths)
+    "Set graphicpath (command \\graphicspath)of current LaTeX buffer to PATHS."
+    (save-excursion
+      (my-latex-goto-graphicspath)
+      (forward-char -1)
+      (sp-get
+          (sp-get-enclosing-sexp)
+        (delete-region :beg-in :end-in)
+        (--each paths (insert "{" it "}")))))
+
+  (defun my-latex-current-graphicspathes ()
+    "Parse from current LaTeX buffer value of \\graphicspath."
+    (save-excursion
+      (my-latex-goto-graphicspath)
+      (forward-char -1)
+      (sp-get (sp-get-enclosing-sexp)
+        (->>
+         (buffer-substring-no-properties :beg-in :end-in)
+         (s-match-strings-all
+          "{\\(.*\\)}")
+         (-map '-last-item)))))
+
+  (defun my-latex-goto-graphicspath ()
+    "Goto end of LaTeX command for set graphic paths, if isn't exit insert."
+    (goto-char (point-min))
+    (unless (search-forward-regexp "^\\\\graphicspath" nil t)
+      (search-forward-regexp "\\usepackage.*{graphicspath}" nil t)
+      (forward-line 1)
+      (beginning-of-line)
+      (my-latex-insert-command "graphicspath")
+      (insert "{}")
+      (newline)
+      (forward-char -1))
+    (end-of-line))
+
+  (defun my-latex-insert-includegraphics (filename &optional width)
+    "Insert the \\includegraphics LaTeX command which include FILENAME.
+
+  If WIDTH is non-nil, then insert WIDTH as the optional argument width to the
+  \\includegraphics command."
+    (my-latex-insert-single-line-command "includegraphics" filename
+                                         :optional `((width . ,width))))
+
+  (defun my-latex-download-image-to-graphicspath (url &optional filename)
+    "Download image at URL into graphicspath of current LaTeX buffer.
+  This file has name FILENAME.  Return nil when fail, otherwise return path of
+  downloaded file"
+    (or filename (setq filename (my-uri-of-url url)))
+    (let* ((graphicspath (-last-item (my-latex-current-graphicspathes)))
+           (dest (f-join graphicspath filename)))
+      (url-copy-file url dest t)
+      dest))
+
+  (defun my-uri-of-url (url)
+    "Get the URI of URL."
+    (->>
+     url
+     (s-split "/")
+     (-last-item)
+     (s-split "?")
+     (-first-item)))
+
+#+END_SRC
+
+***** A lot of LaTeX commands insertion defnitions
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (my-latex-expand-define "f" my-latex-insert-figure-environment ;nofmt
+      (&optional placement)
+    "Insert the LaTeX environment figure into current buffer with PLACEMENT."
+    (interactive (list (my-latex-read-placement)))
+    (or placement (setq placement "h"))
+    (my-latex-insert-env "figure" placement))
+
+  (my-latex-expand-define "cp" my-latex-insert-caption ;nofmt
+      (&optional caption-string)
+    "If CAPTION-STRING is non-nil, then insert a caption for with LaTeX syntax."
+    (interactive (list (my-latex-read-caption)))
+    (when caption-string
+      (my-latex-insert-single-line-command "caption" caption-string)))
+
+  (my-latex-expand-define "cr" my-latex-insert-center
+      ()
+    "Insert the LaTeX environment center."
+    (interactive)
+    (my-latex-insert-env "center"))
+
+  (my-latex-expand-define "tr" my-latex-insert-tabular
+      (&optional placement)
+    "Insert the latex environment tabular."
+    (interactive (list (my-latex-read-placement)))
+    (or placement (setq placement "ht"))
+    (my-latex-insert-env "tabular" placement))
+
+  (my-latex-expand-define "ar" my-latex-insert-arabic
+      (counter)
+    "Insert the latex command arabic."
+    (interactive (list (my-latex-read-counter-name)))
+    (my-latex-insert-command "arabic" counter))
+
+  (my-latex-expand-define "rom" my-latex-insert-roman
+      (counter)
+    "Insert the latex command roman."
+    (interactive (list (my-latex-read-counter-name)))
+    (my-latex-insert-command "roman" counter))
+
+  (my-latex-expand-define "al" my-latex-insert-alph
+      (counter)
+    "Insert the latex command alph."
+    (interactive (list (my-latex-read-counter-name)))
+    (my-latex-insert-command "alph" counter))
+
+  (defcustom my-latex-default-counters
+    '("part"
+      "chapter"
+      "section"
+      "subsection"
+      "subsubsection"
+      "paragraph"
+      "subparagraph"
+      "page"
+      "equation"
+      "figure"
+      "table"
+      "footnote"
+      "mpfootnote"
+      "enumi"
+      "enumii"
+      "enumiii"
+      "enumiv"
+      "task")
+    "List of the built-in LaTeX counters names."
+    :type '(repeat string))
+
+  (defun my-latex-read-counter-name ()
+    "Read name of a LaTeX counter from the minibuffer."
+    (completing-read "Name of counter, please: "
+                     (my-latex-get-counters-names)))
+
+  (defun my-latex-get-counters-names ()
+    "Get list of all LaTeX counters names."
+    (-concat
+     my-latex-default-counters
+     (my-latex-find-counters-names-in-buffer)))
+
+  (defun my-latex-find-counters-names-in-buffer ()
+    "Find in the current buffer all LaTeX counters defnitions, return its names."
+    (->>
+     (buffer-string)
+     (s-lines)
+     (--keep
+      (when (s-prefix-p "\\newcounter" (s-trim-left it))
+        (->> ;nofmt
+         it
+         (s-chop-prefix "\\newcounter{")
+         (s-chop-suffix "}"))))))
+
+  (my-latex-expand-define "ncr" my-latex-insert-newcounter
+      (counter &optional sub-counter)
+    "Insert the LaTeX command newcounter with name COUNTER.
+
+  SUB-COUNTER is optional argument of that LaTeX command."
+    (interactive (list
+                  (read-string "Name of the counter, please: ")
+                  (my-read-string-or-nil "Depends on counter: ")))
+    (let ((my-latex-insert-at-start-arg-type 'required))
+      (my-latex-insert-single-line-command "newcounter" counter
+                                           :optional sub-counter)))
+
+  (my-latex-expand-define "atc" my-latex-insert-addtocounter
+      (counter amount)
+    "Insert the LaTeX command addtocounter with name COUNTER and AMOUNT."
+    (interactive (list
+                  (my-latex-read-counter-name)
+                  (read-number "Amount for add to counter: ")))
+    (my-latex-insert-command "addtocounter" counter amount))
+
+  (my-latex-expand-define "sc" my-latex-insert-setcounter
+      (counter value)
+    "Insert the LaTeX command setcounter with name COUNTER and VALUE."
+    (interactive (list
+                  (my-latex-read-counter-name)
+                  (read-number "Value to set counter: ")))
+    (my-latex-insert-command "setcounter" counter value))
+
+  (my-latex-expand-define "stc" my-latex-insert-stepcounter
+      (counter)
+    "Insert the LaTeX command stepcounter with name COUNTER and VALUE."
+    (interactive (list (my-latex-read-counter-name)))
+    (my-latex-insert-command "stepcounter" counter))
+
+  (defun my-read-string-or-nil ;nofmt
+      (prompt &optional initial-input history default-value inherit-input-method)
+    "Read string from the minibuffer, if the user type nothing, return nil.
+
+  Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
+  `read-string'"
+    (let ((input
+           (read-string prompt initial-input history default-value
+                        inherit-input-method)))
+      (unless (s-blank-p input)
+        input)))
+
+  (my-latex-expand-define "au" my-latex-insert-author
+      (name)
+    "Insert the latex command author with NAME."
+    (interactive (list (read-string "Name of the author, please: "
+                                    user-full-name)))
+    (my-latex-insert-single-line-command "author" name))
+
+  (my-latex-expand-define "ttl" my-latex-insert-title
+      (title)
+    "Insert the LaTeX command title with TITLE."
+    (interactive "sTitle of the document: ")
+    (my-latex-insert-single-line-command "title" title))
+
+  (my-latex-expand-define "dt" my-latex-insert-date
+      (date)
+    "Insert the LaTeX command date with DATE."
+    (interactive "sDate of the document, please: ")
+    (my-latex-insert-single-line-command "date" date))
+
+#+END_SRC
+
+***** LaTeX =\usepackage=
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (defun my-latex-use-package (package &optional options)
+    "Add \\usepackage for PACKAGE with OPTIONS to the current LaTeX buffer."
+    (interactive "sPlease, choose package which you need use: ")
+    (unless (my-latex-used-package-p package)
+      (save-excursion
+        (my-latex-goto-use-package-source)
+        (beginning-of-line)
+        (my-latex-insert-command "usepackage" :optional options)
+        (newline))))
+
+  (defun my-latex-goto-use-package-source ()
+    "Go to the place of the LaTeX source code where shoud be inserted usepackage."
+    (interactive)
+    (goto-char (point-min))
+    (unless (search-forward-regexp "^\\\\usepackage" nil t)
+      (search-forward-regexp "^\\\\begin{document}" nil t))
+    (beginning-of-line))
+
+  (defun my-latex-used-package-p (package)
+    "Return t, when PACKAGE was used in current LaTeX buffer."
+    (-contains-p (my-latex-used-packages) package))
+
+  (defun my-latex-used-packages ()
+    "Parse from current LaTeX buffer, list of used packages."
+    (->>
+     (buffer-string)
+     (s-lines)
+     (--filter (s-prefix-p "\\usepackage" it))
+     (--map
+      (-last-item
+       (s-match "\\\\usepackage\\(\\[.*\\]\\)?{\\(.*\\)}" it)))))
+
+#+END_SRC
 
 **** Fast Navigation and Insertion in LaTeX
 
@@ -3036,14 +3457,16 @@ transformt its to split environment
 
    #+END_SRC
 **** Insert any image at URL in LaTeX
-I am as old user of =Google.Documents= must have command which
-just insert any image by url, so I create its.  For insert a
-image at url I bind keymaps to =SPC l u= (insert a image at
-readed from the minibuffer URL) and keymap =SPC l v= (insert a
-image from the clipboard)
+I am as old user of =Google.Documents= must have command which just
+insert any image by url, so I create its.  For insert a image at url I
+bind keymaps to =SPC l u= (insert a image at URL readed from either
+clipboard, selected text or the minibuffer) and keymap =SPC l i=
+insert image from file readed from the minibuffer.  Also I have
+snippet /i/ for inserting image
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-  (defun my-latex-insert-image (filename &optional caption placement width centering)
+  (defun my-latex-insert-image (filename  ;nofmt
+                                &optional caption placement width centering)
     "Insert image with FILENAME with LaTeX syntax into current buffer.
 
   By default, caption won't be inserted, but if CAPTION is a string image will
@@ -3051,48 +3474,58 @@ image from the clipboard)
 
   Image will inserted with LaTeX environment figure and command
   \\includegraphics, so you can change PLACEMENT and WIDTH of the inserted
-  image, PLACEMENT defaults to \"h\", WIDTH defaults to the original image width.
+  image, PLACEMENT defaults to \"h\", WIDTH defaults to the original image
+  width.
 
   If CENTERING is non-nil, then image will be centered via \\centering"
     (interactive (my--get-arguments-for-latex-insert-image))
     (my-latex-graphics-init)
     (my-latex-insert-figure-environment placement)
-    (when centering (insert "\\centering"))
+    (when centering ;nofmt
+      (my-latex-insert-centering))
     (my-latex-insert-includegraphics filename width)
     (my-latex-insert-caption caption))
 
+  (defun my-latex-insert-centering ()
+    "Insert the LaTeX command \"centering\"."
+    (interactive)
+    (my-latex-insert-single-line-command "centering"))
+
   (defun my--get-arguments-for-latex-insert-image ()
     "Read from the minibuffer arguments for the `my-latex-insert-image'."
-    (my-latex-ensure-has-graphicspath)
-    (let* ((graphicspath (-last-item (my-latex-current-graphicspathes)))
-           (filename
-            (s-chop-prefix
-             (f-slash graphicspath)
-             (read-file-name "Choose image, please: " graphicspath)))
-           (caption (my-latex-read-caption))
-           (width (my-latex-read-width))
-           (placement (my-latex-read-placement))
-           (centering (my-latex-read-centering)))
-      (list filename caption placement width centering)))
+    (my-latex-graphics-init)
+    (list
+     (my-latex-read-image-path-from-graphicspath)
+     (my-latex-read-caption)
+     (my-latex-read-width)
+     (my-latex-read-placement)
+     (my-latex-read-centering)))
+
+  (defun my-latex-read-image-path-from-graphicspath ()
+    "Read from the minibuffer path to an image from the graphicspath."
+    (let ((graphicspath (f-full (-last-item (my-latex-current-graphicspathes)))))
+      (->>
+       (read-file-name "Filename of image, please: " graphicspath)
+       (s-chop-prefix graphicspath))))
 
   (defun my-latex-read-caption ()
     "Read from the minibuffer a caption for the LaTeX.
 
-  If the user typed nothing, then return nil"
+    If the user typed nothing, then return nil"
     (let ((typed (read-string "Caption, please: ")))
       (unless (s-blank? typed) typed)))
 
   (defun my-latex-read-width ()
     "Read a LaTeX width from the minibuffer.
 
-  If the user typed nothing, then return nil"
+    If the user typed nothing, then return nil"
     (let ((typed (read-string "Width, please: ")))
       (unless (s-blank? typed) typed)))
 
   (defun my-latex-read-placement ()
     "Read a LaTeX placement from the minibuffer.
 
-  If the user typed nothing, then return nil"
+    If the user typed nothing, then return nil"
     (let ((typed
            (read-string "Placement, please (some chars of h t b p ! H): ")))
       (unless (s-blank? typed) typed)))
@@ -3101,156 +3534,48 @@ image from the clipboard)
     "Return t, when the user need to centering of the LaTeX block."
     (y-or-n-p "Centering or no? "))
 
-  (defun my-latex-ensure-has-graphicspath ()
-    "Ensure that current LaTeX buffer has \\graphicspath{}.
 
-  If now current LaTeX buffer hasn't \\graphicspath{}, read new graphicspath from
-  the minibuffer."
-    (unless (my-latex-current-graphicspathes)
-      (my-latex-add-graphicspath
-       (read-directory-name "Dirictory of the saved images, please: "))))
+  (defun my-latex-insert-image-at-url (url
+                                       &optional
+                                         filename
+                                         caption
+                                         placement
+                                         width
+                                         centering)
+    "Download as FILENAME and insert image at URL to the current LaTeX buffer.
 
-  (defun my-latex-graphics-init ()
-    "Add some stuffs for graphics in LaTeX."
-    (interactive)
-    (my-latex-use-package "graphicx")
-    (unless (my-latex-current-graphicspathes)
-      (my-latex-add-graphicspath "./images/")))
+  Image will be inserted with CAPTION (if CAPTION isn't nil), PLACEMENT (defaults
+  to \"h\"), width (defaults to origin width of the image at URL) and centering
+  if centering is non-nil.
 
-  (defun my-latex-add-graphicspath (path)
-    "Add to list of current LaTeX file' s graphicpath PATH."
-    (->>
-     (my-latex-current-graphicspathes)
-     (cons path)
-     (my-latex-set-graphicspath)))
-
-  (defun my-latex-set-graphicspath (paths)
-    "Set graphicpath (command \\graphicspath)of current LaTeX buffer to PATHS."
-    (save-excursion
-      (my-latex-goto-graphicspath)
-      (forward-char -1)
-      (sp-get
-          (sp-get-enclosing-sexp)
-        (delete-region :beg-in :end-in)
-        (--each paths (insert (format "{%s}" it))))))
-
-  (defun my-latex-current-graphicspathes ()
-    "Parse from current LaTeX buffer value of \\graphicspath."
-    (save-excursion
-      (my-latex-goto-graphicspath)
-      (-when-let
-          (ok (sp-get-sexp t))
-        (sp-get ok
-          (->>
-           (buffer-substring-no-properties :beg-in :end-in)
-           (s-match-strings-all
-            (rx "{" (group (0+ (not "}"))) "}"))
-           (-map #'-last-item))))))
-
-  (defun my-latex-goto-graphicspath ()
-    "Goto end of LaTeX command for set graphic paths, if isn't exit insert."
-    (goto-char (point-min))
-    (unless (search-forward-regexp "^\\\\graphicspath"  nil t)
-      (search-forward-regexp "\\usepackage.*{graphicspath}"  nil t)
-      (forward-line -1)
-      (end-of-line)
-      (newline)
-      (insert "\\graphicspath{}"))
-    (end-of-line))
-
-  (defun my-latex-use-package (package &optional options)
-    "Add \\usepackage for PACKAGE with OPTIONS to current LaTeX buffer."
-    (interactive "sPlease, choose package which you need use: ")
-    (unless (my-latex-used-package-p package)
-      (save-excursion
-        (my-latex-goto-use-package-source)
-        (beginning-of-line)
-        (insert "\\usepackage")
-        (LaTeX-arg-usepackage-insert (list package) options)
-        (LaTeX-newline))))
-
-  (defun my-latex-goto-use-package-source ()
-    "Go to the place of the LaTeX source code where shoud be inserted usepackage."
-    (interactive)
-    (goto-char (point-min))
-    (unless (search-forward-regexp "^\\\\usepackage" nil t)
-      (search-forward-regexp "^\\\\begin{document}" nil t))
-    (beginning-of-line))
-
-  (defun my-latex-used-package-p (package)
-    "Return t, when PACKAGE was used in current LaTeX buffer."
-    (-contains-p (my-latex-used-packages) package))
-
-  (defun my-latex-used-packages ()
-    "Parse from current LaTeX buffer, list of used packages."
-    (->>
-     (buffer-string)
-     (s-lines)
-     (--filter (s-prefix-p "\\usepackage" it))
-     (--map
-      (-last-item
-       (s-match "\\\\usepackage\\(\\[.*\\]\\)?{\\(.*\\)}" it)))))
-
-  (defun my-latex-insert-figure-environment (placement)
-    "Insert the LaTeX environment figure into current buffer with PLACEMENT."
-    (or placement (setq placement "h"))
-    (LaTeX-insert-environment "figure" (format "{%s}" placement)))
-
-  (defun my-latex-insert-includegraphics (filename &optional width)
-    "Insert the \\includegraphics LaTeX command which include FILENAME.
-
-  If WIDTH is non-nil, then insert WIDTH as the optional argument width to the
-  \\includegraphics command."
-    (just-ensure-empty-line)
-    (insert "\\includegraphics")
-    (when width (insert "[width=" width "]"))
-    (insert "{" filename "}"))
-
-  (defun my-latex-insert-caption (caption-string)
-    "If CAPTION-STRING is non-nil, then insert a caption for with LaTeX syntax."
-    (unless caption-string
-      (just-ensure-empty-line)
-      (insert "\\caption{" caption-string "}")))
-
-  (defun my-latex-insert-img-at-url (url &optional image-name)
-    "Insert to current latex buffer image at URL, install if need.
-  Downloaded image will be called IMAGE-NAME"
-    (interactive
-     (let* ((url (my-read-image-url))
-            (image-name
-             (read-string "Name of downloaded image, please: "
-                          (my-uri-of-url url))))
-       (list url image-name)))
+  If call that function interactively, then URL will be readed from either
+  the `kill-ring', the selected region or the minibuffer"
+    (interactive (my--get-arguments-for-latex-insert-image-at-url))
     (my-latex-graphics-init)
-    (->>
-     (my-latex-download-image-into-graphicspath url image-name)
-     (my-latex-insert-img-at-path)))
+    (my-latex-download-image-to-graphicspath url filename)
+    (my-latex-insert-image filename caption placement width centering))
 
-  (defun my-latex-download-image-into-graphicspath (url &optional filename)
-    "Download image at URL into graphicspath of current LaTeX buffer.
-  This file has name FILENAME.  Return nil when fail, otherwise return path of
-  downloaded file"
-    (or filename (setq filename (my-uri-of-url)))
-    (let* ((graphicspath (-last-item (my-latex-current-graphicspathes)))
-           (dest (f-join graphicspath filename)))
-      (url-copy-file url dest t)
-      dest))
+  (defun my--get-arguments-for-latex-insert-image-at-url ()
+    "Get arguments for `my-latex-insert-image-at-url'."
+    (let ((url (my-read-image-url)))
+      (list
+       url
+       (my-latex-read-new-filename-of-image-at-url url)
+       (my-latex-read-caption)
+       (my-latex-read-placement)
+       (my-latex-read-width)
+       (my-latex-read-centering))))
 
-  (defun my-uri-of-url (url)
-    "Get the URI of URL."
-    (->>
-     url
-     (s-split "/")
-     (-last-item)
-     (s-split "?")
-     (-first-item)))
+  (defun my-latex-read-new-filename-of-image-at-url (url)
+    "Read from the minibuffer new filename of the downloaded image at URL."
+    (read-string "New filename of the downloaded image: "
+                 (my-uri-of-url url)))
 
   (bind-keys
    :map my-latex-local-map
-   ("n" . my-latex-use-package)
-   ("u" . my-latex-insert-img-at-url)
-   ("v" . my-latex-insert-img-at-copied-url))
-   #+END_SRC
+   ("i" . my-latex-insert-image)
+   ("u" . my-latex-insert-image-at-url))
+#+END_SRC
 
 *** Org
 I am consider that Org Mode built in Emacs:
@@ -3352,7 +3677,6 @@ I am consider that Org Mode built in Emacs:
     (org-schedule t (format-time-string "%Y-%m-%d")))
     #+END_SRC
 
-    
 **** Insert Images in the Org Mode
 Defnition of the =my-org-insert-image=:
 
@@ -3453,7 +3777,7 @@ I am centering text, when enable =org-mode=:
     "exthe" "explore the"
     "misc " "miscellaneous"
     "Iau" "I am use")
-    #+END_SRC
+#+END_SRC
 
 **** Auto Format in Org
 I am use my autoformat system, which I am taked from [[https://github.com/jkitchin/scimax/][scimax]]:
@@ -4020,7 +4344,6 @@ name and it contract
   (add-to-list 'my-racket-meta-return-functions
                #'my-racket-meta-return-contracted)
                #+END_SRC
-
 
 **** Scribble: The Racket Documentation Tool
 I am use [[https://docs.racket-lang.org/scribble/][scribble]].  The =scribble= is special for =racket=
@@ -5517,7 +5840,6 @@ I am use [[https://github.com/bbatsov/projectile][projectile]]:
       :init                               ;nofmt
       (projectile-mode 1))
 
-
       #+END_SRC
 
 *** Projectile with Helm
@@ -5603,7 +5925,6 @@ I am use offical [[https://github.com/bbatsov/helm-projectile][helm-projectile]]
      :persistent-help "Preview file"))
 
      #+END_SRC
-
 
 ** Regexp IDE
 I am use [[https://github.com/jwiegley/regex-tool][regex-tool]] for testing regexp in Emacs
@@ -6035,7 +6356,6 @@ the my /Planes on Day/Week/
 
         #+END_SRC
 
-
 ** Notes
 I am create own simple system of notes:
 
@@ -6322,7 +6642,7 @@ I am create own simple system of notes:
   (fast-exec/register-keymap-func 'fast-exec-my-notes-keys)
   (fast-exec/reload-functions-chain)
   #+END_SRC
-  
+
 * MIPT
 ** Management of MIPT Files
 I am make homework of [[https://mipt.ru][MIPT]], so I make small script, which create
@@ -6892,6 +7212,4 @@ I have some functions for the management of the ZMS:
   (add-to-list 'run-command-recipes 'my-zms-run-command-recipe)
 
   #+END_SRC
-
-
 

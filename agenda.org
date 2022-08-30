@@ -66,6 +66,17 @@
 *** TODO In =just-doc= change view of non-taked arguments functions
   
   [[file:~/projects/just/README.md::Contributing]]
+*** TODO Complete system of =LaTeX= commands insertion=
+*** TODO Add \underline command for =LaTeX=
+  
+*** TODO Delete weird links in =org-capture= templates
+  
+*** TODO Explore notes style for LaTeX
+  
+*** TODO CDLaTeX Math Modify for Russian imput method
+*** TODO See notes without Emacs
+  
+  [[file:~/notes/passwords/obit.org::+TITLE: OBIT]]
 ** Targets on Day
 
 *** DONE new org captures for inserting new planes on day/week          :org:
