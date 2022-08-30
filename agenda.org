@@ -11,8 +11,6 @@
 *** TODO Explore =xenops=                                             :latex:
 *** TODO Add a automatic management of the spaces to =LaTeX=
 *** TODO =racket-mmanager=
-*** TODO =emacs-run-command-recipes=
-*** TODO bind to /[tab]/, instead of /"\t"/
 *** TODO use =org-crypt= for the crypting notes of the category /passwords/ :org:
 
 *** TODO explore the =xetex=                                          :latex:
@@ -54,8 +52,6 @@
   [[file:~/projects/just/README.md::Contributing]]
 *** TODO Add \underline command for =LaTeX=
   
-*** TODO Delete weird links in =org-capture= templates
-  
 *** TODO Explore notes style for LaTeX
   
 *** TODO CDLaTeX Math Modify for Russian imput method
@@ -64,65 +60,36 @@
   [[file:~/notes/passwords/obit.org::+TITLE: OBIT]]
 ** Targets on Day
 
-*** DONE Add binding to /SPC x/ for the =dired=                     :dired:
-SCHEDULED: <2022-08-30 Вт>
-
-*** TODO change =directory-abbrev-alist=                              :dired:
-SCHEDULED: <2022-08-30 Вт>
-
-*** DONE Add able to the renaming of file which has space in the name :dired:
-SCHEDULED: <2022-08-30 Вт>
-
-*** DONE change =lpr-{command,switches}=                            :dired:
-SCHEDULED: <2022-08-30 Вт>
-
-*** TODO Bind command to /SPC l q/ in =org-mode=
-SCHEDULED: <2022-08-30 Вт>
-*** TODO Template of =org-capture= for the film
-SCHEDULED: <2022-08-30 Вт>
-*** DONE Rebind the binding of =dired= /'/
-SCHEDULED: <2022-08-30 Вт>
-*** TODO Do =zms=
-SCHEDULED: <2022-08-16>
 * Films
 
-** SAW The Shawshank Redemption
-   :PROPERTIES:
-   :name:     Побег из Шоушенка
-   :year:     1994
-   :slogan:   Страх - это кандалы. Надежда - это свобода
-   :id:       326
-   :rating:   91.0
-   :countries: (США)
-   :END:
-** SAW Better Call Saul
-   :PROPERTIES:
-   :name:     Лучше звоните Солу
-   :year:     2015
-   :slogan:   Make the call
-   :id:       796660
-   :rating:   82.0
-   :countries: (США)
-   :END:
-
 ** MUST-SEE Elvis
-   :PROPERTIES:
-   :name:     Элвис
-   :year:     2022
-   :slogan:   The Man. The Legend. The King of Rock & Roll.
-   :id:       1179041
-   :rating:   75.0
-   :countries: (Австралия США)
-   :END:
+:PROPERTIES:
+:name:     Элвис
+:year:     2022
+:slogan:   The Man. The Legend. The King of Rock & Roll.
+:id:       1179041
+:rating:   73.0
+:countries: (Австралия США)
+:END:
 ** MUST-SEE The Green Mile
-   :PROPERTIES:
-   :name:     Зеленая миля
-   :year:     1999
-   :slogan:   Пол Эджкомб не верил в чудеса. Пока не столкнулся с одним из них
-   :id:       435
-   :rating:   91.0
-   :countries: (США)
-   :END:
+:PROPERTIES:
+:name:     Зеленая миля
+:year:     1999
+:slogan:   Пол Эджкомб не верил в чудеса. Пока не столкнулся с одним из них
+:id:       435
+:rating:   91.0
+:countries: (США)
+:END:
+
+** MUST-SEE The Matrix Reloaded
+:PROPERTIES:
+:name:     Матрица: Перезагрузка
+:year:     2003
+:slogan:   Одни машины помогают нам жить, другие – пытаются нас убить
+:id:       299
+:rating:   77.0
+:countries: (США)
+:END:
 ** MUST-SEE The Batman
    :PROPERTIES:
    :name:     Бэтмен
@@ -176,13 +143,4 @@ SCHEDULED: <2022-08-16>
    :id:       102474
    :rating:   67.0
    :countries: (Великобритания США)
-   :END:
-** SAW Les fugitifs
-   :PROPERTIES:
-   :name:     Беглецы
-   :year:     1986
-   :slogan:   The oddest «odd couple» from «Les Comperes» are back in a gag-filled comic masterpiece of role reversal and farcical misadventure
-   :id:       20897
-   :rating:   79.0
-   :countries: (Франция)
    :END:

@@ -5317,6 +5317,13 @@ films
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
+  (defun my-films-format-as-org-heading ()
+    "Format an `kinopoisk-film' readed from the minibuffer as an org entry."
+    (with-temp-buffer
+      (org-mode)
+      (my-films-add (my-films--search-new))
+      (s-concat (buffer-string) "%?")))
+
   (defun my-films-add (film)
     "Add FILM to current org file, this file is db of films."
     (interactive (list (my-films--search-new)))
@@ -6357,14 +6364,19 @@ the my /Planes on Day/Week/
         "Target on Day"
         entry
         (file+headline "~/agenda.org" "Targets on Day")
-        "* TODO %?\n  SCHEDULED: %t\n  %i\n  %a")
+        "* TODO %?\n  SCHEDULED: %t\n  \n")
        ("w"
         "Target on Week"
         entry
         (file+headline "~/agenda.org" "Targets on Week")
-        "* TODO %?\n  %i\n  %a"))))
+        "* TODO %?\n  \n")
+       ("f"
+        "Film for See"
+        entry
+        (file+headline "~/agenda.org" "Films")
+        (function my-films-format-as-org-heading)))))
 
-        #+END_SRC
+#+END_SRC
 
 ** Notes
 I am create own simple system of notes:

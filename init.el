@@ -3540,6 +3540,13 @@ List of racket expressions in which this function should work:
 (fast-exec/register-keymap-func 'fast-exec-fake-pptx-keys)
 (fast-exec/reload-functions-chain)
 
+(defun my-films-format-as-org-heading ()
+  "Format an `kinopoisk-film' readed from the minibuffer as an org entry."
+  (with-temp-buffer
+    (org-mode)
+    (my-films-add (my-films--search-new))
+    (s-concat (buffer-string) "%?")))
+
 (defun my-films-add (film)
   "Add FILM to current org file, this file is db of films."
   (interactive (list (my-films--search-new)))
@@ -4301,12 +4308,17 @@ PT defaults to the current `point'"
       "Target on Day"
       entry
       (file+headline "~/agenda.org" "Targets on Day")
-      "* TODO %?\n  SCHEDULED: %t\n  %i\n  %a")
+      "* TODO %?\n  SCHEDULED: %t\n  \n")
      ("w"
       "Target on Week"
       entry
       (file+headline "~/agenda.org" "Targets on Week")
-      "* TODO %?\n  %i\n  %a"))))
+      "* TODO %?\n  \n")
+     ("f"
+      "Film for See"
+      entry
+      (file+headline "~/agenda.org" "Films")
+      (function my-films-format-as-org-heading)))))
 
 (defgroup my-notes nil
   "My own simple system of notes."
