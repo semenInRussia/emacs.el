@@ -2,8 +2,6 @@
 #+TODO: MUST-SEE | SAW
 #+TODO: FAIL | GOAL DONE
 
-* Habbits
-
 * Planes
 
 ** Targets on Week
@@ -65,8 +63,6 @@ Also use some themes for exporting to the =html=
 
 *** TODO Add \underline command for =LaTeX=
 
-*** DONE Explore notes style for LaTeX
-
 *** TODO CDLaTeX Math Modify for Russian imput method
 
 *** TODO See notes without Emacs
@@ -74,37 +70,25 @@ Also use some themes for exporting to the =html=
 *** TODO Print current buffer command for =fast-exec=
 
 **** TODO More pretty =helm-projectile-files=
+
 *** TODO Enable prettify mode in latex
+
 *** TODO Change defnition of =insert-new-counter=
+
 *** TODO Multicolumn expansion latex
+
 *** TODO Latex expansion : wrapfig, wraptable
+*** TODO Auto capitalize on #+TITLE in org
 ** Targets on Day
 
-*** DONE Placement -> Table Preamble in the LaTeX insertion commands
-SCHEDULED: <2022-09-01 Чт>
-
-*** DONE visit /Suggestion to keep your Org files tidy/               :org:
-SCHEDULED: <2022-09-01 Чт>
-
-*** DONE Update =org-preview-latex=                             :org:latex:
-SCHEDULED: <2022-09-01 Чт>
-
-*** DONE Remove dependicies from the =s= library in the =run-command-recipes= :run_command_recipes:
-SCHEDULED: <2022-09-01 Чт>
-
 *** TODO Use =org-crypt= for the crypting notes of the category /passwords/ :org:
-SCHEDULED: <2022-09-01 Чт>
-
-*** DONE Explore =xenops=                                           :latex:
 SCHEDULED: <2022-09-01 Чт>
 
 *** TODO Do =zms=
 SCHEDULED: <2022-08-16 Вт>
 
-
-
-*** DONE Chop default-directory from the graphicspath when insert image in LaTeX
-SCHEDULED: <2022-09-01 Чт>
+*** DONE Use =deft= instead of my own notes system
+SCHEDULED: <2022-09-02 Пт>
 
 * Films
 
@@ -116,16 +100,6 @@ SCHEDULED: <2022-09-01 Чт>
 :id:       435
 :rating:   91.0
 :countries: (США)
-:END:
-
-** SAW Elvis
-:PROPERTIES:
-:name:     Элвис
-:year:     2022
-:slogan:   The Man. The Legend. The King of Rock & Roll.
-:id:       1179041
-:rating:   73.0
-:countries: (Австралия США)
 :END:
 
 ** MUST-SEE The Matrix Reloaded
@@ -197,3 +171,14 @@ SCHEDULED: <2022-09-01 Чт>
    :rating:   67.0
    :countries: (Великобритания США)
    :END:
+
+** MUST-SEE Raiders of the Lost Ark
+:PROPERTIES:
+:name:     Индиана Джонс: В поисках утраченного ковчега
+:year:     1981
+:slogan:   Indiana Jones - the new hero from the creators of JAWS and STAR WARS
+:id:       339
+:rating:   80.0
+:countries: (США)
+:END:
+

@@ -1,5 +1,0 @@
-emacs
-cool-texts
-physics
-passwords
-default

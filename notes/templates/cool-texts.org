@@ -1,5 +1,0 @@
-#+TITLE: ${1:name}
-#+AUTHOR: ${2:untitled Author}
-
-* {title}
-
