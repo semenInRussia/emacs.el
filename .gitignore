@@ -42,3 +42,5 @@ auto-save-list/
 devdocs/
 /zms
 *.org_archive
+/.emacs.d/xenops/
+/test/

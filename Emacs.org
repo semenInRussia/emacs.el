@@ -2,6 +2,7 @@
 #+AUTHOR: semenInRussia
 
 * Hi!
+
 Hello, This is configuration of Emacs from =semenInRussia=!
 
 My moto is "Good Luck!", so my homepage is "Good Luck":
@@ -130,6 +131,7 @@ I'm use followed repositories as a template for my Emacs config:
       - [[#generate-table-of-contents-in-org-mode-][Generate Table of Contents in =org-mode= ==]]
       - [[#startup-of-org-mode][Startup of =org-mode=]]
       - [[#org--cdlatex][Org + CDLaTeX]]
+      - [[#keep-your-org-files-tidy][Keep your Org files tidy]]
     - [[#elisp][Elisp]]
       - [[#special-linters][Special Linters]]
       - [[#refactoring][Refactoring]]
@@ -255,7 +257,9 @@ I'm use followed repositories as a template for my Emacs config:
 - [[#zms][ZMS]]
 
 * Package Management - base
+
 ** use-package
+
 I am use [[https://github.com/jwiegley/use-package][use-package]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -276,7 +280,9 @@ I am use [[https://github.com/jwiegley/use-package][use-package]]:
 
   (require 'use-package)
   #+END_SRC
+
 ** Packages Not in MELPA/ELPA/ORG-ELPA
+
 *** Stranger Packages
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -297,15 +303,20 @@ I am use [[https://github.com/jwiegley/use-package][use-package]]:
   #+END_SRC
 
 * Writing This Config
+
 I am use some packages for simple develop on Emacs Lisp
+
 ** Libraries
+
 *** s
+
 This is [[https://github.com/magnars/s.el][s]]:
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
   (use-package s :ensure t)
   #+END_SRC
 
 *** f
+
 This is [[https://github.com/rejeep/f.el][f]]:
 
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
@@ -313,6 +324,7 @@ This is [[https://github.com/rejeep/f.el][f]]:
   #+END_SRC
 
 *** Dash
+
 This is [[https://github.com/magnars/dash.el][dash:]]
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
 
@@ -321,6 +333,7 @@ This is [[https://github.com/magnars/dash.el][dash:]]
   #+END_SRC
 
 *** Caching
+
 I am use the most usefull library for caching data in the Emacs
 lisp [[https://github.com/sigma/pcache][pcache]].
 
@@ -332,6 +345,7 @@ lisp [[https://github.com/sigma/pcache][pcache]].
       #+END_SRC
 
 *** API for =org-mode=
+
 I am use [[https://github.com/ndwarshuis/org-ml][org-ml]] --- a functional API for =org-mode= inspired by
 @magnars's dash.el and s.el libraries.
 
@@ -342,7 +356,9 @@ I am use [[https://github.com/ndwarshuis/org-ml][org-ml]] --- a functional API f
       #+END_SRC
 
 ** My Small Standard Library
+
 *** Work with Files
+
 Function =my-try-delete= delete file when it is exists, otherwise
 do nothing:
 
@@ -382,7 +398,9 @@ directory which has extension:
      (--filter (f-ext-p it ext))))
 
      #+END_SRC
+
 *** Work with Strings
+
 Functions =my-humanize-string= and =my-normalize-string= transform
 strings as =print-something-real-noral= to "Print Something Real
 Noral" and to back.
@@ -461,6 +479,7 @@ string mathces with taked string:
 #+END_SRC
 
 *** Work with Lists
+
 =dash= has function =-max= which return maximal value from of
 passed list, but this functions raise error when list is empty, so
 I writed function =my-max=:
@@ -509,7 +528,9 @@ list to N lists with same length:
       (-partition-in-steps step step seq)))
 
       #+END_SRC
+
 *** Work with Lisp Sexps
+
 Without commentaries, just see below to the source code.
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -548,7 +569,9 @@ Without commentaries, just see below to the source code.
           (sp-get sexp (< :beg pt :end))))))
 
           #+END_SRC
+
 *** Read Anything from the User
+
 Function =my-read-image-url= read a image URL.  If copied text is
 a URL, then return.  If region is active, then return a text in the
 region.  Otherwise, read a URL from the minibuffer.
@@ -573,6 +596,7 @@ region.  Otherwise, read a URL from the minibuffer.
         #+END_SRC
 
 *** Work with Math
+
 I am create some functions for work with divisors.  It's very
 useful, because I am "mathist" and now I can just fast run
 function in Emacs and know result
@@ -595,6 +619,7 @@ function in Emacs and know result
      #+END_SRC
 
 ** Function for work with the Emacs
+
 I created library =just= which has a lot of power functions for
 work with Emacs
 
@@ -649,7 +674,9 @@ work with Emacs
       #+END_SRC
 
 * Organize Editing
+
 ** Main keymaps
+
 I am use [[https://github.com/xahlee/xah-fly-keys][xah-fly-keys]], this as VIM, but keymaps created for keyboard (in VIM keymaps created for easy remember):
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -663,7 +690,9 @@ I am use [[https://github.com/xahlee/xah-fly-keys][xah-fly-keys]], this as VIM, 
     (define-key xah-fly-command-map (kbd "SPC SPC") nil))
 
     #+END_SRC
+
 *** Easy Create Major Modes Maps
+
 I am use =use-package=, so I'm add flag =:major-mode-map= for create major modes in =use-package= macro, I am bind local major mode map to =SPC l=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -689,6 +718,7 @@ I am use =use-package=, so I'm add flag =:major-mode-map= for create major modes
   #+END_SRC
 
 **** Normalizer for =:major-mode-map=
+
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (defun use-package-normalize/:major-mode-map (name keyword args)
@@ -713,6 +743,7 @@ I am use =use-package=, so I'm add flag =:major-mode-map= for create major modes
          #+END_SRC
 
 **** =major-mode-map='s Handler
+
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (defun use-package-handler/:major-mode-map (name keyword
@@ -738,6 +769,7 @@ I am use =use-package=, so I'm add flag =:major-mode-map= for create major modes
       #+END_SRC
 
 ** Fast Executing Command
+
 I am use [[https://github.com/semenInRussia/fast-exec.el][fast-exec]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -764,8 +796,11 @@ I am use [[https://github.com/semenInRussia/fast-exec.el][fast-exec]]:
   (define-key xah-fly-command-map (kbd "=") 'fast-exec/exec)
 
   #+END_SRC
+
 ** Snippets
+
 *** Auto Activating Snippets
+
 I am use [[https://github.com/ymarco/auto-activating-snippets][auto-activating-snippets]], I'm just insert a certain text,
 and the certain snipped automatically expand.
 
@@ -779,6 +814,7 @@ and the certain snipped automatically expand.
       #+END_SRC
 
 *** Standard Snippets
+
 I am use [[https://github.com/joaotavora/yasnippet][yasnippet]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -794,6 +830,7 @@ I am use [[https://github.com/joaotavora/yasnippet][yasnippet]]:
       #+END_SRC
 
 **** COMMENT A Lot of Snippets
+
 NOTE: this heading isn't used, because, now I try don't use extra
 snippets, but I'm use [[https://github.com/AndreaCrotti/yasnippet-snippets][yasnippet-snippets]] by coping of the certain
 directories
@@ -809,6 +846,7 @@ collection of snippets for [[https://github.com/joaotavora/yasnippet][yasnippet]
       #+END_SRC
 
 **** Ignore Case in Snippets' Expansion
+
 When I am use =org= first symbol of the sentence will
 automatically capitalizated, so when I insert /equ/ this will
 changed to /Equ/, and when I am press =TAB=, instead of expanding
@@ -832,6 +870,7 @@ snippet (use =yas-expand=), the cursor moved to next position (use
          #+END_SRC
 
 **** Quick Way to Change Defnition of Snippet
+
 I must have command which read from the minibuffer (with
 completing) name of a snippet after visit file of snippet's
 defnition.  I bound it to a keymap from the =fast-exec=
@@ -848,6 +887,7 @@ defnition.  I bound it to a keymap from the =fast-exec=
   #+END_SRC
 
 ** Highlight Errors and Warnings (maybe other things also)
+
 I am use [[https://www.flycheck.org/en/latest/][flycheck]] for fly checking errors in buffer:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -868,6 +908,7 @@ I am use [[https://www.flycheck.org/en/latest/][flycheck]] for fly checking erro
     #+END_SRC
 
 ** Autocomplete
+
 I am use [[http://company-mode.github.io][company-mode]], I am set delay beetween typing text and viewing hints to
 0.8 seconds:
 
@@ -909,6 +950,7 @@ And for =yasnippet= I am use code from [[https://emacs.stackexchange.com/questio
         #+END_SRC
 
 *** More Pretty Auto Complete
+
 I am use popular [[https://github.com/sebastiencs/company-box][company-box]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -920,6 +962,7 @@ I am use popular [[https://github.com/sebastiencs/company-box][company-box]]:
       #+END_SRC
 
 ** Format All Code
+
 Each programmer need to format code for this I am use [[https://github.com/lassik/emacs-format-all-the-code][format-all]],
 its support 65 languages:
 
@@ -931,6 +974,7 @@ its support 65 languages:
       #+END_SRC
 
 *** I am Russian!
+
 I am need to use russian letters as english in key hots:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -960,6 +1004,7 @@ will pressed KEY in KEYMAP and when CONDITION will true:
          #+END_SRC
 
 ** Search
+
 *** Search in File
 
 I am press ='= for search anything in current buffer.  I am use
@@ -984,6 +1029,7 @@ major mode.
              #+END_SRC
 
 *** Search in Very Some File
+
 I am use [[https://github.com/Wilfred/deadgrep][deadgrep]], because I am love =Rust=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -997,6 +1043,7 @@ I am use [[https://github.com/Wilfred/deadgrep][deadgrep]], because I am love =R
              #+END_SRC
 
 ** Search and Replace
+
 I am use =SPC r= for replace word in buffer, and =SPC SPC r= for replace word in project:
 
 *** Search and Replace in Project
@@ -1008,6 +1055,7 @@ I am use =SPC r= for replace word in buffer, and =SPC SPC r= for replace word in
   #+END_SRC
 
 *** Search and Replace in Current Buffer
+
 I am use [[https://github.com/benma/visual-regexp.el][visual-regexp]].  This is like replace-regexp, but with
 live visual feedback directly in the buffer.
 
@@ -1021,6 +1069,7 @@ live visual feedback directly in the buffer.
              #+END_SRC
 
 ** Change Case of Text
+
 I am use [[https://github.com/akicho8/string-inflection][string-inflection]] for change case of text on cycle
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -1033,6 +1082,7 @@ I am use [[https://github.com/akicho8/string-inflection][string-inflection]] for
              #+END_SRC
 
 ** Auto indent (aggressive)
+
 I am use [[https://github.com/Malabarba/aggressive-indent-mode/][aggressive-indent-mode]].  When I'm press space, all will
 indented (see [[https://github.com/Malabarba/aggressive-indent-mode/][docs]]).  I need use [[https://github.com/Malabarba/aggressive-indent-mode/][aggressive-indent-mode]] only in
 specific major modes, so I make variable
@@ -1061,6 +1111,7 @@ in which should be working [[https://github.com/Malabarba/aggressive-indent-mode
                   #+END_SRC
 
 ** Navigation beetween Functions/Classes/etc.
+
 I am use =imenu= with =Helm= and keymap =SPC SPC SPC=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -1073,6 +1124,7 @@ I am use =imenu= with =Helm= and keymap =SPC SPC SPC=:
              #+END_SRC
 
 *** In Project
+
 For Imenu In Project I am use [[https://github.com/vspinu/imenu-anywhere][imenu-anywhere]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -1085,6 +1137,7 @@ For Imenu In Project I am use [[https://github.com/vspinu/imenu-anywhere][imenu-
                   #+END_SRC
 
 ** Smart Comment/Uncomment
+
 I am use [[https://github.com/remyferre/comment-dwim-2][comment-dwim-2]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -1097,6 +1150,7 @@ I am use [[https://github.com/remyferre/comment-dwim-2][comment-dwim-2]]:
                   #+END_SRC
 
 ** Jump to Defnition
+
 I am use [[https://github.com/jacktasia/dumb-jump][cool package dumb-jump]] for jump to defnition in 50+ languages:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -1116,6 +1170,7 @@ I am use [[https://github.com/jacktasia/dumb-jump][cool package dumb-jump]] for 
       #+END_SRC
 
 ** Multiple Cursors
+
 I am use package of magnars [[https://github.com/magnars/multiple-cursors.el][multiple-cursors]]:
 
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
@@ -1188,6 +1243,7 @@ I am use package of magnars [[https://github.com/magnars/multiple-cursors.el][mu
           #+END_SRC
 
 ** Very Fast Jump
+
 I am use [[https://github.com/abo-abo/avy][avy]]:
 
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
@@ -1402,7 +1458,9 @@ I am use [[https://github.com/abo-abo/avy][avy]]:
 : avy-action-insert-new-line-at-bol
 
 ** Smart Parens
+
 *** Smartparens
+
 I am use [[https://github.com/Fuco1/smartparens/][smartparens]], for slurp expresion I am use =]=, also for
 splice parens I am use =-= , for navigating I am use =.= and =m=:
 
@@ -1433,7 +1491,9 @@ splice parens I am use =-= , for navigating I am use =.= and =m=:
               ("SPC ="     . 'sp-raise-sexp))))
 
               #+END_SRC
+
 *** Special Configuration for Major Modes
+
 For enable builtin smartparens configuration for major modes, add require statement to =.emacs.el=, with name of major mode and smartparens prefix:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -1456,6 +1516,7 @@ For enable builtin smartparens configuration for major modes, add require statem
   #+END_SRC
 
 ** Smart Select Text
+
 I am use cool package [[https://github.com/magnars/expand-region.el/][expand-region]]:
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
   (defun mark-inner-or-expand-region ()
@@ -1478,7 +1539,9 @@ I am use cool package [[https://github.com/magnars/expand-region.el/][expand-reg
             ("m" . sp-backward-up-sexp)))
 
             #+END_SRC
+
 ** Macros
+
 I am use =\= in command mode for start of record macro.
 I am also use =SPC RET= for execute last macro or execute macro to lines:
 
@@ -1510,7 +1573,9 @@ I am also use =SPC RET= for execute last macro or execute macro to lines:
 
 #+RESULTS:
 : kmacro-call-macro-or-apply-to-lines
+
 ** Outline
+
 Outline is feature which show and hide framgents of buffer for
 organization of buffer text.  I am use built-in the Emacs =outline=
 
@@ -1538,6 +1603,7 @@ organization of buffer text.  I am use built-in the Emacs =outline=
              #+END_SRC
 
 ** Special Strings as Seperated Buffers
+
 I am use [[https://github.com/magnars/string-edit.el][string-edit]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -1548,7 +1614,9 @@ I am use [[https://github.com/magnars/string-edit.el][string-edit]]:
                   ("SPC `" . string-edit-at-point)))
 
                   #+END_SRC
+
 ** Documentation on Fly
+
 I am use built-in Emacs =eldoc=, I'm love when =eldoc= work at the
 moment when I type something, so I decrease eldoc's delay
 
@@ -1560,12 +1628,14 @@ moment when I type something, so I decrease eldoc's delay
       #+END_SRC
 
 ** Transpose
+
 For example I am press =SPC TAB o=, then current word will moved to
 right, but again press this hard key sequence is hard, so I am
 press just =o=, and current word again moved to right, next time I
 am press =i= and now line moved to up.
 
 *** Define Extensible Drag System
+
 I want to agile system of drag, because in each cases my drag
 functions must can do each things.  For agile I have
 followed functions:
@@ -1777,6 +1847,7 @@ commands:
        #+END_SRC
 
 *** Draggers of =drag-stuff=
+
 I am use [[https://github.com/rejeep/drag-stuff.el][drag-stuff]], and my [[*Define Extensible Drag System][drag system]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -1787,6 +1858,7 @@ I am use [[https://github.com/rejeep/drag-stuff.el][drag-stuff]], and my [[*Defi
   #+END_SRC
 
 *** Draggers for =org-mode=
+
 I am use [[*Define Extensible Drag System][my drag system]] and built in =org= functions:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -1848,6 +1920,7 @@ I am use [[*Define Extensible Drag System][my drag system]] and built in =org= f
   #+END_SRC
 
 ** Custom Deleting Text
+
 I am delete this line and edit this by press =w=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -1878,6 +1951,7 @@ I am delete content of this line (including whitespaces) on press =SPC w=:
   #+END_SRC
 
 ** Custom Selecting Text
+
 I am press 2 times =8= for selecting 2 words
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -1924,6 +1998,7 @@ I am press =-= for change position when select text to begin/end of selected reg
     #+END_SRC
 
 ** Custom Editing Text
+
 I am use =s= for inserting new line:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -2184,6 +2259,7 @@ I press =SPC k 6= and Emacs duplicate last text block:
    #+END_SRC
 
 ** Custom Navigation
+
 I am press =m= and =.= for go to next, previous sexp:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -2292,6 +2368,7 @@ I am press =SPC , ,= for go to defnition:
   #+END_SRC
 
 ** Quick Navigation Between 2 Buffers
+
 This like on =C-tab= in your web-browser or on =M-tab= in a lot of
 OS.  I bind it to =SPC 0=
 
@@ -2321,8 +2398,11 @@ OS.  I bind it to =SPC 0=
    #+END_SRC
 
 * Support of Languages
+
 ** Functions for extending functional of language
+
 *** Functions for Navigation
+
 Function `add-nav-to-imports-for-language`, is define keys for go to imports:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -2341,6 +2421,7 @@ Function `add-nav-to-imports-for-language`, is define keys for go to imports:
             #+END_SRC
 
 *** Functions for Pretty View
+
 I am use [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] for centering content of org file:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -2359,6 +2440,7 @@ I am use [[https://github.com/joostkremers/visual-fill-column][visual-fill-colum
     #+END_SRC
 
 *** Functions for Import
+
 Function `add-import-keymap-for-language` defines key for `add-import`.
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -2376,6 +2458,7 @@ Function `add-import-keymap-for-language` defines key for `add-import`.
             #+END_SRC
 
 *** Functions for Auto Format Code
+
 I am take this from [[https://github.com/jkitchin/scimax/][scimax]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -2477,7 +2560,9 @@ I am take this from [[https://github.com/jkitchin/scimax/][scimax]]:
 : t
 
 ** Supported Languages
+
 *** LaTeX
+
 I am use [[https://github.com/emacsmirror/auctex][auctex]], I am take some configuration from
 [[https://habr.com/ru/company/skillfactory/blog/593999/][this article from HABR]]:
 
@@ -2492,47 +2577,66 @@ Main skeleton of my LaTeX configuration is package =tex-mode= with
 #+END_SRC
 
 **** LaTeX + calc
+
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (use-package latex
       :ensure auctex
       :hook ((LaTeX-mode . prettify-symbols-mode))
       :bind ((:map my-latex-local-map)
-             (="     . my-calc-simplify-region-copy)
+             ("="     . my-calc-simplify-region-copy)
              ("f"     . my-calc-simplify-region-change))
+
       :config (require 'calc-lang)
       (defun my-calc-simplify (expr)
-        "Simplify EXPR via `calc' and return this."
-        (calc-latex-language t)
-        (calc-alg-entry expr)
-        (with-temp-buffer
-          (calc-copy-to-buffer 1)
-          (delete-char -1)
-          (buffer-string)))
+          "Simplify EXPR via `calc' and return this."
+          (calc-latex-language t)
+          (calc-alg-entry expr)
+          (with-temp-buffer
+              (calc-copy-to-buffer 1)
+              (delete-char -1)
+              (buffer-string)))
 
       (defun my-calc-simplify-region-copy (beg end)
-        "Take from BEG to END, simplify this via `calc' and copy as kill."
-        (interactive "r")
-        (let ((expr (my-calc-simplify (buffer-substring beg end))))
-          (kill-new expr)
-          (message "coppied: %s" (current-kill 0))))
+          "Take from BEG to END, simplify this via `calc' and copy as kill."
+          (interactive "r")
+          (let ((expr (my-calc-simplify (buffer-substring beg end))))
+              (kill-new expr)
+              (message "coppied: %s" (current-kill 0))))
 
       (defun my-calc-simplify-region-change (beg end)
-        "Get from BEG to END change this via `calc' and yank instead of region."
-        (interactive "r")
-        (let* ((expr (buffer-substring beg end))
-               (simplified (my-calc-simplify expr)))
-          (goto-char beg)
-          (delete-region beg end)
-          (insert simplified))))
+          "Get from BEG to END change this via `calc' and yank instead of region."
+          (interactive "r")
+          (let* ((expr (buffer-substring beg end))
+                 (simplified (my-calc-simplify expr)))
+              (goto-char beg)
+              (delete-region beg end)
+              (insert simplified))))
 
 #+END_SRC
 
 **** Preview Latex
 
-I am use =math-preview= which via [[https://docs.mathjax.org/][MathJax]] preview =LaTeX= source
-code inline.  Before use =math-preview= you must install external
-programm via =npm=
+Instead of use keymaps for previewing of a =LaTeX= fragments I prefer
+use the automatic preview with [[https://github.com/dandavison/xenops][xenops]]
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package xenops
+      :ensure t
+      :hook
+      (LaTeX-mode . xenops-mode)
+      :custom
+      (xenops-math-image-scale-factor 2))
+
+#+END_SRC
+
+Also I can press =SPC l v= and Emacs preview fragment of LaTeX in
+other buffer
+
+For that feature I am use =math-preview= which via [[https://docs.mathjax.org/][MathJax]] preview
+=LaTeX= source code inline.  Before use =math-preview= you must
+install external programm via =npm=
 
 #+BEGIN_SRC shell
   npm install -g git+https://gitlab.com/matsievskiysv/math-preview
@@ -2543,41 +2647,7 @@ programm via =npm=
       :ensure t
       :custom
       (math-preview-preprocess-functions
-       (list (lambda (s) (s-concat "{\\color{white}" s "}""))))
-      :bind ((:map my-latex-local-map)
-             ("p" . 'my-latex-preview)
-             ("d" . 'math-preview-clear-at-point))
-      :config
-      (defun fast-exec-math-preview-keys ()
-        "Get some useful keymaps of  `fast-exec' for math-preview."
-        (fast-exec/some-commands
-         ("Preview All Latex Fragments" 'math-preview-all)))
-
-      (fast-exec/register-keymap-func 'fast-exec-math-preview-keys)
-      (fast-exec/reload-functions-chain))
-
-  (defun my-latex-preview ()
-    "Preview latex fragments combine `org-latex-combine', `math-preview'."
-    (interactive)
-    (if (->> (math-preview--find-gaps (point-min) (point-max))
-             (--filter (and (>= (point) (car it))
-                            (< (point) (cdr it))))
-             (--map (math-preview--search (car it) (cdr it)))
-             (-flatten)
-             (--filter (and (>= (point) (car it))
-                            (< (point) (cdr it)))))
-        (math-preview-at-point)
-      (org-latex-preview)))
-
-      #+END_SRC
-
-Also I can press =SPC l v= and Emacs preview fragment of LaTeX in
-other buffer
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  (use-package math-preview
-      :ensure t
+       (list (lambda (s) (s-concat "{\\color{white}" s "}"))))
       :config
       (defun my-latex-preview-in-other-window ()
         "Preview fragment of LaTeX source at point in seperated window."
@@ -2591,15 +2661,23 @@ other buffer
           (LaTeX-mode)
           (insert source)
           (math-preview-region (point-min) (point-max))))
+      (defun fast-exec-math-preview-keys ()
+        "Get some useful keymaps of  `fast-exec' for math-preview."
+        (fast-exec/some-commands
+         ("Preview All Latex Fragments" 'math-preview-all)))
+
+      (fast-exec/register-keymap-func 'fast-exec-math-preview-keys)
+      (fast-exec/reload-functions-chain)
       :bind
       ((:map my-latex-local-map)
        ("v" . 'my-latex-preview-in-other-window)))
 
-       #+END_SRC
+#+END_SRC
 
 **** Insertion of commands of LaTeX from the Source Code
 
 ***** LaTeX core
+
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (defvar my-latex-insert-at-start-arg-type 'optional
@@ -2620,7 +2698,8 @@ other buffer
   If you need to use optional arguments, add to ARGS the keyword `:optional' and
   each element after it will be inserted as optional argument."
     (insert "\\" name)
-    (my-latex--insert-args args))
+    (my-latex--insert-args args)
+    (indent-region (point-at-bol) (point-at-eol)))
 
   (defun my-latex--insert-args (args)
     "Insert ARGS as LaTeX arguments.
@@ -2638,15 +2717,11 @@ other buffer
 
   (defun my-latex--insert-optional-args (optional)
     "Insert list OPTIONAL as optional LaTeX arguments."
-    (--each optional
-      (when it
-        (my-latex-insert-optional-arg it))))
+    (-each optional 'my-latex-insert-optional-arg))
 
   (defun my-latex--insert-required-args (required)
     "Insert list REQUIRED as required LaTeX arguments."
-    (--each required
-      (when it
-        (my-latex-insert-required-arg it))))
+    (-each required 'my-latex-insert-required-arg))
 
   (defun my-latex-optional-and-required-args (args)
     "Split ARGS to 2 lists: required and optional arguments.
@@ -2667,22 +2742,24 @@ other buffer
 
   (defun my-latex-insert-required-arg (val)
     "Insert VAL as an LaTeX required argument."
-    (insert "{" (my-latex-format-for-arg val) "}"))
+    (--when-let (my-latex-format-for-arg val)
+      (insert "{" it "}")))
 
   (defun my-latex-insert-optional-arg (val)
     "Insert VAL as an LaTeX optional argument."
-    (insert "[" (my-latex-format-for-arg val) "]"))
+    (--when-let (my-latex-format-for-arg val)
+      (insert "[" it "]")))
 
   (defun my-latex-format-for-arg (val)
     "Format VAL as string for inserting of an LaTeX argument."
     (cond
       ((my-alist-p val)
-       (->>
-        val
-        (--keep
-         (when (cdr it)
-           (format "%s=%s" (car it) (cdr it))))
-        (s-join ",")))
+       (-some->>
+           val
+         (-filter 'cdr)
+         (--map
+          (format "%s=%s" (car it) (cdr it)))
+         (s-join ",")))
       (val
        (format "%s" val))))
 
@@ -2704,7 +2781,7 @@ other buffer
     "Insert the LaTeX environment named NAME with ARGS.
 
   See `my-latex-insert-command' for understand of use ARGS"
-    (my-latex-insert-command "begin" name)
+    (my-latex-insert-single-line-command "begin" name)
     (my-latex--insert-args args)
     (newline)
     (insert "  ")
@@ -2713,12 +2790,13 @@ other buffer
       (my-latex-insert-command "end" name)))
 
   (add-hook 'latex-mode-hook 'aas-activate-for-major-mode)
+  (add-hook 'LaTeX-mode-hook 'aas-activate-for-major-mode)
 
   (defun my-latex-expand-define-function (key fun)
     "Bind call of FUN at KEY in the LaTeX.
 
   FUN will be called when the user press KEY and dot"
-    (aas-set-snippets 'latex-mode
+    (aas-set-snippets 'LaTeX-mode
       (s-concat key ".") fun))
 
   (defmacro my-latex-expand-define (key name args &rest body)
@@ -2733,9 +2811,13 @@ other buffer
 
 #+END_SRC
 
+#+RESULTS:
+: my-latex-expand-define
+
 ***** LaTeX Graphics
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
   (defun my-latex-ensure-has-graphicspath ()
     "Ensure that current LaTeX buffer has \\graphicspath{}.
 
@@ -2754,10 +2836,11 @@ other buffer
 
   (defun my-latex-add-graphicspath (path)
     "Add to list of current LaTeX file' s graphicpath PATH."
-    (->>
-     (my-latex-current-graphicspathes)
-     (cons path)
-     (my-latex-set-graphicspath)))
+    (let ((path (s-chop-prefix (f-full default-directory) (f-full path))))
+      (->>
+       (my-latex-current-graphicspathes)
+       (cons path)
+       (my-latex-set-graphicspath))))
 
   (defun my-latex-set-graphicspath (paths)
     "Set graphicpath (command \\graphicspath)of current LaTeX buffer to PATHS."
@@ -2799,8 +2882,15 @@ other buffer
 
   If WIDTH is non-nil, then insert WIDTH as the optional argument width to the
   \\includegraphics command."
-    (my-latex-insert-single-line-command "includegraphics" filename
-                                         :optional `((width . ,width))))
+    (let* ((filename filename)
+           (image-graphicspath (--find
+                                (s-prefix-p it filename)
+                                (my-latex-current-graphicspathes)))
+           (filename (if image-graphicspath
+                         (s-chop-prefix (f-full image-graphicspath) filename)
+                       filename)))
+      (my-latex-insert-single-line-command "includegraphics" filename
+                                           :optional `((width . ,width)))))
 
   (defun my-latex-download-image-to-graphicspath (url &optional filename)
     "Download image at URL into graphicspath of current LaTeX buffer.
@@ -2823,16 +2913,32 @@ other buffer
 
 #+END_SRC
 
+#+RESULTS:
+: my-uri-of-url
+
 ***** A lot of LaTeX commands insertion defnitions
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (my-latex-expand-define "f" my-latex-insert-figure-environment ;nofmt
-      (&optional placement)
+  (my-latex-expand-define "t" my-latex-insert-table ;nofmt
+      (preamble &optional centering-p)
+    "Insert the LaTeX environment table to the current buffer with PREAMBLE."
+    (interactive (list
+                  (my-latex-read-preamble)
+                  (my-latex-read-centering)))
+    (my-latex-insert-env "table")
+    (when centering-p
+      (my-latex-insert-centering))
+    (my-latex-insert-tabular preamble))
+
+  (defun my-latex-read-preamble ()
+    "Read a LaTeX preamble for table from the minibuffer."
+    (my-read-string-or-nil "Preamble, please: "))
+
+  (my-latex-expand-define "f" my-latex-insert-figure (&optional placement)
     "Insert the LaTeX environment figure into current buffer with PLACEMENT."
     (interactive (list (my-latex-read-placement)))
-    (or placement (setq placement "h"))
-    (my-latex-insert-env "figure" placement))
+    (my-latex-insert-env "figure" :optional placement))
 
   (my-latex-expand-define "cp" my-latex-insert-caption ;nofmt
       (&optional caption-string)
@@ -2848,11 +2954,10 @@ other buffer
     (my-latex-insert-env "center"))
 
   (my-latex-expand-define "tr" my-latex-insert-tabular
-      (&optional placement)
+      (preamble)
     "Insert the latex environment tabular."
-    (interactive (list (my-latex-read-placement)))
-    (or placement (setq placement "ht"))
-    (my-latex-insert-env "tabular" placement))
+    (interactive (list (my-latex-read-preamble)))
+    (my-latex-insert-env "tabular" preamble))
 
   (my-latex-expand-define "ar" my-latex-insert-arabic
       (counter)
@@ -2984,16 +3089,23 @@ other buffer
 
 #+END_SRC
 
+#+RESULTS:
+| keymap | (100 keymap (116 keymap (46 . #[0 \303\300\301\302#\207 [dt. my-latex-insert-date nil aas-expand-snippet-maybe] 4]))) | (115 keymap (116 keymap (99 keymap (46 . #[0 \303\300\301\302#\207 [stc. my-latex-insert-stepcounter nil aas-expand-snippet-maybe] 4]))) (99 keymap (46 . #[0 \303\300\301\302#\207 [sc. my-latex-insert-setcounter nil aas-expand-snippet-maybe] 4]))) | (110 keymap (99 keymap (114 keymap (46 . #[0 \303\300\301\302#\207 [ncr. my-latex-insert-newcounter nil aas-expand-snippet-maybe] 4])))) | (114 keymap (111 keymap (109 keymap (46 . #[0 \303\300\301\302#\207 [rom. my-latex-insert-roman nil aas-expand-snippet-maybe] 4])))) | (97 keymap (117 keymap (46 . #[0 \303\300\301\302#\207 [au. my-latex-insert-author nil aas-expand-snippet-maybe] 4])) (116 keymap (99 keymap (46 . #[0 \303\300\301\302#\207 [atc. my-latex-insert-addtocounter nil aas-expand-snippet-maybe] 4]))) (108 keymap (46 . #[0 \303\300\301\302#\207 [al. my-latex-insert-alph nil aas-expand-snippet-maybe] 4])) (114 keymap (46 . #[0 \303\300\301\302#\207 [ar. my-latex-insert-arabic nil aas-expand-snippet-maybe] 4]))) | (116 keymap (46 . #[0 \303\300\301\302#\207 [t. my-latex-insert-table nil aas-expand-snippet-maybe] 4]) (116 keymap (108 keymap (46 . #[0 \303\300\301\302#\207 [ttl. my-latex-insert-title nil aas-expand-snippet-maybe] 4]))) (114 keymap (46 . #[0 \303\300\301\302#\207 [tr. my-latex-insert-tabular nil aas-expand-snippet-maybe] 4]))) | (99 keymap (114 keymap (46 . #[0 \303\300\301\302#\207 [cr. my-latex-insert-center nil aas-expand-snippet-maybe] 4])) (112 keymap (46 . #[0 \303\300\301\302#\207 [cp. my-latex-insert-caption nil aas-expand-snippet-maybe] 4]))) | (102 keymap (46 . #[0 \303\300\301\302#\207 [f. my-latex-insert-figure nil aas-expand-snippet-maybe] 4])) |
+
 ***** LaTeX =\usepackage=
+
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
   (defun my-latex-use-package (package &optional options)
     "Add \\usepackage for PACKAGE with OPTIONS to the current LaTeX buffer."
-    (interactive "sPlease, choose package which you need use: ")
+    (interactive
+     (list
+      (my-read-string-or-nil "Please, choose package which you need use: ")))
     (unless (my-latex-used-package-p package)
       (save-excursion
         (my-latex-goto-use-package-source)
         (beginning-of-line)
-        (my-latex-insert-command "usepackage" :optional options)
+        (my-latex-insert-command "usepackage" package :optional options)
         (newline))))
 
   (defun my-latex-goto-use-package-source ()
@@ -3076,6 +3188,7 @@ other buffer
           #+END_SRC
 
 **** Insert Pairs in LaTeX
+
 =CDLaTeX= rebind some keymaps of =smartparens= to more stupid
 alternatives, so I rebind its back:
 
@@ -3215,6 +3328,7 @@ input method
           #+END_SRC
 
 **** Variables for LaTeX
+
 Variable `latex-documentclasses` is list of documentclasses in Emacs, each element
 of this list is name of documentclass in lower case. Defaults to:
 
@@ -3236,6 +3350,7 @@ of this list is name of documentclass in lower case. Defaults to:
     #+END_SRC
 
 **** LaTeX Outline
+
 In =LaTeX= I use built-in =outline= (section of my confing about
 [[*Outline][outline]]).
 
@@ -3246,6 +3361,7 @@ In =LaTeX= I use built-in =outline= (section of my confing about
   #+END_SRC
 
 **** Keymaps for LaTeX
+
 I am russian, and on my native keyboard =;= is =$=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -3256,7 +3372,9 @@ I am russian, and on my native keyboard =;= is =$=:
              (";" . cdlatex-dollar)))
 
              #+END_SRC
+
 **** Auto Complete for LaTeX
+
 I am use [[https://github.com/vspinu/company-math][company-math]] and [[https://github.com/alexeyr/company-auctex][company-auctex]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -3276,7 +3394,9 @@ I am use [[https://github.com/vspinu/company-math][company-math]] and [[https://
       (company-auctex-init))
 
       #+END_SRC
+
 **** Auto Activating Snippets for LaTeX
+
 I am use [[https://github.com/tecosaur/LaTeX-auto-activating-snippets][LaTeX-auto-activating-snippets]]. I am use some standard
 snippets, but also I need to some things, which will expands as
 units, for example /Om/ will be expanded to /\mathrm{Ом}/:
@@ -3305,7 +3425,9 @@ units, for example /Om/ will be expanded to /\mathrm{Ом}/:
         "grd" "^\\circ"))
 
         #+END_SRC
+
 **** Auto Format in LaTeX
+
 I am use my own [[*Functions for Auto Format Code]] to auto format in
 =LaTeX=:
 
@@ -3396,6 +3518,7 @@ I am use my own [[*Functions for Auto Format Code]] to auto format in
 : autoformat-latex-expand-to-itemized-list-item
 
 **** Equation Environment to Split Environment
+
 I must has funcion which take current equation environment and
 transformt its to split environment
 
@@ -3456,7 +3579,9 @@ transformt its to split environment
    ("\\" . my-latex-equation-to-split))
 
    #+END_SRC
+
 **** Insert any image at URL in LaTeX
+
 I am as old user of =Google.Documents= must have command which just
 insert any image by url, so I create its.  For insert a image at url I
 bind keymaps to =SPC l u= (insert a image at URL readed from either
@@ -3472,7 +3597,7 @@ snippet /i/ for inserting image
   By default, caption won't be inserted, but if CAPTION is a string image will
   has caption CAPTION.
 
-  Image will inserted with LaTeX environment figure and command
+  Image will be inserted with LaTeX environment figure and command
   \\includegraphics, so you can change PLACEMENT and WIDTH of the inserted
   image, PLACEMENT defaults to \"h\", WIDTH defaults to the original image
   width.
@@ -3480,7 +3605,7 @@ snippet /i/ for inserting image
   If CENTERING is non-nil, then image will be centered via \\centering"
     (interactive (my--get-arguments-for-latex-insert-image))
     (my-latex-graphics-init)
-    (my-latex-insert-figure-environment placement)
+    (my-latex-insert-figure placement)
     (when centering ;nofmt
       (my-latex-insert-centering))
     (my-latex-insert-includegraphics filename width)
@@ -3534,7 +3659,6 @@ snippet /i/ for inserting image
     "Return t, when the user need to centering of the LaTeX block."
     (y-or-n-p "Centering or no? "))
 
-
   (defun my-latex-insert-image-at-url (url
                                        &optional
                                          filename
@@ -3578,6 +3702,7 @@ snippet /i/ for inserting image
 #+END_SRC
 
 *** Org
+
 I am consider that Org Mode built in Emacs:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -3678,6 +3803,7 @@ I am consider that Org Mode built in Emacs:
     #+END_SRC
 
 **** Insert Images in the Org Mode
+
 Defnition of the =my-org-insert-image=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -3759,6 +3885,7 @@ Defnition of the =my-org-insert-image-at-url=:
     #+END_SRC
 
 **** Centering Org
+
 I am centering text, when enable =org-mode=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -3780,6 +3907,7 @@ I am centering text, when enable =org-mode=:
 #+END_SRC
 
 **** Auto Format in Org
+
 I am use my autoformat system, which I am taked from [[https://github.com/jkitchin/scimax/][scimax]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -3821,6 +3949,7 @@ I am use my autoformat system, which I am taked from [[https://github.com/jkitch
       #+END_SRC
 
 **** Load from Wiki
+
 I am use [[https://github.com/progfolio/wikinforg][wikinforg]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -3831,6 +3960,7 @@ I am use [[https://github.com/progfolio/wikinforg][wikinforg]]:
       #+END_SRC
 
 **** Drag and Drop Images to Org
+
 I am use [[https://github.com/abo-abo/org-download][org-download]] for this:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -3843,6 +3973,7 @@ I am use [[https://github.com/abo-abo/org-download][org-download]] for this:
       #+END_SRC
 
 **** Navigation beetween Org Headings in Current Buffer
+
 I am use [[https://github.com/emacs-helm/helm-org][helm-org]] for navigation in Org Mode:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -3856,6 +3987,7 @@ I am use [[https://github.com/emacs-helm/helm-org][helm-org]] for navigation in 
                    #+END_SRC
 
 **** Improvement Navigation beetween the =org-mode= Headings
+
 I am use [[https://github.com/alphapapa/org-ql][org-ql]] for smart queries to find my =org= Files:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -3879,6 +4011,7 @@ I am use [[https://github.com/alphapapa/org-ql][org-ql]] for smart queries to fi
   #+END_SRC
 
 **** Paste Link from Browser
+
 I'm use [[https://github.com/rexim/org-cliplink][org-cliplink]] from cool man [[https://github.com/rexim/org-cliplink][Alexey Kutepov]].  Because I
 install this package I can copy any link from web-browser, run
 commnad =org-cliplink= (I'm bind to =SPC l i=) and my clipboard
@@ -3895,6 +4028,7 @@ will have a org code to copied link
        #+END_SRC
 
 **** Generate Table of Contents in =org-mode= ==
+
 I am use [[https://github.com/snosov1/toc-org][toc-org]].  This cool package helps you to have an
 up-to-date table of contents in org files.  I just add tag :TOC:
 to any org heading and after save this file table of contents
@@ -3911,6 +4045,7 @@ will automatically updated
       #+END_SRC
 
 **** Startup of =org-mode=
+
 When I start work in a =org-mode= buffer, =org-mode= also do 3
 things:
 
@@ -3930,6 +4065,7 @@ things:
     #+END_SRC
 
 **** Org + CDLaTeX
+
 In =LaTeX= for navigation and first insertion of commands I am
 use [[https://github.com/cdominik/cdlatex][CDLaTeX]], In =org= I must use it too:
 
@@ -3944,9 +4080,153 @@ use [[https://github.com/cdominik/cdlatex][CDLaTeX]], In =org= I must use it too
 
   #+END_SRC
 
+**** Keep your Org files tidy
+
+I suggest you read article [[https://orgmode.org/worg/org-tidy.html][Suggestion to keep your Org files tidy]]
+
+***** Tidy Org: Cleaning up metadata
+
+Cleaning up metadata is:
+
+- Remove empty property drawers
+- Remove redundant tags
+- Ensure DEADLINE/SCHEDULED timestamps are placed correctly
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (defun my-org-remove-empty-property-drawers ()
+    "Remove all empty property drawers in current file."
+    (interactive)
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward ":PROPERTIES:" nil t)
+        (save-excursion
+          (org-remove-empty-drawer-at (match-beginning 0))))))
+
+  (defun my-org-remove-redundant-tags ()
+    "Remove redundant tags of headlines in current buffer.
+
+  A tag is considered redundant if it is local to a headline and
+  inherited by a parent headline.
+
+  Thanks to David Maus!"
+    (interactive)
+    (when (eq major-mode 'org-mode)
+      (save-excursion
+        (org-map-entries
+         (lambda ()
+           (let ((alltags (split-string (or (org-entry-get (point) "ALLTAGS") "") ":"))
+                 local inherited tag)
+             (dolist (tag alltags)
+               (if (get-text-property 0 'inherited tag)
+                   (push tag inherited) (push tag local)))
+             (dolist (tag local)
+               (if (member tag inherited) (org-toggle-tag tag 'off)))))
+         t nil))))
+
+  (defun my-org-check-misformatted-subtree ()
+    "Check misformatted entries in the current buffer."
+    (interactive)
+    (show-all)
+    (org-map-entries
+     (lambda ()
+       (when (and (move-beginning-of-line 2)
+                  (not (looking-at org-heading-regexp)))
+         (if (or (and (org-get-scheduled-time (point))
+                      (not (looking-at (concat "^.*" org-scheduled-regexp))))
+                 (and (org-get-deadline-time (point))
+                      (not (looking-at (concat "^.*" org-deadline-regexp)))))
+             (when (y-or-n-p "Fix this subtree? ")
+               (message "Call the function again when you're done fixing this subtree.")
+               (recursive-edit))
+           (message "All subtrees checked."))))))
+
+#+END_SRC
+
+***** Tidy Org: Repair Other Elements of Org
+
+Here:
+
+- Ensure blank lines between headings and before contents
+- Ensure tables are formatted correctly
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (defun my-org-fix-blank-lines (&optional prefix)
+    "Ensure that Blank lines exist between headings and between headings and their contents.
+  With prefix, operate on whole buffer. Ensures that blank lines
+  exist after each headings's drawers."
+    (interactive "P")
+    (org-map-entries
+     (lambda ()
+       (org-with-wide-buffer
+        ;; `org-map-entries' narrows the buffer, which prevents us from seeing
+        ;; newlines before the current heading, so we do this part widened.
+        (while (not (looking-back "\n\n" nil))
+          ;; Insert blank lines before heading.
+          (insert "\n")))
+       (let ((end (org-entry-end-position)))
+         ;; Insert blank lines before entry content
+         (forward-line)
+         (while (and (org-at-planning-p)
+                     (< (point) (point-max)))
+           ;; Skip planning lines
+           (forward-line))
+         (while (re-search-forward org-drawer-regexp end t)
+           ;; Skip drawers. You might think that `org-at-drawer-p' would suffice, but
+           ;; for some reason it doesn't work correctly when operating on hidden text.
+           ;; This works, taken from `org-agenda-get-some-entry-text'.
+           (re-search-forward "^[ \t]*:END:.*\n?" end t)
+           (goto-char (match-end 0)))
+         (unless (or (= (point) (point-max))
+                     (org-at-heading-p)
+                     (looking-at-p "\n"))
+           (insert "\n"))))
+     t
+     (if prefix
+         nil
+       'tree)))
+
+  (defun my-org-align-all-tables ()
+    (interactive)
+    (org-table-map-tables 'org-table-align 'quietly))
+#+END_SRC
+
+#+RESULTS:
+: my-org-align-all-tables
+
+***** Tidy Org: General Command
+
+I'm use each of the /Tidy Org/ command by press on /SPC l k/ bound
+with command =my-org-tidy=
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (defun my-org-tidy ()
+    "Use each of rules tidy org."
+    (interactive)
+    ;; Clean up metadata
+    (my-org-remove-redundant-tags)
+    (my-org-remove-empty-property-drawers)
+    (my-org-check-misformatted-subtree)
+    ;; Repair other elements of org-mode
+    (my-org-fix-blank-lines t)
+    (my-org-align-all-tables))
+
+  (use-package org
+      :bind
+    ((:map my-org-local-map)
+     ("k" . 'my-org-tidy)))
+
+#+END_SRC
+
+
+
 *** Elisp
+
 **** Special Linters
+
 ***** Package Linter
+
 I am use [[https://github.com/purcell/package-lint][package-lint]] for lint my packages for Melpa for view I
 am use [[https://github.com/purcell/flycheck-package][flycheck-package]]:
 
@@ -3963,6 +4243,7 @@ am use [[https://github.com/purcell/flycheck-package][flycheck-package]]:
       #+END_SRC
 
 **** Refactoring
+
 I am use [[https://github.com/Wilfred/emacs-refactor][emacs-refactor]] for refactor not only in =emacs-lisp=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -3974,6 +4255,7 @@ I am use [[https://github.com/Wilfred/emacs-refactor][emacs-refactor]] for refac
                   #+END_SRC
 
 **** Package Manager
+
 I am use [[https://github.com/cask/cask/][Cask]] for manage packages of =elisp=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -3985,6 +4267,7 @@ I am use [[https://github.com/cask/cask/][Cask]] for manage packages of =elisp=:
       #+END_SRC
 
 **** Elisp Format Code
+
 I am use [[https://github.com/riscy/elfmt][elfmt]] of =Riscky=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -3995,6 +4278,7 @@ I am use [[https://github.com/riscy/elfmt][elfmt]] of =Riscky=:
     #+END_SRC
 
 **** Modern Documentation
+
 I am use [[https://github.com/Wilfred/suggest.el][suggest]], I am just type print input and excepted output and see suggesting examples as this do:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4006,6 +4290,7 @@ I am use [[https://github.com/Wilfred/suggest.el][suggest]], I am just type prin
       #+END_SRC
 
 **** Elisp Docstrings Mode
+
 I am use [[https://github.com/Fuco1/elisp-docstring-mode][elisp-docstring-mode]] with [[https://github.com/Fuco1/elisp-docstring-mode][string-edit]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4024,6 +4309,7 @@ I am use [[https://github.com/Fuco1/elisp-docstring-mode][elisp-docstring-mode]]
                   #+END_SRC
 
 **** Elisp Indent Code
+
 I am use standard functions of indenting lisp code, but some
 variables set to non normal values:
 
@@ -4032,6 +4318,7 @@ variables set to non normal values:
   #+END_SRC
 
 **** Some Insertion Functions for Elisp
+
 In =org-mode= I am press =M-RET= for insertion heading, in
 =elisp= I need to press =M-RET= for insetion of class' fields
 (see [[info:EIEIO][Info about Classes in Elisp]]):
@@ -4116,6 +4403,7 @@ In =org-mode= I am press =M-RET= for insertion heading, in
 #      #+END_SRC
 
 *** Racket
+
 I am use [[https://www.racket-mode.com][racket-mode]] for =racket=.  Because checker for =racket=
 so slow, I disable it.
 
@@ -4140,6 +4428,7 @@ so slow, I disable it.
       #+END_SRC
 
 **** Smart Insertion in Racket (=M-ret=)
+
 I create small system of smart insertion in =racket= inspired by
 =org-meta-return=
 
@@ -4165,6 +4454,7 @@ I create small system of smart insertion in =racket= inspired by
     #+END_SRC
 
 ***** Smart insertion in Racket: let bindings
+
 The =racket= has the macros for bindings values to identifiers.
 If you are a normal programmer, then you should know followed
 syntax:
@@ -4199,6 +4489,7 @@ Without =M-ret= add new binding isn't fast thing, but with
   #+END_SRC
 
 ***** Smart insertion in Racket: test cases
+
 Each cool programmer of 21th century should use tests.  Racket
 also has tests.  See to following example of =racket= tests:
 
@@ -4243,6 +4534,7 @@ With =my-racket-meta-return= you should:
 | my-racket-meta-return-test-case | my-racket-meta-return-cond-clauses |
 
 ***** Smart insertion in Racket: =cond= and =match= and other clauses
+
 The Racket Programming Language has the macro called =cond= and
 =match=, each programmer of the racket for add a new clause to a
 =cond= sexp should:
@@ -4297,6 +4589,7 @@ like on syntax of the =cond=, see to the followed list
 | my-racket-meta-return-cond-clauses |
 
 ***** Smart insertion in Racket: =contracted=
+
 Here example of usage =contracted=:
 
 #+BEGIN_SRC racket
@@ -4346,6 +4639,7 @@ name and it contract
                #+END_SRC
 
 **** Scribble: The Racket Documentation Tool
+
 I am use [[https://docs.racket-lang.org/scribble/][scribble]].  The =scribble= is special for =racket=
 documentation tool, each racket package documentated via
 =scribble=.
@@ -4358,6 +4652,7 @@ documentation tool, each racket package documentated via
       #+END_SRC
 
 ***** Auto Format in Scribble
+
 I am use my autoformat system, which I am taked from [[https://github.com/jkitchin/scimax/][scimax]]
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4367,6 +4662,7 @@ I am use my autoformat system, which I am taked from [[https://github.com/jkitch
   #+END_SRC
 
 *** Markdown
+
 I am use [[https://github.com/jrblevin/markdown-mode/][markdown-mode]] , and for its I am centering code:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4404,6 +4700,7 @@ I am use [[https://github.com/jrblevin/markdown-mode/][markdown-mode]] , and for
                               #+END_SRC
 
 **** Create Table of Contents in Markdown
+
 I am use [[https://github.com/ardumont/markdown-toc][markdown-toc]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4417,6 +4714,7 @@ I am use [[https://github.com/ardumont/markdown-toc][markdown-toc]]:
              #+END_SRC
 
 **** Auto Format in markdown
+
 I am use my own [[*Functions for Auto Format Code]] to auto format in
 =markdown=:
 
@@ -4444,7 +4742,9 @@ I am use my own [[*Functions for Auto Format Code]] to auto format in
       #+END_SRC
 
 *** Python
+
 **** Vars
+
 Var =py/imports-regexp= is regexp of import statements in python:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4491,6 +4791,7 @@ Var =python-shell-interpreter= is builtin Emacs var, see docs in Emacs:
   #+END_SRC
 
 **** Helping info
+
 I am use [[https://www.emacswiki.org/emacs/pydoc-info.el][pydoc-info]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4501,6 +4802,7 @@ I am use [[https://www.emacswiki.org/emacs/pydoc-info.el][pydoc-info]]:
       #+END_SRC
 
 **** Autocomplete
+
 I am hasn't autocompletion special for python, so I enable default =dabbrev-autocompletion=:
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
@@ -4515,7 +4817,9 @@ I am hasn't autocompletion special for python, so I enable default =dabbrev-auto
   #+END_SRC
 
 *** Rust
+
 **** Auto Completion in Rust
+
 I am use [[https://github.com/racer-rust/emacs-racer][racer]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4526,7 +4830,9 @@ I am use [[https://github.com/racer-rust/emacs-racer][racer]]:
              (racer-mode . eldoc-mode)))
 
              #+END_SRC
+
 **** Check Errors in Rust
+
 I am use [[https://github.com/flycheck/flycheck-rust][flycheck-rust]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4539,6 +4845,7 @@ I am use [[https://github.com/flycheck/flycheck-rust][flycheck-rust]]:
       #+END_SRC
 
 *** Go Lang
+
 I am use [[https://github.com/dominikh/go-mode.el][go-mode]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4562,6 +4869,7 @@ I am use [[https://github.com/dominikh/go-mode.el][go-mode]]:
                                   #+END_SRC
 
 *** PDF
+
 I am use [[https://github.com/vedang/pdf-tools][pdf-tools]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4573,6 +4881,7 @@ I am use [[https://github.com/vedang/pdf-tools][pdf-tools]]:
       #+END_SRC
 
 *** Haskell
+
 I am use [[https://github.com/haskell/haskell-mode][haskell-mode]], and I love =indention-mode=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4590,7 +4899,9 @@ I am use [[https://github.com/haskell/haskell-mode][haskell-mode]], and I love =
    haskell-navigate-imports)
 
    #+END_SRC
+
 **** Auto Completion for Haskell
+
 I am use [[https://github.com/horellana/company-ghci][company-ghci]]:
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
@@ -4604,7 +4915,9 @@ I am use [[https://github.com/horellana/company-ghci][company-ghci]]:
       #+END_SRC
 
 *** JavaScript (Node.js)
+
 **** Variables
+
 Variable `js/imports-regexp` if regular expression for search imports in JS.
 Defaults to:
 
@@ -4624,6 +4937,7 @@ Defaults to:
   #+END_SRC
 
 **** Repl
+
 I am use [[https://github.com/redguardtoo/js-comint][js-comint]] for run my JS' code:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4637,6 +4951,7 @@ I am use [[https://github.com/redguardtoo/js-comint][js-comint]] for run my JS' 
       #+END_SRC
 
 **** Linters
+
 I am use some packages which you can see on [[http://codewinds.com/blog/2015-04-02-emacs-flycheck-eslint-jsx.html#summary][this]] page:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4704,6 +5019,7 @@ I am use some packages which you can see on [[http://codewinds.com/blog/2015-04-
    #+END_SRC
 
 *** JSON
+
 I am use [[https://github.com/Sterlingg/json-snatcher][json-snatcher]] for copy JSON "path" to current node:
 For this I am press =SPC l c=:
 
@@ -4725,7 +5041,9 @@ For this I am press =SPC l c=:
 : my-json-setup
 
 *** HTML
+
 **** Variables
+
 Variable =html-modes= is list of modes which is for =html=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4736,6 +5054,7 @@ Variable =html-modes= is list of modes which is for =html=:
     #+END_SRC
 
 **** Web Mode
+
 I am use [[https://web-mode.org][web-mode]] and [[https://github.com/smihica/emmet-mode][emmet]] and [[https://github.com/jcs-elpa/auto-rename-tag][auto-rename-tag]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4748,6 +5067,7 @@ I am use [[https://web-mode.org][web-mode]] and [[https://github.com/smihica/emm
       #+END_SRC
 
 **** Auto Rename Tag
+
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (use-package auto-rename-tag
@@ -4786,6 +5106,7 @@ I am use [[https://web-mode.org][web-mode]] and [[https://github.com/smihica/emm
       #+END_SRC
 
 **** =Paredit= for HTML
+
 I am use [[https://github.com/magnars/tagedit][tagedit]] of =magnars=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4821,6 +5142,7 @@ I am use [[https://github.com/magnars/tagedit][tagedit]] of =magnars=:
               #+END_SRC
 
 **** Auto Complete for HTML
+
 I am use [[https://github.com/osv/company-web][company-web]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4837,6 +5159,7 @@ I am use [[https://github.com/osv/company-web][company-web]]:
                   #+END_SRC
 
 *** CSS
+
 I am use =web-mode= and builtin =css-mode=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4846,6 +5169,7 @@ I am use =web-mode= and builtin =css-mode=:
   #+END_SRC
 
 **** Fly Documentation
+
 I am use =css-eldoc= from =Elpa=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4859,7 +5183,9 @@ I am use =css-eldoc= from =Elpa=:
         #+END_SRC
 
 * Support of Some Special Modes
+
 ** Calc
+
 I am use built-in emacs =calc=, I disable =xah-fly-keys= when run
 calc:
 
@@ -4873,6 +5199,7 @@ calc:
                 #+END_SRC
 
 * Small Organize Tricks
+
 ** Very Small Tricks
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4884,7 +5211,9 @@ calc:
   (toggle-truncate-lines 38)
 
   #+END_SRC
+
 ** Highlight Git Changes
+
 I am use [[https://github.com/emacsorphanage/git-gutter][git-gutter]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4895,7 +5224,9 @@ I am use [[https://github.com/emacsorphanage/git-gutter][git-gutter]]:
       (prog-mode . git-gutter-mode))
 
       #+END_SRC
+
 ** Helpful
+
 *** Which Key?
 
 I am use [[https://github.com/justbur/emacs-which-key][which-key]]:
@@ -4909,6 +5240,7 @@ I am use [[https://github.com/justbur/emacs-which-key][which-key]]:
       #+END_SRC
 
 *** Helpful Package
+
 I am use [[https://github.com/Wilfred/helpful][helpful]], for pretty help info about lisp functions and major modes:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4926,6 +5258,7 @@ I am use [[https://github.com/Wilfred/helpful][helpful]], for pretty help info a
       #+END_SRC
 
 ** Autocompletion of Commands (HELM)
+
 I am use [[https://github.com/emacs-helm/helm][HELM]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4954,6 +5287,7 @@ I am use [[https://github.com/emacs-helm/helm][HELM]]:
       #+END_SRC
 
 ** Command Log
+
 I am use [[https://github.com/lewang/command-log-mode][command-log-mode]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4964,6 +5298,7 @@ I am use [[https://github.com/lewang/command-log-mode][command-log-mode]]:
       #+END_SRC
 
 ** Whitespaces Mode
+
 I am enable whitespaces mode on =prog-mode=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4973,6 +5308,7 @@ I am enable whitespaces mode on =prog-mode=:
   #+END_SRC
 
 ** Visual Fill Line Mode
+
 I am ussally use =visual-fill-line-mode=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -4982,6 +5318,7 @@ I am ussally use =visual-fill-line-mode=:
   #+END_SRC
 
 ** Auto Fill Paragraphs (aggressive)
+
 I am enable [[https://github.com/davidshepherd7/aggressive-fill-paragraph-mode/][aggressive-fill-paragraph-mode]].  This is mean that when
 I am press to space, current text paragraph automatically will be
 filled.  But, not each major mode want to has enabled
@@ -5013,6 +5350,7 @@ modes in which =aggressive-fill-paragraph-mode= should be enabled
          #+END_SRC
 
 ** Scratches
+
 I am press =C-t= for opening scratch for this I am use [[https://github.com/ieure/scratch-el][scratch-el]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5024,6 +5362,7 @@ I am press =C-t= for opening scratch for this I am use [[https://github.com/ieur
       #+END_SRC
 
 ** Syntax Subword Mode
+
 I am use [[https://melpa.org/#/syntax-subword][syntax-subword]], for example if I am in current situation:
 
 #+BEGIN_SRC shell
@@ -5044,6 +5383,7 @@ And i am need to delete indent, I am just delete its when delete backward word:
       #+END_SRC
 
 ** Small Pandoc Functions
+
 I have function =my-pandoc-tex-to-documents-dir=, which do what
 name say:
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5072,6 +5412,7 @@ name say:
   #+END_SRC
 
 ** I am Russian!
+
 I am russian man, and I must use russian keyboard with `english`
 hot keys, so I am use builtin emacs =input-method=:
 
@@ -5082,6 +5423,7 @@ hot keys, so I am use builtin emacs =input-method=:
   #+END_SRC
 
 ** Disable or Enable Modes
+
 I am use [[https://github.com/istib/helm-mode-manager][helm-mode-manager]], which has functions
 =helm-switch-major-mode= =helm-enable-minor-mode= and
 =helm-disable-minor-mode=, I bound that via =fast-exec=
@@ -5104,6 +5446,7 @@ I am use [[https://github.com/istib/helm-mode-manager][helm-mode-manager]], whic
       #+END_SRC
 
 ** Cow Say
+
 I am use [[https://github.com/lassik/emacs-cowsay][very serious cowsay]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5139,6 +5482,7 @@ I am use [[https://github.com/lassik/emacs-cowsay][very serious cowsay]]:
       #+END_SRC
 
 ** Auto Save
+
 I am use [[https://github.com/bbatsov/super-save][super-save]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5154,6 +5498,7 @@ I am use [[https://github.com/bbatsov/super-save][super-save]]:
     #+END_SRC
 
 ** Read Documentation for Developers
+
 I am use [[https://github.com/astoff/devdocs.el][devdocs]] for see documentation from [[https://devdocs.io][DevDocs]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5168,6 +5513,7 @@ I am use [[https://github.com/astoff/devdocs.el][devdocs]] for see documentation
       #+END_SRC
 
 ** Pomidor
+
 For pomidor I am use [[https://github.com/TatriX/pomidor][pomidor]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5190,6 +5536,7 @@ For pomidor I am use [[https://github.com/TatriX/pomidor][pomidor]]:
       #+END_SRC
 
 ** Pacman
+
 I am use [[https://github.com/semenInRussia?tab=stars][pacmacs]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5208,6 +5555,7 @@ I am use [[https://github.com/semenInRussia?tab=stars][pacmacs]]:
       #+END_SRC
 
 ** Wikipedia
+
 I am use [[https://github.com/emacs-helm/helm-wikipedia][helm-wikipedia]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5225,6 +5573,7 @@ I am use [[https://github.com/emacs-helm/helm-wikipedia][helm-wikipedia]]:
       #+END_SRC
 
 ** View Github Stars
+
 I am use [[https://github.com/Sliim/helm-github-stars][helm-github-stars]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5244,6 +5593,7 @@ I am use [[https://github.com/Sliim/helm-github-stars][helm-github-stars]]:
       #+END_SRC
 
 ** Easy Generate .gitignore
+
 I am use [[https://github.com/jupl/helm-gitignore][helm-gitignore]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5261,6 +5611,7 @@ I am use [[https://github.com/jupl/helm-gitignore][helm-gitignore]]:
   #+END_SRC
 
 ** Google
+
 I am use built-in =helm= command =helm-google-suggest=, this
 command takes some suggestions from the Google, but query may be
 done in other search engine (for example Wikipedia)
@@ -5278,6 +5629,7 @@ done in other search engine (for example Wikipedia)
   #+END_SRC
 
 ** Kinopoisk
+
 I am use [[https://github.com/semenInRussia/emacs-kinopoisk][emacs-kinopoisk]] for management of Films:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5288,6 +5640,7 @@ I am use [[https://github.com/semenInRussia/emacs-kinopoisk][emacs-kinopoisk]] f
       #+END_SRC
 
 ** Make Broken PPTX File
+
 I need to fast make fake and broken PPTX file, so I just make for
 this Function:
 
@@ -5309,6 +5662,7 @@ this Function:
   #+END_SRC
 
 ** Films Management
+
 I very love see a lot of films, but I forgot films' names every
 day, so I create most simple management of films.  I have snippet
 =film=, which add film to current =org= file, which be films'
@@ -5396,6 +5750,7 @@ films
 : 1
 
 ** See Recent Files
+
 I am use built in Emacs =recentf-mode= and keymap =SPC k f= for
 view recentf files, as =SPC f= but add =k=:
 
@@ -5410,6 +5765,7 @@ view recentf files, as =SPC f= but add =k=:
       #+END_SRC
 
 ** Take Color or Face
+
 I am use built-in helm command =helm-color=. (see [[http://tuhdo.github.io/helm-intro.html][this article]])
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5424,7 +5780,9 @@ I am use built-in helm command =helm-color=. (see [[http://tuhdo.github.io/helm-
   #+END_SRC
 
 * Graphic User Interface
+
 ** Hide ALL
+
 This is standard stuf
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5438,6 +5796,7 @@ This is standard stuf
   #+END_SRC
 
 ** Color Themes
+
 I am use some themes, depends on my state.
 
 *** Gruber Darker Theme
@@ -5450,6 +5809,7 @@ I am use some themes, depends on my state.
       #+END_SRC
 
 *** Some Proffesional Themes
+
 I am use the [[https://github.com/doomemacs/themes][doom-themes]].  It's part of the [[https://github.com/doomemacs/doomemacs][doomemacs]] which contains
 the 20+ themes
 
@@ -5461,6 +5821,7 @@ the 20+ themes
       #+END_SRC
 
 *** Some other themes
+
 Also I am use black theme of =magnars=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5471,6 +5832,7 @@ Also I am use black theme of =magnars=:
                #+END_SRC
 
 *** Load Theme
+
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   ;; See `doom-themes' (list of themes at starting comments)
@@ -5484,7 +5846,9 @@ Also I am use black theme of =magnars=:
   #+END_SRC
 
 ** Numbers of lines
+
 *** Vars
+
 Var `dont-display-lines-mode` is list of modes,
 for this modes willn't display numbers of lines. Defaults to:
 
@@ -5501,6 +5865,7 @@ for this modes willn't display numbers of lines. Defaults to:
           #+END_SRC
 
 *** Enable and Disable
+
 I am display numbers of lines in each mode, excluding modes from
 `dont-display-lines-mode` list:
 
@@ -5519,6 +5884,7 @@ I am display numbers of lines in each mode, excluding modes from
   #+END_SRC
 
 ** Modeline
+
 I am use [[https://github.com/seagle0128/doom-modeline][doom-modeline]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5528,6 +5894,7 @@ I am use [[https://github.com/seagle0128/doom-modeline][doom-modeline]]:
   #+END_SRC
 
 *** Modeline for =drag=
+
 I need to see when keys will readed as =drag=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5572,7 +5939,9 @@ I need to see when keys will readed as =drag=:
            'outline-1))))
 
            #+END_SRC
+
 *** Pomidor in Modeline
+
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (doom-modeline-def-segment pomidor
@@ -5616,6 +5985,7 @@ I need to see when keys will readed as =drag=:
         #+END_SRC
 
 *** No Display =flycheck= in Modeline
+
 I'm don't love =flycheck= in =modeline=, so I turn off that.
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5625,6 +5995,7 @@ I'm don't love =flycheck= in =modeline=, so I turn off that.
   #+END_SRC
 
 *** Enable Modeline
+
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (defvar my-modeline-ignored-modes '(company-mode))
@@ -5692,6 +6063,7 @@ I'm don't love =flycheck= in =modeline=, so I turn off that.
 I
 
 ** View Break Page Lines
+
 I am use [[https://github.com/purcell/page-break-lines][page-break-lines]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5704,7 +6076,9 @@ I am use [[https://github.com/purcell/page-break-lines][page-break-lines]]:
       #+END_SRC
 
 * Developer Environment
+
 ** Projects Management
+
 I am use [[https://github.com/bbatsov/projectile][projectile]]:
 
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
@@ -5850,6 +6224,7 @@ I am use [[https://github.com/bbatsov/projectile][projectile]]:
       #+END_SRC
 
 *** Projectile with Helm
+
 I am use offical [[https://github.com/bbatsov/helm-projectile][helm-projectile]] I am press =SPC j= and find file in current project:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5934,6 +6309,7 @@ I am use offical [[https://github.com/bbatsov/helm-projectile][helm-projectile]]
      #+END_SRC
 
 ** Regexp IDE
+
 I am use [[https://github.com/jwiegley/regex-tool][regex-tool]] for testing regexp in Emacs
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5946,6 +6322,7 @@ I am use [[https://github.com/jwiegley/regex-tool][regex-tool]] for testing rege
       #+END_SRC
 
 ** Git
+
 I am use super famous [[https://github.com/magit/magit][magit]]:
 
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
@@ -5955,6 +6332,7 @@ I am use super famous [[https://github.com/magit/magit][magit]]:
   #+END_SRC
 
 *** Fly View Authors of Changes
+
 For this I am use [[https://github.com/Artawower/blamer.el][blamer]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5975,6 +6353,7 @@ For this I am use [[https://github.com/Artawower/blamer.el][blamer]]:
       #+END_SRC
 
 *** Undo with Git
+
 I am use [[https://github.com/jwiegley/git-undo-el][git-undo]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -5991,6 +6370,7 @@ I am use [[https://github.com/jwiegley/git-undo-el][git-undo]]:
     #+END_SRC
 
 *** Git Major Modes
+
 As major modes of (.github, gitconfig) I am use [[https://github.com/magit/git-modes][git-modes]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -6001,6 +6381,7 @@ As major modes of (.github, gitconfig) I am use [[https://github.com/magit/git-m
       #+END_SRC
 
 *** Genreate .gitignore
+
 I am use [[https://github.com/jupl/helm-gitignore][helm-gitignore]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -6017,6 +6398,7 @@ I am use [[https://github.com/jupl/helm-gitignore][helm-gitignore]]:
     #+END_SRC
 
 ** View Directories
+
 I am use =dired=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -6144,10 +6526,10 @@ I am use =dired=:
     (interactive)
     (avy-goto-line))
 
-
     #+END_SRC
 
 ** Just Run Current File
+
 I am use [[https://github.com/emacsorphanage/quickrun][quickrun]].  [[https://github.com/emacsorphanage/quickrun][Quickrun]] has command which just run current
 file (without other sheet (with any sheet see [[*Run Command][Run Command]])).  I
 press =S-f5= in any =major-mode= and current file was runned or
@@ -6167,6 +6549,7 @@ compiled
       #+END_SRC
 
 ** Run Command
+
 I am use [[https://github.com/bard/emacs-run-command][run-command]] for run special commands for special files:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -6200,6 +6583,7 @@ I am use [[https://github.com/bard/emacs-run-command][run-command]] for run spec
         #+END_SRC
 
 *** Run Command Recipes
+
 I am use [[https://github.com/semenInRussia/emacs-run-command-recipes/][run-command-recipes]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -6210,7 +6594,9 @@ I am use [[https://github.com/semenInRussia/emacs-run-command-recipes/][run-comm
       (run-command-recipes-use-all))
 
       #+END_SRC
+
 ** Projects with Templates
+
 I am use [[https://github.com/chrisbarrett/skeletor.el][skeletor]] for creating new projects by temlate:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -6223,10 +6609,13 @@ I am use [[https://github.com/chrisbarrett/skeletor.el][skeletor]] for creating 
       (skeletor-completing-read-function completing-read-function))
 
       #+END_SRC
+
 ** Snitch
+
 I am use [[https://github.com/tsoding/snitch][snitch]] for managing TODOs
 
 *** Highlight TODOs
+
 I am use [[https://github.com/tarsius/hl-todo][hl-todo]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -6236,7 +6625,9 @@ I am use [[https://github.com/tarsius/hl-todo][hl-todo]]:
       :config (global-hl-todo-mode))
 
       #+END_SRC
+
 *** Run Snitch Commands
+
 I am use =run-command= (see in this config) for run command:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -6258,6 +6649,7 @@ I am use =run-command= (see in this config) for run command:
   #+END_SRC
 
 ** Organization
+
 I am use [[https://orgmode.org/manual/Agenda-Views.html][org-agenda]] for managing of TODOs, DONEs and etc., my all
 todo's saved in one file /agenda.org/.
 
@@ -6352,6 +6744,7 @@ on day:
    #+END_SRC
 
 *** Fast Organiztion
+
 I am use =org-caputure= built-in =org-mode= for fast extension of
 the my /Planes on Day/Week/
 
@@ -6379,6 +6772,7 @@ the my /Planes on Day/Week/
 #+END_SRC
 
 ** Notes
+
 I am create own simple system of notes:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -6666,7 +7060,9 @@ I am create own simple system of notes:
   #+END_SRC
 
 * MIPT
+
 ** Management of MIPT Files
+
 I am make homework of [[https://mipt.ru][MIPT]], so I make small script, which create
 new file of homework of mipt's homework:
 
@@ -6904,6 +7300,7 @@ new file of homework of mipt's homework:
   #+END_SRC
 
 ** Copy Content of File as MIPT Solution
+
 MIPT has bug, when LaTeX's source is too big, source will limited,
 so I need to compess my code, function
 =my-copy-buffer-content-as-mipt-solution= make this, I am press on

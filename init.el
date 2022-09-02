@@ -1602,66 +1602,47 @@ See `just-line-is-whitespaces-p'"
     :ensure auctex
     :hook ((LaTeX-mode . prettify-symbols-mode))
     :bind ((:map my-latex-local-map)
-           (="     . my-calc-simplify-region-copy)
+           ("="     . my-calc-simplify-region-copy)
            ("f"     . my-calc-simplify-region-change))
+
     :config (require 'calc-lang)
     (defun my-calc-simplify (expr)
-      "Simplify EXPR via `calc' and return this."
-      (calc-latex-language t)
-      (calc-alg-entry expr)
-      (with-temp-buffer
-        (calc-copy-to-buffer 1)
-        (delete-char -1)
-        (buffer-string)))
+        "Simplify EXPR via `calc' and return this."
+        (calc-latex-language t)
+        (calc-alg-entry expr)
+        (with-temp-buffer
+            (calc-copy-to-buffer 1)
+            (delete-char -1)
+            (buffer-string)))
 
     (defun my-calc-simplify-region-copy (beg end)
-      "Take from BEG to END, simplify this via `calc' and copy as kill."
-      (interactive "r")
-      (let ((expr (my-calc-simplify (buffer-substring beg end))))
-        (kill-new expr)
-        (message "coppied: %s" (current-kill 0))))
+        "Take from BEG to END, simplify this via `calc' and copy as kill."
+        (interactive "r")
+        (let ((expr (my-calc-simplify (buffer-substring beg end))))
+            (kill-new expr)
+            (message "coppied: %s" (current-kill 0))))
 
     (defun my-calc-simplify-region-change (beg end)
-      "Get from BEG to END change this via `calc' and yank instead of region."
-      (interactive "r")
-      (let* ((expr (buffer-substring beg end))
-             (simplified (my-calc-simplify expr)))
-        (goto-char beg)
-        (delete-region beg end)
-        (insert simplified))))
+        "Get from BEG to END change this via `calc' and yank instead of region."
+        (interactive "r")
+        (let* ((expr (buffer-substring beg end))
+               (simplified (my-calc-simplify expr)))
+            (goto-char beg)
+            (delete-region beg end)
+            (insert simplified))))
+
+(use-package xenops
+    :ensure t
+    :hook
+    (LaTeX-mode . xenops-mode)
+    :custom
+    (xenops-math-image-scale-factor 2))
 
 (use-package math-preview
     :ensure t
     :custom
     (math-preview-preprocess-functions
-     (list (lambda (s) (s-concat "{\\color{white}" s "}""))))
-    :bind ((:map my-latex-local-map)
-           ("p" . 'my-latex-preview)
-           ("d" . 'math-preview-clear-at-point))
-    :config
-    (defun fast-exec-math-preview-keys ()
-      "Get some useful keymaps of  `fast-exec' for math-preview."
-      (fast-exec/some-commands
-       ("Preview All Latex Fragments" 'math-preview-all)))
-
-    (fast-exec/register-keymap-func 'fast-exec-math-preview-keys)
-    (fast-exec/reload-functions-chain))
-
-(defun my-latex-preview ()
-  "Preview latex fragments combine `org-latex-combine', `math-preview'."
-  (interactive)
-  (if (->> (math-preview--find-gaps (point-min) (point-max))
-           (--filter (and (>= (point) (car it))
-                          (< (point) (cdr it))))
-           (--map (math-preview--search (car it) (cdr it)))
-           (-flatten)
-           (--filter (and (>= (point) (car it))
-                          (< (point) (cdr it)))))
-      (math-preview-at-point)
-    (org-latex-preview)))
-
-(use-package math-preview
-    :ensure t
+     (list (lambda (s) (s-concat "{\\color{white}" s "}"))))
     :config
     (defun my-latex-preview-in-other-window ()
       "Preview fragment of LaTeX source at point in seperated window."
@@ -1675,6 +1656,13 @@ See `just-line-is-whitespaces-p'"
         (LaTeX-mode)
         (insert source)
         (math-preview-region (point-min) (point-max))))
+    (defun fast-exec-math-preview-keys ()
+      "Get some useful keymaps of  `fast-exec' for math-preview."
+      (fast-exec/some-commands
+       ("Preview All Latex Fragments" 'math-preview-all)))
+
+    (fast-exec/register-keymap-func 'fast-exec-math-preview-keys)
+    (fast-exec/reload-functions-chain)
     :bind
     ((:map my-latex-local-map)
      ("v" . 'my-latex-preview-in-other-window)))
@@ -1697,7 +1685,8 @@ key1=val1,key2=val2
 If you need to use optional arguments, add to ARGS the keyword `:optional' and
 each element after it will be inserted as optional argument."
   (insert "\\" name)
-  (my-latex--insert-args args))
+  (my-latex--insert-args args)
+  (indent-region (point-at-bol) (point-at-eol)))
 
 (defun my-latex--insert-args (args)
   "Insert ARGS as LaTeX arguments.
@@ -1715,15 +1704,11 @@ See `my-latex-insert-command' for understand of ARGS"
 
 (defun my-latex--insert-optional-args (optional)
   "Insert list OPTIONAL as optional LaTeX arguments."
-  (--each optional
-    (when it
-      (my-latex-insert-optional-arg it))))
+  (-each optional 'my-latex-insert-optional-arg))
 
 (defun my-latex--insert-required-args (required)
   "Insert list REQUIRED as required LaTeX arguments."
-  (--each required
-    (when it
-      (my-latex-insert-required-arg it))))
+  (-each required 'my-latex-insert-required-arg))
 
 (defun my-latex-optional-and-required-args (args)
   "Split ARGS to 2 lists: required and optional arguments.
@@ -1744,22 +1729,24 @@ are rest"
 
 (defun my-latex-insert-required-arg (val)
   "Insert VAL as an LaTeX required argument."
-  (insert "{" (my-latex-format-for-arg val) "}"))
+  (--when-let (my-latex-format-for-arg val)
+    (insert "{" it "}")))
 
 (defun my-latex-insert-optional-arg (val)
   "Insert VAL as an LaTeX optional argument."
-  (insert "[" (my-latex-format-for-arg val) "]"))
+  (--when-let (my-latex-format-for-arg val)
+    (insert "[" it "]")))
 
 (defun my-latex-format-for-arg (val)
   "Format VAL as string for inserting of an LaTeX argument."
   (cond
     ((my-alist-p val)
-     (->>
-      val
-      (--keep
-       (when (cdr it)
-         (format "%s=%s" (car it) (cdr it))))
-      (s-join ",")))
+     (-some->>
+         val
+       (-filter 'cdr)
+       (--map
+        (format "%s=%s" (car it) (cdr it)))
+       (s-join ",")))
     (val
      (format "%s" val))))
 
@@ -1781,7 +1768,7 @@ This version of `my-latex-insert-command', so see `my-latex-insert-command'"
   "Insert the LaTeX environment named NAME with ARGS.
 
 See `my-latex-insert-command' for understand of use ARGS"
-  (my-latex-insert-command "begin" name)
+  (my-latex-insert-single-line-command "begin" name)
   (my-latex--insert-args args)
   (newline)
   (insert "  ")
@@ -1790,12 +1777,13 @@ See `my-latex-insert-command' for understand of use ARGS"
     (my-latex-insert-command "end" name)))
 
 (add-hook 'latex-mode-hook 'aas-activate-for-major-mode)
+(add-hook 'LaTeX-mode-hook 'aas-activate-for-major-mode)
 
 (defun my-latex-expand-define-function (key fun)
   "Bind call of FUN at KEY in the LaTeX.
 
 FUN will be called when the user press KEY and dot"
-  (aas-set-snippets 'latex-mode
+  (aas-set-snippets 'LaTeX-mode
     (s-concat key ".") fun))
 
 (defmacro my-latex-expand-define (key name args &rest body)
@@ -1826,10 +1814,11 @@ the minibuffer."
 
 (defun my-latex-add-graphicspath (path)
   "Add to list of current LaTeX file' s graphicpath PATH."
-  (->>
-   (my-latex-current-graphicspathes)
-   (cons path)
-   (my-latex-set-graphicspath)))
+  (let ((path (s-chop-prefix (f-full default-directory) (f-full path))))
+    (->>
+     (my-latex-current-graphicspathes)
+     (cons path)
+     (my-latex-set-graphicspath))))
 
 (defun my-latex-set-graphicspath (paths)
   "Set graphicpath (command \\graphicspath)of current LaTeX buffer to PATHS."
@@ -1871,8 +1860,15 @@ the minibuffer."
 
 If WIDTH is non-nil, then insert WIDTH as the optional argument width to the
 \\includegraphics command."
-  (my-latex-insert-single-line-command "includegraphics" filename
-                                       :optional `((width . ,width))))
+  (let* ((filename filename)
+         (image-graphicspath (--find
+                              (s-prefix-p it filename)
+                              (my-latex-current-graphicspathes)))
+         (filename (if image-graphicspath
+                       (s-chop-prefix (f-full image-graphicspath) filename)
+                     filename)))
+    (my-latex-insert-single-line-command "includegraphics" filename
+                                         :optional `((width . ,width)))))
 
 (defun my-latex-download-image-to-graphicspath (url &optional filename)
   "Download image at URL into graphicspath of current LaTeX buffer.
@@ -1893,12 +1889,25 @@ downloaded file"
    (s-split "?")
    (-first-item)))
 
-(my-latex-expand-define "f" my-latex-insert-figure-environment ;nofmt
-    (&optional placement)
+(my-latex-expand-define "t" my-latex-insert-table ;nofmt
+    (preamble &optional centering-p)
+  "Insert the LaTeX environment table to the current buffer with PREAMBLE."
+  (interactive (list
+                (my-latex-read-preamble)
+                (my-latex-read-centering)))
+  (my-latex-insert-env "table")
+  (when centering-p
+    (my-latex-insert-centering))
+  (my-latex-insert-tabular preamble))
+
+(defun my-latex-read-preamble ()
+  "Read a LaTeX preamble for table from the minibuffer."
+  (my-read-string-or-nil "Preamble, please: "))
+
+(my-latex-expand-define "f" my-latex-insert-figure (&optional placement)
   "Insert the LaTeX environment figure into current buffer with PLACEMENT."
   (interactive (list (my-latex-read-placement)))
-  (or placement (setq placement "h"))
-  (my-latex-insert-env "figure" placement))
+  (my-latex-insert-env "figure" :optional placement))
 
 (my-latex-expand-define "cp" my-latex-insert-caption ;nofmt
     (&optional caption-string)
@@ -1914,11 +1923,10 @@ downloaded file"
   (my-latex-insert-env "center"))
 
 (my-latex-expand-define "tr" my-latex-insert-tabular
-    (&optional placement)
+    (preamble)
   "Insert the latex environment tabular."
-  (interactive (list (my-latex-read-placement)))
-  (or placement (setq placement "ht"))
-  (my-latex-insert-env "tabular" placement))
+  (interactive (list (my-latex-read-preamble)))
+  (my-latex-insert-env "tabular" preamble))
 
 (my-latex-expand-define "ar" my-latex-insert-arabic
     (counter)
@@ -2050,12 +2058,14 @@ Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
 
 (defun my-latex-use-package (package &optional options)
   "Add \\usepackage for PACKAGE with OPTIONS to the current LaTeX buffer."
-  (interactive "sPlease, choose package which you need use: ")
+  (interactive
+   (list
+    (my-read-string-or-nil "Please, choose package which you need use: ")))
   (unless (my-latex-used-package-p package)
     (save-excursion
       (my-latex-goto-use-package-source)
       (beginning-of-line)
-      (my-latex-insert-command "usepackage" :optional options)
+      (my-latex-insert-command "usepackage" package :optional options)
       (newline))))
 
 (defun my-latex-goto-use-package-source ()
@@ -2439,7 +2449,7 @@ If the environment is not given, ask for it using completion."
 By default, caption won't be inserted, but if CAPTION is a string image will
 has caption CAPTION.
 
-Image will inserted with LaTeX environment figure and command
+Image will be inserted with LaTeX environment figure and command
 \\includegraphics, so you can change PLACEMENT and WIDTH of the inserted
 image, PLACEMENT defaults to \"h\", WIDTH defaults to the original image
 width.
@@ -2447,7 +2457,7 @@ width.
 If CENTERING is non-nil, then image will be centered via \\centering"
   (interactive (my--get-arguments-for-latex-insert-image))
   (my-latex-graphics-init)
-  (my-latex-insert-figure-environment placement)
+  (my-latex-insert-figure placement)
   (when centering ;nofmt
     (my-latex-insert-centering))
   (my-latex-insert-includegraphics filename width)
@@ -2500,7 +2510,6 @@ If CENTERING is non-nil, then image will be centered via \\centering"
 (defun my-latex-read-centering ()
   "Return t, when the user need to centering of the LaTeX block."
   (y-or-n-p "Centering or no? "))
-
 
 (defun my-latex-insert-image-at-url (url
                                      &optional
@@ -2806,6 +2815,108 @@ If caption isn't empty string, then insert image with the caption CAPTION."
   (org-cdlatex-mode t))
 
 (add-hook 'org-mode-hook #'turn-on-org-cdlatex-mode)
+
+(defun my-org-remove-empty-property-drawers ()
+  "Remove all empty property drawers in current file."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward ":PROPERTIES:" nil t)
+      (save-excursion
+        (org-remove-empty-drawer-at (match-beginning 0))))))
+
+(defun my-org-remove-redundant-tags ()
+  "Remove redundant tags of headlines in current buffer.
+
+A tag is considered redundant if it is local to a headline and
+inherited by a parent headline.
+
+Thanks to David Maus!"
+  (interactive)
+  (when (eq major-mode 'org-mode)
+    (save-excursion
+      (org-map-entries
+       (lambda ()
+         (let ((alltags (split-string (or (org-entry-get (point) "ALLTAGS") "") ":"))
+               local inherited tag)
+           (dolist (tag alltags)
+             (if (get-text-property 0 'inherited tag)
+                 (push tag inherited) (push tag local)))
+           (dolist (tag local)
+             (if (member tag inherited) (org-toggle-tag tag 'off)))))
+       t nil))))
+
+(defun my-org-check-misformatted-subtree ()
+  "Check misformatted entries in the current buffer."
+  (interactive)
+  (show-all)
+  (org-map-entries
+   (lambda ()
+     (when (and (move-beginning-of-line 2)
+                (not (looking-at org-heading-regexp)))
+       (if (or (and (org-get-scheduled-time (point))
+                    (not (looking-at (concat "^.*" org-scheduled-regexp))))
+               (and (org-get-deadline-time (point))
+                    (not (looking-at (concat "^.*" org-deadline-regexp)))))
+           (when (y-or-n-p "Fix this subtree? ")
+             (message "Call the function again when you're done fixing this subtree.")
+             (recursive-edit))
+         (message "All subtrees checked."))))))
+
+(defun my-org-fix-blank-lines (&optional prefix)
+  "Ensure that Blank lines exist between headings and between headings and their contents.
+With prefix, operate on whole buffer. Ensures that blank lines
+exist after each headings's drawers."
+  (interactive "P")
+  (org-map-entries
+   (lambda ()
+     (org-with-wide-buffer
+      ;; `org-map-entries' narrows the buffer, which prevents us from seeing
+      ;; newlines before the current heading, so we do this part widened.
+      (while (not (looking-back "\n\n" nil))
+        ;; Insert blank lines before heading.
+        (insert "\n")))
+     (let ((end (org-entry-end-position)))
+       ;; Insert blank lines before entry content
+       (forward-line)
+       (while (and (org-at-planning-p)
+                   (< (point) (point-max)))
+         ;; Skip planning lines
+         (forward-line))
+       (while (re-search-forward org-drawer-regexp end t)
+         ;; Skip drawers. You might think that `org-at-drawer-p' would suffice, but
+         ;; for some reason it doesn't work correctly when operating on hidden text.
+         ;; This works, taken from `org-agenda-get-some-entry-text'.
+         (re-search-forward "^[ \t]*:END:.*\n?" end t)
+         (goto-char (match-end 0)))
+       (unless (or (= (point) (point-max))
+                   (org-at-heading-p)
+                   (looking-at-p "\n"))
+         (insert "\n"))))
+   t
+   (if prefix
+       nil
+     'tree)))
+
+(defun my-org-align-all-tables ()
+  (interactive)
+  (org-table-map-tables 'org-table-align 'quietly))
+
+(defun my-org-tidy ()
+  "Use each of rules tidy org."
+  (interactive)
+  ;; Clean up metadata
+  (my-org-remove-redundant-tags)
+  (my-org-remove-empty-property-drawers)
+  (my-org-check-misformatted-subtree)
+  ;; Repair other elements of org-mode
+  (my-org-fix-blank-lines t)
+  (my-org-align-all-tables))
+
+(use-package org
+    :bind
+  ((:map my-org-local-map)
+   ("k" . 'my-org-tidy)))
 
 (use-package package-lint
     :ensure t)

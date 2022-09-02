@@ -3,23 +3,31 @@
 #+TODO: FAIL | GOAL DONE
 
 * Habbits
-  
+
 * Planes
 
 ** Targets on Week
+
+*** TODO Bind command to /SPC l q/ in =org-mode=
+
+*** TODO change =directory-abbrev-alist=                            :dired:
+
+*** TODO Explore some package from the /Github Stars/
+
 *** TODO Add a cool keymap to =LaTeX=
-*** TODO Explore =xenops=                                             :latex:
+
 *** TODO Add a automatic management of the spaces to =LaTeX=
+
+*** TODO Change =xah-fly-keys= to =ryo=
+
 *** TODO =racket-mmanager=
-*** TODO use =org-crypt= for the crypting notes of the category /passwords/ :org:
 
 *** TODO explore the =xetex=                                          :latex:
 
-*** TODO visit /Suggestion to keep your Org files tidy/                 :org:
-*** TODO remove dependicies from the =s= library in the =run-command-recipes= :run_command_recipes:
 *** TODO fix count of words/chars in the =mode-line=
 
 *** TODO Fix aggresive fill pargaraph mode in the =LaTeX=
+
     Disable on the:
 
     #+BEGIN_EXAMPLE
@@ -31,46 +39,75 @@
 
 *** TODO explore the =which-function-mode=
 
-*** TODO update =org-preview-latex=                               :org:latex:
-
 *** TODO fix the =org-refile=                                           :org:
+
 *** TODO Run the main file of the project in =run-command-reicpes= :run_command_recipes:
+
 *** TODO Add able to to the transposing of the =LaTeX= list items     :latex:
+
 *** TODO See on the =simple-indentation=                  :simple_indentaion:
+
 *** TODO explore the =org-tempo=                                        :org:
+
 *** TODO explore the =org-publish=                                      :org:
 
 *** TODO explore the =org-export=                                       :org:
-    Also use some themes for exporting to the =html=
+
+Also use some themes for exporting to the =html=
 
 *** TODO explore the =org-speed-commands=                               :org:
 
 *** TODO Make =LaTeX= document class for ГОСТ                         :latex:
+
 *** TODO add support of the =org-export= to the =run-command-recipes= :run_command_recipes:
+
 *** TODO In =just-doc= change view of non-taked arguments functions
-  
-  [[file:~/projects/just/README.md::Contributing]]
+
 *** TODO Add \underline command for =LaTeX=
-  
-*** TODO Explore notes style for LaTeX
-  
+
+*** DONE Explore notes style for LaTeX
+
 *** TODO CDLaTeX Math Modify for Russian imput method
+
 *** TODO See notes without Emacs
-  
-  [[file:~/notes/passwords/obit.org::+TITLE: OBIT]]
+
+*** TODO Print current buffer command for =fast-exec=
+
+**** TODO More pretty =helm-projectile-files=
+*** TODO Enable prettify mode in latex
+*** TODO Change defnition of =insert-new-counter=
+*** TODO Multicolumn expansion latex
+*** TODO Latex expansion : wrapfig, wraptable
 ** Targets on Day
+
+*** DONE Placement -> Table Preamble in the LaTeX insertion commands
+SCHEDULED: <2022-09-01 Чт>
+
+*** DONE visit /Suggestion to keep your Org files tidy/               :org:
+SCHEDULED: <2022-09-01 Чт>
+
+*** DONE Update =org-preview-latex=                             :org:latex:
+SCHEDULED: <2022-09-01 Чт>
+
+*** DONE Remove dependicies from the =s= library in the =run-command-recipes= :run_command_recipes:
+SCHEDULED: <2022-09-01 Чт>
+
+*** TODO Use =org-crypt= for the crypting notes of the category /passwords/ :org:
+SCHEDULED: <2022-09-01 Чт>
+
+*** DONE Explore =xenops=                                           :latex:
+SCHEDULED: <2022-09-01 Чт>
+
+*** TODO Do =zms=
+SCHEDULED: <2022-08-16 Вт>
+
+
+
+*** DONE Chop default-directory from the graphicspath when insert image in LaTeX
+SCHEDULED: <2022-09-01 Чт>
 
 * Films
 
-** MUST-SEE Elvis
-:PROPERTIES:
-:name:     Элвис
-:year:     2022
-:slogan:   The Man. The Legend. The King of Rock & Roll.
-:id:       1179041
-:rating:   73.0
-:countries: (Австралия США)
-:END:
 ** MUST-SEE The Green Mile
 :PROPERTIES:
 :name:     Зеленая миля
@@ -79,6 +116,16 @@
 :id:       435
 :rating:   91.0
 :countries: (США)
+:END:
+
+** SAW Elvis
+:PROPERTIES:
+:name:     Элвис
+:year:     2022
+:slogan:   The Man. The Legend. The King of Rock & Roll.
+:id:       1179041
+:rating:   73.0
+:countries: (Австралия США)
 :END:
 
 ** MUST-SEE The Matrix Reloaded
@@ -90,6 +137,7 @@
 :rating:   77.0
 :countries: (США)
 :END:
+
 ** MUST-SEE The Batman
    :PROPERTIES:
    :name:     Бэтмен
@@ -99,6 +147,7 @@
    :rating:   79.0
    :countries: (США)
    :END:
+
 ** MUST-SEE Sound of Metal
    :PROPERTIES:
    :name:     Звук металла
@@ -108,6 +157,7 @@
    :rating:   73.0
    :countries: (Бельгия США)
    :END:
+
 ** MUST-SEE Missionary: Impossible
    :PROPERTIES:
    :name:     Миссия невыполнима
@@ -117,6 +167,7 @@
    :rating:   0
    :countries: (США)
    :END:
+
 ** MUST-SEE Thor: Love and Thunder
    :PROPERTIES:
    :name:     Тор: Любовь и гром
@@ -126,6 +177,7 @@
    :rating:   65.0
    :countries: (Австралия США)
    :END:
+
 ** MUST-SEE Doctor Strange in the Multiverse of Madness
    :PROPERTIES:
    :name:     Доктор Стрэндж: В мультивселенной безумия
@@ -135,6 +187,7 @@
    :rating:   67.0
    :countries: (США)
    :END:
+
 ** MUST-SEE Borat: Cultural Learnings of America for Make Benefit Glorious Nation of Kazakhstan
    :PROPERTIES:
    :name:     Борат
