@@ -773,6 +773,12 @@ Action of `avy', see `avy-action-yank' for example"
 
 (define-key xah-fly-command-map (kbd "DEL") 'delete-only-1-char)
 
+(use-package embrace
+    :ensure tI
+    :bind ((:map xah-fly-command-map)
+           ("/"         . 'embrace-commander)
+           ("SPC SPC /" . 'xah-goto-matching-bracket)))
+
 (defun mark-inner-or-expand-region ()
   "If text is selected, expand region, otherwise then mark inner of brackets."
   (interactive)
@@ -814,26 +820,6 @@ Action of `avy', see `avy-action-yank' for example"
     (kmacro-call-macro arg)))
 
 (define-key xah-fly-command-map (kbd "SPC RET") 'kmacro-call-macro-or-apply-to-lines)
-
-(defun outline-show-all-or-entry ()
-  "If call once, use `outline-show-entry', twice call `outline-show-all'."
-  (interactive)
-  (if (equal last-command this-command)
-      (outline-show-all)
-    (outline-show-entry)))
-
-(defun outline-hide-all-or-entry ()
-  "If call once, use `outline-hide-entry', twice call `outline-hide-all'."
-  (interactive)
-  (if (equal last-command this-command)
-      (outline-hide-other)
-    (outline-hide-entry)))
-
-(use-package outline
-    :ensure t
-    :bind ((:map outline-minor-mode-map)
-           ("<backtab>" . 'outline-hide-all-or-entry)
-           ("C-<tab>" . 'outline-show-all-or-entry)))
 
 (use-package string-edit
     :ensure t
@@ -975,7 +961,7 @@ Is used in `my-drag-stuff-down'.")
 (define-key-when
     my-insert-new-line-or-nothing
     xah-fly-command-map
-  ""
+  ""
   'stop-drag
   'my-last-command-is-dragged-stuff-p)
 
@@ -1177,7 +1163,8 @@ If there's no region, the current line will be duplicated."
       (let ((beg (region-beginning))
             (end (region-end)))
         (duplicate-region arg beg end)
-        (one-shot-keybinding "d" (λ (duplicate-region 1 beg end))))
+        (one-shot-keybinding "d"
+                             (lambda (duplicate-region 1 beg end))))
     (duplicate-current-line arg)
     (one-shot-keybinding "d" 'duplicate-current-line)))
 
@@ -1552,7 +1539,7 @@ Either at the beginning of a line, or after a sentence end."
   (interactive)
   (when (and
          (my-in-text-p)
-         (looking-back "[а-яa-z]")
+         (looking-back "[1-9a-z]")
          (save-excursion
            (forward-char -1)
            (or
@@ -1633,8 +1620,8 @@ See `just-line-is-whitespaces-p'"
 
 (use-package xenops
     :ensure t
-    :hook
-    (LaTeX-mode . xenops-mode)
+    ;; :hook
+    ;; (LaTeX-mode . xenops-mode)
     :custom
     (xenops-math-image-scale-factor 2))
 
@@ -2301,7 +2288,7 @@ Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
       "cls" "^\\circ C"
 
       ;; Some Physics Sheet
-      "eqv" "\\mathrm{экв}"
+      "eqv" "\\mathrm{Экв.}"
 
       ;; Some Cool Symbols
       "trg" "\\triangle"
@@ -2560,22 +2547,23 @@ the `kill-ring', the selected region or the minibuffer"
      (:map my-org-local-map)
 
      ;; Insert anything
-     ("l" . 'org-insert-link)
-     ("s" . 'org-schedule)
-     ("d" . 'org-deadline)
-     ("i" . 'my-org-insert-image)
-     ("u" . 'my-org-insert-img-at-url)
+     ("l"   . 'org-insert-link)
+     ("s"   . 'org-schedule)
+     ("d"   . 'org-deadline)
+     ("i"   . 'my-org-insert-image)
+     ("u"   . 'my-org-insert-img-at-url)
 
      ;; Manipulations with a subtree
-     ("c" . 'org-copy-subtree)
-     ("x" . 'org-cut-subtree)
-     ("6" . 'org-mark-subtree)
-     ("w" . 'my-org-clear-subtree)
+     ("c"   . 'org-copy-subtree)
+     ("x"   . 'org-cut-subtree)
+     ("q"   . 'my-org-indent-subtree)
+     ("6"   . 'org-mark-subtree)
+     ("w"   . 'my-org-clear-subtree)
      ([tab] . 'org-refile)
-     ("1" . 'org-todo)
-     (";" . 'org-set-tags-command)
-     ("a" . 'org-archive-subtree)
-     ("z" . 'org-toggle-comment)
+     ("1"   . 'org-todo)
+     (";"   . 'org-set-tags-command)
+     ("a"   . 'org-archive-subtree)
+     ("z"   . 'org-toggle-comment)
 
      ;; Org Babel
      ("b t" . 'org-babel-tangle)
@@ -2584,42 +2572,42 @@ the `kill-ring', the selected region or the minibuffer"
 
      ;; Manipulations with a table
      ("t n" . 'org-table-create-or-convert-from-region)
-     ("=" . 'org-table-eval-formula)
+     ("="   . 'org-table-eval-formula)
      ("t f" . 'my-org-table-eval-formula-in-field)
      ("t i" . 'org-table-import)
      ("t e" . 'org-table-export)
      ("t g" . 'org-table-recalculate)
-     ("-" . 'org-table-insert-hline)
+     ("t x" . 'org-table-kill-row)
+     ("-"   . 'org-table-insert-hline)
+     ("t o" . 'org-table-toggle-coordinate-overlays)
      ;; sum
-     ("+" . 'org-table-sum)
+     ("+"   . 'org-table-sum)
      ("t +" . 'org-table-sum)
      ("t s" . 'org-table-sum)
-     ;;
-     ("t o" . 'org-table-toggle-coordinate-overlays)
 
      ;; Export
-     ("p" . 'org-publish)
-     ("e" . 'org-export-dispatch)
+     ("p"   . 'org-publish)
+     ("e"   . 'org-export-dispatch)
 
      ;; Context Commands
-     ("g" . 'org-ctrl-c-ctrl-c)
-     ("'" . 'org-edit-special)
+     ("g"   . 'org-ctrl-c-ctrl-c)
+     ("'"   . 'org-edit-special)
      ;; other being in the `org-mode-map' section
 
      ;; Miscellaneous
-     ("j" . 'org-latex-preview)
+     ("j"   . 'org-latex-preview)
      ("SPC" . 'org-toggle-checkbox)
      ("RET" . 'org-open-at-point)
-     ("r" . 'my-org-schedule-to-today)
-     ("/" . 'org-sparse-tree)
+     ("r"   . 'my-org-schedule-to-today)
+     ("/"   . 'org-sparse-tree)
 
      (:map org-mode-map)
      ;; Here continoue of the Context Commands...
      ;; M-
-     ("M-j" . 'org-metaleft)
-     ("M-i" . 'org-metaup)
-     ("M-k" . 'org-metadown)
-     ("M-l" . 'org-metaright)
+     ("M-j"   . 'org-metaleft)
+     ("M-i"   . 'org-metaup)
+     ("M-k"   . 'org-metadown)
+     ("M-l"   . 'org-metaright)
      ;; M-S-
      ("M-S-j" . 'org-shiftmetaleft)
      ("M-S-i" . 'org-shiftmetaup)
@@ -2645,6 +2633,13 @@ the `kill-ring', the selected region or the minibuffer"
   "Scheduale a `org-mode' heading to today."
   (interactive)
   (org-schedule t (format-time-string "%Y-%m-%d")))
+
+(defun my-org-indent-subtree ()
+  "Indent current the `org-mode' subtree at current position."
+  (interactive)
+  (save-excursion
+    (org-mark-subtree)
+    (indent-region (region-beginning) (region-end))))
 
 (defun my-org-insert-image (filename &optional caption)
   "Insert a image with FILENAME.
@@ -3331,6 +3326,7 @@ List of racket expressions in which this function should work:
 
 (use-package web-mode
     :ensure t
+    :major-mode-map html (html-mode web-mode web-mode-prog-mode mhtml-mode)
     :hook (web-mode . yas-minor-mode-off)
     :custom
     (web-mode-script-padding 1)
@@ -3401,6 +3397,20 @@ List of racket expressions in which this function should work:
                      '(company-web-html))
                 (company-mode t))))
 
+(use-package impatient-mode
+    :ensure t
+    :bind ((:map my-html-local-map)
+           ("e" . 'my-enable-impatient-mode)))
+
+(defun my-enable-impatient-mode ()
+  "Enable `impatient-mode' and open the page of current browser in web browser."
+  (interactive)
+  (impatient-mode +1)
+  (->>
+   (buffer-name)
+   (s-prepend "http://localhost:8080/imp/live/")
+   (browse-url)))
+
 (use-package css-mode)
 
 (use-package css-eldoc
@@ -3456,6 +3466,12 @@ List of racket expressions in which this function should work:
     (helm-mode +1)
     ;; this fix one bug
     (defvar helm-completion-style nil))
+
+(use-package helm-ext
+    :ensure t
+    :config
+    (helm-ext-ff-enable-skipping-dots +1)
+    (helm-ext-ff-enable-auto-path-expansion t))
 
 (use-package command-log-mode
     :ensure t)
@@ -4166,10 +4182,9 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
            ("'"       . 'dired-isearch-filenames)
 
            ;; Open file
-           ("l"       . 'dired-find-file)
-           ("RET"     . 'dired-find-file)
            ("o"       . 'dired-find-file-other-window)
            ("j"       . 'my-dired-goto-parent-dir)
+           ;; some other open files I define in the section "Dired Hacks: Open"
 
            ;; Manipulation with file(s)
            ("SPC g"   . 'my-dired-delete)
@@ -4177,6 +4192,7 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
            ("f"       . 'my-dired-rename)
            ("SPC TAB" . 'my-dired-move)
            ("s"       . 'my-dired-new-file)
+           ;; copy/move/paste also defines in the section "Dired Hacks: Ranger"
 
            ;; Mark files
            ("t"       . 'dired-mark)
@@ -4269,6 +4285,245 @@ Return new name of FILE"
   "Version of `avy' for the `dired'."
   (interactive)
   (avy-goto-line))
+
+(use-package dired-filter
+    :ensure t
+    :init
+    (define-key dired-mode-map (kbd "SPC k g") dired-filter-map))
+
+(use-package dired-open
+    :ensure t
+    :bind ((:map dired-mode-map)
+           ("l"   . 'dired-open-file)
+           ("RET" . 'dired-open-file))
+    :config
+    (add-to-list 'dired-open-functions 'my-dired-open-function-pdf))
+
+(defun my-dired-open-function-pdf ()
+  "Open function for `dired-open-functions'."
+  (my-try-open-pdf-file (dired-get-file-for-visit)))
+
+(defun my-try-open-pdf-file (filename)
+  "If file with FILENAME is a pdf file, then open it as pdf, other return nil."
+  (when (my-pdf-file filename)
+    (helm-open-file-with-default-tool filename)
+    t))
+
+(defun my-pdf-file (filename)
+  "Return t, when FILENAME is path to a PDF file."
+  (s-suffix-p ".pdf" filename))
+
+(use-package dired-rainbow
+    :ensure t
+    :config
+    (dired-rainbow-define-chmod directory "#6cb2eb" "d.*")
+    (dired-rainbow-define html "#eb5286"
+                          ("css"
+                           "less"
+                           "sass"
+                           "scss"
+                           "htm"
+                           "html"
+                           "jhtm"
+                           "mht"
+                           "eml"
+                           "mustache"
+                           "xhtml"))
+    (dired-rainbow-define xml "#f2d024" ("xml"
+                                         "xsd"
+                                         "xsl"
+                                         "xslt"
+                                         "wsdl"
+                                         "bib"
+                                         "json"
+                                         "msg"
+                                         "pgn"
+                                         "rss"
+                                         "yaml"
+                                         "yml"
+                                         "rdata"))
+    (dired-rainbow-define document "#9561e2" ("docm"
+                                              "doc"
+                                              "docx"
+                                              "odb"
+                                              "odt"
+                                              "pdb"
+                                              "pdf"
+                                              "ps"
+                                              "rtf"
+                                              "djvu"
+                                              "epub"
+                                              "odp"
+                                              "ppt"
+                                              "pptx"))
+    (dired-rainbow-define markdown "#ffed4a" ("org"
+                                              "etx"
+                                              "info"
+                                              "markdown"
+                                              "md"
+                                              "mkd"
+                                              "nfo"
+                                              "pod"
+                                              "rst"
+                                              "tex"
+                                              "textfile"
+                                              "txt"))
+    (dired-rainbow-define database "#6574cd" ("xlsx"
+                                              "xls"
+                                              "csv"
+                                              "accdb"
+                                              "db"
+                                              "mdb"
+                                              "sqlite"
+                                              "nc"))
+    (dired-rainbow-define media "#de751f" ("mp3"
+                                           "mp4"
+                                           "MP3"
+                                           "MP4"
+                                           "avi"
+                                           "mpeg"
+                                           "mpg"
+                                           "flv"
+                                           "ogg"
+                                           "mov"
+                                           "mid"
+                                           "midi"
+                                           "wav"
+                                           "aiff"
+                                           "flac"))
+    (dired-rainbow-define image "#f66d9b" ("tiff"
+                                           "tif"
+                                           "cdr"
+                                           "gif"
+                                           "ico"
+                                           "jpeg"
+                                           "jpg"
+                                           "png"
+                                           "psd"
+                                           "eps"
+                                           "svg"))
+    (dired-rainbow-define log "#c17d11" ("log"))
+    (dired-rainbow-define shell "#f6993f" ("awk"
+                                           "bash"
+                                           "bat"
+                                           "sed"
+                                           "sh"
+                                           "zsh"
+                                           "vim"))
+    (dired-rainbow-define interpreted "#38c172" ("py"
+                                                 "ipynb"
+                                                 "rb"
+                                                 "pl"
+                                                 "t"
+                                                 "msql"
+                                                 "mysql"
+                                                 "pgsql"
+                                                 "sql"
+                                                 "r"
+                                                 "clj"
+                                                 "cljs"
+                                                 "scala"
+                                                 "js"))
+    (dired-rainbow-define compiled "#4dc0b5" ("asm"
+                                              "cl"
+                                              "lisp"
+                                              "el"
+                                              "c"
+                                              "h"
+                                              "c++"
+                                              "h++"
+                                              "hpp"
+                                              "hxx"
+                                              "m"
+                                              "cc"
+                                              "cs"
+                                              "cp"
+                                              "cpp"
+                                              "go"
+                                              "f"
+                                              "for"
+                                              "ftn"
+                                              "f90"
+                                              "f95"
+                                              "f03"
+                                              "f08"
+                                              "s"
+                                              "rs"
+                                              "hi"
+                                              "hs"
+                                              "pyc"
+                                              ".java"))
+    (dired-rainbow-define executable "#8cc4ff" ("exe" "msi"))
+    (dired-rainbow-define compressed "#51d88a" ("7z"
+                                                "zip"
+                                                "bz2"
+                                                "tgz"
+                                                "txz"
+                                                "gz"
+                                                "xz"
+                                                "z"
+                                                "Z"
+                                                  "jar"
+                                                  "war"
+                                                  "ear"
+                                                  "rar"
+                                                  "sar"
+                                                  "xpi"
+                                                  "apk"
+                                                  "xz"
+                                                  "tar"))
+      (dired-rainbow-define packaged "#faad63" ("deb"
+                                                "rpm"
+                                                "apk"
+                                                "jad"
+                                                "jar"
+                                                "cab"
+                                                "pak"
+                                                "pk3"
+                                                "vdf"
+                                                "vpk"
+                                                "bsp"))
+      (dired-rainbow-define encrypted "#ffed4a" ("gpg"
+                                                 "pgp"
+                                                 "asc"
+                                                 "bfe"
+                                                 "enc"
+                                                 "signature"
+                                                 "sig"
+                                                 "p12"
+                                                 "pem"))
+      (dired-rainbow-define fonts "#6cb2eb" ("afm"
+                                             "fon"
+                                             "fnt"
+                                             "pfb"
+                                             "pfm"
+                                             "ttf"
+                                             "otf"))
+      (dired-rainbow-define
+       partition
+       "#e3342f"
+       ("dmg"
+        "iso"
+        "bin"
+        "nrg"
+        "qcow"
+        "toast"
+        "vcd"
+        "vmdk"
+        "bak"))
+      (dired-rainbow-define vc "#0074d9"
+                            ("git" "gitignore" "gitattributes" "gitmodules")))
+
+(use-package dired-ranger
+    :ensure t
+    :bind ((:map dired-mode-map)
+           ("m" . 'dired-ranger-move)
+           ("v" . 'dired-ranger-paste)
+           ("c" . 'dired-ranger-copy)))
+
+(use-package dired-collapse
+    :ensure t
+    :hook (dired-mode . dired-collapse-mode))
 
 (use-package quickrun
     :ensure t
@@ -4432,17 +4687,17 @@ PT defaults to the current `point'"
       (function my-films-format-as-org-heading)))))
 
 (use-package deft
-      :ensure t
-      :custom ((deft-directory "~/notes/")
-               (deft-recursive t))
-      :config
-      (defun fast-exec-deft-keys ()
-        "Get some useful keymaps of  `fast-exec' for deft."
-        (fast-exec/some-commands
-         ("Manage Notes" 'deft)))
-I
-      (fast-exec/register-keymap-func 'fast-exec-deft-keys)
-      (fast-exec/reload-functions-chain))
+    :ensure t
+    :custom
+    ((deft-directory "~/notes/")
+     (deft-recursive t))
+    :config
+    (defun fast-exec-deft-keys ()
+      "Get some useful keymaps of  `fast-exec' for deft."
+      (fast-exec/some-commands
+       ("Manage Notes" 'deft)))
+    (fast-exec/register-keymap-func 'fast-exec-deft-keys)
+    (fast-exec/reload-functions-chain))
 
 (defcustom my-mipt-dir "c:/Users/hrams/Documents/mipt"
   "Path to the directory in which will be saved all MIPT solutions.")
@@ -4684,9 +4939,7 @@ I
    source
    (s-replace "\n" " ")
    (s-replace "\\begin{equation}" "\\[")
-   (s-replace "\\end{equation}" "\\]")
-   (s-append "Так как ваш сайт не любит большие решения, ")
-   (s-append "то оно было уменьшено с помощью программного кода")))
+   (s-replace "\\end{equation}" "\\]")))
 
 (bind-keys
  :map my-latex-local-map

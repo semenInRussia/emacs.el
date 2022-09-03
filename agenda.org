@@ -6,12 +6,6 @@
 
 ** Targets on Week
 
-*** TODO Bind command to /SPC l q/ in =org-mode=
-
-*** TODO change =directory-abbrev-alist=                            :dired:
-
-*** TODO Explore some package from the /Github Stars/
-
 *** TODO Add a cool keymap to =LaTeX=
 
 *** TODO Add a automatic management of the spaces to =LaTeX=
@@ -79,18 +73,29 @@ Also use some themes for exporting to the =html=
 
 *** TODO Latex expansion : wrapfig, wraptable
 *** TODO Auto capitalize on #+TITLE in org
+*** TODO Xenops in non \documentclass =LaTeX= documents
+*** TODO Color Picker
+*** TODO /spc spc v/ to insert string from kill ring
+*** TODO Delete directories too in the =dired= via =SPC g=
+*** TODO Impatient modes for all =major-modes=
+*** TODO When "I am use" after insert description last uri
+*** TODO Fix =my-copy-buffer-content-as-mipt-solution=
+*** TODO /SPC y/ for =dired=
 ** Targets on Day
 
-*** TODO Use =org-crypt= for the crypting notes of the category /passwords/ :org:
-SCHEDULED: <2022-09-01 Чт>
+*** DONE Explore some package from the /Github Stars/
+SCHEDULED: <2022-09-02 Пт>
+
+*** DONE Bind command to /SPC l q/ in =org-mode=
+SCHEDULED: <2022-09-02 Пт>
 
 *** TODO Do =zms=
-SCHEDULED: <2022-08-16 Вт>
+DEADLINE: <2022-09-10 Сб> SCHEDULED: <2022-08-16 Вт>
 
 *** DONE Use =deft= instead of my own notes system
 SCHEDULED: <2022-09-02 Пт>
 
-* Films
+* Films 
 
 ** MUST-SEE The Green Mile
 :PROPERTIES:

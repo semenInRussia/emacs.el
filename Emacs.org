@@ -79,9 +79,9 @@ I'm use followed repositories as a template for my Emacs config:
     - [[#smartparens][Smartparens]]
     - [[#special-configuration-for-major-modes][Special Configuration for Major Modes]]
     - [[#delete-only-parens-without-inner-contents][Delete Only Parens without Inner Contents]]
+  - [[#editing-based-on-language-objects][Editing Based on Language Objects]]
   - [[#smart-select-text][Smart Select Text]]
   - [[#macros][Macros]]
-  - [[#outline][Outline]]
   - [[#special-strings-as-seperated-buffers][Special Strings as Seperated Buffers]]
   - [[#documentation-on-fly][Documentation on Fly]]
   - [[#transpose][Transpose]]
@@ -168,12 +168,13 @@ I'm use followed repositories as a template for my Emacs config:
       - [[#navigation-1][Navigation]]
     - [[#json][JSON]]
     - [[#html][HTML]]
-      - [[#variables-1][Variables]]
+      - [[#variables-for-html][Variables for HTML]]
       - [[#web-mode][Web Mode]]
       - [[#auto-rename-tag][Auto Rename Tag]]
       - [[#emmet][Emmet]]
       - [[#paredit-for-html][=Paredit= for HTML]]
       - [[#auto-complete-for-html][Auto Complete for HTML]]
+      - [[#live-view-of-the-html-buffers][Live View of the HTML buffers]]
     - [[#css][CSS]]
       - [[#fly-documentation][Fly Documentation]]
 - [[#support-of-some-special-modes][Support of Some Special Modes]]
@@ -185,6 +186,7 @@ I'm use followed repositories as a template for my Emacs config:
     - [[#which-key][Which Key?]]
     - [[#helpful-package][Helpful Package]]
   - [[#autocompletion-of-commands-helm][Autocompletion of Commands (HELM)]]
+    - [[#extension-of-the-helm][Extension of the =HELM=]]
   - [[#command-log][Command Log]]
   - [[#whitespaces-mode][Whitespaces Mode]]
   - [[#visual-fill-line-mode][Visual Fill Line Mode]]
@@ -239,8 +241,14 @@ I'm use followed repositories as a template for my Emacs config:
     - [[#undo-with-git][Undo with Git]]
     - [[#git-major-modes][Git Major Modes]]
     - [[#genreate-gitignore][Genreate .gitignore]]
-  - [[#view-directories][View Directories]]
+  - [[#view-directories-in-dired][View Directories in =dired=]]
     - [[#my-keymaps-for-dired][My Keymaps for Dired]]
+    - [[#dired-hacks][Dired Hacks]]
+      - [[#dired-hacks-filter][Dired Hacks: Filter]]
+      - [[#dired-hacks-open-open-certain-files-different-ways][Dired Hacks: Open (Open Certain Files Different Ways)]]
+      - [[#dired-hacks-rainbow-different-colors-for-certain-files][Dired Hacks: Rainbow (Different Colors for Certain Files)]]
+      - [[#dired-hacks-ranger-copypaste-files-as-text][Dired Hacks: Ranger (Copy/Paste Files as Text)]]
+      - [[#dired-hacks-collapse][Dired Hacks: Collapse]]
   - [[#just-run-current-file][Just Run Current File]]
   - [[#run-command][Run Command]]
     - [[#run-command-recipes][Run Command Recipes]]
@@ -1515,6 +1523,20 @@ For enable builtin smartparens configuration for major modes, add require statem
   (define-key xah-fly-command-map (kbd "DEL") 'delete-only-1-char)
   #+END_SRC
 
+** Editing Based on Language Objects
+
+I am use [[https://github.com/cute-jumper/embrace.el][embrace]].
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package embrace
+      :ensure tI
+      :bind ((:map xah-fly-command-map)
+             ("/"         . 'embrace-commander)
+             ("SPC SPC /" . 'xah-goto-matching-bracket)))
+
+#+END_SRC
+
 ** Smart Select Text
 
 I am use cool package [[https://github.com/magnars/expand-region.el/][expand-region]]:
@@ -1573,34 +1595,6 @@ I am also use =SPC RET= for execute last macro or execute macro to lines:
 
 #+RESULTS:
 : kmacro-call-macro-or-apply-to-lines
-
-** Outline
-
-Outline is feature which show and hide framgents of buffer for
-organization of buffer text.  I am use built-in the Emacs =outline=
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  (defun outline-show-all-or-entry ()
-    "If call once, use `outline-show-entry', twice call `outline-show-all'."
-    (interactive)
-    (if (equal last-command this-command)
-        (outline-show-all)
-      (outline-show-entry)))
-
-  (defun outline-hide-all-or-entry ()
-    "If call once, use `outline-hide-entry', twice call `outline-hide-all'."
-    (interactive)
-    (if (equal last-command this-command)
-        (outline-hide-other)
-      (outline-hide-entry)))
-
-  (use-package outline
-      :ensure t
-      :bind ((:map outline-minor-mode-map)
-             ("<backtab>" . 'outline-hide-all-or-entry)
-             ("C-<tab>" . 'outline-show-all-or-entry)))
-             #+END_SRC
 
 ** Special Strings as Seperated Buffers
 
@@ -1781,7 +1775,7 @@ followed functions:
       (define-key-when
           my-insert-new-line-or-nothing
           xah-fly-command-map
-        ""
+        ""
         'stop-drag
         'my-last-command-is-dragged-stuff-p)
 
@@ -2021,130 +2015,131 @@ And =SPC s= for new line below and =SPC SPC s= for new line above:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defun open-line-below ()
-    (interactive)
-    (end-of-line)
-    (newline)
-    (indent-for-tab-command))
-
-  (defun open-line-above ()
-    (interactive)
-    (beginning-of-line)
-    (newline)
-    (forward-line -1)
-    (indent-for-tab-command))
-
-  (defun new-line-in-between ()
-    (interactive)
-    (newline)
-    (save-excursion
+    (defun open-line-below ()
+      (interactive)
+      (end-of-line)
       (newline)
       (indent-for-tab-command))
-    (indent-for-tab-command))
 
-  (defun duplicate-current-line-or-region (arg)
-    "Duplicates the current line or region ARG times.
-  If there's no region, the current line will be duplicated."
-    (interactive "p")
-    (if (region-active-p)
-        (let ((beg (region-beginning))
-              (end (region-end)))
-          (duplicate-region arg beg end)
-          (one-shot-keybinding "d" (λ (duplicate-region 1 beg end))))
-      (duplicate-current-line arg)
-      (one-shot-keybinding "d" 'duplicate-current-line)))
+    (defun open-line-above ()
+      (interactive)
+      (beginning-of-line)
+      (newline)
+      (forward-line -1)
+      (indent-for-tab-command))
 
-  (defun one-shot-keybinding (key command)
-    (set-temporary-overlay-map
-     (let ((map (make-sparse-keymap)))
-       (define-key map (kbd key) command)
-       map) t))
-
-  (defun replace-region-by (fn)
-    (let* ((beg (region-beginning))
-           (end (region-end))
-           (contents (buffer-substring beg end)))
-      (delete-region beg end)
-      (insert (funcall fn contents))))
-
-  (defun duplicate-region (&optional num start end)
-    "Duplicates the region bounded by START and END NUM times.
-  If no START and END is provided, the current region-beginning and
-  region-end is used."
-    (interactive "p")
-    (save-excursion
-      (let* ((start (or start (region-beginning)))
-             (end (or end (region-end)))
-             (region (buffer-substring start end)))
-        (goto-char end)
-        (dotimes (i num)
-          (insert region)))))
-
-  (defun paredit-duplicate-current-line ()
-    (back-to-indentation)
-    (let (kill-ring kill-ring-yank-pointer)
-      (paredit-kill)
-      (yank)
-      (newline-and-indent)
-      (yank)))
-
-  (defun duplicate-current-line (&optional num)
-    "Duplicate the current line NUM times."
-    (interactive "p")
-    (if (bound-and-true-p paredit-mode)
-        (paredit-duplicate-current-line)
+    (defun new-line-in-between ()
+      (interactive)
+      (newline)
       (save-excursion
-        (when (eq (point-at-eol) (point-max))
-          (goto-char (point-max))
-          (newline)
-          (forward-char -1))
-        (duplicate-region num (point-at-bol) (1+ (point-at-eol))))))
+        (newline)
+        (indent-for-tab-command))
+      (indent-for-tab-command))
 
-  (defvar yank-indent-modes '(prog-mode
-                              sgml-mode
-                              js2-mode)
-    "Modes in which to indent regions that are yanked (or yank-popped)")
+    (defun duplicate-current-line-or-region (arg)
+      "Duplicates the current line or region ARG times.
+    If there's no region, the current line will be duplicated."
+      (interactive "p")
+      (if (region-active-p)
+          (let ((beg (region-beginning))
+                (end (region-end)))
+            (duplicate-region arg beg end)
+            (one-shot-keybinding "d"
+                                 (lambda (duplicate-region 1 beg end))))
+        (duplicate-current-line arg)
+        (one-shot-keybinding "d" 'duplicate-current-line)))
 
-  (defvar yank-advised-indent-threshold 1000
-    "Threshold (# chars) over which indentation does not automatically occur.")
+    (defun one-shot-keybinding (key command)
+      (set-temporary-overlay-map
+       (let ((map (make-sparse-keymap)))
+         (define-key map (kbd key) command)
+         map) t))
 
-  (defun yank-advised-indent-function (beg end)
-    "Do indentation, as long as the region isn't too large."
-    (if (<= (- end beg) yank-advised-indent-threshold)
-        (indent-region beg end nil)))
+    (defun replace-region-by (fn)
+      (let* ((beg (region-beginning))
+             (end (region-end))
+             (contents (buffer-substring beg end)))
+        (delete-region beg end)
+        (insert (funcall fn contents))))
 
-  (defadvice yank (after yank-indent activate)
-    "If current mode is one of 'yank-indent-modes, indent yanked text.
-  With prefix arg don't indent."
-    (if (and (not (ad-get-arg 0))
-             (--any? (derived-mode-p it) yank-indent-modes))
-        (let ((transient-mark-mode nil))
-          (yank-advised-indent-function (region-beginning) (region-end)))))
+    (defun duplicate-region (&optional num start end)
+      "Duplicates the region bounded by START and END NUM times.
+    If no START and END is provided, the current region-beginning and
+    region-end is used."
+      (interactive "p")
+      (save-excursion
+        (let* ((start (or start (region-beginning)))
+               (end (or end (region-end)))
+               (region (buffer-substring start end)))
+          (goto-char end)
+          (dotimes (i num)
+            (insert region)))))
 
-  (defadvice yank-pop (after yank-pop-indent activate)
-    "If current mode is one of 'yank-indent-modes, indent yanked text.
-  With prefix arg don't indent."
-    (if (and (not (ad-get-arg 0))
-             (member major-mode yank-indent-modes))
-        (let ((transient-mark-mode nil))
-          (yank-advised-indent-function (region-beginning) (region-end)))))
+    (defun paredit-duplicate-current-line ()
+      (back-to-indentation)
+      (let (kill-ring kill-ring-yank-pointer)
+        (paredit-kill)
+        (yank)
+        (newline-and-indent)
+        (yank)))
 
-  (defun yank-unindented ()
-    (interactive)
-    (yank 1))
+    (defun duplicate-current-line (&optional num)
+      "Duplicate the current line NUM times."
+      (interactive "p")
+      (if (bound-and-true-p paredit-mode)
+          (paredit-duplicate-current-line)
+        (save-excursion
+          (when (eq (point-at-eol) (point-max))
+            (goto-char (point-max))
+            (newline)
+            (forward-char -1))
+          (duplicate-region num (point-at-bol) (1+ (point-at-eol))))))
 
-  (defun kill-to-beginning-of-line ()
-    (interactive)
-    (kill-region (save-excursion (beginning-of-line) (point))
-                 (point)))
+    (defvar yank-indent-modes '(prog-mode
+                                sgml-mode
+                                js2-mode)
+      "Modes in which to indent regions that are yanked (or yank-popped)")
 
-  (bind-keys :map
-             xah-fly-command-map
-             ("SPC y"     . duplicate-current-line-or-region)
-             ("SPC s"     . open-line-below)
-             ("SPC e"     . kill-to-beginning-of-line)
-             ("SPC k RET" . new-line-in-between)
-             ("SPC SPC s" . open-line-above))
+    (defvar yank-advised-indent-threshold 1000
+      "Threshold (# chars) over which indentation does not automatically occur.")
+
+    (defun yank-advised-indent-function (beg end)
+      "Do indentation, as long as the region isn't too large."
+      (if (<= (- end beg) yank-advised-indent-threshold)
+          (indent-region beg end nil)))
+
+    (defadvice yank (after yank-indent activate)
+      "If current mode is one of 'yank-indent-modes, indent yanked text.
+    With prefix arg don't indent."
+      (if (and (not (ad-get-arg 0))
+               (--any? (derived-mode-p it) yank-indent-modes))
+          (let ((transient-mark-mode nil))
+            (yank-advised-indent-function (region-beginning) (region-end)))))
+
+    (defadvice yank-pop (after yank-pop-indent activate)
+      "If current mode is one of 'yank-indent-modes, indent yanked text.
+    With prefix arg don't indent."
+      (if (and (not (ad-get-arg 0))
+               (member major-mode yank-indent-modes))
+          (let ((transient-mark-mode nil))
+            (yank-advised-indent-function (region-beginning) (region-end)))))
+
+    (defun yank-unindented ()
+      (interactive)
+      (yank 1))
+
+    (defun kill-to-beginning-of-line ()
+      (interactive)
+      (kill-region (save-excursion (beginning-of-line) (point))
+                   (point)))
+
+    (bind-keys :map
+               xah-fly-command-map
+               ("SPC y"     . duplicate-current-line-or-region)
+               ("SPC s"     . open-line-below)
+               ("SPC e"     . kill-to-beginning-of-line)
+               ("SPC k RET" . new-line-in-between)
+               ("SPC SPC s" . open-line-above))
 
              #+END_SRC
 
@@ -2512,7 +2507,7 @@ I am take this from [[https://github.com/jkitchin/scimax/][scimax]]:
     (interactive)
     (when (and
            (my-in-text-p)
-           (looking-back "[а-яa-z]")
+           (looking-back "[1-9a-z]")
            (save-excursion
              (forward-char -1)
              (or
@@ -2624,8 +2619,8 @@ use the automatic preview with [[https://github.com/dandavison/xenops][xenops]]
 
   (use-package xenops
       :ensure t
-      :hook
-      (LaTeX-mode . xenops-mode)
+      ;; :hook
+      ;; (LaTeX-mode . xenops-mode)
       :custom
       (xenops-math-image-scale-factor 2))
 
@@ -3417,7 +3412,7 @@ units, for example /Om/ will be expanded to /\mathrm{Ом}/:
         "cls" "^\\circ C"
 
         ;; Some Physics Sheet
-        "eqv" "\\mathrm{экв}"
+        "eqv" "\\mathrm{Экв.}"
 
         ;; Some Cool Symbols
         "trg" "\\triangle"
@@ -3715,22 +3710,23 @@ I am consider that Org Mode built in Emacs:
        (:map my-org-local-map)
 
        ;; Insert anything
-       ("l" . 'org-insert-link)
-       ("s" . 'org-schedule)
-       ("d" . 'org-deadline)
-       ("i" . 'my-org-insert-image)
-       ("u" . 'my-org-insert-img-at-url)
+       ("l"   . 'org-insert-link)
+       ("s"   . 'org-schedule)
+       ("d"   . 'org-deadline)
+       ("i"   . 'my-org-insert-image)
+       ("u"   . 'my-org-insert-img-at-url)
 
        ;; Manipulations with a subtree
-       ("c" . 'org-copy-subtree)
-       ("x" . 'org-cut-subtree)
-       ("6" . 'org-mark-subtree)
-       ("w" . 'my-org-clear-subtree)
+       ("c"   . 'org-copy-subtree)
+       ("x"   . 'org-cut-subtree)
+       ("q"   . 'my-org-indent-subtree)
+       ("6"   . 'org-mark-subtree)
+       ("w"   . 'my-org-clear-subtree)
        ([tab] . 'org-refile)
-       ("1" . 'org-todo)
-       (";" . 'org-set-tags-command)
-       ("a" . 'org-archive-subtree)
-       ("z" . 'org-toggle-comment)
+       ("1"   . 'org-todo)
+       (";"   . 'org-set-tags-command)
+       ("a"   . 'org-archive-subtree)
+       ("z"   . 'org-toggle-comment)
 
        ;; Org Babel
        ("b t" . 'org-babel-tangle)
@@ -3739,42 +3735,42 @@ I am consider that Org Mode built in Emacs:
 
        ;; Manipulations with a table
        ("t n" . 'org-table-create-or-convert-from-region)
-       ("=" . 'org-table-eval-formula)
+       ("="   . 'org-table-eval-formula)
        ("t f" . 'my-org-table-eval-formula-in-field)
        ("t i" . 'org-table-import)
        ("t e" . 'org-table-export)
        ("t g" . 'org-table-recalculate)
-       ("-" . 'org-table-insert-hline)
+       ("t x" . 'org-table-kill-row)
+       ("-"   . 'org-table-insert-hline)
+       ("t o" . 'org-table-toggle-coordinate-overlays)
        ;; sum
-       ("+" . 'org-table-sum)
+       ("+"   . 'org-table-sum)
        ("t +" . 'org-table-sum)
        ("t s" . 'org-table-sum)
-       ;;
-       ("t o" . 'org-table-toggle-coordinate-overlays)
 
        ;; Export
-       ("p" . 'org-publish)
-       ("e" . 'org-export-dispatch)
+       ("p"   . 'org-publish)
+       ("e"   . 'org-export-dispatch)
 
        ;; Context Commands
-       ("g" . 'org-ctrl-c-ctrl-c)
-       ("'" . 'org-edit-special)
+       ("g"   . 'org-ctrl-c-ctrl-c)
+       ("'"   . 'org-edit-special)
        ;; other being in the `org-mode-map' section
 
        ;; Miscellaneous
-       ("j" . 'org-latex-preview)
+       ("j"   . 'org-latex-preview)
        ("SPC" . 'org-toggle-checkbox)
        ("RET" . 'org-open-at-point)
-       ("r" . 'my-org-schedule-to-today)
-       ("/" . 'org-sparse-tree)
+       ("r"   . 'my-org-schedule-to-today)
+       ("/"   . 'org-sparse-tree)
 
        (:map org-mode-map)
        ;; Here continoue of the Context Commands...
        ;; M-
-       ("M-j" . 'org-metaleft)
-       ("M-i" . 'org-metaup)
-       ("M-k" . 'org-metadown)
-       ("M-l" . 'org-metaright)
+       ("M-j"   . 'org-metaleft)
+       ("M-i"   . 'org-metaup)
+       ("M-k"   . 'org-metadown)
+       ("M-l"   . 'org-metaright)
        ;; M-S-
        ("M-S-j" . 'org-shiftmetaleft)
        ("M-S-i" . 'org-shiftmetaup)
@@ -3800,6 +3796,14 @@ I am consider that Org Mode built in Emacs:
     "Scheduale a `org-mode' heading to today."
     (interactive)
     (org-schedule t (format-time-string "%Y-%m-%d")))
+
+  (defun my-org-indent-subtree ()
+    "Indent current the `org-mode' subtree at current position."
+    (interactive)
+    (save-excursion
+      (org-mark-subtree)
+      (indent-region (region-beginning) (region-end))))
+
     #+END_SRC
 
 **** Insert Images in the Org Mode
@@ -5042,7 +5046,7 @@ For this I am press =SPC l c=:
 
 *** HTML
 
-**** Variables
+**** Variables for HTML
 
 Variable =html-modes= is list of modes which is for =html=:
 
@@ -5060,11 +5064,12 @@ I am use [[https://web-mode.org][web-mode]] and [[https://github.com/smihica/emm
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
   (use-package web-mode
       :ensure t
+      :major-mode-map html (html-mode web-mode web-mode-prog-mode mhtml-mode)
       :hook (web-mode . yas-minor-mode-off)
       :custom
       (web-mode-script-padding 1)
       (web-mode-block-padding 0))
-      #+END_SRC
+#+END_SRC
 
 **** Auto Rename Tag
 
@@ -5157,6 +5162,29 @@ I am use [[https://github.com/osv/company-web][company-web]]:
                   (company-mode t))))
 
                   #+END_SRC
+
+**** Live View of the HTML buffers
+
+I am use [[https://github.com/skeeto/impatient-mode][impatient-mode]].  In a html buffer I can press =SPC l e= and
+in the default browser open the page of that html buffer
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package impatient-mode
+      :ensure t
+      :bind ((:map my-html-local-map)
+             ("e" . 'my-enable-impatient-mode)))
+
+  (defun my-enable-impatient-mode ()
+    "Enable `impatient-mode' and open the page of current browser in web browser."
+    (interactive)
+    (impatient-mode +1)
+    (->>
+     (buffer-name)
+     (s-prepend "http://localhost:8080/imp/live/")
+     (browse-url)))
+
+#+END_SRC
 
 *** CSS
 
@@ -5284,7 +5312,24 @@ I am use [[https://github.com/emacs-helm/helm][HELM]]:
       ;; this fix one bug
       (defvar helm-completion-style nil))
 
-      #+END_SRC
+#+END_SRC
+
+*** Extension of the =HELM=
+
+I am use [[https://github.com/cute-jumper/helm-ext][helm-ext]].  From that package I'm use:
+
+- Skipping Dots in the file search
+- Auto Path Expansion with the ZMS path expansion style
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package helm-ext
+      :ensure t
+      :config
+      (helm-ext-ff-enable-skipping-dots +1)
+      (helm-ext-ff-enable-auto-path-expansion t))
+
+#+END_SRC
 
 ** Command Log
 
@@ -6308,6 +6353,20 @@ I am use offical [[https://github.com/bbatsov/helm-projectile][helm-projectile]]
 
      #+END_SRC
 
+     #+RESULTS:
+     #+begin_example
+     ((name . Projectile files) (candidates lambda nil (when (projectile-project-p) (with-helm-current-buffer (let ((root (f-full (projectile-project-root)))) (--map (cons (s-chop-prefix root (f-full it)) it) (projectile-current-project-files)))))) (keymap keymap (left . helm-previous-source) (right . helm-next-source) (127 . #[0 \307C\310\311\312\313\314\305"\315"\316$\216\317\302!\210\306\203  \211\320\306\307\321#\240\210\322\304!\307\211\211\301=\203: \317\302!\210\302\323\202t \324\303"\211\262\203Q \317A!\210A\323\202t \314!\262\325\300"\262\326!\203j \317!\210\202s \327\330"\244\307\266\204\205| \202  )\207 [(keymap (left . helm-find-files-up-one-level) (right . helm-execute-persistent-action) (127 . #3) (S-f6 . helm-ff-sort-by-ext) (S-f5 . helm-ff-toggle-files-only) (S-f4 . helm-ff-toggle-dirs-only) (S-f3 . helm-ff-sort-by-size) (S-f2 . helm-ff-sort-by-newest) (S-f1 . helm-ff-sort-alpha) (18 . helm-find-files-down-last-level) (31 . helm-ff-undo) (12 . helm-find-files-up-one-level) (67108911 . helm-ff-run-fd) (C-backspace . helm-ff-run-toggle-auto-update) (67108987 . helm-enlarge-window) (67108989 . helm-narrow-window) (3 keymap (20 . helm-ff-find-file-other-tab) (64 . helm-ff-run-insert-org-link) (114 . helm-ff-run-find-file-as-root) (47 . helm-ff-run-find-sh-command) (112 . helm-ff-run-print-file) (1 . helm-ff-run-mail-attach-files) (127 . helm-ff-run-toggle-auto-update) (104 . helm-ff-file-name-history) (61 . helm-ff-run-ediff-file) (116 . helm-ff-toggle-thumbnails) (88 . helm-ff-run-open-file-with-default-tool) (22 . helm-ff-run-preview-file-externally) (24 . helm-ff-run-open-file-externally) (15 . helm-ff-run-switch-other-frame) (111 . helm-ff-run-switch-other-window) (105 . helm-ff-run-complete-fn-at-point) (100 . helm-ff-persistent-delete)) (27 keymap (45 . helm-ff-decrease-image-size-persistent) (43 . helm-ff-increase-image-size-persistent) (114 . helm-ff-rotate-right-persistent) (108 . helm-ff-rotate-left-persistent) (105 . helm-ff-properties-persistent) (112 . helm-find-files-history) (61 . helm-ff-run-ediff-merge-file) (67108901 . helm-ff-run-query-replace-regexp) (37 . helm-ff-run-query-replace) (64 . helm-ff-run-query-replace-fnames-on-marked) (33 . helm-ff-run-eshell-command-on-file) (101 . helm-ff-run-switch-to-shell) (84 . helm-ff-run-touch-files) (75 . helm-ff-run-kill-buffer-persistent) (68 . helm-ff-run-delete-file) (72 . helm-ff-run-hardlink-file) (89 . helm-ff-run-relsymlink-file) (83 . helm-ff-run-symlink-file) (76 . helm-ff-run-load-file) (66 . helm-ff-run-byte-compile-file) (67 . helm-ff-run-copy-file) (82 . helm-ff-run-rename-file) (46 . helm-ff-run-etags) (103 keymap (105 . helm-ff-run-gid) (103 . helm-ff-run-git-grep) (97 . helm-ff-run-grep-ag) (122 . helm-ff-run-zgrep) (112 . helm-ff-run-pdfgrep) (115 . helm-ff-run-grep))) (19 . helm-ff-run-grep) (24 keymap (22 . helm-ff-run-find-alternate-file) (17 . helm-ff-run-marked-files-in-dired) (114 keymap (98 . helm-find-files-switch-to-bookmark) (109 . helm-ff-bookmark-set)) (4 . helm-ff-run-browse-project) (6 . helm-ff-run-locate)) (29 . helm-ff-run-toggle-basename) (13 . helm-ff-RET) keymap (f13 lambda nil (interactive) (helm-select-nth-action 12)) (f12 lambda nil (interactive) (helm-select-nth-action 11)) (f11 lambda nil (interactive) (helm-select-nth-action 10)) (f10 lambda nil (interactive) (helm-select-nth-action 9)) (f9 lambda nil (interactive) (helm-select-nth-action 8)) (f8 lambda nil (interactive) (helm-select-nth-action 7)) (f7 lambda nil (interactive) (helm-select-nth-action 6)) (f6 lambda nil (interactive) (helm-select-nth-action 5)) (f5 lambda nil (interactive) (helm-select-nth-action 4)) (f4 lambda nil (interactive) (helm-select-nth-action 3)) (f3 lambda nil (interactive) (helm-select-nth-action 2)) (f2 lambda nil (interactive) (helm-select-nth-action 1)) (menu-bar keymap (help-menu keymap (describe keymap (describe-mode . helm-help)))) (help keymap (109 . helm-help)) (23 . #[0 \307C\310\311\312\313\314\305"\315"\316$\216\317\302!\210\306\203  \211\320\306\307\321#\240\210\322\304!\307\211\211\301=\203: \317\302!\210\302\323\202t \324\303"\211\262\203Q \317A!\210A\323\202t \314!\262\325\300"\262\326!\203j \317!\210\202s \327\330"\244\307\266\204\205| \202  )\207 [(keymap (f13 lambda nil (interactive) (helm-select-nth-action 12)) (f12 lambda nil (interactive) (helm-select-nth-action 11)) (f11 lambda nil (interactive) (helm-select-nth-action 10)) (f10 lambda nil (interactive) (helm-select-nth-action 9)) (f9 lambda nil (interactive) (helm-select-nth-action 8)) (f8 lambda nil (interactive) (helm-select-nth-action 7)) (f7 lambda nil (interactive) (helm-select-nth-action 6)) (f6 lambda nil (interactive) (helm-select-nth-action 5)) (f5 lambda nil (interactive) (helm-select-nth-action 4)) (f4 lambda nil (interactive) (helm-select-nth-action 3)) (f3 lambda nil (interactive) (helm-select-nth-action 2)) (f2 lambda nil (interactive) (helm-select-nth-action 1)) (menu-bar keymap (help-menu keymap (describe keymap (describe-mode . helm-help)))) (help keymap (109 . helm-help)) #6 (f1 lambda nil (interactive) (helm-select-nth-action 0)) (8 keymap (109 . helm-help) (104 . undefined) (8 . undefined) (99 . helm-customize-group) (4 . helm-enable-or-switch-to-debug)) (20 . helm-toggle-resplit-and-swap-windows) (C-tab . undefined) (67108897 . helm-toggle-suspend-update) (3 keymap (112) (57 . helm-execute-selection-action-at-nth-+9) (56 . helm-execute-selection-action-at-nth-+8) (55 . helm-execute-selection-action-at-nth-+7) (54 . helm-execute-selection-action-at-nth-+6) (53 . helm-execute-selection-action-at-nth-+5) (52 . helm-execute-selection-action-at-nth-+4) (51 . helm-execute-selection-action-at-nth-+3) (50 . helm-execute-selection-action-at-nth-+2) (49 . helm-execute-selection-action-at-nth-+1) (63 . helm-help) (110 . #[0 \307C\310\311\312\313\314\305"\315"\316$\216\317\302!\210\306\203  \211\320\306\307\321#\240\210\322\304!\307\211\211\301=\203: \317\302!\210\302\323\202t \324\303"\211\262\203Q \317A!\210A\323\202t \314!\262\325\300"\262\326!\203j \317!\210\202s \327\330"\244\307\266\204\205| \202  )\207 [#9 110 helm-run-cycle-resume nil nil nil nil nil make-byte-code 0 \301\242\203
+      \302\301\242!\210\300\205 \300 \207 vconcat vector [cancel-timer] 2 call-interactively run-with-idle-timer #[0 \300 \207 [keyboard-quit] 1] read-key t assoc lookup-key commandp mapcar identity last-command-event last-command unread-command-events] 8 nil nil]) (108 . helm-display-line-numbers-mode) (62 . helm-toggle-truncate-line) (21 . helm-refresh) (6 . helm-follow-mode) (9 . helm-insert-or-copy) (11 . helm-kill-selection-and-quit) (25 . helm-yank-selection) (37 . helm-exchange-minibuffer-and-header-line) (95 . helm-toggle-full-frame) (45 . helm-swap-windows)) (67108987 . helm-enlarge-window) (67108989 . helm-narrow-window) (19 . undefined) (24 keymap (57 . helm-execute-selection-action-at-nth-+9) (56 . helm-execute-selection-action-at-nth-+8) (55 . helm-execute-selection-action-at-nth-+7) (54 . helm-execute-selection-action-at-nth-+6) (53 . helm-execute-selection-action-at-nth-+5) (52 . helm-execute-selection-action-at-nth-+4) (51 . helm-execute-selection-action-at-nth-+3) (50 . helm-execute-selection-action-at-nth-+2) (49 . helm-execute-selection-action-at-nth-+1) (2 . helm-resume-list-buffers-after-quit) (98 . helm-resume-previous-session-after-quit) (6 . helm-quit-and-find-file)) (11 . helm-delete-minibuffer-contents) (67108896 . helm-toggle-visible-mark-forward) (0 . helm-toggle-visible-mark) (C-M-up . helm-scroll-other-window-down) (C-M-down . helm-scroll-other-window) (M-prior . helm-scroll-other-window-down) (M-next . helm-scroll-other-window) (12 . helm-recenter-top-bottom-other-window) (left . helm-previous-source) (right . helm-next-source) (15 . helm-next-source) (10 . helm-execute-persistent-action) (9 . helm-select-action) (13 . helm-maybe-exit-minibuffer) (7 . helm-keyboard-quit) (22 . helm-next-page) (27 keymap (110 . next-history-element) (112 . previous-history-element) (115 . undefined) (5 . helm-display-all-sources) (1 . helm-show-all-candidates-in-source) (85 . helm-unmark-all) (97 . helm-mark-all) (109 . helm-toggle-all-marks) (41 . helm-next-visible-mark) (40 . helm-prev-visible-mark) (91) (32 . helm-toggle-visible-mark-backward) (33554454 . helm-scroll-other-window-down) (25 . helm-scroll-other-window-down) (22 . helm-scroll-other-window) (12 . helm-reposition-window-other-window) (111 . helm-previous-source) (62 . helm-end-of-buffer) (60 . helm-beginning-of-buffer) (118 . helm-previous-page)) (next . helm-next-page) (prior . helm-previous-page) (C-up . helm-follow-action-backward) (C-down . helm-follow-action-forward) (16 . helm-previous-line) (14 . helm-next-line) (up . helm-previous-line) (down . helm-next-line) keymap (18 . helm-minibuffer-history) (menu-bar keymap (minibuf Minibuf keymap (previous menu-item Previous History Item previous-history-element :help Put previous minibuffer history element in the minibuffer) (next menu-item Next History Item next-history-element :help Put next minibuffer history element in the minibuffer) (isearch-backward menu-item Isearch History Backward isearch-backward :help Incrementally search minibuffer history backward) (isearch-forward menu-item Isearch History Forward isearch-forward :help Incrementally search minibuffer history forward) (return menu-item Enter exit-minibuffer :key-sequence  :help Terminate input and exit minibuffer) (quit menu-item Quit abort-recursive-edit :help Abort input and exit minibuffer) Minibuf)) (10 . exit-minibuffer) (13 . exit-minibuffer) (7 . minibuffer-keyboard-quit) (C-tab . file-cache-minibuffer-complete) (9 . self-insert-command) (XF86Back . previous-history-element) (up . previous-line-or-history-element) (prior . previous-history-element) (XF86Forward . next-history-element) (down . next-line-or-history-element) (next . next-history-element) (27 keymap (60 . minibuffer-beginning-of-buffer) (114 . previous-matching-history-element) (115 . next-matching-history-element) (112 . previous-history-element) (110 . next-history-element))) 23 helm-yank-text-at-point ((31 . helm-undo-yank-text-at-point)) nil nil nil nil make-byte-code 0 \301\242\203
+      \302\301\242!\210\300\205 \300 \207 vconcat vector [cancel-timer] 2 call-interactively run-with-idle-timer #[0 \300 \207 [keyboard-quit] 1] read-key t assoc lookup-key commandp mapcar identity last-command-event last-command unread-command-events] 8 nil nil]) (f1 lambda nil (interactive) (helm-select-nth-action 0)) (8 keymap (109 . helm-help) (104 . undefined) (8 . undefined) (99 . helm-customize-group) (4 . helm-enable-or-switch-to-debug)) (20 . helm-toggle-resplit-and-swap-windows) (C-tab . undefined) (67108897 . helm-toggle-suspend-update) (3 keymap (112) (57 . helm-execute-selection-action-at-nth-+9) (56 . helm-execute-selection-action-at-nth-+8) (55 . helm-execute-selection-action-at-nth-+7) (54 . helm-execute-selection-action-at-nth-+6) (53 . helm-execute-selection-action-at-nth-+5) (52 . helm-execute-selection-action-at-nth-+4) (51 . helm-execute-selection-action-at-nth-+3) (50 . helm-execute-selection-action-at-nth-+2) (49 . helm-execute-selection-action-at-nth-+1) (63 . helm-help) (110 . #[0 \307C\310\311\312\313\314\305"\315"\316$\216\317\302!\210\306\203  \211\320\306\307\321#\240\210\322\304!\307\211\211\301=\203: \317\302!\210\302\323\202t \324\303"\211\262\203Q \317A!\210A\323\202t \314!\262\325\300"\262\326!\203j \317!\210\202s \327\330"\244\307\266\204\205| \202  )\207 [(keymap (f13 lambda nil (interactive) (helm-select-nth-action 12)) (f12 lambda nil (interactive) (helm-select-nth-action 11)) (f11 lambda nil (interactive) (helm-select-nth-action 10)) (f10 lambda nil (interactive) (helm-select-nth-action 9)) (f9 lambda nil (interactive) (helm-select-nth-action 8)) (f8 lambda nil (interactive) (helm-select-nth-action 7)) (f7 lambda nil (interactive) (helm-select-nth-action 6)) (f6 lambda nil (interactive) (helm-select-nth-action 5)) (f5 lambda nil (interactive) (helm-select-nth-action 4)) (f4 lambda nil (interactive) (helm-select-nth-action 3)) (f3 lambda nil (interactive) (helm-select-nth-action 2)) (f2 lambda nil (interactive) (helm-select-nth-action 1)) (menu-bar keymap (help-menu keymap (describe keymap (describe-mode . helm-help)))) (help keymap (109 . helm-help)) (23 . #[0 \307C\310\311\312\313\314\305"\315"\316$\216\317\302!\210\306\203  \211\320\306\307\321#\240\210\322\304!\307\211\211\301=\203: \317\302!\210\302\323\202t \324\303"\211\262\203Q \317A!\210A\323\202t \314!\262\325\300"\262\326!\203j \317!\210\202s \327\330"\244\307\266\204\205| \202  )\207 [#10 23 helm-yank-text-at-point ((31 . helm-undo-yank-text-at-point)) nil nil nil nil make-byte-code 0 \301\242\203
+      \302\301\242!\210\300\205 \300 \207 vconcat vector [cancel-timer] 2 call-interactively run-with-idle-timer #[0 \300 \207 [keyboard-quit] 1] read-key t assoc lookup-key commandp mapcar identity last-command-event last-command unread-command-events] 8 nil nil]) (f1 lambda nil (interactive) (helm-select-nth-action 0)) (8 keymap (109 . helm-help) (104 . undefined) (8 . undefined) (99 . helm-customize-group) (4 . helm-enable-or-switch-to-debug)) (20 . helm-toggle-resplit-and-swap-windows) (C-tab . undefined) (67108897 . helm-toggle-suspend-update) #6 (67108987 . helm-enlarge-window) (67108989 . helm-narrow-window) (19 . undefined) (24 keymap (57 . helm-execute-selection-action-at-nth-+9) (56 . helm-execute-selection-action-at-nth-+8) (55 . helm-execute-selection-action-at-nth-+7) (54 . helm-execute-selection-action-at-nth-+6) (53 . helm-execute-selection-action-at-nth-+5) (52 . helm-execute-selection-action-at-nth-+4) (51 . helm-execute-selection-action-at-nth-+3) (50 . helm-execute-selection-action-at-nth-+2) (49 . helm-execute-selection-action-at-nth-+1) (2 . helm-resume-list-buffers-after-quit) (98 . helm-resume-previous-session-after-quit) (6 . helm-quit-and-find-file)) (11 . helm-delete-minibuffer-contents) (67108896 . helm-toggle-visible-mark-forward) (0 . helm-toggle-visible-mark) (C-M-up . helm-scroll-other-window-down) (C-M-down . helm-scroll-other-window) (M-prior . helm-scroll-other-window-down) (M-next . helm-scroll-other-window) (12 . helm-recenter-top-bottom-other-window) (left . helm-previous-source) (right . helm-next-source) (15 . helm-next-source) (10 . helm-execute-persistent-action) (9 . helm-select-action) (13 . helm-maybe-exit-minibuffer) (7 . helm-keyboard-quit) (22 . helm-next-page) (27 keymap (110 . next-history-element) (112 . previous-history-element) (115 . undefined) (5 . helm-display-all-sources) (1 . helm-show-all-candidates-in-source) (85 . helm-unmark-all) (97 . helm-mark-all) (109 . helm-toggle-all-marks) (41 . helm-next-visible-mark) (40 . helm-prev-visible-mark) (91) (32 . helm-toggle-visible-mark-backward) (33554454 . helm-scroll-other-window-down) (25 . helm-scroll-other-window-down) (22 . helm-scroll-other-window) (12 . helm-reposition-window-other-window) (111 . helm-previous-source) (62 . helm-end-of-buffer) (60 . helm-beginning-of-buffer) (118 . helm-previous-page)) (next . helm-next-page) (prior . helm-previous-page) (C-up . helm-follow-action-backward) (C-down . helm-follow-action-forward) (16 . helm-previous-line) (14 . helm-next-line) (up . helm-previous-line) (down . helm-next-line) keymap (18 . helm-minibuffer-history) (menu-bar keymap (minibuf Minibuf keymap (previous menu-item Previous History Item previous-history-element :help Put previous minibuffer history element in the minibuffer) (next menu-item Next History Item next-history-element :help Put next minibuffer history element in the minibuffer) (isearch-backward menu-item Isearch History Backward isearch-backward :help Incrementally search minibuffer history backward) (isearch-forward menu-item Isearch History Forward isearch-forward :help Incrementally search minibuffer history forward) (return menu-item Enter exit-minibuffer :key-sequence  :help Terminate input and exit minibuffer) (quit menu-item Quit abort-recursive-edit :help Abort input and exit minibuffer) Minibuf)) (10 . exit-minibuffer) (13 . exit-minibuffer) (7 . minibuffer-keyboard-quit) (C-tab . file-cache-minibuffer-complete) (9 . self-insert-command) (XF86Back . previous-history-element) (up . previous-line-or-history-element) (prior . previous-history-element) (XF86Forward . next-history-element) (down . next-line-or-history-element) (next . next-history-element) (27 keymap (60 . minibuffer-beginning-of-buffer) (114 . previous-matching-history-element) (115 . next-matching-history-element) (112 . previous-history-element) (110 . next-history-element))) 110 helm-run-cycle-resume nil nil nil nil nil make-byte-code 0 \301\242\203
+      \302\301\242!\210\300\205 \300 \207 vconcat vector [cancel-timer] 2 call-interactively run-with-idle-timer #[0 \300 \207 [keyboard-quit] 1] read-key t assoc lookup-key commandp mapcar identity last-command-event last-command unread-command-events] 8 nil nil]) (108 . helm-display-line-numbers-mode) (62 . helm-toggle-truncate-line) (21 . helm-refresh) (6 . helm-follow-mode) (9 . helm-insert-or-copy) (11 . helm-kill-selection-and-quit) (25 . helm-yank-selection) (37 . helm-exchange-minibuffer-and-header-line) (95 . helm-toggle-full-frame) (45 . helm-swap-windows)) (67108987 . helm-enlarge-window) (67108989 . helm-narrow-window) (19 . undefined) (24 keymap (57 . helm-execute-selection-action-at-nth-+9) (56 . helm-execute-selection-action-at-nth-+8) (55 . helm-execute-selection-action-at-nth-+7) (54 . helm-execute-selection-action-at-nth-+6) (53 . helm-execute-selection-action-at-nth-+5) (52 . helm-execute-selection-action-at-nth-+4) (51 . helm-execute-selection-action-at-nth-+3) (50 . helm-execute-selection-action-at-nth-+2) (49 . helm-execute-selection-action-at-nth-+1) (2 . helm-resume-list-buffers-after-quit) (98 . helm-resume-previous-session-after-quit) (6 . helm-quit-and-find-file)) (11 . helm-delete-minibuffer-contents) (67108896 . helm-toggle-visible-mark-forward) (0 . helm-toggle-visible-mark) (C-M-up . helm-scroll-other-window-down) (C-M-down . helm-scroll-other-window) (M-prior . helm-scroll-other-window-down) (M-next . helm-scroll-other-window) (12 . helm-recenter-top-bottom-other-window) (left . helm-previous-source) (right . helm-next-source) (15 . helm-next-source) (10 . helm-execute-persistent-action) (9 . helm-select-action) (13 . helm-maybe-exit-minibuffer) (7 . helm-keyboard-quit) (22 . helm-next-page) (27 keymap (110 . next-history-element) (112 . previous-history-element) (115 . undefined) (5 . helm-display-all-sources) (1 . helm-show-all-candidates-in-source) (85 . helm-unmark-all) (97 . helm-mark-all) (109 . helm-toggle-all-marks) (41 . helm-next-visible-mark) (40 . helm-prev-visible-mark) (91) (32 . helm-toggle-visible-mark-backward) (33554454 . helm-scroll-other-window-down) (25 . helm-scroll-other-window-down) (22 . helm-scroll-other-window) (12 . helm-reposition-window-other-window) (111 . helm-previous-source) (62 . helm-end-of-buffer) (60 . helm-beginning-of-buffer) (118 . helm-previous-page)) (next . helm-next-page) (prior . helm-previous-page) (C-up . helm-follow-action-backward) (C-down . helm-follow-action-forward) (16 . helm-previous-line) (14 . helm-next-line) (up . helm-previous-line) (down . helm-next-line) keymap (18 . helm-minibuffer-history) (menu-bar keymap (minibuf Minibuf keymap (previous menu-item Previous History Item previous-history-element :help Put previous minibuffer history element in the minibuffer) (next menu-item Next History Item next-history-element :help Put next minibuffer history element in the minibuffer) (isearch-backward menu-item Isearch History Backward isearch-backward :help Incrementally search minibuffer history backward) (isearch-forward menu-item Isearch History Forward isearch-forward :help Incrementally search minibuffer history forward) (return menu-item Enter exit-minibuffer :key-sequence  :help Terminate input and exit minibuffer) (quit menu-item Quit abort-recursive-edit :help Abort input and exit minibuffer) Minibuf)) (10 . exit-minibuffer) (13 . exit-minibuffer) (7 . minibuffer-keyboard-quit) (C-tab . file-cache-minibuffer-complete) (9 . self-insert-command) (XF86Back . previous-history-element) (up . previous-line-or-history-element) (prior . previous-history-element) (XF86Forward . next-history-element) (down . next-line-or-history-element) (next . next-history-element) (27 keymap (60 . minibuffer-beginning-of-buffer) (114 . previous-matching-history-element) (115 . next-matching-history-element) (112 . previous-history-element) (110 . next-history-element))) 127 helm-ff-delete-char-backward ((C-backspace . helm-ff-run-toggle-auto-update) ([C-c DEL] . helm-ff-run-toggle-auto-update)) nil helm-ff-delete-char-backward--exit-fn nil nil make-byte-code 0 \301\242\203
+      \302\301\242!\210\300\205 \300 \207 vconcat vector [cancel-timer] 2 call-interactively run-with-idle-timer #[0 \300 \207 [keyboard-quit] 1] read-key t assoc lookup-key commandp mapcar identity last-command-event last-command unread-command-events] 8 nil nil]) (S-f6 . helm-ff-sort-by-ext) (S-f5 . helm-ff-toggle-files-only) (S-f4 . helm-ff-toggle-dirs-only) (S-f3 . helm-ff-sort-by-size) (S-f2 . helm-ff-sort-by-newest) (S-f1 . helm-ff-sort-alpha) (18) (31 . helm-ff-undo) (12) (67108911 . helm-ff-run-fd) (C-backspace . helm-ff-run-toggle-auto-update) (67108987 . helm-enlarge-window) (67108989 . helm-narrow-window) (3 keymap (97 lambda nil (interactive) (helm-exit-and-execute-action #'helm-projectile-dired-files-add-action)) (102 lambda nil (interactive) (helm-exit-and-execute-action #'helm-projectile-dired-files-new-action)) (20 . helm-ff-find-file-other-tab) (64 . helm-ff-run-insert-org-link) (114 . helm-ff-run-find-file-as-root) (47 . helm-ff-run-find-sh-command) (112 . helm-ff-run-print-file) (1 . helm-ff-run-mail-attach-files) (127 . helm-ff-run-toggle-auto-update) (104 . helm-ff-file-name-history) (61 . helm-ff-run-ediff-file) (116 . helm-ff-toggle-thumbnails) (88 . helm-ff-run-open-file-with-default-tool) (22 . helm-ff-run-preview-file-externally) (24 . helm-ff-run-open-file-externally) (15 . helm-ff-run-switch-other-frame) (111 . helm-ff-run-switch-other-window) (105 . helm-ff-run-complete-fn-at-point) (100 . helm-ff-persistent-delete)) (27 keymap (45 . helm-ff-decrease-image-size-persistent) (43 . helm-ff-increase-image-size-persistent) (114 . helm-ff-rotate-right-persistent) (108 . helm-ff-rotate-left-persistent) (105 . helm-ff-properties-persistent) (112 . helm-find-files-history) (61 . helm-ff-run-ediff-merge-file) (67108901 . helm-ff-run-query-replace-regexp) (37 . helm-ff-run-query-replace) (64 . helm-ff-run-query-replace-fnames-on-marked) (33 lambda nil (interactive) (helm-exit-and-execute-action #'helm-projectile-find-files-eshell-command-on-file-action)) (101 lambda nil (interactive) (helm-exit-and-execute-action #'helm-projectile-switch-to-shell)) (84 . helm-ff-run-touch-files) (75 . helm-ff-run-kill-buffer-persistent) (68 . helm-ff-run-delete-file) (72 . helm-ff-run-hardlink-file) (89 . helm-ff-run-relsymlink-file) (83 . helm-ff-run-symlink-file) (76 . helm-ff-run-load-file) (66 . helm-ff-run-byte-compile-file) (67 . helm-ff-run-copy-file) (82 . helm-ff-run-rename-file) (46 lambda nil (interactive) (helm-exit-and-execute-action #'helm-projectile-ff-etags-select-action)) (103 keymap (105 . helm-ff-run-gid) (103 . helm-ff-run-git-grep) (97 . helm-ff-run-grep-ag) (122 . helm-ff-run-zgrep) (112 . helm-ff-run-pdfgrep) (115 . helm-ff-run-grep))) (19 . helm-ff-run-grep) (24 keymap (22 . helm-ff-run-find-alternate-file) (17 . helm-ff-run-marked-files-in-dired) (114 keymap (98 . helm-find-files-switch-to-bookmark) (109 . helm-ff-bookmark-set)) (4 . helm-ff-run-browse-project) (6 . helm-ff-run-locate)) (29 . helm-ff-run-toggle-basename) (13 . helm-ff-RET) keymap (f13 lambda nil (interactive) (helm-select-nth-action 12)) (f12 lambda nil (interactive) (helm-select-nth-action 11)) (f11 lambda nil (interactive) (helm-select-nth-action 10)) (f10 lambda nil (interactive) (helm-select-nth-action 9)) (f9 lambda nil (interactive) (helm-select-nth-action 8)) (f8 lambda nil (interactive) (helm-select-nth-action 7)) (f7 lambda nil (interactive) (helm-select-nth-action 6)) (f6 lambda nil (interactive) (helm-select-nth-action 5)) (f5 lambda nil (interactive) (helm-select-nth-action 4)) (f4 lambda nil (interactive) (helm-select-nth-action 3)) (f3 lambda nil (interactive) (helm-select-nth-action 2)) (f2 lambda nil (interactive) (helm-select-nth-action 1)) (menu-bar keymap (help-menu keymap (describe keymap (describe-mode . helm-help)))) (help keymap (109 . helm-help)) (23 . #[0 \307C\310\311\312\313\314\305"\315"\316$\216\317\302!\210\306\203  \211\320\306\307\321#\240\210\322\304!\307\211\211\301=\203: \317\302!\210\302\323\202t \324\303"\211\262\203Q \317A!\210A\323\202t \314!\262\325\300"\262\326!\203j \317!\210\202s \327\330"\244\307\266\204\205| \202  )\207 [(keymap (f13 lambda nil (interactive) (helm-select-nth-action 12)) (f12 lambda nil (interactive) (helm-select-nth-action 11)) (f11 lambda nil (interactive) (helm-select-nth-action 10)) (f10 lambda nil (interactive) (helm-select-nth-action 9)) (f9 lambda nil (interactive) (helm-select-nth-action 8)) (f8 lambda nil (interactive) (helm-select-nth-action 7)) (f7 lambda nil (interactive) (helm-select-nth-action 6)) (f6 lambda nil (interactive) (helm-select-nth-action 5)) (f5 lambda nil (interactive) (helm-select-nth-action 4)) (f4 lambda nil (interactive) (helm-select-nth-action 3)) (f3 lambda nil (interactive) (helm-select-nth-action 2)) (f2 lambda nil (interactive) (helm-select-nth-action 1)) (menu-bar keymap (help-menu keymap (describe keymap (describe-mode . helm-help)))) (help keymap (109 . helm-help)) #2 (f1 lambda nil (interactive) (helm-select-nth-action 0)) (8 keymap (109 . helm-help) (104 . undefined) (8 . undefined) (99 . helm-customize-group) (4 . helm-enable-or-switch-to-debug)) (20 . helm-toggle-resplit-and-swap-windows) (C-tab . undefined) (67108897 . helm-toggle-suspend-update) (3 keymap (112) (57 . helm-execute-selection-action-at-nth-+9) (56 . helm-execute-selection-action-at-nth-+8) (55 . helm-execute-selection-action-at-nth-+7) (54 . helm-execute-selection-action-at-nth-+6) (53 . helm-execute-selection-action-at-nth-+5) (52 . helm-execute-selection-action-at-nth-+4) (51 . helm-execute-selection-action-at-nth-+3) (50 . helm-execute-selection-action-at-nth-+2) (49 . helm-execute-selection-action-at-nth-+1) (63 . helm-help) (110 . #[0 \307C\310\311\312\313\314\305"\315"\316$\216\317\302!\210\306\203  \211\320\306\307\321#\240\210\322\304!\307\211\211\301=\203: \317\302!\210\302\323\202t \324\303"\211\262\203Q \317A!\210A\323\202t \314!\262\325\300"\262\326!\203j \317!\210\202s \327\330"\244\307\266\204\205| \202  )\207 [#5 110 helm-run-cycle-resume nil nil nil nil nil make-byte-code 0 \301\242\203
+      \302\301\242!\210\300\205 \300 \207 vconcat vector [cancel-timer] 2 call-interactively run-with-idle-timer #[0 \300 \207 [keyboard-quit] 1] read-key t assoc lookup-key commandp mapcar identity last-command-event last-command unread-command-events] 8 nil nil]) (108 . helm-display-line-numbers-mode) (62 . helm-toggle-truncate-line) (21 . helm-refresh) (6 . helm-follow-mode) (9 . helm-insert-or-copy) (11 . helm-kill-selection-and-quit) (25 . helm-yank-selection) (37 . helm-exchange-minibuffer-and-header-line) (95 . helm-toggle-full-frame) (45 . helm-swap-windows)) (67108987 . helm-enlarge-window) (67108989 . helm-narrow-window) (19 . undefined) (24 keymap (57 . helm-execute-selection-action-at-nth-+9) (56 . helm-execute-selection-action-at-nth-+8) (55 . helm-execute-selection-action-at-nth-+7) (54 . helm-execute-selection-action-at-nth-+6) (53 . helm-execute-selection-action-at-nth-+5) (52 . helm-execute-selection-action-at-nth-+4) (51 . helm-execute-selection-action-at-nth-+3) (50 . helm-execute-selection-action-at-nth-+2) (49 . helm-execute-selection-action-at-nth-+1) (2 . helm-resume-list-buffers-after-quit) (98 . helm-resume-previous-session-after-quit) (6 . helm-quit-and-find-file)) (11 . helm-delete-minibuffer-contents) (67108896 . helm-toggle-visible-mark-forward) (0 . helm-toggle-visible-mark) (C-M-up . helm-scroll-other-window-down) (C-M-down . helm-scroll-other-window) (M-prior . helm-scroll-other-window-down) (M-next . helm-scroll-other-window) (12 . helm-recenter-top-bottom-other-window) (left . helm-previous-source) (right . helm-next-source) (15 . helm-next-source) (10 . helm-execute-persistent-action) (9 . helm-select-action) (13 . helm-maybe-exit-minibuffer) (7 . helm-keyboard-quit) (22 . helm-next-page) (27 keymap (110 . next-history-element) (112 . previous-history-element) (115 . undefined) (5 . helm-display-all-sources) (1 . helm-show-all-candidates-in-source) (85 . helm-unmark-all) (97 . helm-mark-all) (109 . helm-toggle-all-marks) (41 . helm-next-visible-mark) (40 . helm-prev-visible-mark) (91) (32 . helm-toggle-visible-mark-backward) (33554454 . helm-scroll-other-window-down) (25 . helm-scroll-other-window-down) (22 . helm-scroll-other-window) (12 . helm-reposition-window-other-window) (111 . helm-previous-source) (62 . helm-end-of-buffer) (60 . helm-beginning-of-buffer) (118 . helm-previous-page)) (next . helm-next-page) (prior . helm-previous-page) (C-up . helm-follow-action-backward) (C-down . helm-follow-action-forward) (16 . helm-previous-line) (14 . helm-next-line) (up . helm-previous-line) (down . helm-next-line) keymap (18 . helm-minibuffer-history) (menu-bar keymap (minibuf Minibuf keymap (previous menu-item Previous History Item previous-history-element :help Put previous minibuffer history element in the minibuffer) (next menu-item Next History Item next-history-element :help Put next minibuffer history element in the minibuffer) (isearch-backward menu-item Isearch History Backward isearch-backward :help Incrementally search minibuffer history backward) (isearch-forward menu-item Isearch History Forward isearch-forward :help Incrementally search minibuffer history forward) (return menu-item Enter exit-minibuffer :key-sequence  :help Terminate input and exit minibuffer) (quit menu-item Quit abort-recursive-edit :help Abort input and exit minibuffer) Minibuf)) (10 . exit-minibuffer) (13 . exit-minibuffer) (7 . minibuffer-keyboard-quit) (C-tab . file-cache-minibuffer-complete) (9 . self-insert-command) (XF86Back . previous-history-element) (up . previous-line-or-history-element) (prior . previous-history-element) (XF86Forward . next-history-element) (down . next-line-or-history-element) (next . next-history-element) (27 keymap (60 . minibuffer-beginning-of-buffer) (114 . previous-matching-history-element) (115 . next-matching-history-element) (112 . previous-history-element) (110 . next-history-element))) 23 helm-yank-text-at-point ((31 . helm-undo-yank-text-at-point)) nil nil nil nil make-byte-code 0 \301\242\203
+      \302\301\242!\210\300\205 \300 \207 vconcat vector [cancel-timer] 2 call-interactively run-with-idle-timer #[0 \300 \207 [keyboard-quit] 1] read-key t assoc lookup-key commandp mapcar identity last-command-event last-command unread-command-events] 8 nil nil]) (f1 lambda nil (interactive) (helm-select-nth-action 0)) (8 keymap (109 . helm-help) (104 . undefined) (8 . undefined) (99 . helm-customize-group) (4 . helm-enable-or-switch-to-debug)) (20 . helm-toggle-resplit-and-swap-windows) (C-tab . undefined) (67108897 . helm-toggle-suspend-update) (3 keymap (112) (57 . helm-execute-selection-action-at-nth-+9) (56 . helm-execute-selection-action-at-nth-+8) (55 . helm-execute-selection-action-at-nth-+7) (54 . helm-execute-selection-action-at-nth-+6) (53 . helm-execute-selection-action-at-nth-+5) (52 . helm-execute-selection-action-at-nth-+4) (51 . helm-execute-selection-action-at-nth-+3) (50 . helm-execute-selection-action-at-nth-+2) (49 . helm-execute-selection-action-at-nth-+1) (63 . helm-help) (110 . #[0 \307C\310\311\312\313\314\305"\315"\316$\216\317\302!\210\306\203  \211\320\306\307\321#\240\210\322\304!\307\211\211\301=\203: \317\302!\210\302\323\202t \324\303"\211\262\203Q \317A!\210A\323\202t \314!\262\325\300"\262\326!\203j \317!\210\202s \327\330"\244\307\266\204\205| \202  )\207 [(keymap (f13 lambda nil (interactive) (helm-select-nth-action 12)) (f12 lambda nil (interactive) (helm-select-nth-action 11)) (f11 lambda nil (interactive) (helm-select-nth-action 10)) (f10 lambda nil (interactive) (helm-select-nth-action 9)) (f9 lambda nil (interactive) (helm-select-nth-action 8)) (f8 lambda nil (interactive) (helm-select-nth-action 7)) (f7 lambda nil (interactive) (helm-select-nth-action 6)) (f6 lambda nil (interactive) (helm-select-nth-action 5)) (f5 lambda nil (interactive) (helm-select-nth-action 4)) (f4 lambda nil (interactive) (helm-select-nth-action 3)) (f3 lambda nil (interactive) (helm-select-nth-action 2)) (f2 lambda nil (interactive) (helm-select-nth-action 1)) (menu-bar keymap (help-menu keymap (describe keymap (describe-mode . helm-help)))) (help keymap (109 . helm-help)) (23 . #[0 \307C\310\311\312\313\314\305"\315"\316$\216\317\302!\210\306\203  \211\320\306\307\321#\240\210\322\304!\307\211\211\301=\203: \317\302!\210\302\323\202t \324\303"\211\262\203Q \317A!\210A\323\202t \314!\262\325\300"\262\326!\203j \317!\210\202s \327\330"\244\307\266\204\205| \202  )\207 [#6 23 helm-yank-text-at-point ((31 . helm-undo-yank-text-at-point)) nil nil nil nil make-byte-code 0 \301\242\203
+      \302\301\242!\210\300\205 \300 \207 vconcat vector [cancel-timer] 2 call-interactively run-with-idle-timer #[0 \300 \207 [keyboard-quit] 1] read-key t assoc lookup-key commandp mapcar identity last-command-event last-command unread-command-events] 8 nil nil]) (f1 lambda nil (interactive) (helm-select-nth-action 0)) (8 keymap (109 . helm-help) (104 . undefined) (8 . undefined) (99 . helm-customize-group) (4 . helm-enable-or-switch-to-debug)) (20 . helm-toggle-resplit-and-swap-windows) (C-tab . undefined) (67108897 . helm-toggle-suspend-update) #2 (67108987 . helm-enlarge-window) (67108989 . helm-narrow-window) (19 . undefined) (24 keymap (57 . helm-execute-selection-action-at-nth-+9) (56 . helm-execute-selection-action-at-nth-+8) (55 . helm-execute-selection-action-at-nth-+7) (54 . helm-execute-selection-action-at-nth-+6) (53 . helm-execute-selection-action-at-nth-+5) (52 . helm-execute-selection-action-at-nth-+4) (51 . helm-execute-selection-action-at-nth-+3) (50 . helm-execute-selection-action-at-nth-+2) (49 . helm-execute-selection-action-at-nth-+1) (2 . helm-resume-list-buffers-after-quit) (98 . helm-resume-previous-session-after-quit) (6 . helm-quit-and-find-file)) (11 . helm-delete-minibuffer-contents) (67108896 . helm-toggle-visible-mark-forward) (0 . helm-toggle-visible-mark) (C-M-up . helm-scroll-other-window-down) (C-M-down . helm-scroll-other-window) (M-prior . helm-scroll-other-window-down) (M-next . helm-scroll-other-window) (12 . helm-recenter-top-bottom-other-window) (left . helm-previous-source) (right . helm-next-source) (15 . helm-next-source) (10 . helm-execute-persistent-action) (9 . helm-select-action) (13 . helm-maybe-exit-minibuffer) (7 . helm-keyboard-quit) (22 . helm-next-page) (27 keymap (110 . next-history-element) (112 . previous-history-element) (115 . undefined) (5 . helm-display-all-sources) (1 . helm-show-all-candidates-in-source) (85 . helm-unmark-all) (97 . helm-mark-all) (109 . helm-toggle-all-marks) (41 . helm-next-visible-mark) (40 . helm-prev-visible-mark) (91) (32 . helm-toggle-visible-mark-backward) (33554454 . helm-scroll-other-window-down) (25 . helm-scroll-other-window-down) (22 . helm-scroll-other-window) (12 . helm-reposition-window-other-window) (111 . helm-previous-source) (62 . helm-end-of-buffer) (60 . helm-beginning-of-buffer) (118 . helm-previous-page)) (next . helm-next-page) (prior . helm-previous-page) (C-up . helm-follow-action-backward) (C-down . helm-follow-action-forward) (16 . helm-previous-line) (14 . helm-next-line) (up . helm-previous-line) (down . helm-next-line) keymap (18 . helm-minibuffer-history) (menu-bar keymap (minibuf Minibuf keymap (previous menu-item Previous History Item previous-history-element :help Put previous minibuffer history element in the minibuffer) (next menu-item Next History Item next-history-element :help Put next minibuffer history element in the minibuffer) (isearch-backward menu-item Isearch History Backward isearch-backward :help Incrementally search minibuffer history backward) (isearch-forward menu-item Isearch History Forward isearch-forward :help Incrementally search minibuffer history forward) (return menu-item Enter exit-minibuffer :key-sequence  :help Terminate input and exit minibuffer) (quit menu-item Quit abort-recursive-edit :help Abort input and exit minibuffer) Minibuf)) (10 . exit-minibuffer) (13 . exit-minibuffer) (7 . minibuffer-keyboard-quit) (C-tab . file-cache-minibuffer-complete) (9 . self-insert-command) (XF86Back . previous-history-element) (up . previous-line-or-history-element) (prior . previous-history-element) (XF86Forward . next-history-element) (down . next-line-or-history-element) (next . next-history-element) (27 keymap (60 . minibuffer-beginning-of-buffer) (114 . previous-matching-history-element) (115 . next-matching-history-element) (112 . previous-history-element) (110 . next-history-element))) 110 helm-run-cycle-resume nil nil nil nil nil make-byte-code 0 \301\242\203
+      \302\301\242!\210\300\205 \300 \207 vconcat vector [cancel-timer] 2 call-interactively run-with-idle-timer #[0 \300 \207 [keyboard-quit] 1] read-key t assoc lookup-key commandp mapcar identity last-command-event last-command unread-command-events] 8 nil nil]) (108 . helm-display-line-numbers-mode) (62 . helm-toggle-truncate-line) (21 . helm-refresh) (6 . helm-follow-mode) (9 . helm-insert-or-copy) (11 . helm-kill-selection-and-quit) (25 . helm-yank-selection) (37 . helm-exchange-minibuffer-and-header-line) (95 . helm-toggle-full-frame) (45 . helm-swap-windows)) (67108987 . helm-enlarge-window) (67108989 . helm-narrow-window) (19 . undefined) (24 keymap (57 . helm-execute-selection-action-at-nth-+9) (56 . helm-execute-selection-action-at-nth-+8) (55 . helm-execute-selection-action-at-nth-+7) (54 . helm-execute-selection-action-at-nth-+6) (53 . helm-execute-selection-action-at-nth-+5) (52 . helm-execute-selection-action-at-nth-+4) (51 . helm-execute-selection-action-at-nth-+3) (50 . helm-execute-selection-action-at-nth-+2) (49 . helm-execute-selection-action-at-nth-+1) (2 . helm-resume-list-buffers-after-quit) (98 . helm-resume-previous-session-after-quit) (6 . helm-quit-and-find-file)) (11 . helm-delete-minibuffer-contents) (67108896 . helm-toggle-visible-mark-forward) (0 . helm-toggle-visible-mark) (C-M-up . helm-scroll-other-window-down) (C-M-down . helm-scroll-other-window) (M-prior . helm-scroll-other-window-down) (M-next . helm-scroll-other-window) (12 . helm-recenter-top-bottom-other-window) (left . helm-previous-source) (right . helm-next-source) (15 . helm-next-source) (10 . helm-execute-persistent-action) (9 . helm-select-action) (13 . helm-maybe-exit-minibuffer) (7 . helm-keyboard-quit) (22 . helm-next-page) (27 keymap (110 . next-history-element) (112 . previous-history-element) (115 . undefined) (5 . helm-display-all-sources) (1 . helm-show-all-candidates-in-source) (85 . helm-unmark-all) (97 . helm-mark-all) (109 . helm-toggle-all-marks) (41 . helm-next-visible-mark) (40 . helm-prev-visible-mark) (91) (32 . helm-toggle-visible-mark-backward) (33554454 . helm-scroll-other-window-down) (25 . helm-scroll-other-window-down) (22 . helm-scroll-other-window) (12 . helm-reposition-window-other-window) (111 . helm-previous-source) (62 . helm-end-of-buffer) (60 . helm-beginning-of-buffer) (118 . helm-previous-page)) (next . helm-next-page) (prior . helm-previous-page) (C-up . helm-follow-action-backward) (C-down . helm-follow-action-forward) (16 . helm-previous-line) (14 . helm-next-line) (up . helm-previous-line) (down . helm-next-line) keymap (18 . helm-minibuffer-history) (menu-bar keymap (minibuf Minibuf keymap (previous menu-item Previous History Item previous-history-element :help Put previous minibuffer history element in the minibuffer) (next menu-item Next History Item next-history-element :help Put next minibuffer history element in the minibuffer) (isearch-backward menu-item Isearch History Backward isearch-backward :help Incrementally search minibuffer history backward) (isearch-forward menu-item Isearch History Forward isearch-forward :help Incrementally search minibuffer history forward) (return menu-item Enter exit-minibuffer :key-sequence  :help Terminate input and exit minibuffer) (quit menu-item Quit abort-recursive-edit :help Abort input and exit minibuffer) Minibuf)) (10 . exit-minibuffer) (13 . exit-minibuffer) (7 . minibuffer-keyboard-quit) (C-tab . file-cache-minibuffer-complete) (9 . self-insert-command) (XF86Back . previous-history-element) (up . previous-line-or-history-element) (prior . previous-history-element) (XF86Forward . next-history-element) (down . next-line-or-history-element) (next . next-history-element) (27 keymap (60 . minibuffer-beginning-of-buffer) (114 . previous-matching-history-element) (115 . next-matching-history-element) (112 . previous-history-element) (110 . next-history-element))) (action (Find File . helm-find-file-or-marked) (Find file in Dired . helm-point-file-in-dired) (View file . view-file) (Query replace fnames on marked `M-@' . helm-ff-query-replace-fnames-on-marked) (Marked files in dired `C-x C-q, C-u wdired' . helm-marked-files-in-dired) (Query replace contents on marked `M-%' . helm-ff-query-replace) (Query replace regexp contents on marked `C-M-%' . helm-ff-query-replace-regexp) (Attach file(s) to mail buffer `C-c C-a' . helm-ff-mail-attach-files) (Serial rename files . helm-ff-serial-rename) (Serial rename by symlinking files . helm-ff-serial-rename-by-symlink) (Serial rename by copying files . helm-ff-serial-rename-by-copying) (Open file with default tool . helm-open-file-with-default-tool) (Find file in hex dump . hexl-find-file) (Insert as org link `C-c @' . helm-files-insert-as-org-link) (Fd shell command (C-/) . helm-ff-fd) (Open file externally `C-c C-x, C-u to choose' . helm-open-file-externally) (Grep File(s) `C-s, C-u Recurse' . helm-find-files-grep) (Grep current directory with AG `M-g a, C-u select type' . helm-find-files-ag) (Git grep `M-g g, C-u from root' . helm-ff-git-grep) (Zgrep File(s) `M-g z, C-u Recurse' . helm-ff-zgrep) (Pdf Grep File(s) . helm-ff-pdfgrep) (Gid `M-g i' . helm-ff-gid) (Switch to Eshell `M-e' . helm-projectile-switch-to-shell) (Etags `M-., C-u reload tag file' . helm-projectile-ff-etags-select-action) (Eshell command on file(s) `M-!, C-u take all marked as arguments.' . helm-projectile-find-files-eshell-command-on-file-action) (Find file as root `C-c r' . helm-find-file-as-root) (Find alternate file `C-x C-v' . find-alternate-file) (Ediff File `C-c =' . helm-find-files-ediff-files) (Ediff Merge File `M-=' . helm-find-files-ediff-merge-files) (Delete File(s) `M-D' (C-u reverse trash) . helm-ff-delete-files) (Touch File(s) `M-T' . helm-ff-touch-files) (Copy file(s) `M-C, C-u to follow' . helm-find-files-copy) (Rename file(s) `M-R, C-u to follow' . helm-find-files-rename) (Backup files . helm-find-files-backup) (Symlink files(s) `M-S, C-u to follow' . helm-find-files-symlink) (Relsymlink file(s) `M-Y, C-u to follow' . helm-find-files-relsymlink) (Hardlink file(s) `M-H, C-u to follow' . helm-find-files-hardlink) (Find file other window `C-c o' . helm-find-files-other-window) (Find file other frame `C-c C-o' . find-file-other-frame) (Find file other tab `C-c C-t' . find-file-other-tab) (Print File `C-c p, C-u to refresh' . helm-ff-print) (Locate `C-x C-f, C-u to specify locate db' . helm-ff-locate) (Create Dired buffer from files `C-c f' . helm-projectile-dired-files-new-action) (Add files to Dired buffer `C-c a' . helm-projectile-dired-files-add-action)) (persistent-action . helm-projectile-file-persistent-action) (persistent-help . Preview file) (help-message . helm-ff-help-message) (requires-pattern . 0) (filtered-candidate-transformer (lambda (files _source) (with-helm-current-buffer (let* ((root (projectile-project-root)) (file-at-root (file-relative-name (expand-file-name helm-pattern root)))) (if (or (string-empty-p helm-pattern) (assoc helm-pattern files)) files (if (equal helm-pattern file-at-root) (cl-acons (helm-ff-prefix-filename helm-pattern nil t) (expand-file-name helm-pattern) files) (cl-pairlis (list (helm-ff-prefix-filename helm-pattern nil t) (helm-ff-prefix-filename file-at-root nil t)) (list (expand-file-name helm-pattern) (expand-file-name helm-pattern root)) files)))))) helm-fuzzy-matching-default-sort-fn helm-fuzzy-highlight-matches) (match helm-mm-exact-match helm-mm-match helm-fuzzy-match) (fuzzy-match . t) (redisplay . identity) (mode-line . \<helm-read-file-map>\[helm-help]:Help C/\[helm-cr-empty-string]:Empty \<helm-map>\[helm-select-action]:Act \[helm-maybe-exit-minibuffer]/f1/f2/f-n:NthAct \[helm-toggle-suspend-update]:Tog.suspend \[helm-customize-group]:Conf) (header-line . C-j: Preview file (keeping session)) (multimatch . t) (before-init-hook lambda nil (add-hook 'helm-after-update-hook #'helm-projectile--move-to-real) (add-hook 'helm-cleanup-hook #'helm-projectile--remove-move-to-real)) (group . helm))
+     #+end_example
+
 ** Regexp IDE
 
 I am use [[https://github.com/jwiegley/regex-tool][regex-tool]] for testing regexp in Emacs
@@ -6397,7 +6456,7 @@ I am use [[https://github.com/jupl/helm-gitignore][helm-gitignore]]:
 
     #+END_SRC
 
-** View Directories
+** View Directories in =dired=
 
 I am use =dired=:
 
@@ -6422,10 +6481,9 @@ I am use =dired=:
              ("'"       . 'dired-isearch-filenames)
 
              ;; Open file
-             ("l"       . 'dired-find-file)
-             ("RET"     . 'dired-find-file)
              ("o"       . 'dired-find-file-other-window)
              ("j"       . 'my-dired-goto-parent-dir)
+             ;; some other open files I define in the section "Dired Hacks: Open"
 
              ;; Manipulation with file(s)
              ("SPC g"   . 'my-dired-delete)
@@ -6433,6 +6491,7 @@ I am use =dired=:
              ("f"       . 'my-dired-rename)
              ("SPC TAB" . 'my-dired-move)
              ("s"       . 'my-dired-new-file)
+             ;; copy/move/paste also defines in the section "Dired Hacks: Ranger"
 
              ;; Mark files
              ("t"       . 'dired-mark)
@@ -6527,6 +6586,298 @@ I am use =dired=:
     (avy-goto-line))
 
     #+END_SRC
+
+*** Dired Hacks
+
+I am use [[https://github.com/Fuco1/dired-hacks][dired-hacks]].  From that package I use some /hacks/:
+
+- Filters
+- Open
+- Rainbow
+- Ranger
+- Collapse
+
+(you can visit these /hacks/ by visiting of the file /dired/ + name of
+the /hack/) 
+
+**** Dired Hacks: Filter
+
+I bound filters dispatcher for =dired= to key bindings =SPC k g=
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package dired-filter
+      :ensure t
+      :init
+      (define-key dired-mode-map (kbd "SPC k g") dired-filter-map))
+
+#+END_SRC
+
+**** Dired Hacks: Open (Open Certain Files Different Ways)
+
+I open all /PDF/ files with default application of the OS
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package dired-open
+      :ensure t
+      :bind ((:map dired-mode-map)
+             ("l"   . 'dired-open-file)
+             ("RET" . 'dired-open-file))
+      :config
+      (add-to-list 'dired-open-functions 'my-dired-open-function-pdf))
+
+  (defun my-dired-open-function-pdf ()
+    "Open function for `dired-open-functions'."
+    (my-try-open-pdf-file (dired-get-file-for-visit)))
+
+  (defun my-try-open-pdf-file (filename)
+    "If file with FILENAME is a pdf file, then open it as pdf, other return nil."
+    (when (my-pdf-file filename)
+      (helm-open-file-with-default-tool filename)
+      t))
+
+  (defun my-pdf-file (filename)
+    "Return t, when FILENAME is path to a PDF file."
+    (s-suffix-p ".pdf" filename))
+
+#+END_SRC
+
+**** Dired Hacks: Rainbow (Different Colors for Certain Files)
+
+=dired-rainbow= adds more customizable highlighting for files in dired
+listings
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package dired-rainbow
+      :ensure t
+      :config
+      (dired-rainbow-define-chmod directory "#6cb2eb" "d.*")
+      (dired-rainbow-define html "#eb5286"
+                            ("css"
+                             "less"
+                             "sass"
+                             "scss"
+                             "htm"
+                             "html"
+                             "jhtm"
+                             "mht"
+                             "eml"
+                             "mustache"
+                             "xhtml"))
+      (dired-rainbow-define xml "#f2d024" ("xml"
+                                           "xsd"
+                                           "xsl"
+                                           "xslt"
+                                           "wsdl"
+                                           "bib"
+                                           "json"
+                                           "msg"
+                                           "pgn"
+                                           "rss"
+                                           "yaml"
+                                           "yml"
+                                           "rdata"))
+      (dired-rainbow-define document "#9561e2" ("docm"
+                                                "doc"
+                                                "docx"
+                                                "odb"
+                                                "odt"
+                                                "pdb"
+                                                "pdf"
+                                                "ps"
+                                                "rtf"
+                                                "djvu"
+                                                "epub"
+                                                "odp"
+                                                "ppt"
+                                                "pptx"))
+      (dired-rainbow-define markdown "#ffed4a" ("org"
+                                                "etx"
+                                                "info"
+                                                "markdown"
+                                                "md"
+                                                "mkd"
+                                                "nfo"
+                                                "pod"
+                                                "rst"
+                                                "tex"
+                                                "textfile"
+                                                "txt"))
+      (dired-rainbow-define database "#6574cd" ("xlsx"
+                                                "xls"
+                                                "csv"
+                                                "accdb"
+                                                "db"
+                                                "mdb"
+                                                "sqlite"
+                                                "nc"))
+      (dired-rainbow-define media "#de751f" ("mp3"
+                                             "mp4"
+                                             "MP3"
+                                             "MP4"
+                                             "avi"
+                                             "mpeg"
+                                             "mpg"
+                                             "flv"
+                                             "ogg"
+                                             "mov"
+                                             "mid"
+                                             "midi"
+                                             "wav"
+                                             "aiff"
+                                             "flac"))
+      (dired-rainbow-define image "#f66d9b" ("tiff"
+                                             "tif"
+                                             "cdr"
+                                             "gif"
+                                             "ico"
+                                             "jpeg"
+                                             "jpg"
+                                             "png"
+                                             "psd"
+                                             "eps"
+                                             "svg"))
+      (dired-rainbow-define log "#c17d11" ("log"))
+      (dired-rainbow-define shell "#f6993f" ("awk"
+                                             "bash"
+                                             "bat"
+                                             "sed"
+                                             "sh"
+                                             "zsh"
+                                             "vim"))
+      (dired-rainbow-define interpreted "#38c172" ("py"
+                                                   "ipynb"
+                                                   "rb"
+                                                   "pl"
+                                                   "t"
+                                                   "msql"
+                                                   "mysql"
+                                                   "pgsql"
+                                                   "sql"
+                                                   "r"
+                                                   "clj"
+                                                   "cljs"
+                                                   "scala"
+                                                   "js"))
+      (dired-rainbow-define compiled "#4dc0b5" ("asm"
+                                                "cl"
+                                                "lisp"
+                                                "el"
+                                                "c"
+                                                "h"
+                                                "c++"
+                                                "h++"
+                                                "hpp"
+                                                "hxx"
+                                                "m"
+                                                "cc"
+                                                "cs"
+                                                "cp"
+                                                "cpp"
+                                                "go"
+                                                "f"
+                                                "for"
+                                                "ftn"
+                                                "f90"
+                                                "f95"
+                                                "f03"
+                                                "f08"
+                                                "s"
+                                                "rs"
+                                                "hi"
+                                                "hs"
+                                                "pyc"
+                                                ".java"))
+      (dired-rainbow-define executable "#8cc4ff" ("exe" "msi"))
+      (dired-rainbow-define compressed "#51d88a" ("7z"
+                                                  "zip"
+                                                  "bz2"
+                                                  "tgz"
+                                                  "txz"
+                                                  "gz"
+                                                  "xz"
+                                                  "z"
+                                                  "Z"
+                                                    "jar"
+                                                    "war"
+                                                    "ear"
+                                                    "rar"
+                                                    "sar"
+                                                    "xpi"
+                                                    "apk"
+                                                    "xz"
+                                                    "tar"))
+        (dired-rainbow-define packaged "#faad63" ("deb"
+                                                  "rpm"
+                                                  "apk"
+                                                  "jad"
+                                                  "jar"
+                                                  "cab"
+                                                  "pak"
+                                                  "pk3"
+                                                  "vdf"
+                                                  "vpk"
+                                                  "bsp"))
+        (dired-rainbow-define encrypted "#ffed4a" ("gpg"
+                                                   "pgp"
+                                                   "asc"
+                                                   "bfe"
+                                                   "enc"
+                                                   "signature"
+                                                   "sig"
+                                                   "p12"
+                                                   "pem"))
+        (dired-rainbow-define fonts "#6cb2eb" ("afm"
+                                               "fon"
+                                               "fnt"
+                                               "pfb"
+                                               "pfm"
+                                               "ttf"
+                                               "otf"))
+        (dired-rainbow-define
+         partition
+         "#e3342f"
+         ("dmg"
+          "iso"
+          "bin"
+          "nrg"
+          "qcow"
+          "toast"
+          "vcd"
+          "vmdk"
+          "bak"))
+        (dired-rainbow-define vc "#0074d9"
+                              ("git" "gitignore" "gitattributes" "gitmodules")))
+
+#+END_SRC
+
+**** Dired Hacks: Ranger (Copy/Paste Files as Text)
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package dired-ranger
+      :ensure t
+      :bind ((:map dired-mode-map)
+             ("m" . 'dired-ranger-move)
+             ("v" . 'dired-ranger-paste)
+             ("c" . 'dired-ranger-copy)))
+
+#+END_SRC
+
+**** Dired Hacks: Collapse 
+
+=dired-collapse= shows directories containing one file as directory +
+slash + name of that file.
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package dired-collapse
+      :ensure t
+      :hook (dired-mode . dired-collapse-mode))
+
+#+END_SRC
 
 ** Just Run Current File
 
@@ -6779,14 +7130,14 @@ I am use [[https://github.com/jrblevin/deft][deft]] for the managing of the note
 
   (use-package deft
       :ensure t
-      :custom ((deft-directory "~/notes/")
-               (deft-recursive t))
+      :custom
+      ((deft-directory "~/notes/")
+       (deft-recursive t))
       :config
       (defun fast-exec-deft-keys ()
         "Get some useful keymaps of  `fast-exec' for deft."
         (fast-exec/some-commands
          ("Manage Notes" 'deft)))
-I
       (fast-exec/register-keymap-func 'fast-exec-deft-keys)
       (fast-exec/reload-functions-chain))
 
@@ -7053,9 +7404,7 @@ current buffer:
      source
      (s-replace "\n" " ")
      (s-replace "\\begin{equation}" "\\[")
-     (s-replace "\\end{equation}" "\\]")
-     (s-append "Так как ваш сайт не любит большие решения, ")
-     (s-append "то оно было уменьшено с помощью программного кода")))
+     (s-replace "\\end{equation}" "\\]")))
 
   (bind-keys
    :map my-latex-local-map
@@ -7364,4 +7713,3 @@ I have some functions for the management of the ZMS:
   (add-to-list 'run-command-recipes 'my-zms-run-command-recipe)
 
   #+END_SRC
-

@@ -4,7 +4,7 @@
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
 (("org-capture-last-stored"
  (filename . "~/agenda.org")
- (front-context-string . "*** TODO Latex e")
- (rear-context-string . "expansion latex\n")
- (position . 2208))
+ (front-context-string . "*** TODO Fix =my")
+ (rear-context-string . "iption last uri\n")
+ (position . 2364))
 )
