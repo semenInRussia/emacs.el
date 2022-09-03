@@ -79,7 +79,7 @@ I'm use followed repositories as a template for my Emacs config:
     - [[#smartparens][Smartparens]]
     - [[#special-configuration-for-major-modes][Special Configuration for Major Modes]]
     - [[#delete-only-parens-without-inner-contents][Delete Only Parens without Inner Contents]]
-  - [[#editing-based-on-language-objects][Editing Based on Language Objects]]
+  - [[#managing-of-the-parens][Managing of the Parens]]
   - [[#smart-select-text][Smart Select Text]]
   - [[#macros][Macros]]
   - [[#special-strings-as-seperated-buffers][Special Strings as Seperated Buffers]]
@@ -1523,17 +1523,45 @@ For enable builtin smartparens configuration for major modes, add require statem
   (define-key xah-fly-command-map (kbd "DEL") 'delete-only-1-char)
   #+END_SRC
 
-** Editing Based on Language Objects
+** Managing of the Parens
 
 I am use [[https://github.com/cute-jumper/embrace.el][embrace]].
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (use-package embrace
-      :ensure tI
+      :ensure t
       :bind ((:map xah-fly-command-map)
              ("/"         . 'embrace-commander)
-             ("SPC SPC /" . 'xah-goto-matching-bracket)))
+             ("SPC SPC /" . 'xah-goto-matching-bracket))
+      :config
+      (dolist (mode run-command-recipes-latex-modes)
+        (let ((hook (->>
+                     mode
+                     (symbol-name)
+                     (s-append "-hook")
+                     (intern))))
+          (add-hook hook 'embrace-LaTeX-mode-hook)
+          (add-hook hook 'my-embrace-LaTeX-mode-hook)))
+      (add-hook 'org-mode-hook 'embrace-org-mode-hook)
+
+      (defun my-embrace-LaTeX-mode-hook ()
+        "My additional `embrace-LaTeX-mode-hook'."
+        (interactive)
+        (embrace-add-pair-regexp
+         ?\\                              ; key
+         "\\.*?{"                         ; left regexp
+         "}"                              ; right regexp
+         'my-embrace-with-latex-command   ; function returning pairs strings
+         (embrace-build-help "\\name{" "}"))))
+
+  (defun my-embrace-with-latex-command ()
+    "Return pair from the left and right pair for a LaTeX command."
+    (let ((name (read-string "Name of a LaTeX command, please: ")))
+      (cons (s-concat "\\" name "{") "}")))
+
+  (embrace-with-function)
+  (my-embrace-with-latex-command)
 
 #+END_SRC
 
@@ -2458,7 +2486,7 @@ I am take this from [[https://github.com/jkitchin/scimax/][scimax]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defvar my-autoformat-functions nil
+  I(defvar my-autoformat-functions nil
     "Current used autoformat functions.")
 
   (defcustom my-autoformat-all-functions
@@ -2507,7 +2535,7 @@ I am take this from [[https://github.com/jkitchin/scimax/][scimax]]:
     (interactive)
     (when (and
            (my-in-text-p)
-           (looking-back "[1-9a-z]")
+           (looking-back "[а-яa-z]")
            (save-excursion
              (forward-char -1)
              (or
@@ -2784,14 +2812,18 @@ install external programm via =npm=
       (newline)
       (my-latex-insert-command "end" name)))
 
-  (add-hook 'latex-mode-hook 'aas-activate-for-major-mode)
-  (add-hook 'LaTeX-mode-hook 'aas-activate-for-major-mode)
+  (add-hook 'latex-mode-hook 'my-latex-activate-expansion)
+
+  (defun my-latex-activate-expansion ()
+    (interactive)
+    (aas-mode +1)
+    (aas-activate-keymap 'latex))
 
   (defun my-latex-expand-define-function (key fun)
     "Bind call of FUN at KEY in the LaTeX.
 
   FUN will be called when the user press KEY and dot"
-    (aas-set-snippets 'LaTeX-mode
+    (aas-set-snippets 'latex-mode
       (s-concat key ".") fun))
 
   (defmacro my-latex-expand-define (key name args &rest body)
@@ -2805,9 +2837,6 @@ install external programm via =npm=
        (my-latex-expand-define-function ,key ',name)))
 
 #+END_SRC
-
-#+RESULTS:
-: my-latex-expand-define
 
 ***** LaTeX Graphics
 
@@ -6609,7 +6638,7 @@ I bound filters dispatcher for =dired= to key bindings =SPC k g=
   (use-package dired-filter
       :ensure t
       :init
-      (define-key dired-mode-map (kbd "SPC k g") dired-filter-map))
+      (define-key dired-mode-map (kbd ".") dired-filter-map))
 
 #+END_SRC
 
@@ -6654,7 +6683,7 @@ listings
       :ensure t
       :config
       (dired-rainbow-define-chmod directory "#6cb2eb" "d.*")
-      (dired-rainbow-define html "#eb5286"
+      (dired-rainbow-define html 'yellow2
                             ("css"
                              "less"
                              "sass"
@@ -6693,18 +6722,18 @@ listings
                                                 "odp"
                                                 "ppt"
                                                 "pptx"))
-      (dired-rainbow-define markdown "#ffed4a" ("org"
-                                                "etx"
-                                                "info"
-                                                "markdown"
-                                                "md"
-                                                "mkd"
-                                                "nfo"
-                                                "pod"
-                                                "rst"
-                                                "tex"
-                                                "textfile"
-                                                "txt"))
+      (dired-rainbow-define markdown "yellow" ("org"
+                                               "etx"
+                                               "info"
+                                               "markdown"
+                                               "md"
+                                               "mkd"
+                                               "nfo"
+                                               "pod"
+                                               "rst"
+                                               "tex"
+                                               "textfile"
+                                               "txt"))
       (dired-rainbow-define database "#6574cd" ("xlsx"
                                                 "xls"
                                                 "csv"
@@ -6800,56 +6829,56 @@ listings
                                                   "xz"
                                                   "z"
                                                   "Z"
-                                                    "jar"
-                                                    "war"
-                                                    "ear"
-                                                    "rar"
-                                                    "sar"
-                                                    "xpi"
-                                                    "apk"
-                                                    "xz"
-                                                    "tar"))
-        (dired-rainbow-define packaged "#faad63" ("deb"
-                                                  "rpm"
-                                                  "apk"
-                                                  "jad"
                                                   "jar"
-                                                  "cab"
-                                                  "pak"
-                                                  "pk3"
-                                                  "vdf"
-                                                  "vpk"
-                                                  "bsp"))
-        (dired-rainbow-define encrypted "#ffed4a" ("gpg"
-                                                   "pgp"
-                                                   "asc"
-                                                   "bfe"
-                                                   "enc"
-                                                   "signature"
-                                                   "sig"
-                                                   "p12"
-                                                   "pem"))
-        (dired-rainbow-define fonts "#6cb2eb" ("afm"
-                                               "fon"
-                                               "fnt"
-                                               "pfb"
-                                               "pfm"
-                                               "ttf"
-                                               "otf"))
-        (dired-rainbow-define
-         partition
-         "#e3342f"
-         ("dmg"
-          "iso"
-          "bin"
-          "nrg"
-          "qcow"
-          "toast"
-          "vcd"
-          "vmdk"
-          "bak"))
-        (dired-rainbow-define vc "#0074d9"
-                              ("git" "gitignore" "gitattributes" "gitmodules")))
+                                                  "war"
+                                                  "ear"
+                                                  "rar"
+                                                  "sar"
+                                                  "xpi"
+                                                  "apk"
+                                                  "xz"
+                                                  "tar"))
+      (dired-rainbow-define packaged "#faad63" ("deb"
+                                                "rpm"
+                                                "apk"
+                                                "jad"
+                                                "jar"
+                                                "cab"
+                                                "pak"
+                                                "pk3"
+                                                "vdf"
+                                                "vpk"
+                                                "bsp"))
+      (dired-rainbow-define encrypted "#ffed4a" ("gpg"
+                                                 "pgp"
+                                                 "asc"
+                                                 "bfe"
+                                                 "enc"
+                                                 "signature"
+                                                 "sig"
+                                                 "p12"
+                                                 "pem"))
+      (dired-rainbow-define fonts "#6cb2eb" ("afm"
+                                             "fon"
+                                             "fnt"
+                                             "pfb"
+                                             "pfm"
+                                             "ttf"
+                                             "otf"))
+      (dired-rainbow-define
+       partition
+       "#e3342f"
+       ("dmg"
+        "iso"
+        "bin"
+        "nrg"
+        "qcow"
+        "toast"
+        "vcd"
+        "vmdk"
+        "bak"))
+      (dired-rainbow-define vc "#0074d9"
+                            ("git" "gitignore" "gitattributes" "gitmodules")))
 
 #+END_SRC
 
