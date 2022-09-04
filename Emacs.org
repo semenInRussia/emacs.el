@@ -231,6 +231,7 @@ I'm use followed repositories as a template for my Emacs config:
   - [[#fonts][Fonts]]
   - [[#highlight-current-line][Highlight Current Line]]
   - [[#centering][Centering]]
+  - [[#view-certain-text-fragments-as-special-symbols][View Certain Text Fragments as Special Symbols]]
   - [[#view-break-page-lines][View Break Page Lines]]
 - [[#developer-environment][Developer Environment]]
   - [[#projects-management][Projects Management]]
@@ -1536,39 +1537,46 @@ I am use [[https://github.com/cute-jumper/embrace.el][embrace]].
       :config ;nofmt
       (add-hook 'latex-mode-hook 'embrace-LaTeX-mode-hook)
       (add-hook 'latex-mode-hook 'my-embrace-LaTeX-mode-hook)
-      (add-hook 'LaTeX-mode-hook 'embrace-LaTeX-mode-hook)
-      (add-hook 'LaTeX-mode-hook 'my-embrace-LaTeX-mode-hook)
+      (add-hook 'emacs-lisp-mode-hook 'embrace-emacs-lisp-mode-hook)
       (add-hook 'org-mode-hook 'embrace-org-mode-hook))
 
   (defun my-embrace-LaTeX-mode-hook ()
     "My additional `embrace-LaTeX-mode-hook'."
     (interactive)
-    (setq-local embrace--pairs-list nil)
-    (--each (-take 16 cdlatex-math-modify-alist-default)
+    (setq-local embrace-show-help-p nil)
+    (--each cdlatex-math-modify-alist-default
       (my-embrace-add-paren-of-cdlatex-math it))
     (my-embrace-add-paren-latex-command ?a "answer")
     (embrace-add-pair-regexp
      ?\\
-     (rx "\\"
-         (1+ wordchar)
-         (* space)
-         (? "[" (*? any) "]" (1+ space))
-         "{")
+     (rx "\\" (1+ wordchar) (* space) (? "[" (*? any) "]" (1+ space)) "{")
      "}"
      'my-embrace-with-latex-command
-     (embrace-build-help "\\name{" "}")))
+     (embrace-build-help "\\name{" "}"))
+    (embrace-add-pair-regexp
+     ?d
+     "\\\\left."
+     "\\\\right."
+     'my-embrace-with-latex-left-right
+     (embrace-build-help "\\name{" "}"))
+    (embrace-add-pair-regexp
+     ?e
+     "\\\\begin{\\(.*?\\)}\\(\\[.*?\\]\\)*"
+     "\\\\end{\\(.*?\\)}"
+     'my-embrace-with-latex-env
+     (embrace-build-help "\\begin{name}" "\\end{name}")
+     t))
 
   (defun my-embrace-add-paren-of-cdlatex-math (element)
     "Add an ELEMENT of the `cdlatex-math-modify-alist' to the `embrace' parens."
     (let* ((key (-first-item element))
-           (cmd
-            (s-chop-prefix
-             "\\"
-             (or (-third-item element) (-second-item element))))
+           (cmd (and (-third-item element)
+                     (s-chop-prefix "\\" (-third-item element))))
            (type (-fourth-item element)))
-      (if type
-          (my-embrace-add-paren-latex-command key cmd)
-        (my-embrace-add-paren-latex-style-command key cmd))))
+      (when cmd
+        (if type
+            (my-embrace-add-paren-latex-command key cmd)
+          (my-embrace-add-paren-latex-style-command key cmd)))))
 
   (defun my-embrace-add-paren-latex-command (key name)
     "Add paren at KEY for the LaTeX command with NAME in `embrace'."
@@ -1610,6 +1618,17 @@ I am use [[https://github.com/cute-jumper/embrace.el][embrace]].
     "Return pair from the left and right pair for a LaTeX command."
     (let ((name (read-string "Name of a LaTeX command, please: ")))
       (cons (s-concat "\\" name "{") "}")))
+
+  (defun my-embrace-with-latex-left-right ()
+    "Return pair from the left and right pair for the LaTeX command \\left."
+    (cons (s-concat "\\left" (read-char "Left paren, please: "))
+          (s-concat "\\right" (read-char "Right paren, please: "))))
+
+  (defun my-embrace-with-latex-env ()
+    "Return pair from the left and right pair for the LaTeX command \\left."
+    (let ((env (read-string "Name of the environment, please: ")))
+      (cons (s-concat "\\begin{" env "}")
+            (s-concat "\\end{" env "}"))))
 
 #+END_SRC
 
@@ -2643,7 +2662,8 @@ Main skeleton of my LaTeX configuration is package =tex-mode= with
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (use-package tex-mode
-      :major-mode-map latex (LaTeX-mode))
+      :major-mode-map latex (LaTeX-mode)
+      :mode ("\\.\\(tex\\|cls\\)\\'" . LaTeX-mode))
 
 #+END_SRC
 
@@ -2653,7 +2673,6 @@ Main skeleton of my LaTeX configuration is package =tex-mode= with
 
   (use-package latex
       :ensure auctex
-      :hook ((LaTeX-mode . prettify-symbols-mode))
       :bind ((:map my-latex-local-map)
              ("="     . my-calc-simplify-region-copy)
              ("f"     . my-calc-simplify-region-change))
@@ -6181,6 +6200,16 @@ I'm don't love =flycheck= in =modeline=, so I turn off that.
 ** Centering
 
 I
+
+** View Certain Text Fragments as Special Symbols
+
+I am use =prettify-mode=
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (use-package prog-mode
+      :config
+    (add-hook 'LaTeX-mode-hook 'prettify-symbols-mode))
+#+END_SRC
 
 ** View Break Page Lines
 

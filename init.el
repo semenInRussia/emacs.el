@@ -781,39 +781,46 @@ Action of `avy', see `avy-action-yank' for example"
     :config ;nofmt
     (add-hook 'latex-mode-hook 'embrace-LaTeX-mode-hook)
     (add-hook 'latex-mode-hook 'my-embrace-LaTeX-mode-hook)
-    (add-hook 'LaTeX-mode-hook 'embrace-LaTeX-mode-hook)
-    (add-hook 'LaTeX-mode-hook 'my-embrace-LaTeX-mode-hook)
+    (add-hook 'emacs-lisp-mode-hook 'embrace-emacs-lisp-mode-hook)
     (add-hook 'org-mode-hook 'embrace-org-mode-hook))
 
 (defun my-embrace-LaTeX-mode-hook ()
   "My additional `embrace-LaTeX-mode-hook'."
   (interactive)
-  (setq-local embrace--pairs-list nil)
-  (--each (-take 16 cdlatex-math-modify-alist-default)
+  (setq-local embrace-show-help-p nil)
+  (--each cdlatex-math-modify-alist-default
     (my-embrace-add-paren-of-cdlatex-math it))
   (my-embrace-add-paren-latex-command ?a "answer")
   (embrace-add-pair-regexp
    ?\\
-   (rx "\\"
-       (1+ wordchar)
-       (* space)
-       (? "[" (*? any) "]" (1+ space))
-       "{")
+   (rx "\\" (1+ wordchar) (* space) (? "[" (*? any) "]" (1+ space)) "{")
    "}"
    'my-embrace-with-latex-command
-   (embrace-build-help "\\name{" "}")))
+   (embrace-build-help "\\name{" "}"))
+  (embrace-add-pair-regexp
+   ?d
+   "\\\\left."
+   "\\\\right."
+   'my-embrace-with-latex-left-right
+   (embrace-build-help "\\name{" "}"))
+  (embrace-add-pair-regexp
+   ?e
+   "\\\\begin{\\(.*?\\)}\\(\\[.*?\\]\\)*"
+   "\\\\end{\\(.*?\\)}"
+   'my-embrace-with-latex-env
+   (embrace-build-help "\\begin{name}" "\\end{name}")
+   t))
 
 (defun my-embrace-add-paren-of-cdlatex-math (element)
   "Add an ELEMENT of the `cdlatex-math-modify-alist' to the `embrace' parens."
   (let* ((key (-first-item element))
-         (cmd
-          (s-chop-prefix
-           "\\"
-           (or (-third-item element) (-second-item element))))
+         (cmd (and (-third-item element)
+                   (s-chop-prefix "\\" (-third-item element))))
          (type (-fourth-item element)))
-    (if type
-        (my-embrace-add-paren-latex-command key cmd)
-      (my-embrace-add-paren-latex-style-command key cmd))))
+    (when cmd
+      (if type
+          (my-embrace-add-paren-latex-command key cmd)
+        (my-embrace-add-paren-latex-style-command key cmd)))))
 
 (defun my-embrace-add-paren-latex-command (key name)
   "Add paren at KEY for the LaTeX command with NAME in `embrace'."
@@ -855,6 +862,17 @@ Action of `avy', see `avy-action-yank' for example"
   "Return pair from the left and right pair for a LaTeX command."
   (let ((name (read-string "Name of a LaTeX command, please: ")))
     (cons (s-concat "\\" name "{") "}")))
+
+(defun my-embrace-with-latex-left-right ()
+  "Return pair from the left and right pair for the LaTeX command \\left."
+  (cons (s-concat "\\left" (read-char "Left paren, please: "))
+        (s-concat "\\right" (read-char "Right paren, please: "))))
+
+(defun my-embrace-with-latex-env ()
+  "Return pair from the left and right pair for the LaTeX command \\left."
+  (let ((env (read-string "Name of the environment, please: ")))
+    (cons (s-concat "\\begin{" env "}")
+          (s-concat "\\end{" env "}"))))
 
 (defun mark-inner-or-expand-region ()
   "If text is selected, expand region, otherwise then mark inner of brackets."
@@ -1660,11 +1678,11 @@ See `just-line-is-whitespaces-p'"
 (my-autoformat-mode t)
 
 (use-package tex-mode
-    :major-mode-map latex (LaTeX-mode))
+    :major-mode-map latex (LaTeX-mode)
+    :mode ("\\.\\(tex\\|cls\\)\\'" . LaTeX-mode))
 
 (use-package latex
     :ensure auctex
-    :hook ((LaTeX-mode . prettify-symbols-mode))
     :bind ((:map my-latex-local-map)
            ("="     . my-calc-simplify-region-copy)
            ("f"     . my-calc-simplify-region-change))
@@ -3984,6 +4002,10 @@ See `format-time-string' for see what format string"
 (set-frame-font "Consolas" nil t)
 
 (global-hl-line-mode 1)
+
+(use-package prog-mode
+    :config
+  (add-hook 'LaTeX-mode-hook 'prettify-symbols-mode))
 
 (use-package page-break-lines
     :ensure t
