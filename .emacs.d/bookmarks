@@ -1,10 +1,10 @@
-;;;; Emacs Bookmark Format Version 1 ;;;; -*- coding: utf-8-emacs -*-
+;;;; Emacs Bookmark Format Version 1 ;;;; -*- coding: utf-8 -*-
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
 (("org-capture-last-stored"
  (filename . "~/agenda.org")
- (front-context-string . "*** TODO Fix =my")
- (rear-context-string . "iption last uri\n")
- (position . 2364))
+ (front-context-string . "*** TODO View li")
+ (rear-context-string . " y/ for =dired=\n")
+ (position . 2448))
 )

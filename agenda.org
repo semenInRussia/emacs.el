@@ -81,6 +81,7 @@ Also use some themes for exporting to the =html=
 *** TODO When "I am use" after insert description last uri
 *** TODO Fix =my-copy-buffer-content-as-mipt-solution=
 *** TODO /SPC y/ for =dired=
+*** TODO View list of possible LaTeX expansion
 ** Targets on Day
 
 *** DONE Explore some package from the /Github Stars/

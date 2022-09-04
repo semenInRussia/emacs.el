@@ -778,34 +778,83 @@ Action of `avy', see `avy-action-yank' for example"
     :bind ((:map xah-fly-command-map)
            ("/"         . 'embrace-commander)
            ("SPC SPC /" . 'xah-goto-matching-bracket))
-    :config
-    (dolist (mode run-command-recipes-latex-modes)
-      (let ((hook (->>
-                   mode
-                   (symbol-name)
-                   (s-append "-hook")
-                   (intern))))
-        (add-hook hook 'embrace-LaTeX-mode-hook)
-        (add-hook hook 'my-embrace-LaTeX-mode-hook)))
-    (add-hook 'org-mode-hook 'embrace-org-mode-hook)
+    :config ;nofmt
+    (add-hook 'latex-mode-hook 'embrace-LaTeX-mode-hook)
+    (add-hook 'latex-mode-hook 'my-embrace-LaTeX-mode-hook)
+    (add-hook 'LaTeX-mode-hook 'embrace-LaTeX-mode-hook)
+    (add-hook 'LaTeX-mode-hook 'my-embrace-LaTeX-mode-hook)
+    (add-hook 'org-mode-hook 'embrace-org-mode-hook))
 
-    (defun my-embrace-LaTeX-mode-hook ()
-      "My additional `embrace-LaTeX-mode-hook'."
-      (interactive)
-      (embrace-add-pair-regexp
-       ?\\                              ; key
-       "\\.*?{"                         ; left regexp
-       "}"                              ; right regexp
-       'my-embrace-with-latex-command   ; function returning pairs strings
-       (embrace-build-help "\\name{" "}"))))
+(defun my-embrace-LaTeX-mode-hook ()
+  "My additional `embrace-LaTeX-mode-hook'."
+  (interactive)
+  (setq-local embrace--pairs-list nil)
+  (--each (-take 16 cdlatex-math-modify-alist-default)
+    (my-embrace-add-paren-of-cdlatex-math it))
+  (my-embrace-add-paren-latex-command ?a "answer")
+  (embrace-add-pair-regexp
+   ?\\
+   (rx "\\"
+       (1+ wordchar)
+       (* space)
+       (? "[" (*? any) "]" (1+ space))
+       "{")
+   "}"
+   'my-embrace-with-latex-command
+   (embrace-build-help "\\name{" "}")))
+
+(defun my-embrace-add-paren-of-cdlatex-math (element)
+  "Add an ELEMENT of the `cdlatex-math-modify-alist' to the `embrace' parens."
+  (let* ((key (-first-item element))
+         (cmd
+          (s-chop-prefix
+           "\\"
+           (or (-third-item element) (-second-item element))))
+         (type (-fourth-item element)))
+    (if type
+        (my-embrace-add-paren-latex-command key cmd)
+      (my-embrace-add-paren-latex-style-command key cmd))))
+
+(defun my-embrace-add-paren-latex-command (key name)
+  "Add paren at KEY for the LaTeX command with NAME in `embrace'."
+  (embrace-add-pair-regexp
+   key
+   (my-latex-command-left-paren-regexp name)
+   "}"
+   (-const (cons (my-latex-command-left-paren name) "}"))
+   (embrace-build-help (my-latex-command-left-paren name) "}")))
+
+(defun my-latex-command-left-paren (name)
+  "Return paren right of the LaTeX command named NAME."
+  (s-concat "\\" name "{"))
+
+(defun my-latex-command-left-paren-regexp (name)
+  (rx "\\"
+      (literal name)
+      (* space)
+      (? "[" (*? any) "]" (* space))
+      "{"))
+
+(defun my-embrace-add-paren-latex-style-command (key name)
+  "Add paren at KEY for the style LaTeX command with NAME in `embrace'."
+  (embrace-add-pair-regexp
+   key
+   (my-latex-style-command-left-paren-regexp name)
+   "}"
+   (-const (cons (my-latex-style-command-left-paren name) "}"))
+   (embrace-build-help (my-latex-style-command-left-paren name) "}")))
+
+(defun my-latex-style-command-left-paren (name)
+  "Return paren right of the LaTeX command named NAME."
+  (s-concat "{\\" name " "))
+
+(defun my-latex-style-command-left-paren-regexp (name)
+  (rx "{" (* space) "\\" (literal name) (* space)))
 
 (defun my-embrace-with-latex-command ()
   "Return pair from the left and right pair for a LaTeX command."
   (let ((name (read-string "Name of a LaTeX command, please: ")))
     (cons (s-concat "\\" name "{") "}")))
-
-(embrace-with-function)
-(my-embrace-with-latex-command)
 
 (defun mark-inner-or-expand-region ()
   "If text is selected, expand region, otherwise then mark inner of brackets."
@@ -1518,7 +1567,7 @@ List of functions: `xah-toggle-letter-case', `my-change-case-of-current-line'."
             (kbd "SPC i")
           ',add-import-function)))))
 
-I(defvar my-autoformat-functions nil
+(defvar my-autoformat-functions nil
   "Current used autoformat functions.")
 
 (defcustom my-autoformat-all-functions
@@ -2004,11 +2053,9 @@ downloaded file"
    (buffer-string)
    (s-lines)
    (--keep
-    (when (s-prefix-p "\\newcounter" (s-trim-left it))
-      (->> ;nofmt
-       it
-       (s-chop-prefix "\\newcounter{")
-       (s-chop-suffix "}"))))))
+    (-when-let ((all name)
+                (s-match "\\newcounter\\(?:\[.*?\]\\)?{\\(.*\\)}" it))
+      name))))
 
 (my-latex-expand-define "ncr" my-latex-insert-newcounter
     (counter &optional sub-counter)
@@ -5092,13 +5139,12 @@ Number will be automatically initialized, depends on the previous sections."
 (defun my-zms-insert-solution-to-solution.tex (section number)
   "Insert a command viewing solution with NUMBER to Solution.tex of SECTION."
   (find-file (my-zms-section-solution.tex-path section))
-  (save-excursion
-    (end-of-buffer)
+  (with-temp-buffer
+    (insert (f-read (my-zms-section-solution.tex-path section)))
     (forward-line -1)
     (end-of-line)
     (newline)
-    (insert (format my-zms-view-solution-latex number))
-    (newline)))
+    (insert (format my-zms-view-solution-latex number))))
 
 (defun my-zms-find-solution (section number)
   "Find/visit file of the ZMS SECTION solution with NUMBER file."
