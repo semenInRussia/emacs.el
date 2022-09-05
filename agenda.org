@@ -16,8 +16,6 @@
 
 *** TODO explore the =xetex=                                          :latex:
 
-*** TODO fix count of words/chars in the =mode-line=
-
 *** TODO Fix aggresive fill pargaraph mode in the =LaTeX=
 
     Disable on the:
@@ -35,8 +33,6 @@
 
 *** TODO Run the main file of the project in =run-command-reicpes= :run_command_recipes:
 
-*** TODO Add able to to the transposing of the =LaTeX= list items     :latex:
-
 *** TODO See on the =simple-indentation=                  :simple_indentaion:
 
 *** TODO explore the =org-tempo=                                        :org:
@@ -52,8 +48,6 @@ Also use some themes for exporting to the =html=
 *** TODO Make =LaTeX= document class for ГОСТ                         :latex:
 
 *** TODO add support of the =org-export= to the =run-command-recipes= :run_command_recipes:
-
-*** TODO In =just-doc= change view of non-taked arguments functions
 
 *** TODO Add \underline command for =LaTeX=
 
@@ -82,19 +76,20 @@ Also use some themes for exporting to the =html=
 *** TODO Fix =my-copy-buffer-content-as-mipt-solution=
 *** TODO /SPC y/ for =dired=
 *** TODO View list of possible LaTeX expansion
+*** TODO Fix coding
 ** Targets on Day
 
-*** DONE Explore some package from the /Github Stars/
-SCHEDULED: <2022-09-02 Пт>
+*** DONE In =just-doc= change view of non-taked arguments functions
+SCHEDULED: <2022-09-05 Пн>
 
-*** DONE Bind command to /SPC l q/ in =org-mode=
-SCHEDULED: <2022-09-02 Пт>
+*** DONE Add able to to the transposing of the =LaTeX= list items   :latex:
+SCHEDULED: <2022-09-05 Пн>
+
+*** TODO fix count of words/chars in the =mode-line=
+SCHEDULED: <2022-09-05 Пн>
 
 *** TODO Do =zms=
 DEADLINE: <2022-09-10 Сб> SCHEDULED: <2022-08-16 Вт>
-
-*** DONE Use =deft= instead of my own notes system
-SCHEDULED: <2022-09-02 Пт>
 
 * Films 
 
@@ -105,16 +100,6 @@ SCHEDULED: <2022-09-02 Пт>
 :slogan:   Пол Эджкомб не верил в чудеса. Пока не столкнулся с одним из них
 :id:       435
 :rating:   91.0
-:countries: (США)
-:END:
-
-** MUST-SEE The Matrix Reloaded
-:PROPERTIES:
-:name:     Матрица: Перезагрузка
-:year:     2003
-:slogan:   Одни машины помогают нам жить, другие – пытаются нас убить
-:id:       299
-:rating:   77.0
 :countries: (США)
 :END:
 
@@ -167,6 +152,16 @@ SCHEDULED: <2022-09-02 Пт>
    :rating:   67.0
    :countries: (США)
    :END:
+
+** MUST-SEE The Matrix Reloaded
+:PROPERTIES:
+:name:     Матрица: Перезагрузка
+:year:     2003
+:slogan:   Одни машины помогают нам жить, другие – пытаются нас убить
+:id:       299
+:rating:   77.0
+:countries: (США)
+:END:
 
 ** MUST-SEE Borat: Cultural Learnings of America for Make Benefit Glorious Nation of Kazakhstan
    :PROPERTIES:

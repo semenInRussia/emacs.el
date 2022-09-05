@@ -1118,59 +1118,63 @@ Is used in `my-drag-stuff-down'.")
 (add-up-dragger    #'drag-stuff-up)
 (add-down-dragger  #'drag-stuff-down)
 
+(defun my-drag-org-right ()
+  "Try drag anything `org-mode' thing to right."
+  (interactive)
+  (when (my-drag-org-p)
+    (org-metaright)
+    t))
+
+(defun my-drag-org-left ()
+  "Try drag anything `org-mode' thing to left."
+  (interactive)
+  (when (my-drag-org-p)
+    (org-metaleft)
+    t))
+
+(defun my-drag-org-up ()
+  "Try drag anything `org-mode' thing to up."
+  (interactive)
+  (when (my-drag-org-p)
+    (org-metaup)
+    t))
+
+(defun my-drag-org-down ()
+  "Try drag anything `org-mode' thing to down."
+  (interactive)
+  (when (my-drag-org-p)
+    (org-metadown)
+    t))
+
+(defun my-drag-org-p ()
+  "Return t, when draggers for `org-mode' should work."
+  (and
+   (eq major-mode 'org-mode)
+   (or
+    (my-org-mode-in-heading-start-p)
+    (my-org-mode-at-list-item)
+    (org-at-table-p))))
+
 (defun my-org-mode-in-heading-start-p ()
-  "Return t, when current position now in start of org's heading."
+  "Return t, when the current position being at a `org-mode' heading."
   (interactive "d")
   (and
    (not (org-in-src-block-p))
    (just-line-prefix-p "*")))
 
-(defun my-drag-org-heading-right ()
-  "Drag Org's heading to right."
-  (interactive)
-  (when (and
-         (eq major-mode 'org-mode)
-         (or
-          (my-org-mode-in-heading-start-p)
-          (org-at-table-p)))
-    (org-metaright)
-    t))
+(defun my-org-mode-at-list-item ()
+  "Return t, when the current position being at an item of a `org-mode' list."
+  (interactive "d")
+  (and
+   (not (org-in-src-block-p))
+   (or
+    (just-line-prefix-p "-" nil t)
+    (just-line-regexp-prefix-p "[0-9]+."))))
 
-(defun my-drag-org-heading-left ()
-  "Drag Org's heading to left."
-  (interactive)
-  (when (and
-         (eq major-mode 'org-mode)
-         (or
-          (my-org-mode-in-heading-start-p)
-          (org-at-table-p)))
-    (org-metaleft)
-    t))
-
-(defun my-drag-org-heading-up ()
-  "Drag Org's heading to up."
-  (interactive)
-  (when (and
-         (eq major-mode 'org-mode)
-         (or
-          (my-org-mode-in-heading-start-p)
-          (org-at-table-p)))
-    (org-metaup)
-    t))
-
-(defun my-drag-org-heading-down ()
-  "Drag Org's heading to down."
-  (interactive)
-  (when (or
-         (org-at-table-p)
-         (my-org-mode-in-heading-start-p))
-    (org-metadown)
-    t))
-
-(add-right-dragger #'my-drag-org-heading-right)
-(add-left-dragger #'my-drag-org-heading-left)
-(add-down-dragger #'my-drag-org-heading-down)
-(add-up-dragger #'my-drag-org-heading-up)
+(add-right-dragger 'my-drag-org-right)
+(add-left-dragger 'my-drag-org-left)
+(add-down-dragger 'my-drag-org-down)
+(add-up-dragger 'my-drag-org-up)
 
 (defun delete-and-edit-current-line ()
   "Delete current line and instroduce to insert mode."
@@ -1678,8 +1682,9 @@ See `just-line-is-whitespaces-p'"
 (my-autoformat-mode t)
 
 (use-package tex-mode
+    :defer t
     :major-mode-map latex (LaTeX-mode)
-    :mode ("\\.\\(tex\\|cls\\)\\'" . LaTeX-mode))
+    :mode ("\\.\\(tex\\|cls\\)$" . LaTeX-mode))
 
 (use-package latex
     :ensure auctex
@@ -3010,6 +3015,9 @@ exist after each headings's drawers."
   ((:map my-org-local-map)
    ("k" . 'my-org-tidy)))
 
+(use-package elisp-mode
+    :major-mode-map elisp (emacs-lisp-mode inferior-emacs-lisp-mode))
+
 (use-package package-lint
     :ensure t)
 
@@ -3095,6 +3103,29 @@ Only when in class defnition."
              (my-elisp-defclass-name)))))
 
 (define-key emacs-lisp-mode-map (kbd "M-RET") 'my-elisp-new-field-of-class)
+
+(use-package paxedit
+    :ensure t
+    :hook (emacs-lisp-mode . paxedit-mode)
+    :bind ((:map paxedit-mode-map)
+           (";" . 'paxedit-insert-semicolon)
+           ("(" . 'paxedit-open-round)
+           ("[" . 'paxedit-open-bracket)
+           ("{" . 'paxedit-open-curly)
+           (:map my-elisp-local-map)
+           ("o" . 'paxedit-transpose-forward)
+           ("u" . 'paxedit-transpose-backward)
+           ("u" . 'paxedit-transpose-backward)
+           ("x" . 'paxedit-kill)
+           ("w" . 'my-paxedit-change)
+           ("d" . 'paxedit-symbol-kill)
+           ("q" . 'paxedit-compress)
+           ("k" . 'paxedit-delete-whitespace)))
+
+(defun my-paxedit-change ()
+  "Kill an Lisp expression at the cursor and activate insert mode."
+  (paxedit-delete)
+  (xah-fly-insert-mode-activate))
 
 (use-package racket-mode
     :ensure t
@@ -4004,8 +4035,8 @@ See `format-time-string' for see what format string"
 (global-hl-line-mode 1)
 
 (use-package prog-mode
-    :config
-  (add-hook 'LaTeX-mode-hook 'prettify-symbols-mode))
+    :hook
+  (LaTeX-mode . prettify-symbols-mode))
 
 (use-package page-break-lines
     :ensure t

@@ -133,14 +133,16 @@ I'm use followed repositories as a template for my Emacs config:
       - [[#org--cdlatex][Org + CDLaTeX]]
       - [[#keep-your-org-files-tidy][Keep your Org files tidy]]
     - [[#elisp][Elisp]]
+      - [[#emacs-local-keys-map][Emacs Local Keys Map]]
       - [[#special-linters][Special Linters]]
-      - [[#refactoring][Refactoring]]
+      - [[#emacs-refactoring][Emacs Refactoring]]
       - [[#package-manager][Package Manager]]
       - [[#elisp-format-code][Elisp Format Code]]
       - [[#modern-documentation][Modern Documentation]]
       - [[#elisp-docstrings-mode][Elisp Docstrings Mode]]
       - [[#elisp-indent-code][Elisp Indent Code]]
       - [[#some-insertion-functions-for-elisp][Some Insertion Functions for Elisp]]
+      - [[#editing-and-refactoring-lisp][Editing And Refactoring LISP]]
     - [[#racket][Racket]]
       - [[#smart-insertion-in-racket-m-ret][Smart Insertion in Racket (=M-ret=)]]
       - [[#scribble-the-racket-documentation-tool][Scribble: The Racket Documentation Tool]]
@@ -1952,59 +1954,63 @@ I am use [[*Define Extensible Drag System][my drag system]] and built in =org= f
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
+  (defun my-drag-org-right ()
+    "Try drag anything `org-mode' thing to right."
+    (interactive)
+    (when (my-drag-org-p)
+      (org-metaright)
+      t))
+
+  (defun my-drag-org-left ()
+    "Try drag anything `org-mode' thing to left."
+    (interactive)
+    (when (my-drag-org-p)
+      (org-metaleft)
+      t))
+
+  (defun my-drag-org-up ()
+    "Try drag anything `org-mode' thing to up."
+    (interactive)
+    (when (my-drag-org-p)
+      (org-metaup)
+      t))
+
+  (defun my-drag-org-down ()
+    "Try drag anything `org-mode' thing to down."
+    (interactive)
+    (when (my-drag-org-p)
+      (org-metadown)
+      t))
+
+  (defun my-drag-org-p ()
+    "Return t, when draggers for `org-mode' should work."
+    (and
+     (eq major-mode 'org-mode)
+     (or
+      (my-org-mode-in-heading-start-p)
+      (my-org-mode-at-list-item)
+      (org-at-table-p))))
+
   (defun my-org-mode-in-heading-start-p ()
-    "Return t, when current position now in start of org's heading."
+    "Return t, when the current position being at a `org-mode' heading."
     (interactive "d")
     (and
      (not (org-in-src-block-p))
      (just-line-prefix-p "*")))
 
-  (defun my-drag-org-heading-right ()
-    "Drag Org's heading to right."
-    (interactive)
-    (when (and
-           (eq major-mode 'org-mode)
-           (or
-            (my-org-mode-in-heading-start-p)
-            (org-at-table-p)))
-      (org-metaright)
-      t))
+  (defun my-org-mode-at-list-item ()
+    "Return t, when the current position being at an item of a `org-mode' list."
+    (interactive "d")
+    (and
+     (not (org-in-src-block-p))
+     (or
+      (just-line-prefix-p "-" nil t)
+      (just-line-regexp-prefix-p "[0-9]+."))))
 
-  (defun my-drag-org-heading-left ()
-    "Drag Org's heading to left."
-    (interactive)
-    (when (and
-           (eq major-mode 'org-mode)
-           (or
-            (my-org-mode-in-heading-start-p)
-            (org-at-table-p)))
-      (org-metaleft)
-      t))
-
-  (defun my-drag-org-heading-up ()
-    "Drag Org's heading to up."
-    (interactive)
-    (when (and
-           (eq major-mode 'org-mode)
-           (or
-            (my-org-mode-in-heading-start-p)
-            (org-at-table-p)))
-      (org-metaup)
-      t))
-
-  (defun my-drag-org-heading-down ()
-    "Drag Org's heading to down."
-    (interactive)
-    (when (or
-           (org-at-table-p)
-           (my-org-mode-in-heading-start-p))
-      (org-metadown)
-      t))
-
-  (add-right-dragger #'my-drag-org-heading-right)
-  (add-left-dragger #'my-drag-org-heading-left)
-  (add-down-dragger #'my-drag-org-heading-down)
-  (add-up-dragger #'my-drag-org-heading-up)
+  (add-right-dragger 'my-drag-org-right)
+  (add-left-dragger 'my-drag-org-left)
+  (add-down-dragger 'my-drag-org-down)
+  (add-up-dragger 'my-drag-org-up)
 
   #+END_SRC
 
@@ -2486,7 +2492,7 @@ OS.  I bind it to =SPC 0=
    ("SPC 0" . my-visit-last-opened-buffer))
 
    #+END_SRC
-
+   
 * Support of Languages
 
 ** Functions for extending functional of language
@@ -2662,9 +2668,9 @@ Main skeleton of my LaTeX configuration is package =tex-mode= with
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (use-package tex-mode
+      :defer t
       :major-mode-map latex (LaTeX-mode)
-      :mode ("\\.\\(tex\\|cls\\)\\'" . LaTeX-mode))
-
+      :mode ("\\.\\(tex\\|cls\\)$" . LaTeX-mode))
 #+END_SRC
 
 **** LaTeX + calc
@@ -4317,9 +4323,14 @@ with command =my-org-tidy=
 
 #+END_SRC
 
-
-
 *** Elisp
+
+**** Emacs Local Keys Map
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (use-package elisp-mode
+      :major-mode-map elisp (emacs-lisp-mode inferior-emacs-lisp-mode))
+#+END_SRC
 
 **** Special Linters
 
@@ -4340,7 +4351,7 @@ am use [[https://github.com/purcell/flycheck-package][flycheck-package]]:
 
       #+END_SRC
 
-**** Refactoring
+**** Emacs Refactoring
 
 I am use [[https://github.com/Wilfred/emacs-refactor][emacs-refactor]] for refactor not only in =emacs-lisp=:
 
@@ -4499,6 +4510,37 @@ In =org-mode= I am press =M-RET= for insertion heading, in
 
 #        (my-use-autoformat-in-mode 'emacs-lisp-mode elsip-docstring-capitalization)
 #      #+END_SRC
+
+**** Editing And Refactoring LISP
+
+I am use [[https://github.com/promethial/paxedit][paxedit]], which has some useful commands for ediniting of the
+LISP a source code
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package paxedit
+      :ensure t
+      :hook (emacs-lisp-mode . paxedit-mode)
+      :bind ((:map paxedit-mode-map)
+             (";" . 'paxedit-insert-semicolon)
+             ("(" . 'paxedit-open-round)
+             ("[" . 'paxedit-open-bracket)
+             ("{" . 'paxedit-open-curly)
+             (:map my-elisp-local-map)
+             ("o" . 'paxedit-transpose-forward)
+             ("u" . 'paxedit-transpose-backward)
+             ("u" . 'paxedit-transpose-backward)
+             ("x" . 'paxedit-kill)
+             ("w" . 'my-paxedit-change)
+             ("d" . 'paxedit-symbol-kill)
+             ("q" . 'paxedit-compress)
+             ("k" . 'paxedit-delete-whitespace)))
+
+  (defun my-paxedit-change ()
+    "Kill an Lisp expression at the cursor and activate insert mode."
+    (paxedit-delete)
+    (xah-fly-insert-mode-activate))
+#+END_SRC
 
 *** Racket
 
@@ -6206,9 +6248,11 @@ I
 I am use =prettify-mode=
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
   (use-package prog-mode
-      :config
-    (add-hook 'LaTeX-mode-hook 'prettify-symbols-mode))
+      :hook
+    (LaTeX-mode . prettify-symbols-mode))
+
 #+END_SRC
 
 ** View Break Page Lines
