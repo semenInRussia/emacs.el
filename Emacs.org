@@ -6099,7 +6099,7 @@ I need to see when keys will readed as =drag=:
                         (doom-modeline--multiple-cursors))))
       (or (and (not (equal meta "")) meta)
           (doom-modeline--buffer-size))))
-          #+END_SRC
+#+END_SRC
 
 *** Watch Time in Doom-Modeline
 
@@ -6173,7 +6173,7 @@ I'm don't love =flycheck= in =modeline=, so I turn off that.
 
   (setq flycheck-mode-line nil)
 
-  #+END_SRC
+#+END_SRC
 
 *** Enable Modeline
 
@@ -6200,6 +6200,7 @@ I'm don't love =flycheck= in =modeline=, so I turn off that.
             time
             pomidor
             word-count
+            buffer
             selection-info)
         '(objed-state
           persp-name

@@ -82,10 +82,10 @@ Also use some themes for exporting to the =html=
 *** DONE In =just-doc= change view of non-taked arguments functions
 SCHEDULED: <2022-09-05 Пн>
 
-*** DONE Add able to to the transposing of the =LaTeX= list items   :latex:
+*** TODO Add able to to the transposing of the =LaTeX= list items   :latex:
 SCHEDULED: <2022-09-05 Пн>
 
-*** TODO fix count of words/chars in the =mode-line=
+*** DONE fix count of words/chars in the =mode-line=
 SCHEDULED: <2022-09-05 Пн>
 
 *** TODO Do =zms=

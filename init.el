@@ -4011,6 +4011,7 @@ See `format-time-string' for see what format string"
           time
           pomidor
           word-count
+          buffer
           selection-info)
       '(objed-state
         persp-name
