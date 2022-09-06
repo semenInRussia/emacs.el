@@ -4,5 +4,5 @@
 # key: env
 # type: command
 # --
-(latex-insert-block)
+(cdlatex-environment)
 
