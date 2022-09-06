@@ -376,6 +376,12 @@ string and TEMPLATE is a `yas--template' structure."
     :ensure t
     :hook (company-mode . company-box-mode))
 
+(use-package company-flx
+    :ensure t
+    :after (company)
+    :config
+    (company-flx-mode +9))
+
 (use-package format-all
     :ensure t)
 
@@ -779,8 +785,8 @@ Action of `avy', see `avy-action-yank' for example"
            ("/"         . 'embrace-commander)
            ("SPC SPC /" . 'xah-goto-matching-bracket))
     :config ;nofmt
-    (add-hook 'latex-mode-hook 'embrace-LaTeX-mode-hook)
-    (add-hook 'latex-mode-hook 'my-embrace-LaTeX-mode-hook)
+    (add-hook 'LaTeX-mode-hook 'embrace-LaTeX-mode-hook)
+    (add-hook 'LaTeX-mode-hook 'my-embrace-LaTeX-mode-hook)
     (add-hook 'emacs-lisp-mode-hook 'embrace-emacs-lisp-mode-hook)
     (add-hook 'org-mode-hook 'embrace-org-mode-hook))
 
@@ -870,7 +876,8 @@ Action of `avy', see `avy-action-yank' for example"
 
 (defun my-embrace-with-latex-env ()
   "Return pair from the left and right pair for the LaTeX command \\left."
-  (let ((env (read-string "Name of the environment, please: ")))
+  (let ((env (read-string "Name of the environment, please: "
+                          (latex-complete-envnames))))
     (cons (s-concat "\\begin{" env "}")
           (s-concat "\\end{" env "}"))))
 
@@ -1682,9 +1689,13 @@ See `just-line-is-whitespaces-p'"
 (my-autoformat-mode t)
 
 (use-package tex-mode
-    :defer t
     :major-mode-map latex (LaTeX-mode)
-    :mode ("\\.\\(tex\\|cls\\)$" . LaTeX-mode))
+    :config
+    (setq auto-mode-alist
+          (--remove (eq (cdr it) 'latex-mode)
+                    auto-mode-alist))
+    (add-to-list 'auto-mode-alist
+                 '("\\.\\(tex\\|cls\\)$" . LaTeX-mode)))
 
 (use-package latex
     :ensure auctex
@@ -1753,6 +1764,11 @@ See `just-line-is-whitespaces-p'"
     :bind
     ((:map my-latex-local-map)
      ("v" . 'my-latex-preview-in-other-window)))
+
+(use-package magic-latex-buffer
+    :ensure t
+    :hook (LaTeX-mode . magic-latex-buffer)
+    :custom ((magic-latex-enable-block-highlight nil)))
 
 (defvar my-latex-insert-at-start-arg-type 'optional
   "Type of argument (optional or required) which will be inserted at start.")
@@ -1855,13 +1871,17 @@ This version of `my-latex-insert-command', so see `my-latex-insert-command'"
   "Insert the LaTeX environment named NAME with ARGS.
 
 See `my-latex-insert-command' for understand of use ARGS"
-  (my-latex-insert-single-line-command "begin" name)
-  (my-latex--insert-args args)
-  (newline)
-  (insert "  ")
-  (save-excursion
+  (let ((beg (point))
+        end)
+    (my-latex-insert-single-line-command "begin" name)
+    (my-latex--insert-args args)
     (newline)
-    (my-latex-insert-command "end" name)))
+    (insert "  ")
+    (save-excursion
+      (newline)
+      (my-latex-insert-command "end" name)
+      (setq end (point)))
+    (run-hook-with-args LaTeX-after-insert-env-hook name beg end)))
 
 (add-hook 'latex-mode-hook 'my-latex-activate-expansion)
 
@@ -2145,6 +2165,15 @@ Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
   (interactive "sDate of the document, please: ")
   (my-latex-insert-single-line-command "date" date))
 
+(my-latex-expand-define "s" my-latex-insert-section
+    (name &optional toc-name)
+  "Insert the LaTeX command section with NAME and name for the TOC NAME-TOC."
+  (interactive (list
+                (read-string "Name of the new section: ")
+                (read-string "Name for the TOC of the section: ")))
+  (run-hooks LaTeX-section-hook)
+  (my-latex-insert-single-line-command "section" name :optional toc-name))
+
 (defun my-latex-use-package (package &optional options)
   "Add \\usepackage for PACKAGE with OPTIONS to the current LaTeX buffer."
   (interactive
@@ -2155,7 +2184,8 @@ Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
       (my-latex-goto-use-package-source)
       (beginning-of-line)
       (my-latex-insert-command "usepackage" package :optional options)
-      (newline))))
+      (newline)
+      (run-hooks LaTeX-after-usepackage-hook))))
 
 (defun my-latex-goto-use-package-source ()
   "Go to the place of the LaTeX source code where shoud be inserted usepackage."
@@ -2357,10 +2387,33 @@ Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
 
 (add-hook 'LaTeX-mode-hook 'outline-minor-mode)
 
+(use-package latex-extra
+    :ensure t
+    :hook ((LaTeX-mode . latex-extra-mode)
+           (LaTeX-mode . auto-fill-mode))
+    :bind ((:map my-latex-local-map)
+           ("e" . 'latex/compile-commands-until-done)
+           ("l" . 'latex/next-section-same-level)
+           ("j" . 'latex/previous-section-same-level)))
+
 (use-package latex
     :major-mode-map (TeX-mode LaTeX-mode tex-mode latex-mode)
     :bind ((:map LaTeX-mode-map)
-           (";" . cdlatex-dollar)))
+           (";" . cdlatex-dollar)
+           (:map my-latex-local-map)
+           ;; Mark anything
+           ("1" . 'latex-split-block)
+           ("6" . 'my-latex-mark-inside-environment-or-math)
+
+           ;; Keymaps for the Run defined in the LaTeX Extra Features section
+           ))
+
+(defun my-latex-mark-inside-environment-or-math ()
+  "If the cursor place inside of the math environment mark that."
+  (interactive)
+  (if (texmathp)
+      (er/mark-LaTeX-math)
+    (er/mark-LaTeX-inside-environment)))
 
 (use-package company-math
     :ensure t
@@ -3610,8 +3663,7 @@ List of racket expressions in which this function should work:
 
 (defcustom my-aggresive-fill-paragraph-modes
   '(org-mode
-    markdown-mode
-    LaTeX-mode)
+    markdown-mode)
   "List of major modes in which `aggressive-fill-paragraph' should work."
   :type '(repeat symbol))
 

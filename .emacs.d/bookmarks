@@ -4,7 +4,7 @@
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
 (("org-capture-last-stored"
  (filename . "~/agenda.org")
- (front-context-string . "*** TODO View li")
- (rear-context-string . " y/ for =dired=\n")
- (position . 2448))
+ (front-context-string . "*** TODO =paxedi")
+ (rear-context-string . "s Lisp programs\n")
+ (position . 2374))
 )

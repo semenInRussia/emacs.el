@@ -58,6 +58,7 @@ I'm use followed repositories as a template for my Emacs config:
   - [[#highlight-errors-and-warnings-maybe-other-things-also][Highlight Errors and Warnings (maybe other things also)]]
   - [[#autocomplete][Autocomplete]]
     - [[#more-pretty-auto-complete][More Pretty Auto Complete]]
+    - [[#fuzzy-matching-for-the-auto-complete][Fuzzy Matching for the =auto-complete=]]
   - [[#format-all-code][Format All Code]]
     - [[#i-am-russian][I am Russian!]]
   - [[#functions-for-define-keys][Functions for Define Keys]]
@@ -112,6 +113,7 @@ I'm use followed repositories as a template for my Emacs config:
       - [[#variables-for-latex][Variables for LaTeX]]
       - [[#visual-fill-for-latex][Visual Fill for LaTeX]]
       - [[#latex-outline][LaTeX Outline]]
+      - [[#latex-extra-features][LaTeX Extra Features]]
       - [[#keymaps-for-latex][Keymaps for LaTeX]]
       - [[#auto-complete-for-latex][Auto Complete for LaTeX]]
       - [[#auto-activating-snippets-for-latex][Auto Activating Snippets for LaTeX]]
@@ -939,7 +941,7 @@ I am use [[http://company-mode.github.io][company-mode]], I am set delay beetwee
       (add-to-list 'company-backends 'company-keywords)
       (global-company-mode 1))
 
-      #+END_SRC
+#+END_SRC
 
 And for =yasnippet= I am use code from [[https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names][this]] stackexchange:
 
@@ -971,6 +973,22 @@ I am use popular [[https://github.com/sebastiencs/company-box][company-box]]:
       :hook (company-mode . company-box-mode))
 
       #+END_SRC
+
+*** Fuzzy Matching for the =auto-complete=
+
+I am use [[https://github.com/PythonNut/company-flx][company-flx]] for the enabling of the fuzzy matching in the
+=company-mode=
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package company-flx
+      :ensure t
+      :after (company)
+      :config
+      (company-flx-mode +9))
+
+
+#+END_SRC
 
 ** Format All Code
 
@@ -1537,8 +1555,8 @@ I am use [[https://github.com/cute-jumper/embrace.el][embrace]].
              ("/"         . 'embrace-commander)
              ("SPC SPC /" . 'xah-goto-matching-bracket))
       :config ;nofmt
-      (add-hook 'latex-mode-hook 'embrace-LaTeX-mode-hook)
-      (add-hook 'latex-mode-hook 'my-embrace-LaTeX-mode-hook)
+      (add-hook 'LaTeX-mode-hook 'embrace-LaTeX-mode-hook)
+      (add-hook 'LaTeX-mode-hook 'my-embrace-LaTeX-mode-hook)
       (add-hook 'emacs-lisp-mode-hook 'embrace-emacs-lisp-mode-hook)
       (add-hook 'org-mode-hook 'embrace-org-mode-hook))
 
@@ -1628,7 +1646,8 @@ I am use [[https://github.com/cute-jumper/embrace.el][embrace]].
 
   (defun my-embrace-with-latex-env ()
     "Return pair from the left and right pair for the LaTeX command \\left."
-    (let ((env (read-string "Name of the environment, please: ")))
+    (let ((env (read-string "Name of the environment, please: "
+                            (latex-complete-envnames))))
       (cons (s-concat "\\begin{" env "}")
             (s-concat "\\end{" env "}"))))
 
@@ -2668,9 +2687,14 @@ Main skeleton of my LaTeX configuration is package =tex-mode= with
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (use-package tex-mode
-      :defer t
       :major-mode-map latex (LaTeX-mode)
-      :mode ("\\.\\(tex\\|cls\\)$" . LaTeX-mode))
+      :config
+      (setq auto-mode-alist
+            (--remove (eq (cdr it) 'latex-mode)
+                      auto-mode-alist))
+      (add-to-list 'auto-mode-alist
+                   '("\\.\\(tex\\|cls\\)$" . LaTeX-mode)))
+
 #+END_SRC
 
 **** LaTeX + calc
@@ -2770,6 +2794,17 @@ install external programm via =npm=
 
 #+END_SRC
 
+Preview of the =LaTeX= fragments sush as WYSIWYG-editors.  I am use
+[[https://github.com/zk-phi/magic-latex-buffer][magic-latex-buffer]] for that target.
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package magic-latex-buffer
+      :ensure t
+      :hook (LaTeX-mode . magic-latex-buffer)
+      :custom ((magic-latex-enable-block-highlight nil)))
+
+#+END_SRC
 **** Insertion of commands of LaTeX from the Source Code
 
 ***** LaTeX core
@@ -2877,13 +2912,17 @@ install external programm via =npm=
     "Insert the LaTeX environment named NAME with ARGS.
 
   See `my-latex-insert-command' for understand of use ARGS"
-    (my-latex-insert-single-line-command "begin" name)
-    (my-latex--insert-args args)
-    (newline)
-    (insert "  ")
-    (save-excursion
+    (let ((beg (point))
+          end)
+      (my-latex-insert-single-line-command "begin" name)
+      (my-latex--insert-args args)
       (newline)
-      (my-latex-insert-command "end" name)))
+      (insert "  ")
+      (save-excursion
+        (newline)
+        (my-latex-insert-command "end" name)
+        (setq end (point)))
+      (run-hook-with-args LaTeX-after-insert-env-hook name beg end)))
 
   (add-hook 'latex-mode-hook 'my-latex-activate-expansion)
 
@@ -3182,6 +3221,15 @@ install external programm via =npm=
     (interactive "sDate of the document, please: ")
     (my-latex-insert-single-line-command "date" date))
 
+  (my-latex-expand-define "s" my-latex-insert-section
+      (name &optional toc-name)
+    "Insert the LaTeX command section with NAME and name for the TOC NAME-TOC."
+    (interactive (list
+                  (read-string "Name of the new section: ")
+                  (read-string "Name for the TOC of the section: ")))
+    (run-hooks LaTeX-section-hook)
+    (my-latex-insert-single-line-command "section" name :optional toc-name))
+
 #+END_SRC
 
 #+RESULTS:
@@ -3201,7 +3249,8 @@ install external programm via =npm=
         (my-latex-goto-use-package-source)
         (beginning-of-line)
         (my-latex-insert-command "usepackage" package :optional options)
-        (newline))))
+        (newline)
+        (run-hooks LaTeX-after-usepackage-hook))))
 
   (defun my-latex-goto-use-package-source ()
     "Go to the place of the LaTeX source code where shoud be inserted usepackage."
@@ -3455,6 +3504,24 @@ In =LaTeX= I use built-in =outline= (section of my confing about
 
   #+END_SRC
 
+**** LaTeX Extra Features
+
+I am use [[https://github.com/Malabarba/latex-extra][latex-extra]].  From that package I'm use the
+following features:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package latex-extra
+      :ensure t
+      :hook ((LaTeX-mode . latex-extra-mode)
+             (LaTeX-mode . auto-fill-mode))
+      :bind ((:map my-latex-local-map)
+             ("e" . 'latex/compile-commands-until-done)
+             ("l" . 'latex/next-section-same-level)
+             ("j" . 'latex/previous-section-same-level)))
+
+#+END_SRC
+
 **** Keymaps for LaTeX
 
 I am russian, and on my native keyboard =;= is =$=:
@@ -3464,8 +3531,21 @@ I am russian, and on my native keyboard =;= is =$=:
   (use-package latex
       :major-mode-map (TeX-mode LaTeX-mode tex-mode latex-mode)
       :bind ((:map LaTeX-mode-map)
-             (";" . cdlatex-dollar)))
+             (";" . cdlatex-dollar)
+             (:map my-latex-local-map)
+             ;; Mark anything
+             ("1" . 'latex-split-block)
+             ("6" . 'my-latex-mark-inside-environment-or-math)
 
+             ;; Keymaps for the Run defined in the LaTeX Extra Features section
+             ))
+
+  (defun my-latex-mark-inside-environment-or-math ()
+    "If the cursor place inside of the math environment mark that."
+    (interactive)
+    (if (texmathp)
+        (er/mark-LaTeX-math)
+      (er/mark-LaTeX-inside-environment)))
              #+END_SRC
 
 **** Auto Complete for LaTeX
@@ -5511,8 +5591,7 @@ modes in which =aggressive-fill-paragraph-mode= should be enabled
 
   (defcustom my-aggresive-fill-paragraph-modes
     '(org-mode
-      markdown-mode
-      LaTeX-mode)
+      markdown-mode)
     "List of major modes in which `aggressive-fill-paragraph' should work."
     :type '(repeat symbol))
 

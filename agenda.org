@@ -75,8 +75,11 @@ Also use some themes for exporting to the =html=
 *** TODO When "I am use" after insert description last uri
 *** TODO Fix =my-copy-buffer-content-as-mipt-solution=
 *** TODO /SPC y/ for =dired=
+*** TODO /SPC y/ for =paxedit=
 *** TODO View list of possible LaTeX expansion
 *** TODO Fix coding
+*** TODO Find /jwiegley/ way to refactor Emacs Lisp programs
+*** TODO =paxedit-mode= for =racket-mode=
 ** Targets on Day
 
 *** DONE In =just-doc= change view of non-taked arguments functions
