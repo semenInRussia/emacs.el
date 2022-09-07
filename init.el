@@ -376,12 +376,6 @@ string and TEMPLATE is a `yas--template' structure."
     :ensure t
     :hook (company-mode . company-box-mode))
 
-(use-package company-flx
-    :ensure t
-    :after (company)
-    :config
-    (company-flx-mode +9))
-
 (use-package format-all
     :ensure t)
 
@@ -1182,6 +1176,79 @@ Is used in `my-drag-stuff-down'.")
 (add-left-dragger 'my-drag-org-left)
 (add-down-dragger 'my-drag-org-down)
 (add-up-dragger 'my-drag-org-up)
+
+(defun my-latex-drag-right-list-item ()
+  "Drag the list item at the point to the right LaTeX list item."
+  (interactive)
+  (my-latex-mark-list-item)
+  (let ((1-list-item (just-text-in-region)))
+    (delete-region (region-beginning) (region-end))
+    (my-latex-end-of-list-item)
+    (insert 1-list-item)
+    (my-latex-goto-backward-list-item)))
+
+(defun my-latex-drag-left-list-item ()
+  "Drag the list item at the point to the left LaTeX list item."
+  (interactive)
+  (my-latex-mark-list-item)
+  (let ((1-list-item (just-text-in-region)))
+    (delete-region (region-beginning) (region-end))
+    (my-latex-goto-backward-list-item)
+    (insert 1-list-item)
+    (my-latex-goto-backward-list-item)))
+
+(defun my-latex-mark-list-item ()
+  "Mark as region from the start of the current list item to end of that."
+  (interactive)
+  (my-latex-beginning-of-list-item)
+  (push-mark nil nil t)
+  (my-latex-end-of-list-item))
+
+(defun my-latex-beginning-of-list-item ()
+  "Go to the beginning of an LaTeX list item."
+  (interactive)
+  (end-of-line)
+  (just-search-backward-one-of-regexp
+   '("\\\\item"                         ;nofmt
+     "\\\\begin *{\\(enumerate\\|itemize\\)}")))
+
+(defun my-latex-end-of-list-item ()
+  "Go to the end of an LaTeX list item."
+  (interactive)
+  (end-of-line)
+  (just-search-forward-one-of-regexp
+   '("\\\\item"                         ;nofmt
+     "\\\\end *{\\(itemize\\|enumerate\\)}"))
+  (beginning-of-line))
+
+(defun my-latex-goto-backward-list-item ()
+  "Go to the beginning of the backward list item."
+  (beginning-of-line)
+  (search-backward my-latex-list-item-string))
+
+(defun my-latex-list-item-drag-p ()
+  "Return t, when dragger for LaTeX list items should work."
+  (interactive)
+  (and (eq major-mode 'latex-mode) (my-latex-list-item-line-p)))
+
+(defun my-latex-list-item-line-p ()
+  "Return t, when current line is a LaTeX list item."
+  (just-line-prefix-p "\\item" nil t))
+
+(defun my-latex-try-drag-right-list-item ()
+  "If the dragger for LaTeX list item should be work, drag that to right."
+  (interactive)
+  (when (my-latex-list-item-drag-p)
+    (my-latex-drag-right-list-item)
+    t))
+
+(defun my-latex-try-drag-left-list-item ()
+  "If the dragger for LaTeX list item should be work, drag that to left."
+  (interactive)
+  (when (my-latex-list-item-drag-p) (my-latex-drag-left-list-item) t))
+
+(add-up-dragger 'my-latex-try-drag-left-list-item)
+(add-down-dragger 'my-latex-try-drag-right-list-item)
 
 (defun delete-and-edit-current-line ()
   "Delete current line and instroduce to insert mode."
@@ -3177,6 +3244,7 @@ Only when in class defnition."
 
 (defun my-paxedit-change ()
   "Kill an Lisp expression at the cursor and activate insert mode."
+  (interactive)
   (paxedit-delete)
   (xah-fly-insert-mode-activate))
 

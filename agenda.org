@@ -80,6 +80,10 @@ Also use some themes for exporting to the =html=
 *** TODO Fix coding
 *** TODO Find /jwiegley/ way to refactor Emacs Lisp programs
 *** TODO =paxedit-mode= for =racket-mode=
+*** TODO More useful way to run =run-command-recipes= recipes
+
+See on the compile command from the =latex-extra=
+*** TODO Keybinding =SPC l z= for =peaxedit=
 ** Targets on Day
 
 *** DONE In =just-doc= change view of non-taked arguments functions
@@ -91,7 +95,7 @@ SCHEDULED: <2022-09-05 Пн>
 *** DONE fix count of words/chars in the =mode-line=
 SCHEDULED: <2022-09-05 Пн>
 
-*** TODO Do =zms=
+*** DONE Do =zms=
 DEADLINE: <2022-09-10 Сб> SCHEDULED: <2022-08-16 Вт>
 
 * Films 
