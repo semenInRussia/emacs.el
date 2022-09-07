@@ -779,101 +779,8 @@ Action of `avy', see `avy-action-yank' for example"
            ("/"         . 'embrace-commander)
            ("SPC SPC /" . 'xah-goto-matching-bracket))
     :config ;nofmt
-    (add-hook 'LaTeX-mode-hook 'embrace-LaTeX-mode-hook)
-    (add-hook 'LaTeX-mode-hook 'my-embrace-LaTeX-mode-hook)
     (add-hook 'emacs-lisp-mode-hook 'embrace-emacs-lisp-mode-hook)
     (add-hook 'org-mode-hook 'embrace-org-mode-hook))
-
-(defun my-embrace-LaTeX-mode-hook ()
-  "My additional `embrace-LaTeX-mode-hook'."
-  (interactive)
-  (setq-local embrace-show-help-p nil)
-  (--each cdlatex-math-modify-alist-default
-    (my-embrace-add-paren-of-cdlatex-math it))
-  (my-embrace-add-paren-latex-command ?a "answer")
-  (embrace-add-pair-regexp
-   ?\\
-   (rx "\\" (1+ wordchar) (* space) (? "[" (*? any) "]" (1+ space)) "{")
-   "}"
-   'my-embrace-with-latex-command
-   (embrace-build-help "\\name{" "}"))
-  (embrace-add-pair-regexp
-   ?d
-   "\\\\left."
-   "\\\\right."
-   'my-embrace-with-latex-left-right
-   (embrace-build-help "\\name{" "}"))
-  (embrace-add-pair-regexp
-   ?e
-   "\\\\begin{\\(.*?\\)}\\(\\[.*?\\]\\)*"
-   "\\\\end{\\(.*?\\)}"
-   'my-embrace-with-latex-env
-   (embrace-build-help "\\begin{name}" "\\end{name}")
-   t))
-
-(defun my-embrace-add-paren-of-cdlatex-math (element)
-  "Add an ELEMENT of the `cdlatex-math-modify-alist' to the `embrace' parens."
-  (let* ((key (-first-item element))
-         (cmd (and (-third-item element)
-                   (s-chop-prefix "\\" (-third-item element))))
-         (type (-fourth-item element)))
-    (when cmd
-      (if type
-          (my-embrace-add-paren-latex-command key cmd)
-        (my-embrace-add-paren-latex-style-command key cmd)))))
-
-(defun my-embrace-add-paren-latex-command (key name)
-  "Add paren at KEY for the LaTeX command with NAME in `embrace'."
-  (embrace-add-pair-regexp
-   key
-   (my-latex-command-left-paren-regexp name)
-   "}"
-   (-const (cons (my-latex-command-left-paren name) "}"))
-   (embrace-build-help (my-latex-command-left-paren name) "}")))
-
-(defun my-latex-command-left-paren (name)
-  "Return paren right of the LaTeX command named NAME."
-  (s-concat "\\" name "{"))
-
-(defun my-latex-command-left-paren-regexp (name)
-  (rx "\\"
-      (literal name)
-      (* space)
-      (? "[" (*? any) "]" (* space))
-      "{"))
-
-(defun my-embrace-add-paren-latex-style-command (key name)
-  "Add paren at KEY for the style LaTeX command with NAME in `embrace'."
-  (embrace-add-pair-regexp
-   key
-   (my-latex-style-command-left-paren-regexp name)
-   "}"
-   (-const (cons (my-latex-style-command-left-paren name) "}"))
-   (embrace-build-help (my-latex-style-command-left-paren name) "}")))
-
-(defun my-latex-style-command-left-paren (name)
-  "Return paren right of the LaTeX command named NAME."
-  (s-concat "{\\" name " "))
-
-(defun my-latex-style-command-left-paren-regexp (name)
-  (rx "{" (* space) "\\" (literal name) (* space)))
-
-(defun my-embrace-with-latex-command ()
-  "Return pair from the left and right pair for a LaTeX command."
-  (let ((name (read-string "Name of a LaTeX command, please: ")))
-    (cons (s-concat "\\" name "{") "}")))
-
-(defun my-embrace-with-latex-left-right ()
-  "Return pair from the left and right pair for the LaTeX command \\left."
-  (cons (s-concat "\\left" (read-char "Left paren, please: "))
-        (s-concat "\\right" (read-char "Right paren, please: "))))
-
-(defun my-embrace-with-latex-env ()
-  "Return pair from the left and right pair for the LaTeX command \\left."
-  (let ((env (read-string "Name of the environment, please: "
-                          (latex-complete-envnames))))
-    (cons (s-concat "\\begin{" env "}")
-          (s-concat "\\end{" env "}"))))
 
 (defun mark-inner-or-expand-region ()
   "If text is selected, expand region, otherwise then mark inner of brackets."
@@ -2067,6 +1974,41 @@ downloaded file"
    (s-split "?")
    (-first-item)))
 
+(defun my-latex-use-package (package &optional options)
+  "Add \\usepackage for PACKAGE with OPTIONS to the current LaTeX buffer."
+  (interactive
+   (list
+    (my-read-string-or-nil "Please, choose package which you need use: ")))
+  (unless (my-latex-used-package-p package)
+    (save-excursion
+      (my-latex-goto-use-package-source)
+      (beginning-of-line)
+      (my-latex-insert-command "usepackage" package :optional options)
+      (newline)
+      (run-hooks LaTeX-after-usepackage-hook))))
+
+(defun my-latex-goto-use-package-source ()
+  "Go to the place of the LaTeX source code where shoud be inserted usepackage."
+  (interactive)
+  (goto-char (point-min))
+  (unless (search-forward-regexp "^\\\\usepackage" nil t)
+    (search-forward-regexp "^\\\\begin{document}" nil t))
+  (beginning-of-line))
+
+(defun my-latex-used-package-p (package)
+  "Return t, when PACKAGE was used in current LaTeX buffer."
+  (-contains-p (my-latex-used-packages) package))
+
+(defun my-latex-used-packages ()
+  "Parse from current LaTeX buffer, list of used packages."
+  (->>
+   (buffer-string)
+   (s-lines)
+   (--filter (s-prefix-p "\\usepackage" it))
+   (--map
+    (-last-item
+     (s-match "\\\\usepackage\\(\\[.*\\]\\)?{\\(.*\\)}" it)))))
+
 (my-latex-expand-define "t" my-latex-insert-table ;nofmt
     (preamble &optional centering-p)
   "Insert the LaTeX environment table to the current buffer with PREAMBLE."
@@ -2241,41 +2183,6 @@ Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
   (run-hooks LaTeX-section-hook)
   (my-latex-insert-single-line-command "section" name :optional toc-name))
 
-(defun my-latex-use-package (package &optional options)
-  "Add \\usepackage for PACKAGE with OPTIONS to the current LaTeX buffer."
-  (interactive
-   (list
-    (my-read-string-or-nil "Please, choose package which you need use: ")))
-  (unless (my-latex-used-package-p package)
-    (save-excursion
-      (my-latex-goto-use-package-source)
-      (beginning-of-line)
-      (my-latex-insert-command "usepackage" package :optional options)
-      (newline)
-      (run-hooks LaTeX-after-usepackage-hook))))
-
-(defun my-latex-goto-use-package-source ()
-  "Go to the place of the LaTeX source code where shoud be inserted usepackage."
-  (interactive)
-  (goto-char (point-min))
-  (unless (search-forward-regexp "^\\\\usepackage" nil t)
-    (search-forward-regexp "^\\\\begin{document}" nil t))
-  (beginning-of-line))
-
-(defun my-latex-used-package-p (package)
-  "Return t, when PACKAGE was used in current LaTeX buffer."
-  (-contains-p (my-latex-used-packages) package))
-
-(defun my-latex-used-packages ()
-  "Parse from current LaTeX buffer, list of used packages."
-  (->>
-   (buffer-string)
-   (s-lines)
-   (--filter (s-prefix-p "\\usepackage" it))
-   (--map
-    (-last-item
-     (s-match "\\\\usepackage\\(\\[.*\\]\\)?{\\(.*\\)}" it)))))
-
 (use-package cdlatex
     :ensure t
     :hook (LaTeX-mode . turn-on-cdlatex)
@@ -2326,154 +2233,11 @@ Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
           (cdlatex-tab)
         (yas-next-field-or-maybe-expand))))
 
-(use-package tex-mode
-    :after cdlatex
-    :bind
-    ((:map cdlatex-mode-map)
-     ("(" . self-insert-command)
-     (")" . self-insert-command)
-     ("{" . self-insert-command)
-     ("}" . self-insert-command)
-     ("[" . self-insert-command)
-     ("]" . self-insert-command)
-     ("\\" . self-insert-command)))
-
-(defun my-latex-dollar ()
-  "Insert dollars and toggle input method to russian."
-  (interactive)
-  (when current-input-method (toggle-input-method))
-  (if (use-region-p)
-      (sp-wrap-with-pair "$")
-    (insert "$$")
-    (forward-char -1)))
-
-(use-package cdlatex
-    :ensure t
-    :bind
-    (:map cdlatex-mode-map)
-    (";" . my-latex-dollar)
-    ("$" . my-latex-dollar))
-
-;; Array/tabular input with org-tables and cdlatex
-(use-package org-table
-    :after cdlatex
-    :bind (:map orgtbl-mode-map
-                ("<tab>" . lazytab-org-table-next-field-maybe)
-                ("TAB" . lazytab-org-table-next-field-maybe))
-    :init (add-hook 'cdlatex-tab-hook 'lazytab-cdlatex-or-orgtbl-next-field 90)
-    ;; Tabular environments using cdlatex
-    (add-to-list 'cdlatex-command-alist
-                 '("smat" "Insert smallmatrix env"
-                   "\\left( \\begin{smallmatrix} ? \\end{smallmatrix} \\right)"
-                   lazytab-position-cursor-and-edit
-                   nil nil t))
-    (add-to-list 'cdlatex-command-alist
-                 '("bmat" "Insert bmatrix env"
-                   "\\begin{bmatrix} ? \\end{bmatrix}"
-                   lazytab-position-cursor-and-edit
-                   nil nil t))
-    (add-to-list 'cdlatex-command-alist
-                 '("pmat" "Insert pmatrix env"
-                   "\\begin{pmatrix} ? \\end{pmatrix}"
-                   lazytab-position-cursor-and-edit
-                   nil nil t))
-    (add-to-list 'cdlatex-command-alist
-                 '("tbl" "Insert table"
-                   "\\begin{table}\n\\centering ? \\caption{}\n\\end{table}\n"
-                   lazytab-position-cursor-and-edit
-                   nil t nil))
-    :config ;; Tab handling in org tables
-    (defun lazytab-position-cursor-and-edit ()
-      ;; (if (search-backward "\?" (- (point) 100) t)
-      ;;     (delete-char 1))
-      (cdlatex-position-cursor)
-      (lazytab-orgtbl-edit))
-
-    (defun lazytab-orgtbl-edit ()
-      (advice-add 'orgtbl-ctrl-c-ctrl-c :after #'lazytab-orgtbl-replace)
-      (orgtbl-mode 1)
-      (open-line 1)
-      (insert "\n|"))
-
-    (defun lazytab-orgtbl-replace (_)
-      (interactive "P")
-      (unless (org-at-table-p) (user-error "Not at a table"))
-      (let* ((table (org-table-to-lisp))
-             params
-             (replacement-table
-              (if (texmathp)
-                  (lazytab-orgtbl-to-amsmath table params)
-                (orgtbl-to-latex table params))))
-        (kill-region (org-table-begin) (org-table-end))
-        (open-line 1)
-        (push-mark)
-        (insert replacement-table)
-        (align-regexp
-         (region-beginning)
-         (region-end)
-         "\\([:space:]*\\)& ")
-        (orgtbl-mode -1)
-        (advice-remove 'orgtbl-ctrl-c-ctrl-c #'lazytab-orgtbl-replace)))
-
-    (defun lazytab-orgtbl-to-amsmath (table params)
-      (orgtbl-to-generic
-       table
-       (org-combine-plists
-        '(:splice t
-          :lstart ""
-          :lend " \\\\"
-          :sep " & "
-          :hline nil
-          :llend "")
-        params)))
-
-    (defun lazytab-cdlatex-or-orgtbl-next-field ()
-      (when (and
-             (bound-and-true-p orgtbl-mode)
-             (org-table-p)
-             (looking-at "[[:space:]]*\\(?:|\\|$\\)")
-             (let ((s (thing-at-point 'sexp)))
-               (not (and s (assoc s cdlatex-command-alist-comb)))))
-        (call-interactively #'org-table-next-field)
-        t))
-
-    (defun lazytab-org-table-next-field-maybe ()
-      (interactive)
-      (if (bound-and-true-p cdlatex-mode)
-          (cdlatex-tab)
-        (org-table-next-field))))
-
-(setq latex-documentclasses
-      '("article" "reoport" "book" "proc" "minimal" "slides" "memoir" "letter" "beamer"))
-
-(dolist (mode (list 'TeX-mode-hook
-                    'tex-mode-hook
-                    'latex-mode-hook
-                    'LaTeX-mode-hook))
-  (add-hook mode (lambda () (call-interactively 'visual-fill))))
-
-(add-hook 'LaTeX-mode-hook 'outline-minor-mode)
-
-(use-package latex-extra
-    :ensure t
-    :hook ((LaTeX-mode . latex-extra-mode)
-           (LaTeX-mode . auto-fill-mode))
-    :bind ((:map my-latex-local-map)
-           ("e" . 'latex/compile-commands-until-done)
-           ("l" . 'latex/next-section-same-level)
-           ("j" . 'latex/previous-section-same-level)))
-
 (use-package latex
     :major-mode-map (TeX-mode LaTeX-mode tex-mode latex-mode)
-    :bind ((:map LaTeX-mode-map)
-           (";" . cdlatex-dollar)
-           (:map my-latex-local-map)
-           ;; Mark anything
+    :bind ((:map my-latex-local-map)
            ("1" . 'latex-split-block)
-           ("6" . 'my-latex-mark-inside-environment-or-math)
-
-           ;; Keymaps for the Run defined in the LaTeX Extra Features section
-           ))
+           ("6" . 'my-latex-mark-inside-environment-or-math)))
 
 (defun my-latex-mark-inside-environment-or-math ()
   "If the cursor place inside of the math environment mark that."
@@ -2481,20 +2245,6 @@ Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
   (if (texmathp)
       (er/mark-LaTeX-math)
     (er/mark-LaTeX-inside-environment)))
-
-(use-package company-math
-    :ensure t
-    :init
-    (defun my-company-math-setup ()
-      "Setup for `company-math'."
-      (add-to-list 'company-backends 'company-math-symbols-latex)
-      (add-to-list 'company-backends 'company-latex-commands))
-    (add-hook 'LaTeX-mode 'my-company-math-setup))
-
-(use-package company-auctex
-    :ensure t
-    :config
-    (company-auctex-init))
 
 (use-package laas
     :ensure t
@@ -2516,6 +2266,159 @@ Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
       "trg" "\\triangle"
       "agl" "\\angle"
       "grd" "^\\circ"))
+
+(use-package embrace
+    :ensure t
+    :hook
+    ((LaTeX-mode . embrace-LaTeX-mode-hook)
+     (LaTeX-mode . my-embrace-LaTeX-mode-hook)))
+
+(defun my-embrace-LaTeX-mode-hook ()
+  "My additional `embrace-LaTeX-mode-hook'."
+  (interactive)
+  (setq-local embrace-show-help-p nil)
+  (--each cdlatex-math-modify-alist-default
+    (my-embrace-add-paren-of-cdlatex-math it))
+  (my-embrace-add-paren-latex-command ?a "answer")
+  (embrace-add-pair-regexp
+   ?\\
+   (rx "\\" (1+ wordchar) (* space) (? "[" (*? any) "]" (1+ space)) "{")
+   "}"
+   'my-embrace-with-latex-command
+   (embrace-build-help "\\name{" "}"))
+  (embrace-add-pair-regexp
+   ?d
+   "\\\\left."
+   "\\\\right."
+   'my-embrace-with-latex-left-right
+   (embrace-build-help "\\name{" "}"))
+  (embrace-add-pair-regexp
+   ?e
+   "\\\\begin{\\(.*?\\)}\\(\\[.*?\\]\\)*"
+   "\\\\end{\\(.*?\\)}"
+   'my-embrace-with-latex-env
+   (embrace-build-help "\\begin{name}" "\\end{name}")
+   t))
+
+(defun my-embrace-add-paren-of-cdlatex-math (element)
+  "Add an ELEMENT of the `cdlatex-math-modify-alist' to the `embrace' parens."
+  (let* ((key (-first-item element))
+         (cmd (and (-third-item element)
+                   (s-chop-prefix "\\" (-third-item element))))
+         (type (-fourth-item element)))
+    (when cmd
+      (if type
+          (my-embrace-add-paren-latex-command key cmd)
+        (my-embrace-add-paren-latex-style-command key cmd)))))
+
+(defun my-embrace-add-paren-latex-command (key name)
+  "Add paren at KEY for the LaTeX command with NAME in `embrace'."
+  (embrace-add-pair-regexp
+   key
+   (my-latex-command-left-paren-regexp name)
+   "}"
+   (-const (cons (my-latex-command-left-paren name) "}"))
+   (embrace-build-help (my-latex-command-left-paren name) "}")))
+
+(defun my-latex-command-left-paren (name)
+  "Return paren right of the LaTeX command named NAME."
+  (s-concat "\\" name "{"))
+
+(defun my-latex-command-left-paren-regexp (name)
+  (rx "\\"
+      (literal name)
+      (* space)
+      (? "[" (*? any) "]" (* space))
+      "{"))
+
+(defun my-embrace-add-paren-latex-style-command (key name)
+  "Add paren at KEY for the style LaTeX command with NAME in `embrace'."
+  (embrace-add-pair-regexp
+   key
+   (my-latex-style-command-left-paren-regexp name)
+   "}"
+   (-const (cons (my-latex-style-command-left-paren name) "}"))
+   (embrace-build-help (my-latex-style-command-left-paren name) "}")))
+
+(defun my-latex-style-command-left-paren (name)
+  "Return paren right of the LaTeX command named NAME."
+  (s-concat "{\\" name " "))
+
+(defun my-latex-style-command-left-paren-regexp (name)
+  (rx "{" (* space) "\\" (literal name) (* space)))
+
+(defun my-embrace-with-latex-command ()
+  "Return pair from the left and right pair for a LaTeX command."
+  (let ((name (read-string "Name of a LaTeX command, please: ")))
+    (cons (s-concat "\\" name "{") "}")))
+
+(defun my-embrace-with-latex-left-right ()
+  "Return pair from the left and right pair for the LaTeX command \\left."
+  (cons (s-concat "\\left" (read-char "Left paren, please: "))
+        (s-concat "\\right" (read-char "Right paren, please: "))))
+
+(defun my-embrace-with-latex-env ()
+  "Return pair from the left and right pair for the LaTeX command \\left."
+  (let ((env (read-string "Name of the environment, please: "
+                          (latex-complete-envnames))))
+    (cons (s-concat "\\begin{" env "}")
+          (s-concat "\\end{" env "}"))))
+
+(use-package tex-mode
+    :after cdlatex
+    :bind
+    ((:map cdlatex-mode-map)
+     ("(" . self-insert-command)
+     (")" . self-insert-command)
+     ("{" . self-insert-command)
+     ("}" . self-insert-command)
+     ("[" . self-insert-command)
+     ("]" . self-insert-command)
+     ("\\" . self-insert-command)))
+
+(defun my-latex-dollar ()
+  "Insert dollars and turn input method into English."
+  (interactive)
+                                        ; when current-input-method isn standard
+  (if (not current-input-method)
+                                        ; then
+      (insert ";")
+                                        ; else
+    (toggle-input-method)
+    (if (use-region-p)
+        (sp-wrap-with-pair "$")
+      (insert "$$")
+      (forward-char -1))))
+
+(use-package cdlatex
+    :ensure t
+    :bind
+    (:map cdlatex-mode-map)
+    (";" . my-latex-dollar))
+
+(use-package org-table
+    :hook (LaTeX-mode . 'orgtbl-mode))
+
+(my-latex-expand-define "ot" my-latex-insert-orgtbl-table
+    (name)
+  "Insert table with `orgtbl-mode'.
+
+It's insert two comments line and the LaTeX environment comment in which
+you will edit your table in the `org-mode' syntax.  After you should press
+C-c C-c and the source code will be replaced.
+
+Each table should has certain NAME, so inserted table will has name NAME"
+  (interactive "sName of the table, please: ")
+  (let* ((e (cl-assoc-if #'derived-mode-p orgtbl-radio-table-templates))
+         (txt (nth 1 e))
+         name pos)
+    (unless e (user-error "No radio table setup defined for %s" major-mode))
+    (while (string-match "%n" txt)
+      (setq txt (replace-match name t t txt)))
+    (or (bolp) (insert "\n"))
+    (setq pos (point))
+    (insert txt)
+    (goto-char pos)))
 
 (eval
  `(my-use-autoformat-in-mode
@@ -2760,6 +2663,49 @@ the `kill-ring', the selected region or the minibuffer"
  :map my-latex-local-map
  ("i" . my-latex-insert-image)
  ("u" . my-latex-insert-image-at-url))
+
+(use-package tex-mode
+    :ensure t
+    :bind ((:map my-latex-local-map)
+           ("x" . 'my-latex-kill-section)))
+
+(defun my-latex-kill-section ()
+  "Kill a LaTeX section."
+  (interactive)
+  (LaTeX-mark-section)
+  (kill-region (region-beginning) (region-end)))
+
+(setq latex-documentclasses
+      '("article" "reoport" "book" "proc" "minimal" "slides" "memoir" "letter" "beamer"))
+
+(dolist (mode (list 'TeX-mode-hook
+                    'tex-mode-hook
+                    'latex-mode-hook
+                    'LaTeX-mode-hook))
+  (add-hook mode (lambda () (call-interactively 'visual-fill))))
+
+(use-package latex-extra
+    :ensure t
+    :hook ((LaTeX-mode . latex-extra-mode)
+           (LaTeX-mode . auto-fill-mode))
+    :bind ((:map my-latex-local-map)
+           ("e" . 'latex/compile-commands-until-done)
+           ("l" . 'latex/next-section-same-level)
+           ("j" . 'latex/previous-section-same-level)))
+
+(use-package company-math
+    :ensure t
+    :init
+    (defun my-company-math-setup ()
+      "Setup for `company-math'."
+      (add-to-list 'company-backends 'company-math-symbols-latex)
+      (add-to-list 'company-backends 'company-latex-commands))
+    (add-hook 'LaTeX-mode 'my-company-math-setup))
+
+(use-package company-auctex
+    :ensure t
+    :config
+    (company-auctex-init))
 
 (use-package org
     :major-mode-map (org-mode)
@@ -3240,13 +3186,32 @@ Only when in class defnition."
            ("w" . 'my-paxedit-change)
            ("d" . 'paxedit-symbol-kill)
            ("q" . 'paxedit-compress)
-           ("k" . 'paxedit-delete-whitespace)))
+           ("k" . 'paxedit-delete-whitespace)
+           ("y" . 'my-paxedit-duplicate)))
 
 (defun my-paxedit-change ()
-  "Kill an Lisp expression at the cursor and activate insert mode."
+  "Kill the Lisp expression at the cursor and activate insert mode."
   (interactive)
   (paxedit-delete)
   (xah-fly-insert-mode-activate))
+
+(defun my-paxedit-duplicate ()
+  "Make copy of the Lisp expression at the cursor."
+  (interactive)
+  (let* ((reg (paxedit-sexp-region))
+         (beg (car reg))
+         (end (cdr reg))
+         (sexp (buffer-substring beg end))
+         (sep (if (my-lisp-sexp-whole-line-p) "\n" " ")))
+    (goto-char end)
+    (insert sep sexp)))
+
+(defun my-lisp-sexp-whole-line-p ()
+  "Return t, when the Lisp sexp at the point being at whole of line."
+  (interactive "P")
+  (and (= beg (save-excursion (beginning-of-line-text)
+                              (point)))
+       (= end (point-at-eol))))
 
 (use-package racket-mode
     :ensure t
@@ -4131,7 +4096,6 @@ See `format-time-string' for see what format string"
           time
           pomidor
           word-count
-          buffer
           selection-info)
       '(objed-state
         persp-name
@@ -4442,6 +4406,7 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
            ;; Manipulation with file(s)
            ("SPC g"   . 'my-dired-delete)
            ("SPC x"   . 'my-dired-delete-all-files)
+           ("SPC y"   . 'my-dired-duplicate)
            ("f"       . 'my-dired-rename)
            ("SPC TAB" . 'my-dired-move)
            ("s"       . 'my-dired-new-file)
@@ -4449,7 +4414,7 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
 
            ;; Mark files
            ("t"       . 'dired-mark)
-           ("SPC y"   . 'dired-unmark-all-marks)
+           ("SPC u"   . 'dired-unmark-all-marks)
            ("SPC a"   . 'my-dired-mark-all-files)
 
            ;; Misc.
@@ -4525,7 +4490,7 @@ Return new name of FILE"
 (defun my-dired-new-file (filename)
   "Create file with FILENAME in the directory which opened in the dired buffer."
   (interactive "sName of new file, please: ")
-  (find-file (f-join (dired-current-directory) filename)))
+  (f-touch (f-join (dired-current-directory) filename)))
 
 (defun my-dired-delete-all-files ()
   "Delete all files from the directory of the `dired' buffer."
@@ -4538,6 +4503,13 @@ Return new name of FILE"
   "Version of `avy' for the `dired'."
   (interactive)
   (avy-goto-line))
+
+(my-define-dired-command-taking-file my-dired-duplicate (filename)
+  "Make copy of the file with FILENAME in the same directory."
+  (f-touch
+   (f-join
+    (dired-current-directory)
+    (read-string "Name of the filename, please: " (f-filename filename)))))
 
 (use-package dired-filter
     :ensure t

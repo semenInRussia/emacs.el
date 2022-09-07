@@ -106,20 +106,20 @@ I'm use followed repositories as a template for my Emacs config:
     - [[#latex][LaTeX]]
       - [[#latex--calc][LaTeX + calc]]
       - [[#preview-latex][Preview Latex]]
-      - [[#insertion-of-commands-of-latex-from-the-source-code][Insertion of commands of LaTeX from the Source Code]]
-      - [[#fast-navigation-and-insertion-in-latex][Fast Navigation and Insertion in LaTeX]]
-      - [[#insert-pairs-in-latex][Insert Pairs in LaTeX]]
-      - [[#latex-tables][LaTeX Tables]]
-      - [[#variables-for-latex][Variables for LaTeX]]
-      - [[#visual-fill-for-latex][Visual Fill for LaTeX]]
-      - [[#latex-outline][LaTeX Outline]]
-      - [[#latex-extra-features][LaTeX Extra Features]]
-      - [[#keymaps-for-latex][Keymaps for LaTeX]]
-      - [[#auto-complete-for-latex][Auto Complete for LaTeX]]
+      - [[#insertion-of-the-latex-commands][Insertion of the LaTeX commands]]
+      - [[#insertion-of-the-math-symbols-and-smart-nabigation-in-latex][Insertion of the Math Symbols and Smart Nabigation in LaTeX]]
+      - [[#mark-region-in-the-latex][Mark region in the LaTeX]]
       - [[#auto-activating-snippets-for-latex][Auto Activating Snippets for LaTeX]]
+      - [[#pairs-in-latex][Pairs in LaTeX]]
+      - [[#latex-tables][LaTeX Tables]]
       - [[#auto-format-in-latex][Auto Format in LaTeX]]
       - [[#equation-environment-to-split-environment][Equation Environment to Split Environment]]
       - [[#insert-any-image-at-url-in-latex][Insert any image at URL in LaTeX]]
+      - [[#kill-sections][Kill sections]]
+      - [[#variables-for-latex][Variables for LaTeX]]
+      - [[#visual-fill-for-latex][Visual Fill for LaTeX]]
+      - [[#latex-extra-features][LaTeX Extra Features]]
+      - [[#auto-complete-for-latex][Auto Complete for LaTeX]]
     - [[#org][Org]]
       - [[#insert-images-in-the-org-mode][Insert Images in the Org Mode]]
       - [[#centering-org][Centering Org]]
@@ -1539,101 +1539,10 @@ I am use [[https://github.com/cute-jumper/embrace.el][embrace]].
              ("/"         . 'embrace-commander)
              ("SPC SPC /" . 'xah-goto-matching-bracket))
       :config ;nofmt
-      (add-hook 'LaTeX-mode-hook 'embrace-LaTeX-mode-hook)
-      (add-hook 'LaTeX-mode-hook 'my-embrace-LaTeX-mode-hook)
       (add-hook 'emacs-lisp-mode-hook 'embrace-emacs-lisp-mode-hook)
       (add-hook 'org-mode-hook 'embrace-org-mode-hook))
 
-  (defun my-embrace-LaTeX-mode-hook ()
-    "My additional `embrace-LaTeX-mode-hook'."
-    (interactive)
-    (setq-local embrace-show-help-p nil)
-    (--each cdlatex-math-modify-alist-default
-      (my-embrace-add-paren-of-cdlatex-math it))
-    (my-embrace-add-paren-latex-command ?a "answer")
-    (embrace-add-pair-regexp
-     ?\\
-     (rx "\\" (1+ wordchar) (* space) (? "[" (*? any) "]" (1+ space)) "{")
-     "}"
-     'my-embrace-with-latex-command
-     (embrace-build-help "\\name{" "}"))
-    (embrace-add-pair-regexp
-     ?d
-     "\\\\left."
-     "\\\\right."
-     'my-embrace-with-latex-left-right
-     (embrace-build-help "\\name{" "}"))
-    (embrace-add-pair-regexp
-     ?e
-     "\\\\begin{\\(.*?\\)}\\(\\[.*?\\]\\)*"
-     "\\\\end{\\(.*?\\)}"
-     'my-embrace-with-latex-env
-     (embrace-build-help "\\begin{name}" "\\end{name}")
-     t))
 
-  (defun my-embrace-add-paren-of-cdlatex-math (element)
-    "Add an ELEMENT of the `cdlatex-math-modify-alist' to the `embrace' parens."
-    (let* ((key (-first-item element))
-           (cmd (and (-third-item element)
-                     (s-chop-prefix "\\" (-third-item element))))
-           (type (-fourth-item element)))
-      (when cmd
-        (if type
-            (my-embrace-add-paren-latex-command key cmd)
-          (my-embrace-add-paren-latex-style-command key cmd)))))
-
-  (defun my-embrace-add-paren-latex-command (key name)
-    "Add paren at KEY for the LaTeX command with NAME in `embrace'."
-    (embrace-add-pair-regexp
-     key
-     (my-latex-command-left-paren-regexp name)
-     "}"
-     (-const (cons (my-latex-command-left-paren name) "}"))
-     (embrace-build-help (my-latex-command-left-paren name) "}")))
-
-  (defun my-latex-command-left-paren (name)
-    "Return paren right of the LaTeX command named NAME."
-    (s-concat "\\" name "{"))
-
-  (defun my-latex-command-left-paren-regexp (name)
-    (rx "\\"
-        (literal name)
-        (* space)
-        (? "[" (*? any) "]" (* space))
-        "{"))
-
-  (defun my-embrace-add-paren-latex-style-command (key name)
-    "Add paren at KEY for the style LaTeX command with NAME in `embrace'."
-    (embrace-add-pair-regexp
-     key
-     (my-latex-style-command-left-paren-regexp name)
-     "}"
-     (-const (cons (my-latex-style-command-left-paren name) "}"))
-     (embrace-build-help (my-latex-style-command-left-paren name) "}")))
-
-  (defun my-latex-style-command-left-paren (name)
-    "Return paren right of the LaTeX command named NAME."
-    (s-concat "{\\" name " "))
-
-  (defun my-latex-style-command-left-paren-regexp (name)
-    (rx "{" (* space) "\\" (literal name) (* space)))
-
-  (defun my-embrace-with-latex-command ()
-    "Return pair from the left and right pair for a LaTeX command."
-    (let ((name (read-string "Name of a LaTeX command, please: ")))
-      (cons (s-concat "\\" name "{") "}")))
-
-  (defun my-embrace-with-latex-left-right ()
-    "Return pair from the left and right pair for the LaTeX command \\left."
-    (cons (s-concat "\\left" (read-char "Left paren, please: "))
-          (s-concat "\\right" (read-char "Right paren, please: "))))
-
-  (defun my-embrace-with-latex-env ()
-    "Return pair from the left and right pair for the LaTeX command \\left."
-    (let ((env (read-string "Name of the environment, please: "
-                            (latex-complete-envnames))))
-      (cons (s-concat "\\begin{" env "}")
-            (s-concat "\\end{" env "}"))))
 
 #+END_SRC
 
@@ -2869,9 +2778,9 @@ Preview of the =LaTeX= fragments sush as WYSIWYG-editors.  I am use
       :custom ((magic-latex-enable-block-highlight nil)))
 
 #+END_SRC
-**** Insertion of commands of LaTeX from the Source Code
+**** Insertion of the LaTeX commands
 
-***** LaTeX core
+***** LaTeX Insertion Core
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
@@ -3014,7 +2923,7 @@ Preview of the =LaTeX= fragments sush as WYSIWYG-editors.  I am use
 
 #+END_SRC
 
-***** LaTeX Graphics
+***** LaTeX Insertion of the Graphics
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
@@ -3116,7 +3025,48 @@ Preview of the =LaTeX= fragments sush as WYSIWYG-editors.  I am use
 #+RESULTS:
 : my-uri-of-url
 
-***** A lot of LaTeX commands insertion defnitions
+***** LaTeX =\usepackage=
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (defun my-latex-use-package (package &optional options)
+    "Add \\usepackage for PACKAGE with OPTIONS to the current LaTeX buffer."
+    (interactive
+     (list
+      (my-read-string-or-nil "Please, choose package which you need use: ")))
+    (unless (my-latex-used-package-p package)
+      (save-excursion
+        (my-latex-goto-use-package-source)
+        (beginning-of-line)
+        (my-latex-insert-command "usepackage" package :optional options)
+        (newline)
+        (run-hooks LaTeX-after-usepackage-hook))))
+
+  (defun my-latex-goto-use-package-source ()
+    "Go to the place of the LaTeX source code where shoud be inserted usepackage."
+    (interactive)
+    (goto-char (point-min))
+    (unless (search-forward-regexp "^\\\\usepackage" nil t)
+      (search-forward-regexp "^\\\\begin{document}" nil t))
+    (beginning-of-line))
+
+  (defun my-latex-used-package-p (package)
+    "Return t, when PACKAGE was used in current LaTeX buffer."
+    (-contains-p (my-latex-used-packages) package))
+
+  (defun my-latex-used-packages ()
+    "Parse from current LaTeX buffer, list of used packages."
+    (->>
+     (buffer-string)
+     (s-lines)
+     (--filter (s-prefix-p "\\usepackage" it))
+     (--map
+      (-last-item
+       (s-match "\\\\usepackage\\(\\[.*\\]\\)?{\\(.*\\)}" it)))))
+
+#+END_SRC
+
+***** A lot of LaTeX insertion defnitions
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
@@ -3299,48 +3249,7 @@ Preview of the =LaTeX= fragments sush as WYSIWYG-editors.  I am use
 #+RESULTS:
 | keymap | (100 keymap (116 keymap (46 . #[0 \303\300\301\302#\207 [dt. my-latex-insert-date nil aas-expand-snippet-maybe] 4]))) | (115 keymap (116 keymap (99 keymap (46 . #[0 \303\300\301\302#\207 [stc. my-latex-insert-stepcounter nil aas-expand-snippet-maybe] 4]))) (99 keymap (46 . #[0 \303\300\301\302#\207 [sc. my-latex-insert-setcounter nil aas-expand-snippet-maybe] 4]))) | (110 keymap (99 keymap (114 keymap (46 . #[0 \303\300\301\302#\207 [ncr. my-latex-insert-newcounter nil aas-expand-snippet-maybe] 4])))) | (114 keymap (111 keymap (109 keymap (46 . #[0 \303\300\301\302#\207 [rom. my-latex-insert-roman nil aas-expand-snippet-maybe] 4])))) | (97 keymap (117 keymap (46 . #[0 \303\300\301\302#\207 [au. my-latex-insert-author nil aas-expand-snippet-maybe] 4])) (116 keymap (99 keymap (46 . #[0 \303\300\301\302#\207 [atc. my-latex-insert-addtocounter nil aas-expand-snippet-maybe] 4]))) (108 keymap (46 . #[0 \303\300\301\302#\207 [al. my-latex-insert-alph nil aas-expand-snippet-maybe] 4])) (114 keymap (46 . #[0 \303\300\301\302#\207 [ar. my-latex-insert-arabic nil aas-expand-snippet-maybe] 4]))) | (116 keymap (46 . #[0 \303\300\301\302#\207 [t. my-latex-insert-table nil aas-expand-snippet-maybe] 4]) (116 keymap (108 keymap (46 . #[0 \303\300\301\302#\207 [ttl. my-latex-insert-title nil aas-expand-snippet-maybe] 4]))) (114 keymap (46 . #[0 \303\300\301\302#\207 [tr. my-latex-insert-tabular nil aas-expand-snippet-maybe] 4]))) | (99 keymap (114 keymap (46 . #[0 \303\300\301\302#\207 [cr. my-latex-insert-center nil aas-expand-snippet-maybe] 4])) (112 keymap (46 . #[0 \303\300\301\302#\207 [cp. my-latex-insert-caption nil aas-expand-snippet-maybe] 4]))) | (102 keymap (46 . #[0 \303\300\301\302#\207 [f. my-latex-insert-figure nil aas-expand-snippet-maybe] 4])) |
 
-***** LaTeX =\usepackage=
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  (defun my-latex-use-package (package &optional options)
-    "Add \\usepackage for PACKAGE with OPTIONS to the current LaTeX buffer."
-    (interactive
-     (list
-      (my-read-string-or-nil "Please, choose package which you need use: ")))
-    (unless (my-latex-used-package-p package)
-      (save-excursion
-        (my-latex-goto-use-package-source)
-        (beginning-of-line)
-        (my-latex-insert-command "usepackage" package :optional options)
-        (newline)
-        (run-hooks LaTeX-after-usepackage-hook))))
-
-  (defun my-latex-goto-use-package-source ()
-    "Go to the place of the LaTeX source code where shoud be inserted usepackage."
-    (interactive)
-    (goto-char (point-min))
-    (unless (search-forward-regexp "^\\\\usepackage" nil t)
-      (search-forward-regexp "^\\\\begin{document}" nil t))
-    (beginning-of-line))
-
-  (defun my-latex-used-package-p (package)
-    "Return t, when PACKAGE was used in current LaTeX buffer."
-    (-contains-p (my-latex-used-packages) package))
-
-  (defun my-latex-used-packages ()
-    "Parse from current LaTeX buffer, list of used packages."
-    (->>
-     (buffer-string)
-     (s-lines)
-     (--filter (s-prefix-p "\\usepackage" it))
-     (--map
-      (-last-item
-       (s-match "\\\\usepackage\\(\\[.*\\]\\)?{\\(.*\\)}" it)))))
-
-#+END_SRC
-
-**** Fast Navigation and Insertion in LaTeX
+**** Insertion of the Math Symbols and Smart Nabigation in LaTeX
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
@@ -3393,216 +3302,20 @@ Preview of the =LaTeX= fragments sush as WYSIWYG-editors.  I am use
              (bound-and-true-p org-cdlatex-mode))
             (cdlatex-tab)
           (yas-next-field-or-maybe-expand))))
-          #+END_SRC
-
-**** Insert Pairs in LaTeX
-
-=CDLaTeX= rebind some keymaps of =smartparens= to more stupid
-alternatives, so I rebind its back:
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  (use-package tex-mode
-      :after cdlatex
-      :bind
-      ((:map cdlatex-mode-map)
-       ("(" . self-insert-command)
-       (")" . self-insert-command)
-       ("{" . self-insert-command)
-       ("}" . self-insert-command)
-       ("[" . self-insert-command)
-       ("]" . self-insert-command)
-       ("\\" . self-insert-command)))
-
-       #+END_SRC
-
-Also beacause I am Russian, i need press =;= in =Russian=
-keyboard and Emacs should insert pairs of dollars and toggle
-input method
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  (defun my-latex-dollar ()
-    "Insert dollars and toggle input method to russian."
-    (interactive)
-    (when current-input-method (toggle-input-method))
-    (if (use-region-p)
-        (sp-wrap-with-pair "$")
-      (insert "$$")
-      (forward-char -1)))
-
-  (use-package cdlatex
-      :ensure t
-      :bind
-      (:map cdlatex-mode-map)
-      (";" . my-latex-dollar)
-      ("$" . my-latex-dollar))
-
-      #+END_SRC
-
-**** LaTeX Tables
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  ;; Array/tabular input with org-tables and cdlatex
-  (use-package org-table
-      :after cdlatex
-      :bind (:map orgtbl-mode-map
-                  ("<tab>" . lazytab-org-table-next-field-maybe)
-                  ("TAB" . lazytab-org-table-next-field-maybe))
-      :init (add-hook 'cdlatex-tab-hook 'lazytab-cdlatex-or-orgtbl-next-field 90)
-      ;; Tabular environments using cdlatex
-      (add-to-list 'cdlatex-command-alist
-                   '("smat" "Insert smallmatrix env"
-                     "\\left( \\begin{smallmatrix} ? \\end{smallmatrix} \\right)"
-                     lazytab-position-cursor-and-edit
-                     nil nil t))
-      (add-to-list 'cdlatex-command-alist
-                   '("bmat" "Insert bmatrix env"
-                     "\\begin{bmatrix} ? \\end{bmatrix}"
-                     lazytab-position-cursor-and-edit
-                     nil nil t))
-      (add-to-list 'cdlatex-command-alist
-                   '("pmat" "Insert pmatrix env"
-                     "\\begin{pmatrix} ? \\end{pmatrix}"
-                     lazytab-position-cursor-and-edit
-                     nil nil t))
-      (add-to-list 'cdlatex-command-alist
-                   '("tbl" "Insert table"
-                     "\\begin{table}\n\\centering ? \\caption{}\n\\end{table}\n"
-                     lazytab-position-cursor-and-edit
-                     nil t nil))
-      :config ;; Tab handling in org tables
-      (defun lazytab-position-cursor-and-edit ()
-        ;; (if (search-backward "\?" (- (point) 100) t)
-        ;;     (delete-char 1))
-        (cdlatex-position-cursor)
-        (lazytab-orgtbl-edit))
-
-      (defun lazytab-orgtbl-edit ()
-        (advice-add 'orgtbl-ctrl-c-ctrl-c :after #'lazytab-orgtbl-replace)
-        (orgtbl-mode 1)
-        (open-line 1)
-        (insert "\n|"))
-
-      (defun lazytab-orgtbl-replace (_)
-        (interactive "P")
-        (unless (org-at-table-p) (user-error "Not at a table"))
-        (let* ((table (org-table-to-lisp))
-               params
-               (replacement-table
-                (if (texmathp)
-                    (lazytab-orgtbl-to-amsmath table params)
-                  (orgtbl-to-latex table params))))
-          (kill-region (org-table-begin) (org-table-end))
-          (open-line 1)
-          (push-mark)
-          (insert replacement-table)
-          (align-regexp
-           (region-beginning)
-           (region-end)
-           "\\([:space:]*\\)& ")
-          (orgtbl-mode -1)
-          (advice-remove 'orgtbl-ctrl-c-ctrl-c #'lazytab-orgtbl-replace)))
-
-      (defun lazytab-orgtbl-to-amsmath (table params)
-        (orgtbl-to-generic
-         table
-         (org-combine-plists
-          '(:splice t
-            :lstart ""
-            :lend " \\\\"
-            :sep " & "
-            :hline nil
-            :llend "")
-          params)))
-
-      (defun lazytab-cdlatex-or-orgtbl-next-field ()
-        (when (and
-               (bound-and-true-p orgtbl-mode)
-               (org-table-p)
-               (looking-at "[[:space:]]*\\(?:|\\|$\\)")
-               (let ((s (thing-at-point 'sexp)))
-                 (not (and s (assoc s cdlatex-command-alist-comb)))))
-          (call-interactively #'org-table-next-field)
-          t))
-
-      (defun lazytab-org-table-next-field-maybe ()
-        (interactive)
-        (if (bound-and-true-p cdlatex-mode)
-            (cdlatex-tab)
-          (org-table-next-field))))
-
-          #+END_SRC
-
-**** Variables for LaTeX
-
-Variable `latex-documentclasses` is list of documentclasses in Emacs, each element
-of this list is name of documentclass in lower case. Defaults to:
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-  (setq latex-documentclasses
-        '("article" "reoport" "book" "proc" "minimal" "slides" "memoir" "letter" "beamer"))
-        #+END_SRC
-
-**** Visual Fill for LaTeX
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  (dolist (mode (list 'TeX-mode-hook
-                      'tex-mode-hook
-                      'latex-mode-hook
-                      'LaTeX-mode-hook))
-    (add-hook mode (lambda () (call-interactively 'visual-fill))))
-
-    #+END_SRC
-
-**** LaTeX Outline
-
-In =LaTeX= I use built-in =outline= (section of my confing about
-[[*Outline][outline]]).
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  (add-hook 'LaTeX-mode-hook 'outline-minor-mode)
-
-  #+END_SRC
-
-**** LaTeX Extra Features
-
-I am use [[https://github.com/Malabarba/latex-extra][latex-extra]].  From that package I'm use the
-following features:
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  (use-package latex-extra
-      :ensure t
-      :hook ((LaTeX-mode . latex-extra-mode)
-             (LaTeX-mode . auto-fill-mode))
-      :bind ((:map my-latex-local-map)
-             ("e" . 'latex/compile-commands-until-done)
-             ("l" . 'latex/next-section-same-level)
-             ("j" . 'latex/previous-section-same-level)))
-
 #+END_SRC
 
-**** Keymaps for LaTeX
+**** Mark region in the LaTeX
 
-I am russian, and on my native keyboard =;= is =$=:
+I press /SPC l 1/ to split LaTeX environment and /SPC l 6/ for mark
+region inside an LaTeX environment or a LaTeX math fragment
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (use-package latex
       :major-mode-map (TeX-mode LaTeX-mode tex-mode latex-mode)
-      :bind ((:map LaTeX-mode-map)
-             (";" . cdlatex-dollar)
-             (:map my-latex-local-map)
-             ;; Mark anything
+      :bind ((:map my-latex-local-map)
              ("1" . 'latex-split-block)
-             ("6" . 'my-latex-mark-inside-environment-or-math)
-
-             ;; Keymaps for the Run defined in the LaTeX Extra Features section
-             ))
+             ("6" . 'my-latex-mark-inside-environment-or-math)))
 
   (defun my-latex-mark-inside-environment-or-math ()
     "If the cursor place inside of the math environment mark that."
@@ -3610,29 +3323,7 @@ I am russian, and on my native keyboard =;= is =$=:
     (if (texmathp)
         (er/mark-LaTeX-math)
       (er/mark-LaTeX-inside-environment)))
-             #+END_SRC
-
-**** Auto Complete for LaTeX
-
-I am use [[https://github.com/vspinu/company-math][company-math]] and [[https://github.com/alexeyr/company-auctex][company-auctex]]:
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  (use-package company-math
-      :ensure t
-      :init
-      (defun my-company-math-setup ()
-        "Setup for `company-math'."
-        (add-to-list 'company-backends 'company-math-symbols-latex)
-        (add-to-list 'company-backends 'company-latex-commands))
-      (add-hook 'LaTeX-mode 'my-company-math-setup))
-
-  (use-package company-auctex
-      :ensure t
-      :config
-      (company-auctex-init))
-
-      #+END_SRC
+#+END_SRC
 
 **** Auto Activating Snippets for LaTeX
 
@@ -3663,12 +3354,191 @@ units, for example /Om/ will be expanded to /\mathrm{Ом}/:
         "agl" "\\angle"
         "grd" "^\\circ"))
 
-        #+END_SRC
+#+END_SRC
+
+**** Pairs in LaTeX
+
+I'm use =embrace= for the =LaTeX= add some parens
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (use-package embrace
+      :ensure t
+      :hook
+      ((LaTeX-mode . embrace-LaTeX-mode-hook)
+       (LaTeX-mode . my-embrace-LaTeX-mode-hook)))
+
+  (defun my-embrace-LaTeX-mode-hook ()
+    "My additional `embrace-LaTeX-mode-hook'."
+    (interactive)
+    (setq-local embrace-show-help-p nil)
+    (--each cdlatex-math-modify-alist-default
+      (my-embrace-add-paren-of-cdlatex-math it))
+    (my-embrace-add-paren-latex-command ?a "answer")
+    (embrace-add-pair-regexp
+     ?\\
+     (rx "\\" (1+ wordchar) (* space) (? "[" (*? any) "]" (1+ space)) "{")
+     "}"
+     'my-embrace-with-latex-command
+     (embrace-build-help "\\name{" "}"))
+    (embrace-add-pair-regexp
+     ?d
+     "\\\\left."
+     "\\\\right."
+     'my-embrace-with-latex-left-right
+     (embrace-build-help "\\name{" "}"))
+    (embrace-add-pair-regexp
+     ?e
+     "\\\\begin{\\(.*?\\)}\\(\\[.*?\\]\\)*"
+     "\\\\end{\\(.*?\\)}"
+     'my-embrace-with-latex-env
+     (embrace-build-help "\\begin{name}" "\\end{name}")
+     t))
+
+  (defun my-embrace-add-paren-of-cdlatex-math (element)
+    "Add an ELEMENT of the `cdlatex-math-modify-alist' to the `embrace' parens."
+    (let* ((key (-first-item element))
+           (cmd (and (-third-item element)
+                     (s-chop-prefix "\\" (-third-item element))))
+           (type (-fourth-item element)))
+      (when cmd
+        (if type
+            (my-embrace-add-paren-latex-command key cmd)
+          (my-embrace-add-paren-latex-style-command key cmd)))))
+
+  (defun my-embrace-add-paren-latex-command (key name)
+    "Add paren at KEY for the LaTeX command with NAME in `embrace'."
+    (embrace-add-pair-regexp
+     key
+     (my-latex-command-left-paren-regexp name)
+     "}"
+     (-const (cons (my-latex-command-left-paren name) "}"))
+     (embrace-build-help (my-latex-command-left-paren name) "}")))
+
+  (defun my-latex-command-left-paren (name)
+    "Return paren right of the LaTeX command named NAME."
+    (s-concat "\\" name "{"))
+
+  (defun my-latex-command-left-paren-regexp (name)
+    (rx "\\"
+        (literal name)
+        (* space)
+        (? "[" (*? any) "]" (* space))
+        "{"))
+
+  (defun my-embrace-add-paren-latex-style-command (key name)
+    "Add paren at KEY for the style LaTeX command with NAME in `embrace'."
+    (embrace-add-pair-regexp
+     key
+     (my-latex-style-command-left-paren-regexp name)
+     "}"
+     (-const (cons (my-latex-style-command-left-paren name) "}"))
+     (embrace-build-help (my-latex-style-command-left-paren name) "}")))
+
+  (defun my-latex-style-command-left-paren (name)
+    "Return paren right of the LaTeX command named NAME."
+    (s-concat "{\\" name " "))
+
+  (defun my-latex-style-command-left-paren-regexp (name)
+    (rx "{" (* space) "\\" (literal name) (* space)))
+
+  (defun my-embrace-with-latex-command ()
+    "Return pair from the left and right pair for a LaTeX command."
+    (let ((name (read-string "Name of a LaTeX command, please: ")))
+      (cons (s-concat "\\" name "{") "}")))
+
+  (defun my-embrace-with-latex-left-right ()
+    "Return pair from the left and right pair for the LaTeX command \\left."
+    (cons (s-concat "\\left" (read-char "Left paren, please: "))
+          (s-concat "\\right" (read-char "Right paren, please: "))))
+
+  (defun my-embrace-with-latex-env ()
+    "Return pair from the left and right pair for the LaTeX command \\left."
+    (let ((env (read-string "Name of the environment, please: "
+                            (latex-complete-envnames))))
+      (cons (s-concat "\\begin{" env "}")
+            (s-concat "\\end{" env "}"))))
+#+END_SRC
+
+=CDLaTeX= rebind some keymaps of =smartparens= to more stupid
+alternatives, so I rebind its back:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package tex-mode
+      :after cdlatex
+      :bind
+      ((:map cdlatex-mode-map)
+       ("(" . self-insert-command)
+       (")" . self-insert-command)
+       ("{" . self-insert-command)
+       ("}" . self-insert-command)
+       ("[" . self-insert-command)
+       ("]" . self-insert-command)
+       ("\\" . self-insert-command)))
+
+#+END_SRC
+
+Also beacause of I am Russian, I need press =;= in =Russian= keyboard
+and Emacs should insert pairs of dollars and toggle input method
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (defun my-latex-dollar ()
+    "Insert dollars and turn input method into English."
+    (interactive)
+                                          ; when current-input-method isn standard
+    (if (not current-input-method)
+                                          ; then
+        (insert ";")
+                                          ; else
+      (toggle-input-method)
+      (if (use-region-p)
+          (sp-wrap-with-pair "$")
+        (insert "$$")
+        (forward-char -1))))
+
+  (use-package cdlatex
+      :ensure t
+      :bind
+      (:map cdlatex-mode-map)
+      (";" . my-latex-dollar))
+
+      #+END_SRC
+
+**** LaTeX Tables
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package org-table
+      :hook (LaTeX-mode . 'orgtbl-mode))
+
+  (my-latex-expand-define "ot" my-latex-insert-orgtbl-table
+      (name)
+    "Insert table with `orgtbl-mode'.
+
+  It's insert two comments line and the LaTeX environment comment in which
+  you will edit your table in the `org-mode' syntax.  After you should press
+  C-c C-c and the source code will be replaced.
+
+  Each table should has certain NAME, so inserted table will has name NAME"
+    (interactive "sName of the table, please: ")
+    (let* ((e (cl-assoc-if #'derived-mode-p orgtbl-radio-table-templates))
+           (txt (nth 1 e))
+           name pos)
+      (unless e (user-error "No radio table setup defined for %s" major-mode))
+      (while (string-match "%n" txt)
+        (setq txt (replace-match name t t txt)))
+      (or (bolp) (insert "\n"))
+      (setq pos (point))
+      (insert txt)
+      (goto-char pos)))
+#+END_SRC
 
 **** Auto Format in LaTeX
 
 I am use my own [[*Functions for Auto Format Code]] to auto format in
-=LaTeX=:
+=LaTeX=.  I press /*/ and space at the start of a line and this
+expands to item of the LaTeX environment =itemize=.
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
@@ -3752,9 +3622,6 @@ I am use my own [[*Functions for Auto Format Code]] to auto format in
         (LaTeX-insert-item)
       (LaTeX-env-item "itemize")))
       #+END_SRC
-
-#+RESULTS:
-: autoformat-latex-expand-to-itemized-list-item
 
 **** Equation Environment to Split Environment
 
@@ -3938,6 +3805,87 @@ snippet /i/ for inserting image
    :map my-latex-local-map
    ("i" . my-latex-insert-image)
    ("u" . my-latex-insert-image-at-url))
+#+END_SRC
+
+**** Kill sections
+
+I press /SPC l x/ for kill the LaTeX section which being at the cursor
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package tex-mode
+      :ensure t
+      :bind ((:map my-latex-local-map)
+             ("x" . 'my-latex-kill-section)))
+
+  (defun my-latex-kill-section ()
+    "Kill a LaTeX section."
+    (interactive)
+    (LaTeX-mark-section)
+    (kill-region (region-beginning) (region-end)))
+
+#+END_SRC
+
+**** Variables for LaTeX
+
+Variable `latex-documentclasses` is list of documentclasses in Emacs, each element
+of this list is name of documentclass in lower case. Defaults to:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (setq latex-documentclasses
+        '("article" "reoport" "book" "proc" "minimal" "slides" "memoir" "letter" "beamer"))
+        #+END_SRC
+
+**** Visual Fill for LaTeX
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (dolist (mode (list 'TeX-mode-hook
+                      'tex-mode-hook
+                      'latex-mode-hook
+                      'LaTeX-mode-hook))
+    (add-hook mode (lambda () (call-interactively 'visual-fill))))
+
+    #+END_SRC
+
+**** LaTeX Extra Features
+
+I am use [[https://github.com/Malabarba/latex-extra][latex-extra]].  From that package I'm use the
+following features:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package latex-extra
+      :ensure t
+      :hook ((LaTeX-mode . latex-extra-mode)
+             (LaTeX-mode . auto-fill-mode))
+      :bind ((:map my-latex-local-map)
+             ("e" . 'latex/compile-commands-until-done)
+             ("l" . 'latex/next-section-same-level)
+             ("j" . 'latex/previous-section-same-level)))
+
+#+END_SRC
+
+**** Auto Complete for LaTeX
+
+I am use [[https://github.com/vspinu/company-math][company-math]] and [[https://github.com/alexeyr/company-auctex][company-auctex]]:
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package company-math
+      :ensure t
+      :init
+      (defun my-company-math-setup ()
+        "Setup for `company-math'."
+        (add-to-list 'company-backends 'company-math-symbols-latex)
+        (add-to-list 'company-backends 'company-latex-commands))
+      (add-hook 'LaTeX-mode 'my-company-math-setup))
+
+  (use-package company-auctex
+      :ensure t
+      :config
+      (company-auctex-init))
+
 #+END_SRC
 
 *** Org
@@ -4678,13 +4626,33 @@ LISP a source code
              ("w" . 'my-paxedit-change)
              ("d" . 'paxedit-symbol-kill)
              ("q" . 'paxedit-compress)
-             ("k" . 'paxedit-delete-whitespace)))
+             ("k" . 'paxedit-delete-whitespace)
+             ("y" . 'my-paxedit-duplicate)))
 
   (defun my-paxedit-change ()
-    "Kill an Lisp expression at the cursor and activate insert mode."
+    "Kill the Lisp expression at the cursor and activate insert mode."
     (interactive)
     (paxedit-delete)
     (xah-fly-insert-mode-activate))
+
+  (defun my-paxedit-duplicate ()
+    "Make copy of the Lisp expression at the cursor."
+    (interactive)
+    (let* ((reg (paxedit-sexp-region))
+           (beg (car reg))
+           (end (cdr reg))
+           (sexp (buffer-substring beg end))
+           (sep (if (my-lisp-sexp-whole-line-p) "\n" " ")))
+      (goto-char end)
+      (insert sep sexp)))
+
+  (defun my-lisp-sexp-whole-line-p ()
+    "Return t, when the Lisp sexp at the point being at whole of line."
+    (interactive "P")
+    (and (= beg (save-excursion (beginning-of-line-text)
+                                (point)))
+         (= end (point-at-eol))))
+
 #+END_SRC
 
 *** Racket
@@ -6307,7 +6275,7 @@ I need to see when keys will readed as =drag=:
         durand-buffer-name-max
         buffer-info))))
 
-        #+END_SRC
+#+END_SRC
 
 *** No Display =flycheck= in Modeline
 
@@ -6344,7 +6312,6 @@ I'm don't love =flycheck= in =modeline=, so I turn off that.
             time
             pomidor
             word-count
-            buffer
             selection-info)
         '(objed-state
           persp-name
@@ -6755,7 +6722,7 @@ I am use =dired=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
   (add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
-  #+END_SRC
+#+END_SRC
 
 *** My Keymaps for Dired
 
@@ -6781,6 +6748,7 @@ I am use =dired=:
              ;; Manipulation with file(s)
              ("SPC g"   . 'my-dired-delete)
              ("SPC x"   . 'my-dired-delete-all-files)
+             ("SPC y"   . 'my-dired-duplicate)
              ("f"       . 'my-dired-rename)
              ("SPC TAB" . 'my-dired-move)
              ("s"       . 'my-dired-new-file)
@@ -6788,7 +6756,7 @@ I am use =dired=:
 
              ;; Mark files
              ("t"       . 'dired-mark)
-             ("SPC y"   . 'dired-unmark-all-marks)
+             ("SPC u"   . 'dired-unmark-all-marks)
              ("SPC a"   . 'my-dired-mark-all-files)
 
              ;; Misc.
@@ -6864,7 +6832,7 @@ I am use =dired=:
   (defun my-dired-new-file (filename)
     "Create file with FILENAME in the directory which opened in the dired buffer."
     (interactive "sName of new file, please: ")
-    (find-file (f-join (dired-current-directory) filename)))
+    (f-touch (f-join (dired-current-directory) filename)))
 
   (defun my-dired-delete-all-files ()
     "Delete all files from the directory of the `dired' buffer."
@@ -6878,6 +6846,12 @@ I am use =dired=:
     (interactive)
     (avy-goto-line))
 
+  (my-define-dired-command-taking-file my-dired-duplicate (filename)
+    "Make copy of the file with FILENAME in the same directory."
+    (f-touch
+     (f-join
+      (dired-current-directory)
+      (read-string "Name of the filename, please: " (f-filename filename)))))
     #+END_SRC
 
 *** Dired Hacks

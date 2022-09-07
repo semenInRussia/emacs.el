@@ -6,8 +6,6 @@
 
 ** Targets on Week
 
-*** TODO Add a cool keymap to =LaTeX=
-
 *** TODO Add a automatic management of the spaces to =LaTeX=
 
 *** TODO Change =xah-fly-keys= to =ryo=
@@ -16,15 +14,6 @@
 
 *** TODO explore the =xetex=                                          :latex:
 
-*** TODO Fix aggresive fill pargaraph mode in the =LaTeX=
-
-    Disable on the:
-
-    #+BEGIN_EXAMPLE
-    \author{jdej}
-    \date{dje |}
-    #+END_EXAMPLE
-
 *** TODO see on the =org-store-link=                                    :org:
 
 *** TODO explore the =which-function-mode=
@@ -32,8 +21,6 @@
 *** TODO fix the =org-refile=                                           :org:
 
 *** TODO Run the main file of the project in =run-command-reicpes= :run_command_recipes:
-
-*** TODO See on the =simple-indentation=                  :simple_indentaion:
 
 *** TODO explore the =org-tempo=                                        :org:
 
@@ -74,8 +61,6 @@ Also use some themes for exporting to the =html=
 *** TODO Impatient modes for all =major-modes=
 *** TODO When "I am use" after insert description last uri
 *** TODO Fix =my-copy-buffer-content-as-mipt-solution=
-*** TODO /SPC y/ for =dired=
-*** TODO /SPC y/ for =paxedit=
 *** TODO View list of possible LaTeX expansion
 *** TODO Fix coding
 *** TODO Find /jwiegley/ way to refactor Emacs Lisp programs
@@ -86,10 +71,17 @@ See on the compile command from the =latex-extra=
 *** TODO Keybinding =SPC l z= for =peaxedit=
 ** Targets on Day
 
+*** DONE /SPC y/ for =dired=
+SCHEDULED: <2022-09-07 Ср>
+*** DONE /SPC y/ for =paxedit=
+SCHEDULED: <2022-09-07 Ср>
+*** DONE Add a cool keymap to =LaTeX=
+SCHEDULED: <2022-09-07 Ср>
+
 *** DONE In =just-doc= change view of non-taked arguments functions
 SCHEDULED: <2022-09-05 Пн>
 
-*** TODO Add able to to the transposing of the =LaTeX= list items   :latex:
+*** DONE Add able to to the transposing of the =LaTeX= list items   :latex:
 SCHEDULED: <2022-09-05 Пн>
 
 *** DONE fix count of words/chars in the =mode-line=
