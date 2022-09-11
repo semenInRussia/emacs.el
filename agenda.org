@@ -6,8 +6,6 @@
 
 ** Targets on Week
 
-*** TODO Add a automatic management of the spaces to =LaTeX=
-
 *** TODO Change =xah-fly-keys= to =ryo=
 
 *** TODO =racket-mmanager=
@@ -69,27 +67,22 @@ Also use some themes for exporting to the =html=
 
 See on the compile command from the =latex-extra=
 *** TODO Keybinding =SPC l z= for =peaxedit=
+*** TODO ZMS PDF files should be names in special format
+
+#+BEGIN_EXAMPLE
+9_Иванов И._ЛФ-1.pdf
+#+END_EXAMPLE
+*** TODO Use =sp= instead of =paxedit= when can
 ** Targets on Day
 
-*** DONE /SPC y/ for =dired=
-SCHEDULED: <2022-09-07 Ср>
-*** DONE /SPC y/ for =paxedit=
-SCHEDULED: <2022-09-07 Ср>
-*** DONE Add a cool keymap to =LaTeX=
-SCHEDULED: <2022-09-07 Ср>
+*** TODO Complete a automatic management of the spaces to =LaTeX=
+SCHEDULED: <2022-09-08 Чт>
 
-*** DONE In =just-doc= change view of non-taked arguments functions
-SCHEDULED: <2022-09-05 Пн>
-
-*** DONE Add able to to the transposing of the =LaTeX= list items   :latex:
-SCHEDULED: <2022-09-05 Пн>
-
-*** DONE fix count of words/chars in the =mode-line=
-SCHEDULED: <2022-09-05 Пн>
-
-*** DONE Do =zms=
-DEADLINE: <2022-09-10 Сб> SCHEDULED: <2022-08-16 Вт>
-
+- Add functions for declaring binary ops/parens
+- Manage spaces for parens
+- Manage spaces for all normal commands (argument and nonargument)
+*** TODO =smartparens=
+  SCHEDULED: <2022-09-11 Вс>
 * Films 
 
 ** MUST-SEE The Green Mile

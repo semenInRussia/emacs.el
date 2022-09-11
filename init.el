@@ -742,25 +742,25 @@ Action of `avy', see `avy-action-yank' for example"
     :ensure t
     :init
     (smartparens-global-mode 1)
-    :bind (("RET"       . sp-newline)
+    :bind (("RET"       . 'sp-newline)
            ("M-("       . 'sp-wrap-round)
            ("M-{"       . 'sp-wrap-curly)
-           :map
-           xah-fly-command-map
-           (("]"         . 'sp-forward-slurp-sexp)
-            ("["         . 'sp-forward-barf-sexp)
-            ("M-("       . 'sp-wrap-round)
-            ("M-["       . 'sp-wrap-square)
-            ("M-{"       . 'sp-wrap-curly)
-            ("-"         . 'sp-splice-sexp)
-            ("SPC -"     . 'sp-rewrap-sexp)
-            ("m"         . 'sp-backward-sexp)
-            ("."         . 'sp-forward-sexp)
-            ("SPC 1"     . 'sp-join-sexp)
-            ("SPC SPC 1" . 'sp-split-sexp)
-            ("SPC 9"     . 'sp-change-enclosing)
-            ("SPC SPC g" . 'sp-kill-hybrid-sexp)
-            ("SPC ="     . 'sp-raise-sexp))))
+           (:map xah-fly-command-map)
+           ("]"         . 'sp-forward-slurp-sexp)
+           ("["         . 'sp-forward-barf-sexp)
+           ("M-("       . 'sp-wrap-round)
+           ("M-["       . 'sp-wrap-square)
+           ("M-{"       . 'sp-wrap-curly)
+           ("-"         . 'sp-splice-sexp)
+           ("SPC -"     . 'sp-rewrap-sexp)
+           ("m"         . 'sp-backward-sexp)
+           ("."         . 'sp-forward-sexp)
+           ("SPC 1"     . 'sp-join-sexp)
+           ("SPC SPC 1" . 'sp-split-sexp)
+           ("SPC 9"     . 'sp-change-enclosing)
+           ("SPC SPC g" . 'sp-kill-hybrid-sexp)
+           ("SPC SPC e" . 'sp-splice-sexp-killing-backward)
+           ("SPC ="     . 'sp-raise-sexp)))
 
 (require 'smartparens-config)
 
@@ -1662,14 +1662,41 @@ See `just-line-is-whitespaces-p'"
 
 (my-autoformat-mode t)
 
-(use-package tex-mode
-    :major-mode-map latex (LaTeX-mode)
-    :config
-    (setq auto-mode-alist
-          (--remove (eq (cdr it) 'latex-mode)
-                    auto-mode-alist))
-    (add-to-list 'auto-mode-alist
-                 '("\\.\\(tex\\|cls\\)$" . LaTeX-mode)))
+(use-package tex
+    :ensure auctex
+    :major-mode-map latex
+    (LaTeX-mode)
+    :hook ((latex-mode . my-latex-find-master-file)
+           (latex-mode . LaTeX-mode)))
+
+(defun my-latex-find-master-file ()
+  "Find auctex master file for the current buffer."
+  (interactive)
+  (setq-local TeX-master
+              (or
+               (my-latex-lookup-master-file-of (buffer-file-name))
+               t)))
+
+(defcustom my-latex-master-files-alist
+  '(("~/zms/*/solutions/*.tex" . "../Solution.tex"))
+  "Associated list, keys are wildcards, values are him master files."
+  :type '(alist :key-type string :value-type string))
+
+(defun my-latex-lookup-master-file-of (filename)
+  "Lookup a auctex master file for the file with FILENAME."
+  (->>
+   my-latex-master-files-alist
+   (--find (my-latex-master-file-key-matches-with-p it filename))
+   (cdr)))
+
+(defun my-latex-master-file-key-matches-with-p (master-file-key filename)
+  "Return t, when master file key alist MASTER-FILE-KEY match with FILENAME."
+  (->
+   master-file-key
+   (car)
+   (f-full)
+   (wildcard-to-regexp)
+   (string-match-p filename)))
 
 (use-package latex
     :ensure auctex
@@ -1741,8 +1768,7 @@ See `just-line-is-whitespaces-p'"
 
 (use-package magic-latex-buffer
     :ensure t
-    :hook (LaTeX-mode . magic-latex-buffer)
-    :custom ((magic-latex-enable-block-highlight nil)))
+    :hook (LaTeX-mode . magic-latex-buffer))
 
 (defvar my-latex-insert-at-start-arg-type 'optional
   "Type of argument (optional or required) which will be inserted at start.")
@@ -1857,13 +1883,6 @@ See `my-latex-insert-command' for understand of use ARGS"
       (setq end (point)))
     (run-hook-with-args LaTeX-after-insert-env-hook name beg end)))
 
-(add-hook 'latex-mode-hook 'my-latex-activate-expansion)
-
-(defun my-latex-activate-expansion ()
-  (interactive)
-  (aas-mode +1)
-  (aas-activate-keymap 'latex))
-
 (defun my-latex-expand-define-function (key fun)
   "Bind call of FUN at KEY in the LaTeX.
 
@@ -1880,6 +1899,19 @@ BODY will be evaluated when the user press KEY and dot"
      (defun ,name ,args
        ,@body)
      (my-latex-expand-define-function ,key ',name)))
+
+(define-minor-mode my-latex-expansion-mode
+    "Which expands certain text fragments to LaTeX objects."
+  :init-value nil
+  (if my-latex-expansion-mode
+      (progn
+        (aas-mode +1)
+        (aas-activate-keymap 'latex-mode))
+    (aas-deactivate-keymap 'latex-mode)))
+
+(use-package tex
+    :ensure auctex
+    :hook (LaTeX-mode . my-latex-expansion-mode))
 
 (defun my-latex-ensure-has-graphicspath ()
   "Ensure that current LaTeX buffer has \\graphicspath{}.
@@ -2180,8 +2212,7 @@ Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
   (interactive (list
                 (read-string "Name of the new section: ")
                 (read-string "Name for the TOC of the section: ")))
-  (run-hooks LaTeX-section-hook)
-  (my-latex-insert-single-line-command "section" name :optional toc-name))
+  (run-hooks 'LaTeX-section-hook))
 
 (use-package cdlatex
     :ensure t
@@ -2368,12 +2399,13 @@ Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
     :after cdlatex
     :bind
     ((:map cdlatex-mode-map)
-     ("(" . self-insert-command)
-     (")" . self-insert-command)
-     ("{" . self-insert-command)
-     ("}" . self-insert-command)
-     ("[" . self-insert-command)
-     ("]" . self-insert-command)
+     ("(" .  self-insert-command)
+     (")" .  self-insert-command)
+     ("{" .  self-insert-command)
+     ("}" .  self-insert-command)
+     ("[" .  self-insert-command)
+     ("]" .  self-insert-command)
+     ("\"" . self-insert-command)
      ("\\" . self-insert-command)))
 
 (defun my-latex-dollar ()
@@ -2387,7 +2419,7 @@ Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
     (toggle-input-method)
     (if (use-region-p)
         (sp-wrap-with-pair "$")
-      (insert "$$")
+      (sp-insert-pair "$")
       (forward-char -1))))
 
 (use-package cdlatex
@@ -2396,8 +2428,20 @@ Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
     (:map cdlatex-mode-map)
     (";" . my-latex-dollar))
 
-(use-package org-table
-    :hook (LaTeX-mode . 'orgtbl-mode))
+(sp-with-modes
+    '(tex-mode plain-tex-mode latex-mode LaTeX-mode)
+  (sp-local-pair " ``"
+                 "''"
+                 :trigger "\""
+                 :unless '(sp-latex-point-after-backslash sp-in-math-p)
+                 :post-handlers '(sp-latex-skip-double-quote))
+
+  (sp-local-pair " \"<"
+                 "\">"
+                 :trigger "<"
+                 :unless '(sp-latex-point-after-backslash sp-in-math-p)))
+
+(use-package org-table)
 
 (my-latex-expand-define "ot" my-latex-insert-orgtbl-table
     (name)
@@ -2706,6 +2750,82 @@ the `kill-ring', the selected region or the minibuffer"
     :ensure t
     :config
     (company-auctex-init))
+
+(defcustom my-latex-math-spaces-binary-ops
+  '("\\+" "-" "\\\\cdot" "\\\\times" "=")
+  "List of the regexps which indicates an binary operator of the LaTeX math.
+
+Binary operator is a LaTeX command which no take arguments and needs to 2
+one left number/expression and one rigth number/expression.  So, \\frac isn't
+binary operator, because it takes arguments"
+  :type '(repeat regexp))
+
+(defcustom my-latex-math-spaces-parens
+  '("(" ")" "\\\\left." "\\\\right." "|")
+  "List of the regexps which indicates an paren of the LaTeX math.
+
+In that list openning and closing parens should be added separately."
+  :type '(repeat string))
+
+(defvar my-latex-math-spaces-do-hook nil
+  "Hooks which will be run when called `my-latex-math-spaces-do'.")
+
+(define-minor-mode my-latex-math-spaces-mode
+    "Minor mode which automatically insert spaces in the LaTeX math."
+  :init-value t
+  (if (not my-latex-math-spaces-mode)
+      (remove-hook 'post-self-insert-hook 'my-latex-math-spaces-do)
+    (add-hook 'post-self-insert-hook 'my-latex-math-spaces-do)))
+
+(defun my-latex-math-spaces-do ()
+  "Do insertion of the spaces for the LaTeX math syntax, if needed."
+  (interactive)
+  (when (and (eq major-mode 'latex-mode) (texmathp))
+    (run-hooks 'my-latex-math-spaces-do-hook)))
+
+(defun my-latex-math-spaces-for-binary-ops ()
+  "Do insertion of the spaces for the last LaTeX binary operation, if needed."
+  (let ((start (point)))
+    (when (my-latex-math-spaces-goto-binary-op-start)
+      (just-spaces-to-1)
+      (goto-char start)
+      (my-latex-math-spaces-goto-binary-op-end)
+      (just-spaces-to-1))))
+
+(add-hook 'my-latex-math-spaces-do-hook 'my-latex-math-spaces-for-binary-ops)
+
+(defun my-latex-math-spaces-goto-binary-op-start ()
+  "Go to backward binary operation start when its looking back."
+  (let ((init (point))
+        binary-op-start)
+    (skip-chars-backward " ")
+    (setq binary-op-start
+          (-any 'my-latex-math-spaces-skip-backward
+                my-latex-math-spaces-binary-ops))
+    (if binary-op-start
+        binary-op-start
+      (goto-char init)
+      nil)))
+
+(defun my-latex-math-spaces-goto-binary-op-end ()
+  "Go to the end of the binary operation."
+  (-any
+   'my-latex-math-spaces-skip-forward
+   my-latex-math-spaces-binary-ops))
+
+(defun my-latex-math-spaces-skip-backward (regexp)
+  "Skip REGEXP looking back, if regexps match return point, else return nil."
+  (when (search-backward-regexp (s-concat regexp "\\=") nil t)
+    (goto-char (match-beginning 0))
+    (match-string 0)))
+
+(defun my-latex-math-spaces-skip-forward (regexp)
+  "Skip REGEXP looking back, if regexps match return point, else return nil."
+  (search-forward-regexp (s-concat "\\=" regexp) nil t))
+
+(use-package tex
+    :ensure auctex
+    :hook (LaTeX-mode . my-latex-math-spaces-mode))
 
 (use-package org
     :major-mode-map (org-mode)
@@ -3745,6 +3865,8 @@ List of racket expressions in which this function should work:
 (fast-exec/reload-functions-chain)
 
 (setq default-input-method "russian-computer")
+
+(setq buffer-file-coding-system 'utf-8)
 
 (use-package helm-mode-manager
     :ensure t
@@ -4927,7 +5049,7 @@ PT defaults to the current `point'"
 (defcustom my-mipt-dir "c:/Users/hrams/Documents/mipt"
   "Path to the directory in which will be saved all MIPT solutions.")
 
-(defcustom my-mipt-lessons '("f" "m") "Lessons of MIPT.")
+(defcustom my-mipt-lessons '("f" "m" "i") "Lessons of the MIPT.")
 
 (defclass my-mipt-task ()
   ((class :initform nil :initarg :class :accessor my-mipt-task-class)
@@ -4939,19 +5061,21 @@ PT defaults to the current `point'"
             :accessor my-mipt-task-section)
    (kind :initform nil ;nofmt
          :initarg :kind
-         :accessor my-mipt-task-kind)   ; 'control or 'normal
+         :accessor my-mipt-task-kind)   ; either 'control or 'normal
    (number  :initform nil
             :initarg :number
             :accessor my-mipt-task-number))
-  "Object for task of MIPT.")
+  "Object for task of the MIPT.")
 
 (defvar my-mipt-found-task
   (my-mipt-task)
-  "Object of `my-mipt-task', will set automatically when find task.")
+  "Object of the `my-mipt-task', will be setted automatically when find task.")
 
 (defvar my-mipt-last-task
   nil
-  "Object of `my-mipt-task', will set automatically when find task.")
+  "Last found MIPT task.
+
+Object of the `my-mipt-task', will set automatically when find task.")
 
 (defun my-mipt-task-control-p (task)
   "Return t, when TASK is control."
@@ -4962,7 +5086,7 @@ PT defaults to the current `point'"
   (not (my-mipt-task-control-p task)))
 
 (defun my-mipt-task-parse (filename)
-  "Parse from FILENAME MIPT task."
+  "Parse from FILENAME a MIPT task."
   (when (s-matches-p ".+-.-.+-.+\\(-control\\)?\\.tex" filename)
     (-let*
         ((base (f-base (f-no-ext filename)))
@@ -4976,7 +5100,7 @@ PT defaults to the current `point'"
        :kind (if (stringp is-control) 'control 'normal)))))
 
 (defun my-mipt-task-path (task)
-  "Get path to TASK's solution."
+  "Get path to the TASK's solution."
   (->>
    (format
     "%s-%s-%s-%s%s.tex"
@@ -5001,9 +5125,9 @@ PT defaults to the current `point'"
   (my-mipt-task-visit (my-mipt-last-task)))
 
 (defun my-mipt-next-task ()
-  "Return the next task, after the last found task.
+  "Return the next task after the last found task.
 
-     When run interactively visit that task."
+When run interactively visit that task."
   (interactive)
   (let ((next-task (my-mipt-last-task)))
     (incf (my-mipt-task-number next-task))
@@ -5012,23 +5136,23 @@ PT defaults to the current `point'"
 (defun my-mipt-prev-task ()
   "Return previous task, before the last found task.
 
-     When run interactively visit that task."
+When run interactively visit that task."
   (interactive)
   (let ((prev-task (my-mipt-last-task)))
     (decf (my-mipt-task-number prev-task))
     (if (interactive-p) (my-mipt-task-visit prev-task) prev-task)))
 
 (defun my-mipt-task-visit (task)
-  "Visit file of TASK's solution."
+  "Visit file of the TASK's solution."
   (interactive (list (my-mipt-find-task)))
-  (->> task (my-mipt-task-path) (find-file)))
+  (find-file (my-mipt-task-path task)))
 
 (defun my-mipt-all-tasks ()
-  "Return all mipt tasks in special dir `my-mipt-dir'."
+  "Return all mipt tasks in the directory `my-mipt-dir'."
   (->> my-mipt-dir (f-files) (-keep #'my-mipt-task-parse)))
 
 (defun my-mipt-find-task ()
-  "Find task of MIPT from created."
+  "Find the task from the minibuffer, take default info from the last task."
   (interactive)
   (setq my-mipt-found-task (my-mipt-task))
   (->>
@@ -5042,7 +5166,8 @@ PT defaults to the current `point'"
 
 (defun my-mipt--find-lesson-from-tasks (tasks)
   "From TASKS find lesson, save in special variable, and return filtered TASKS.
-     Special variable is `my-mipt-found-task'"
+
+Special variable is `my-mipt-found-task'"
   (let ((lesson (my-mipt-read-lesson)))
     (setf (my-mipt-task-lesson my-mipt-found-task) lesson)
     (->>
@@ -5055,10 +5180,13 @@ PT defaults to the current `point'"
 
 (defun my-mipt--find-class-from-tasks (tasks)
   "From TASKS find class, save in special variable, and return filtered TASKS.
-     Special variable is `my-mipt-found-task'"
+
+Special variable is `my-mipt-found-task'"
   (let* ((class (my-mipt-choose-one-of-task-classes tasks)))
     (setf (my-mipt-task-class my-mipt-found-task) class)
-    (->> tasks (--filter (= (my-mipt-task-class it) class)))))
+    (--filter
+     (= (my-mipt-task-class it) class)
+     tasks)))
 
 (defun my-mipt-choose-one-of-task-classes (tasks)
   "Take TASKS and choose one of classes."
@@ -5074,10 +5202,11 @@ PT defaults to the current `point'"
 
 (defun my-mipt--find-section-from-tasks (tasks)
   "From TASKS find section, save in special variable, and return filtered TASKS.
-     Special variable is `my-mipt-found-task'"
+
+Special variable is `my-mipt-found-task'"
   (let* ((section (my-mipt-choose-one-of-task-sections tasks)))
     (setf (my-mipt-task-section my-mipt-found-task) section)
-    (->> tasks (--filter (= (my-mipt-task-section it) section)))))
+    (--filter (= (my-mipt-task-section it) section) tasks)))
 
 (defun my-mipt-choose-one-of-task-sections (tasks)
   "Take TASKS and choose one of sections."
@@ -5093,10 +5222,11 @@ PT defaults to the current `point'"
 
 (defun my-mipt--find-kind-from-tasks (tasks)
   "From TASKS find kind, save in special variable, and return filtered TASKS.
-     Special variable is `my-mipt-found-task'"
+
+Special variable is `my-mipt-found-task'"
   (let ((kind (my-mipt-choose-one-of-task-kinds tasks)))
     (setf (my-mipt-task-kind my-mipt-found-task) kind)
-    (->> tasks (--filter (eq (my-mipt-task-kind it) kind)))))
+    (--filter (eq (my-mipt-task-kind it) kind) tasks)))
 
 (defun my-mipt-choose-one-of-task-kinds (tasks)
   "Take TASKS and choose one of kinds."
@@ -5104,7 +5234,7 @@ PT defaults to the current `point'"
          (is-normal
           (if is-was-normal-tasks
               (y-or-n-p "Your task normal? ")
-            I                 (not (y-or-n-p "Your task control? ")))))
+            (not (y-or-n-p "Your task control? ")))))
     (if is-normal 'normal 'control)))
 
 (defun my-mipt-read-kind (&optional default)
@@ -5113,21 +5243,21 @@ PT defaults to the current `point'"
 
 (defun my-mipt--find-number-from-tasks (tasks)
   "From TASKS find number, save in special variable, and return filtered TASKS.
-     Special variable is `my-mipt-found-task'"
+
+Special variable is `my-mipt-found-task'"
   (let* ((number (my-mipt-choose-one-of-task-numbers tasks)))
     (setf (my-mipt-task-number my-mipt-found-task) number)
-    (->> tasks (--filter (= (my-mipt-task-number it) number)))))
+    (--filter (= (my-mipt-task-number it) number) tasks)))
 
 (defun my-mipt-choose-one-of-task-numbers (tasks)
   "Take TASKS and choose one of classes."
   (let* ((numbers (-map #'my-mipt-task-number tasks))
          (default (my-max numbers)))
-    (just-completing-read-numbers
-     "Please, choose number of MIPT task: "
-     numbers
-     nil
-     nil
-     default)))
+    (just-completing-read-numbers "Please, choose number of MIPT task: "
+                                  numbers
+                                  nil
+                                  nil
+                                  default)))
 
 (defun my-mipt-read-number (&optional default)
   "Read from user number of MIPT's task, defaults to DEFAULT."
@@ -5186,7 +5316,7 @@ section"
   "Path to the directory in which will be saved files of the ZMS."
   :type 'string)
 
-(defcustom my-zms-view-solution-latex "\\inputtask{./solutions/%s.tex}"
+(defcustom my-zms-view-solution-latex "\\inputsolution{./solutions/%s.tex}"
   "LaTeX source code which should view solution of the ZMS task."
   :type 'string)
 
@@ -5218,8 +5348,30 @@ section"
 
 (defun my-zms-section-save (section)
   "Save the ZMS SECTION into the file system."
-  (f-copy my-zms-section-template-directory
-          (my-zms-section-path section)))
+  (my-use-skeleton my-zms-section-template-directory
+                   (my-zms-section-path section)
+                   `(("_section-number"
+                      . ,(number-to-string (my-zms-section-number section)))
+                     ("_section-name_"
+                      . ,(my-zms-section-name section)))))
+
+(defun my-use-skeleton (skeleton-path destination replacements)
+  "Copy SKELETON-PATH to DESTINATION and do REPLACEMENTS."
+  (f-copy skeleton-path destination)
+  (my-replace-all-in-dir replacements destination))
+
+(defun my-replace-all-in-dir (replacements dir)
+  "Replace each `car' of REPLACEMENTS to respective `cdr' in each file of DIR."
+  (->
+   dir
+   (f-files)
+   (--each (my-replace-all-in-file replacements it))))
+
+(defun my-replace-all-in-file (replacements filename)
+  "Replace each `car' of REPLACEMENTS to respective `cdr' in file at FILENAME."
+  (f-write (s-replace-all replacements (f-read filename))
+           'utf-8
+           filename))
 
 (defun my-zms-section-path (section)
   "Return path to the directory of the ZMS section SECTION."
