@@ -224,9 +224,10 @@ Info take from var `user-os`, user must set it."
     :config
   (xah-fly-keys-set-layout "qwerty")
   (xah-fly-keys 1)
-  (define-key xah-fly-command-map (kbd "SPC l") nil)
-  (define-key xah-fly-command-map (kbd "SPC j") nil)
-  (define-key xah-fly-command-map (kbd "SPC SPC") nil))
+  :bind ((:map xah-fly-command-map)
+         ("SPC l"   . nil)
+         ("SPC j"   . nil)
+         ("SPC SPC" . nil)))
 
 (defvar my-local-major-mode-map nil
   "My map for current `major-mode'")
@@ -394,6 +395,19 @@ Instead of KEY will command FUN-NAME"
               ,def
             #',old-def)))
        (define-key ,map ,key #',fun-name))))
+
+(defun repeat-at-last-keystroke ()
+  "Define in the tempory keymap at last pressed keystroke `this-command'."
+  (one-shot-keybinding
+   (char-to-string (event-basic-type last-input-event))
+   this-command))
+
+(defun one-shot-keybinding (key command)
+  (set-temporary-overlay-map
+   (let ((map (make-sparse-keymap)))
+     (define-key map (kbd key) command)
+     map)
+   t))
 
 (use-package helm-swoop
     :ensure t
@@ -742,25 +756,46 @@ Action of `avy', see `avy-action-yank' for example"
     :ensure t
     :init
     (smartparens-global-mode 1)
-    :bind (("RET"       . 'sp-newline)
-           ("M-("       . 'sp-wrap-round)
-           ("M-{"       . 'sp-wrap-curly)
-           (:map xah-fly-command-map)
-           ("]"         . 'sp-forward-slurp-sexp)
-           ("["         . 'sp-forward-barf-sexp)
+    (show-smartparens-global-mode 1)
+    :bind (
+           ;; Wrap anything
            ("M-("       . 'sp-wrap-round)
            ("M-["       . 'sp-wrap-square)
            ("M-{"       . 'sp-wrap-curly)
-           ("-"         . 'sp-splice-sexp)
-           ("SPC -"     . 'sp-rewrap-sexp)
-           ("m"         . 'sp-backward-sexp)
-           ("."         . 'sp-forward-sexp)
-           ("SPC 1"     . 'sp-join-sexp)
-           ("SPC SPC 1" . 'sp-split-sexp)
-           ("SPC 9"     . 'sp-change-enclosing)
+
+           (:map xah-fly-command-map)
+           ;; Kill anything
+           ("x"         . 'sp-kill-whole-line)
+           ("SPC 8"     . 'sp-kill-sexp)
+           ("SPC k e"   . 'sp-backward-kill-sexp)
            ("SPC SPC g" . 'sp-kill-hybrid-sexp)
            ("SPC SPC e" . 'sp-splice-sexp-killing-backward)
-           ("SPC ="     . 'sp-raise-sexp)))
+           ("-"         . 'sp-splice-sexp)
+           ("SPC 9"     . 'sp-change-enclosing)
+
+           ;; Change wrap placement
+           ("]"         . 'sp-forward-slurp-sexp)
+           ("["         . 'sp-forward-barf-sexp)
+           ("SPC ["     . 'sp-backward-slurp-sexp)
+           ("SPC ]"     . 'sp-backward-barf-sexp)
+           ("SPC ="     . 'sp-raise-sexp)
+
+           ;; Navigation
+           ("m"         . 'sp-backward-sexp)
+           ("."         . 'sp-forward-sexp)
+
+           ;; misc.
+           ("SPC 1"     . 'sp-join-sexp)
+           ("SPC SPC 1" . 'sp-split-sexp)
+           ("SPC SPC y" . 'my-sp-clone)))
+
+(defun my-sp-clone ()
+  (interactive)
+  (sp-clone-sexp)
+  (repeat-at-last-keystroke))
+
+(define-key-when my-kill-line-or-region
+    xah-fly-command-map "x" 'kill-region 'use-region-p)
 
 (require 'smartparens-config)
 
@@ -1243,23 +1278,12 @@ If there's no region, the current line will be duplicated."
       (let ((beg (region-beginning))
             (end (region-end)))
         (duplicate-region arg beg end)
-        (one-shot-keybinding "d"
-                             (lambda (duplicate-region 1 beg end))))
+        (one-shot-keybinding
+         "y"
+         (lambda (interactive)
+           (duplicate-region 1 beg end))))
     (duplicate-current-line arg)
-    (one-shot-keybinding "d" 'duplicate-current-line)))
-
-(defun one-shot-keybinding (key command)
-  (set-temporary-overlay-map
-   (let ((map (make-sparse-keymap)))
-     (define-key map (kbd key) command)
-     map) t))
-
-(defun replace-region-by (fn)
-  (let* ((beg (region-beginning))
-         (end (region-end))
-         (contents (buffer-substring beg end)))
-    (delete-region beg end)
-    (insert (funcall fn contents))))
+    (one-shot-keybinding "y" 'duplicate-current-line)))
 
 (defun duplicate-region (&optional num start end)
   "Duplicates the region bounded by START and END NUM times.
@@ -1273,14 +1297,6 @@ region-end is used."
       (goto-char end)
       (dotimes (i num)
         (insert region)))))
-
-(defun paredit-duplicate-current-line ()
-  (back-to-indentation)
-  (let (kill-ring kill-ring-yank-pointer)
-    (paredit-kill)
-    (yank)
-    (newline-and-indent)
-    (yank)))
 
 (defun duplicate-current-line (&optional num)
   "Duplicate the current line NUM times."
@@ -1436,10 +1452,9 @@ List of functions: `xah-toggle-letter-case', `my-change-case-of-current-line'."
 (define-key xah-fly-command-map (kbd "m") 'backward-sexp)
 (define-key xah-fly-command-map (kbd ".") 'forward-sexp)
 
-(require 'rect)
-
-(define-key xah-fly-command-map (kbd "SPC t") 'rectangle-mark-mode)
-(define-key xah-fly-command-map (kbd "SPC v") 'yank-rectangle)
+(use-package rect
+    :bind (("SPC t" . 'rectangle-mark-mode)
+           ("SPC v" . 'yank-rectangle)))
 
 (defun rectangle-mark-mode-p ()
   "Return t, when `rectangle-mark-mode' is enabled."
@@ -2752,7 +2767,7 @@ the `kill-ring', the selected region or the minibuffer"
     (company-auctex-init))
 
 (defcustom my-latex-math-spaces-binary-ops
-  '("\\+" "-" "\\\\cdot" "\\\\times" "=")
+  nil
   "List of the regexps which indicates an binary operator of the LaTeX math.
 
 Binary operator is a LaTeX command which no take arguments and needs to 2
@@ -2785,37 +2800,53 @@ In that list openning and closing parens should be added separately."
 
 (defun my-latex-math-spaces-for-binary-ops ()
   "Do insertion of the spaces for the last LaTeX binary operation, if needed."
+  (interactive)
   (let ((start (point)))
     (when (my-latex-math-spaces-goto-binary-op-start)
-      (just-spaces-to-1)
-      (goto-char start)
-      (my-latex-math-spaces-goto-binary-op-end)
+      (goto-char (+
+                  start
+                  (just-spaces-to-1)
+                  ;; traveled distance
+                  ))
       (just-spaces-to-1))))
 
 (add-hook 'my-latex-math-spaces-do-hook 'my-latex-math-spaces-for-binary-ops)
 
 (defun my-latex-math-spaces-goto-binary-op-start ()
   "Go to backward binary operation start when its looking back."
-  (let ((init (point))
-        binary-op-start)
+  (-any 'my-latex-math-spaces-skip-backward my-latex-math-spaces-binary-ops))
+
+(defun my-latex-math-spaces-for-parens ()
+  "Do insertion of the spaces for the last LaTeX parens commands, if needed."
+  (-when-let (paren (my-latex-math-spaces-goto-parens-start))
+    (just-spaces-to-1)
+    (my-latex-math-spaces-goto-binary-op-end)
+    (when (> (length paren) 1)
+      (just-spaces-to-1))))
+
+(add-hook 'my-latex-math-spaces-do-hook 'my-latex-math-spaces-for-binary-ops)
+
+(defun my-latex-math-spaces-goto-parens-start ()
+  "Go to the start of the LaTeX paren command, if it placed backward of point.
+
+Return a matched paren or nil if paren isn't found."
+  (-any 'my-latex-math-spaces-skip-backward my-latex-math-spaces-parens))
+
+(defun my-latex-math-space-for-backslash ()
+  "Do insertion of the spaces for the backward from point char \ , if needed."
+  (save-excursion
     (skip-chars-backward " ")
-    (setq binary-op-start
-          (-any 'my-latex-math-spaces-skip-backward
-                my-latex-math-spaces-binary-ops))
-    (if binary-op-start
-        binary-op-start
-      (goto-char init)
-      nil)))
+    (when (= (char-before) ?\\)
+      (forward-char -1)
+      (just-spaces-to-1))))
 
-(defun my-latex-math-spaces-goto-binary-op-end ()
-  "Go to the end of the binary operation."
-  (-any
-   'my-latex-math-spaces-skip-forward
-   my-latex-math-spaces-binary-ops))
+(add-hook 'my-latex-math-spaces-do-hook 'my-latex-math-space-for-backslash)
 
-(defun my-latex-math-spaces-skip-backward (regexp)
-  "Skip REGEXP looking back, if regexps match return point, else return nil."
-  (when (search-backward-regexp (s-concat regexp "\\=") nil t)
+(defun my-latex-math-spaces-skip-backward (regexp &optional ignore-spaces)
+  "Skip REGEXP looking back, if regexps match return point, else return nil.
+
+If IGNORE-SPACES is non-nil, then ignore backward-spaces"
+  (when (search-backward-regexp (s-concat regexp " *" "\\=") nil t)
     (goto-char (match-beginning 0))
     (match-string 0)))
 
@@ -2823,9 +2854,44 @@ In that list openning and closing parens should be added separately."
   "Skip REGEXP looking back, if regexps match return point, else return nil."
   (search-forward-regexp (s-concat "\\=" regexp) nil t))
 
+(defun my-latex-declare-bin-op (&rest ops)
+  "Define LaTeX binary OPS for auto insertion of the spaces in math."
+  (--each ops
+    (add-to-list 'my-latex-math-spaces-binary-ops it)))
+
+(defun my-latex-declare-parens (&rest parens)
+  "Define LaTeX PARENS for auto insertion of the spaces in math."
+  (--each ops
+    (add-to-list 'my-latex-math-spaces-parens it)))
+
 (use-package tex
     :ensure auctex
-    :hook (LaTeX-mode . my-latex-math-spaces-mode))
+    :hook (LaTeX-mode . my-latex-math-spaces-mode)
+    :config
+    (my-latex-declare-bin-op
+     "\\+"
+     "-"
+     "\\\\cdot"
+     "\\\\times"
+     "="
+     "\\\\neq"
+     "&="
+     "\\\\mapsto"
+     "\\\\pm"
+     "\\\\mp"
+     "\\\\to"
+     "\\\\ll"
+     "\\\\leq"
+     "\\\\diamond"
+     "\\\\impliedby"
+     "\\\\implies"
+     "\\\\geq"
+     "\\\\gg"
+     "\\\\in"
+     "\\\\models"
+     "\\\\mid"
+     "\\\\approx"
+     "\\\\sim"))
 
 (use-package org
     :major-mode-map (org-mode)
@@ -2848,7 +2914,7 @@ In that list openning and closing parens should be added separately."
      ("6"   . 'org-mark-subtree)
      ("w"   . 'my-org-clear-subtree)
      ([tab] . 'org-refile)
-     ("1"   . 'org-todo)
+     ("1"   . 'my-org-todo)
      (";"   . 'org-set-tags-command)
      ("a"   . 'org-archive-subtree)
      ("z"   . 'org-toggle-comment)
@@ -2928,6 +2994,17 @@ In that list openning and closing parens should be added separately."
   (save-excursion
     (org-mark-subtree)
     (indent-region (region-beginning) (region-end))))
+
+(defun my-org-todo ()
+  "My version of the `org-todo'.
+
+Different with the original functions is that this function can be repeated by
+pressing of the previous last pressed char.  So if functions is bound to
+\"SPC l 1\", that after pressing that user can press \"1\" and this command will
+be repeated"
+  (interactive)
+  (call-interactively #'org-todo)
+  (one-shot-keybinding "1" 'my-org-todo))
 
 (defun my-org-insert-image (filename &optional caption)
   "Insert a image with FILENAME.
@@ -3299,9 +3376,8 @@ Only when in class defnition."
            ("[" . 'paxedit-open-bracket)
            ("{" . 'paxedit-open-curly)
            (:map my-elisp-local-map)
-           ("o" . 'paxedit-transpose-forward)
-           ("u" . 'paxedit-transpose-backward)
-           ("u" . 'paxedit-transpose-backward)
+           ("o" . 'my-paxedit-transpose-forward)
+           ("u" . 'my-paxedit-transpose-backward)
            ("x" . 'paxedit-kill)
            ("w" . 'my-paxedit-change)
            ("d" . 'paxedit-symbol-kill)
@@ -3332,6 +3408,16 @@ Only when in class defnition."
   (and (= beg (save-excursion (beginning-of-line-text)
                               (point)))
        (= end (point-at-eol))))
+
+(defun my-paxedit-transpose-forward ()
+  (interactive)
+  (call-interactively #'paxedit-transpose-forward)
+  (repeat-at-last-keystroke))
+
+(defun my-paxedit-transpose-backward ()
+  (interactive)
+  (call-interactively #'paxedit-transpose-backward)
+  (repeat-at-last-keystroke))
 
 (use-package racket-mode
     :ensure t
@@ -3753,7 +3839,6 @@ List of racket expressions in which this function should work:
     (dolist (hook (list 'web-mode-hook 'css-mode-hook))
       (add-hook hook 'css-eldoc-enable)))
 
-(show-paren-mode 2)
 (setq make-backup-files         nil)
 (setq auto-save-list-file-name  nil)
 (defalias 'yes-or-no-p 'y-or-n-p)

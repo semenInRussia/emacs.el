@@ -6,7 +6,7 @@
 
 ** Targets on Week
 
-*** TODO Change =xah-fly-keys= to =ryo=
+*** DONE Change =xah-fly-keys= to =ryo=
 
 *** TODO =racket-mmanager=
 
@@ -73,6 +73,7 @@ See on the compile command from the =latex-extra=
 9_Иванов И._ЛФ-1.pdf
 #+END_EXAMPLE
 *** TODO Use =sp= instead of =paxedit= when can
+*** TODO Fix the =LaTEX= section insertion
 ** Targets on Day
 
 *** TODO Complete a automatic management of the spaces to =LaTeX=
@@ -85,7 +86,7 @@ SCHEDULED: <2022-09-08 Чт>
   SCHEDULED: <2022-09-11 Вс>
 * Films 
 
-** MUST-SEE The Green Mile
+** SAW The Green Mile
 :PROPERTIES:
 :name:     Зеленая миля
 :year:     1999
