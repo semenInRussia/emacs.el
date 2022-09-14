@@ -6,8 +6,6 @@
 
 ** Targets on Week
 
-*** DONE Change =xah-fly-keys= to =ryo=
-
 *** TODO =racket-mmanager=
 
 *** TODO explore the =xetex=                                          :latex:
@@ -23,10 +21,6 @@
 *** TODO explore the =org-tempo=                                        :org:
 
 *** TODO explore the =org-publish=                                      :org:
-
-*** TODO explore the =org-export=                                       :org:
-
-Also use some themes for exporting to the =html=
 
 *** TODO explore the =org-speed-commands=                               :org:
 
@@ -76,14 +70,19 @@ See on the compile command from the =latex-extra=
 *** TODO Fix the =LaTEX= section insertion
 ** Targets on Day
 
-*** TODO Complete a automatic management of the spaces to =LaTeX=
+*** DONE explore the =org-export=                                     :org:
+SCHEDULED: <2022-09-14 Ср>
+
+Also use some themes for exporting to the =html=
+
+*** DONE Complete a automatic management of the spaces to =LaTeX=
 SCHEDULED: <2022-09-08 Чт>
 
 - Add functions for declaring binary ops/parens
 - Manage spaces for parens
 - Manage spaces for all normal commands (argument and nonargument)
-*** TODO =smartparens=
-  SCHEDULED: <2022-09-11 Вс>
+*** DONE =smartparens=
+SCHEDULED: <2022-09-11 Вс>
 * Films 
 
 ** SAW The Green Mile

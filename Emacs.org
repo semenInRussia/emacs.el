@@ -86,6 +86,7 @@ I'm use followed repositories as a template for my Emacs config:
   - [[#documentation-on-fly][Documentation on Fly]]
   - [[#transpose][Transpose]]
     - [[#define-extensible-drag-system][Define Extensible Drag System]]
+    - [[#some-standard-draggers][Some standard draggers]]
     - [[#draggers-of-drag-stuff][Draggers of =drag-stuff=]]
     - [[#draggers-for-org-mode][Draggers for =org-mode=]]
     - [[#draggers-for-latex][Draggers for =LaTeX=]]
@@ -129,6 +130,7 @@ I'm use followed repositories as a template for my Emacs config:
       - [[#load-from-wiki][Load from Wiki]]
       - [[#drag-and-drop-images-to-org][Drag and Drop Images to Org]]
       - [[#navigation-beetween-org-headings-in-current-buffer][Navigation beetween Org Headings in Current Buffer]]
+      - [[#export-org-to-other][Export Org to Other]]
       - [[#improvement-navigation-beetween-the-org-mode-headings][Improvement Navigation beetween the =org-mode= Headings]]
       - [[#paste-link-from-browser][Paste Link from Browser]]
       - [[#generate-table-of-contents-in-org-mode-][Generate Table of Contents in =org-mode= ==]]
@@ -705,7 +707,7 @@ I am use [[https://github.com/xahlee/xah-fly-keys][xah-fly-keys]], this as VIM, 
            ("SPC l"   . nil)
            ("SPC j"   . nil)
            ("SPC SPC" . nil)))
-    #+END_SRC
+#+END_SRC
 
 *** Easy Create Major Modes Maps
 
@@ -721,7 +723,9 @@ I am use =use-package=, so I'm add flag =:major-mode-map= for create major modes
     (interactive)
     (set-transient-map my-local-major-mode-map))
 
-  (define-key xah-fly-command-map (kbd "SPC l") 'my-local-major-mode-map-run)
+  (bind-keys
+   :map xah-fly-command-map
+   ("SPC l" . my-local-major-mode-map-run))
 
   #+END_SRC
 
@@ -790,26 +794,28 @@ I am use [[https://github.com/semenInRussia/fast-exec.el][fast-exec]]:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (require 'fast-exec)
+  (use-package fast-exec
+      :bind ((:map xah-fly-command-map)
+             ("=" . 'fast-exec/exec))
+      :config
+      (fast-exec/enable-some-builtin-supports
+       haskell-mode
+       flycheck
+       magit
+       org-agenda
+       deadgrep
+       projectile
+       package
+       skeletor
+       yasnippet
+       format-all
+       wikinforg
+       suggest
+       devdocs
+       helm-wikipedia)
+      (fast-exec/initialize))
 
-  (fast-exec/enable-some-builtin-supports haskell-mode
-                                          flycheck
-                                          magit
-                                          org-agenda
-                                          deadgrep
-                                          projectile
-                                          package
-                                          skeletor
-                                          yasnippet
-                                          format-all
-                                          wikinforg
-                                          suggest
-                                          devdocs
-                                          helm-wikipedia)
 
-  (fast-exec/initialize)
-
-  (define-key xah-fly-command-map (kbd "=") 'fast-exec/exec)
 
   #+END_SRC
 
@@ -1092,9 +1098,12 @@ I am use =SPC r= for replace word in buffer, and =SPC SPC r= for replace word in
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (define-key xah-fly-command-map (kbd "SPC SPC r") 'projectile-replace)
+  (use-package projectile
+      :ensure t
+      :bind ((:map xah-fly-command-map)
+             ("SPC SPC r" . 'projectile-replace)))
 
-  #+END_SRC
+#+END_SRC
 
 *** Search and Replace in Current Buffer
 
@@ -1570,7 +1579,7 @@ For enable builtin smartparens configuration for major modes, add require statem
     )
 
   (define-key xah-fly-command-map (kbd "DEL") 'delete-only-1-char)
-  #+END_SRC
+#+END_SRC
 
 ** Managing of the Parens
 
@@ -1621,6 +1630,12 @@ I am use =\= in command mode for start of record macro.
 I am also use =SPC RET= for execute last macro or execute macro to lines:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (use-package kmacro
+      :ensure t
+      :bind ((:map xah-fly-command-map)
+             ("\\"      . 'kmacro-start-or-end-macro)
+             ("SPC RET" . 'kmacro-call-macro-or-apply-to-lines)))
+
   (defun kmacro-start-or-end-macro ()
     "If macro record have just started, then stop this record, otherwise start."
     (interactive)
@@ -1628,21 +1643,17 @@ I am also use =SPC RET= for execute last macro or execute macro to lines:
         (kmacro-end-macro 1)
       (kmacro-start-macro 1)))
 
-  (define-key xah-fly-command-map (kbd "\\") 'kmacro-start-or-end-macro)
-
-  (defun kmacro-call-macro-or-apply-to-lines (arg &optional top bottom)
+  (defun kmacro-call-macro-or-apply-to-lines (&optional top bottom)
     "If selected region, then apply macro to selected lines, otherwise call macro."
     (interactive
-     (list
-      1
-      (if (use-region-p) (region-beginning) nil)
-      (if (use-region-p) (region-end) nil)))
-
+     (if (use-region-p)
+         (list (region-beginning) (region-end))
+       (list nil nil)))
     (if (use-region-p)
         (apply-macro-to-region-lines top bottom)
-      (kmacro-call-macro arg)))
+      (kmacro-call-macro 1)))
 
-  (define-key xah-fly-command-map (kbd "SPC RET") 'kmacro-call-macro-or-apply-to-lines)
+
 
   #+END_SRC
 
@@ -1696,128 +1707,78 @@ followed functions:
     return t when word was successufully moved:
 
     #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-      (defun my-drag-stuff-left-char ()
-        "Drag char to left."
-        (interactive)
-        (transpose-chars -1))
-
-      (defun my-drag-stuff-right-char ()
-        "Drag char to right."
-        (interactive)
-        (transpose-chars 1))
 
       (defcustom my-left-draggers nil
         "Functions, which drag stuff to left, or return nil.
-      Is used in `my-drag-stuff-left'.")
+
+      It is used in `my-drag-stuff-left'.")
 
       (defun my-drag-stuff-left ()
         "My more general and functional version of `drag-stuff-left'."
         (interactive)
-        (--find (call-interactively it) my-left-draggers)
-        (message "Start dragging, use keys u, i, o, k. Type RET for exit..."))
+        (my-drag-anything my-left-draggers))
 
       (defcustom my-right-draggers nil
         "Functions, which drag stuff to right, or return nil.
-      Is used in `my-drag-stuff-right'.")
+
+       It is used in `my-drag-stuff-right'.")
 
       (defun my-drag-stuff-right ()
         "My more general and functional version of `drag-stuff-right'."
         (interactive)
-        (--find (call-interactively it) my-right-draggers)
-        (message "Start dragging, use keys u, i, o, k. Type RET for exit..."))
+        (my-drag-anything my-right-draggers))
 
       (defcustom my-up-draggers nil
         "Functions, which drag stuff to up, or return nil.
+
       Is used in `my-drag-stuff-up'.")
 
       (defun my-drag-stuff-up ()
         "My more general and functional version of `drag-stuff-up'."
         (interactive)
-        (--find (call-interactively it) my-up-draggers)
-        (message "Start dragging, use keys u, i, o, k. Type RET for exit..."))
+        (my-drag-anything my-up-draggers))
 
       (defcustom my-down-draggers nil
         "Functions, which drag stuff to up, or return nil.
-      Is used in `my-drag-stuff-down'.")
+
+      It is used in `my-drag-stuff-down'.")
 
       (defun my-drag-stuff-down ()
         "My more general and functional version of `drag-stuff-down'."
         (interactive)
-        (--find (call-interactively it) my-down-draggers)
-        (message "Start dragging, use keys u, i, o, k. Type RET for exit..."))
+        (my-drag-anything my-down-draggers))
+
+      (defun my-drag-anything (draggers)
+        "Find and call first found true dragger from the DRAGGERS list.
+
+      After a call of the this command, current map will be setted to `my-drag-map'
+      for return the current map back, press either RET or a key which isn't bound in
+      `my-drag-map'.
+
+      True dragger mean that its function return non-nil when called interactively."
+        (--find (call-interactively it) draggers)
+        (message "Start dragging, use keys u, i, o, k. Type RET for exit...")
+        (set-transient-map my-drag-map))
 
       (defun add-left-dragger (f)
         "Add F to list draggers for `my-drag-stuff-left'."
-        (when (-contains-p my-left-draggers f)
-          (setq my-left-draggers (remove f my-left-draggers)))
-        (setq my-left-draggers (cons f my-left-draggers)))
+        (add-to-list 'my-left-draggers f))
 
       (defun add-right-dragger (f)
         "Add F to list draggers for `my-drag-stuff-right'."
-        (when (-contains-p my-right-draggers f)
-          (setq my-right-draggers (remove f my-right-draggers)))
-        (setq my-right-draggers (cons f my-right-draggers)))
+        (add-to-list 'my-right-draggers f))
 
       (defun add-up-dragger (f)
         "Add F to list draggers for `my-drag-stuff-up'."
-        (when (-contains-p my-up-draggers f)
-          (setq my-up-draggers (remove f my-up-draggers)))
-        (setq my-up-draggers (cons f my-up-draggers)))
+        (add-to-list 'my-up-draggers f))
 
       (defun add-down-dragger (f)
         "Add F to list draggers for `my-drag-stuff-down'."
-        (when (-contains-p my-down-draggers f)
-          (setq my-down-draggers (remove f my-down-draggers)))
-        (setq my-down-draggers (cons f my-down-draggers)))
+        (add-to-list 'my-down-draggers f))
 
       (defun add-right-dragger (f)
         "Add F to list draggers for `my-drag-stuff-right'."
-        (when (-contains-p my-right-draggers f)
-          (setq my-right-draggers (remove f my-right-draggers)))
-        (setq my-right-draggers (cons f my-right-draggers)))
-
-      (defcustom my-drag-stuff-functions '(my-drag-stuff-up
-                                           my-drag-stuff-down
-                                           my-drag-stuff-right
-                                           my-drag-stuff-left
-                                           my-drag-stuff-right-char
-                                           my-drag-stuff-left-char)
-        "List of my functions, which always drag stuffs.")
-
-      (defun my-last-command-is-drag-stuff-p ()
-        "Get t, when last command is one of `my-drag-stuff-functions'."
-        (interactive)
-        (-contains-p my-drag-stuff-functions last-command))
-
-      (defvar my-last-command-is-drag-stuff nil
-        "If last command is one of my functions which draged word then this in true.")
-
-      (defun my-last-command-is-dragged-stuff-p ()
-        "Return t, when last command dragged someone stuff."
-        (or
-         (my-last-command-is-drag-stuff-p)
-         (and
-          (s-contains-p "drag-stuff" (symbol-name last-command))
-          my-last-command-is-drag-stuff)))
-
-      (defmacro my-define-stuff-key (keymap key normal-command drag-command)
-        "Define in KEYMAP to KEY command when run NORMAL-COMMAND or DRAG-COMMAND."
-        (let ((command-name (intern
-                             (s-concat
-                              "my-"
-                              (symbol-name (eval normal-command))
-                              "-or-"
-                              (symbol-name (eval drag-command))))))
-          `(progn
-             (defun ,command-name ()
-               ,(s-lex-format "Run `${normal-command}' or `${drag-command}'.")
-               (interactive)
-               (let* ((is-drag (my-last-command-is-dragged-stuff-p)))
-                 (setq my-last-command-is-drag-stuff is-drag)
-                 (if is-drag
-                     (call-interactively ,drag-command)
-                   (call-interactively ,normal-command))))
-             (define-key ,keymap ,key #',command-name))))
+        (add-to-list 'my-right-draggers f))
 
       (defun stop-drag ()
         "Stop drag, just something print, and nothing do, set to nil something."
@@ -1825,49 +1786,18 @@ followed functions:
         (setq my-last-command-is-drag-stuff nil)
         (message "Turn `drag' to normal!"))
 
-      (define-key-when
-          my-insert-new-line-or-nothing
-          xah-fly-command-map
-        ""
-        'stop-drag
-        'my-last-command-is-dragged-stuff-p)
+      (defcustom my-drag-map (make-sparse-keymap "my-drag-map")
+        "Keymap for my own small drag system."
+        :type 'keymap)
 
-      (my-define-stuff-key
-       xah-fly-command-map
-       "j"
-       #'backward-char
-       #'my-drag-stuff-left-char)
-
-      (my-define-stuff-key
-       xah-fly-command-map
-       "l"
-       #'forward-char
-       #'my-drag-stuff-right-char)
-
-      (my-define-stuff-key
-       xah-fly-command-map
-       "o"
-       #'syntax-subword-forward
-       #'my-drag-stuff-right)
-
-      (my-define-stuff-key
-       xah-fly-command-map
-       "u"
-       #'syntax-subword-backward
-       #'my-drag-stuff-left)
-
-      (my-define-stuff-key
-       xah-fly-command-map
-       "i"
-       #'previous-line
-       #'my-drag-stuff-up)
-
-      (my-define-stuff-key
-       xah-fly-command-map
-       "k"
-       #'next-line
-       #'my-drag-stuff-down)
-       #+END_SRC
+      (bind-keys
+       :map my-drag-map
+       ("RET" . stop-drag)
+       ("i"   . my-drag-stuff-up)
+       ("k"   . my-drag-stuff-down)
+       ("o"   . my-drag-stuff-right)
+       ("u"   . my-drag-stuff-left))
+#+END_SRC
 
 I also need to define key for usage, here also define other tranpose
 commands:
@@ -1877,21 +1807,33 @@ commands:
   (use-package drag-stuff
       :ensure t
       :config
+      (define-key xah-fly-command-map (kbd "SPC TAB") my-drag-map)
       (drag-stuff-global-mode t)
       :bind
-      ((:map xah-fly-command-map)
-       ("SPC TAB j" . 'my-drag-stuff-left-char)
-       ("SPC TAB l" . 'my-drag-stuff-right-char)
-       ("SPC TAB i" . 'my-drag-stuff-up)
-       ("SPC TAB k" . 'my-drag-stuff-down)
-       ("SPC TAB o" . 'my-drag-stuff-right)
-       ("SPC TAB u" . 'my-drag-stuff-left)
-       ("SPC TAB ." . 'transpose-sexps)
-       ("SPC TAB m" . 'transpose-sexps)
-       ("SPC TAB n" . 'avy-transpose-lines-in-region)
-       ("SPC TAB t" . 'transpose-regions)))
+      ((:map my-drag-map)
+       ("j"       . 'my-drag-stuff-left-char)
+       ("."       . 'transpose-sexps)
+       ("m"       . 'transpose-sexps)
+       ("n"       . 'avy-transpose-lines-in-region)
+       ("l"       . 'my-drag-stuff-right-char)
+       ("t"       . 'transpose-regions)))
 
-       #+END_SRC
+#+END_SRC
+
+*** Some standard draggers
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (defun my-drag-stuff-left-char ()
+    "Drag char to left."
+    (interactive)
+    (transpose-chars -1))
+
+  (defun my-drag-stuff-right-char ()
+    "Drag char to right."
+    (interactive)
+    (transpose-chars 1))
+#+END_SRC
 
 *** Draggers of =drag-stuff=
 
@@ -1968,7 +1910,10 @@ I am use [[*Define Extensible Drag System][my drag system]] and built in =org= f
   (add-down-dragger 'my-drag-org-down)
   (add-up-dragger 'my-drag-org-up)
 
-  #+END_SRC
+#+END_SRC
+
+#+RESULTS:
+| my-latex-try-drag-left-list-item | my-drag-org-up | drag-stuff-up |
 
 *** Draggers for =LaTeX=
 
@@ -2050,9 +1995,12 @@ I need to the function for the transposing of an list items
 
 #+END_SRC
 
+#+RESULTS:
+| my-latex-try-drag-right-list-item | my-drag-org-down | drag-stuff-down |
+
 ** Custom Deleting Text
 
-I am delete this line and edit this by press =w=:
+I am delete line at the cursor and edit that by press =w=:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
@@ -2060,13 +2008,12 @@ I am delete this line and edit this by press =w=:
     "Delete current line and instroduce to insert mode."
     (interactive)
     (beginning-of-line-text)
-    (kill-line)
-    (xah-fly-insert-mode-init)
-    )
+    (sp-kill-whole-line)
+    (xah-fly-insert-mode-init))
 
   (define-key xah-fly-command-map (kbd "w") 'delete-and-edit-current-line)
 
-  #+END_SRC
+#+END_SRC
 
 I am delete content of this line (including whitespaces) on press =SPC w=:
 
@@ -2075,11 +2022,11 @@ I am delete content of this line (including whitespaces) on press =SPC w=:
   (defun clear-current-line ()
     "Clear content of current line (including whitespaces)."
     (interactive)
-    (kill-region (line-beginning-position) (line-end-position))
-    )
+    (kill-region (line-beginning-position) (line-end-position)))
 
   (define-key xah-fly-command-map (kbd "SPC w") 'clear-current-line)
-  #+END_SRC
+
+#+END_SRC
 
 ** Custom Selecting Text
 
@@ -2091,8 +2038,7 @@ I am press 2 times =8= for selecting 2 words
     (interactive)
     (if (use-region-p)
         (forward-word)
-      (xah-extend-selection))
-    )
+      (xah-extend-selection)))
 
   (define-key xah-fly-command-map (kbd "8") 'select-current-or-next-word)
 
@@ -2110,8 +2056,8 @@ this select:
         (deactivate-mark)
       (xah-delete-current-text-block)))
 
-  (define-key xah-fly-command-map (kbd "g") nil)
-  (define-key xah-fly-command-map (kbd "g") 'delete-current-text-block-or-cancel-selection)
+  (define-key xah-fly-command-map
+      (kbd "g") 'delete-current-text-block-or-cancel-selection)
 
   #+END_SRC
 
@@ -2126,7 +2072,7 @@ I am press =-= for change position when select text to begin/end of selected reg
     'exchange-point-and-mark
     'use-region-p)
 
-    #+END_SRC
+#+END_SRC
 
 ** Custom Editing Text
 
@@ -2146,7 +2092,7 @@ I am use =s= for inserting new line:
 
   (define-key xah-fly-command-map (kbd "s") 'open-line-saving-indent)
 
-  #+END_SRC
+#+END_SRC
 
 And =SPC s= for new line below and =SPC SPC s= for new line above:
 
@@ -2389,7 +2335,8 @@ is enabled for replace rectangle:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
   (use-package rect
-      :bind (("SPC t" . 'rectangle-mark-mode)
+      :bind ((:map xah-fly-command-map)
+             ("SPC t" . 'rectangle-mark-mode)
              ("SPC v" . 'yank-rectangle)))
 
   (defun rectangle-mark-mode-p ()
@@ -4407,6 +4354,32 @@ I am use [[https://github.com/emacs-helm/helm-org][helm-org]] for navigation in 
 
                    #+END_SRC
 
+**** Export Org to Other
+
+I am use built-in the =org-mode= command named =org-export=
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (use-package ox
+
+      ;; bound of the keybinding for the `org-export' is already defined in the
+      ;; start of the Heading "Org"
+
+      :custom ((org-export-coding-system     'utf-8)
+               (org-export-with-smart-quotes t)))
+#+END_SRC
+
+***** Export Org to LaTeX
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package ox-latex
+      :after (ox)
+      :custom ((org-latex-listings 'minted)
+               (org-latex-caption-above '(table image))
+               (org-latex-packages-alist '(("AUTO" "babel" nil ("pdflatex"))))))
+
+#+END_SRC
+
 **** Improvement Navigation beetween the =org-mode= Headings
 
 I am use [[https://github.com/alphapapa/org-ql][org-ql]] for smart queries to find my =org= Files:
@@ -5757,15 +5730,15 @@ I am use [[https://github.com/Wilfred/helpful][helpful]], for pretty help info a
 
   (use-package helpful
       :ensure t
-      :init
-      (global-set-key (kbd "C-h f") #'helpful-callable)
-      (global-set-key (kbd "C-h v") #'helpful-variable)
-      (global-set-key (kbd "C-h k") #'helpful-key)
-      (global-set-key (kbd "C-c C-d") #'helpful-at-point)
-      (global-set-key (kbd "C-h F") #'helpful-function)
-      (global-set-key (kbd "C-h C") #'helpful-command))
+      :bind
+      (("C-h f"   . 'helpful-callable)
+       ("C-h v"   . 'helpful-variable)
+       ("C-h k"   . 'helpful-key)
+       ("C-c C-d" . 'helpful-at-point)
+       ("C-h F"   . 'helpful-function)
+       ("C-h C"   . 'helpful-command)))
 
-      #+END_SRC
+#+END_SRC
 
 ** Autocompletion of Commands (HELM)
 
@@ -5775,24 +5748,22 @@ I am use [[https://github.com/emacs-helm/helm][HELM]]:
 
   (use-package helm
       :ensure t
+      :after (helm-core)
+      :config (helm-mode t)
+      :init (defvar helm-completion-style nil)
+      :hook (helm-mode . helm-autoresize-mode)
       :custom
-      (helm-M-x-fuzzy-match        t)
-      (helm-buffers-fuzzy-matching t)
-      (helm-recentf-fuzzy-match    t)
-      (helm-imenu-fuzzy-match      t)
-      (helm-autoresize-min-height 20)
-      (helm-left-margin-width 2)
+      (helm-M-x-fuzzy-match           t)
+      (helm-buffers-fuzzy-matching    t)
+      (helm-recentf-fuzzy-match       t)
+      (helm-imenu-fuzzy-match         t)
+      (helm-autoresize-min-height    20)
+      (helm-left-margin-width         2)
       (helm-buffers-left-margin-width 2)
       :bind (("C-h a"     . 'helm-apropos)
              (:map xah-fly-command-map)
              ("SPC SPC f" . 'helm-find-files)
-             ("SPC k r"   . 'helm-regexp))
-
-      :init
-      (helm-autoresize-mode +1)
-      (helm-mode +1)
-      ;; this fix one bug
-      (defvar helm-completion-style nil))
+             ("SPC k r"   . 'helm-regexp)))
 
 #+END_SRC
 

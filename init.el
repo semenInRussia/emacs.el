@@ -237,7 +237,9 @@ Info take from var `user-os`, user must set it."
   (interactive)
   (set-transient-map my-local-major-mode-map))
 
-(define-key xah-fly-command-map (kbd "SPC l") 'my-local-major-mode-map-run)
+(bind-keys
+ :map xah-fly-command-map
+ ("SPC l" . my-local-major-mode-map-run))
 
 (add-to-list 'use-package-keywords :major-mode-map)
 
@@ -280,26 +282,26 @@ Info take from var `user-os`, user must set it."
                                         ',map))))))))
     (use-package-process-keywords name rest)))
 
-(require 'fast-exec)
-
-(fast-exec/enable-some-builtin-supports haskell-mode
-                                        flycheck
-                                        magit
-                                        org-agenda
-                                        deadgrep
-                                        projectile
-                                        package
-                                        skeletor
-                                        yasnippet
-                                        format-all
-                                        wikinforg
-                                        suggest
-                                        devdocs
-                                        helm-wikipedia)
-
-(fast-exec/initialize)
-
-(define-key xah-fly-command-map (kbd "=") 'fast-exec/exec)
+(use-package fast-exec
+    :bind ((:map xah-fly-command-map)
+           ("=" . 'fast-exec/exec))
+    :config
+    (fast-exec/enable-some-builtin-supports
+     haskell-mode
+     flycheck
+     magit
+     org-agenda
+     deadgrep
+     projectile
+     package
+     skeletor
+     yasnippet
+     format-all
+     wikinforg
+     suggest
+     devdocs
+     helm-wikipedia)
+    (fast-exec/initialize))
 
 (use-package aas
     :ensure t
@@ -425,7 +427,10 @@ Instead of KEY will command FUN-NAME"
            xah-fly-command-map
            ("SPC '" . deadgrep)))
 
-(define-key xah-fly-command-map (kbd "SPC SPC r") 'projectile-replace)
+(use-package projectile
+    :ensure t
+    :bind ((:map xah-fly-command-map)
+           ("SPC SPC r" . 'projectile-replace)))
 
 (use-package visual-regexp
     :ensure t
@@ -836,6 +841,12 @@ Action of `avy', see `avy-action-yank' for example"
           ("9" . mark-inner-or-expand-region)
           ("m" . sp-backward-up-sexp)))
 
+(use-package kmacro
+    :ensure t
+    :bind ((:map xah-fly-command-map)
+           ("\\"      . 'kmacro-start-or-end-macro)
+           ("SPC RET" . 'kmacro-call-macro-or-apply-to-lines)))
+
 (defun kmacro-start-or-end-macro ()
   "If macro record have just started, then stop this record, otherwise start."
   (interactive)
@@ -843,21 +854,15 @@ Action of `avy', see `avy-action-yank' for example"
       (kmacro-end-macro 1)
     (kmacro-start-macro 1)))
 
-(define-key xah-fly-command-map (kbd "\\") 'kmacro-start-or-end-macro)
-
-(defun kmacro-call-macro-or-apply-to-lines (arg &optional top bottom)
+(defun kmacro-call-macro-or-apply-to-lines (&optional top bottom)
   "If selected region, then apply macro to selected lines, otherwise call macro."
   (interactive
-   (list
-    1
-    (if (use-region-p) (region-beginning) nil)
-    (if (use-region-p) (region-end) nil)))
-
+   (if (use-region-p)
+       (list (region-beginning) (region-end))
+     (list nil nil)))
   (if (use-region-p)
       (apply-macro-to-region-lines top bottom)
-    (kmacro-call-macro arg)))
-
-(define-key xah-fly-command-map (kbd "SPC RET") 'kmacro-call-macro-or-apply-to-lines)
+    (kmacro-call-macro 1)))
 
 (use-package string-edit
     :ensure t
@@ -866,6 +871,110 @@ Action of `avy', see `avy-action-yank' for example"
 
 (use-package eldoc
     :custom ((eldoc-idle-delay 0.01)))
+
+(defcustom my-left-draggers nil
+  "Functions, which drag stuff to left, or return nil.
+
+It is used in `my-drag-stuff-left'.")
+
+(defun my-drag-stuff-left ()
+  "My more general and functional version of `drag-stuff-left'."
+  (interactive)
+  (my-drag-anything my-left-draggers))
+
+(defcustom my-right-draggers nil
+  "Functions, which drag stuff to right, or return nil.
+
+ It is used in `my-drag-stuff-right'.")
+
+(defun my-drag-stuff-right ()
+  "My more general and functional version of `drag-stuff-right'."
+  (interactive)
+  (my-drag-anything my-right-draggers))
+
+(defcustom my-up-draggers nil
+  "Functions, which drag stuff to up, or return nil.
+
+Is used in `my-drag-stuff-up'.")
+
+(defun my-drag-stuff-up ()
+  "My more general and functional version of `drag-stuff-up'."
+  (interactive)
+  (my-drag-anything my-up-draggers))
+
+(defcustom my-down-draggers nil
+  "Functions, which drag stuff to up, or return nil.
+
+It is used in `my-drag-stuff-down'.")
+
+(defun my-drag-stuff-down ()
+  "My more general and functional version of `drag-stuff-down'."
+  (interactive)
+  (my-drag-anything my-down-draggers))
+
+(defun my-drag-anything (draggers)
+  "Find and call first found true dragger from the DRAGGERS list.
+
+After a call of the this command, current map will be setted to `my-drag-map'
+for return the current map back, press either RET or a key which isn't bound in
+`my-drag-map'.
+
+True dragger mean that its function return non-nil when called interactively."
+  (--find (call-interactively it) draggers)
+  (message "Start dragging, use keys u, i, o, k. Type RET for exit...")
+  (set-transient-map my-drag-map))
+
+(defun add-left-dragger (f)
+  "Add F to list draggers for `my-drag-stuff-left'."
+  (add-to-list 'my-left-draggers f))
+
+(defun add-right-dragger (f)
+  "Add F to list draggers for `my-drag-stuff-right'."
+  (add-to-list 'my-right-draggers f))
+
+(defun add-up-dragger (f)
+  "Add F to list draggers for `my-drag-stuff-up'."
+  (add-to-list 'my-up-draggers f))
+
+(defun add-down-dragger (f)
+  "Add F to list draggers for `my-drag-stuff-down'."
+  (add-to-list 'my-down-draggers f))
+
+(defun add-right-dragger (f)
+  "Add F to list draggers for `my-drag-stuff-right'."
+  (add-to-list 'my-right-draggers f))
+
+(defun stop-drag ()
+  "Stop drag, just something print, and nothing do, set to nil something."
+  (interactive)
+  (setq my-last-command-is-drag-stuff nil)
+  (message "Turn `drag' to normal!"))
+
+(defcustom my-drag-map (make-sparse-keymap "my-drag-map")
+  "Keymap for my own small drag system."
+  :type 'keymap)
+
+(bind-keys
+ :map my-drag-map
+ ("RET" . stop-drag)
+ ("i"   . my-drag-stuff-up)
+ ("k"   . my-drag-stuff-down)
+ ("o"   . my-drag-stuff-right)
+ ("u"   . my-drag-stuff-left))
+
+(use-package drag-stuff
+    :ensure t
+    :config
+    (define-key xah-fly-command-map (kbd "SPC TAB") my-drag-map)
+    (drag-stuff-global-mode t)
+    :bind
+    ((:map my-drag-map)
+     ("j"       . 'my-drag-stuff-left-char)
+     ("."       . 'transpose-sexps)
+     ("m"       . 'transpose-sexps)
+     ("n"       . 'avy-transpose-lines-in-region)
+     ("l"       . 'my-drag-stuff-right-char)
+     ("t"       . 'transpose-regions)))
 
 (defun my-drag-stuff-left-char ()
   "Drag char to left."
@@ -876,185 +985,6 @@ Action of `avy', see `avy-action-yank' for example"
   "Drag char to right."
   (interactive)
   (transpose-chars 1))
-
-(defcustom my-left-draggers nil
-  "Functions, which drag stuff to left, or return nil.
-Is used in `my-drag-stuff-left'.")
-
-(defun my-drag-stuff-left ()
-  "My more general and functional version of `drag-stuff-left'."
-  (interactive)
-  (--find (call-interactively it) my-left-draggers)
-  (message "Start dragging, use keys u, i, o, k. Type RET for exit..."))
-
-(defcustom my-right-draggers nil
-  "Functions, which drag stuff to right, or return nil.
-Is used in `my-drag-stuff-right'.")
-
-(defun my-drag-stuff-right ()
-  "My more general and functional version of `drag-stuff-right'."
-  (interactive)
-  (--find (call-interactively it) my-right-draggers)
-  (message "Start dragging, use keys u, i, o, k. Type RET for exit..."))
-
-(defcustom my-up-draggers nil
-  "Functions, which drag stuff to up, or return nil.
-Is used in `my-drag-stuff-up'.")
-
-(defun my-drag-stuff-up ()
-  "My more general and functional version of `drag-stuff-up'."
-  (interactive)
-  (--find (call-interactively it) my-up-draggers)
-  (message "Start dragging, use keys u, i, o, k. Type RET for exit..."))
-
-(defcustom my-down-draggers nil
-  "Functions, which drag stuff to up, or return nil.
-Is used in `my-drag-stuff-down'.")
-
-(defun my-drag-stuff-down ()
-  "My more general and functional version of `drag-stuff-down'."
-  (interactive)
-  (--find (call-interactively it) my-down-draggers)
-  (message "Start dragging, use keys u, i, o, k. Type RET for exit..."))
-
-(defun add-left-dragger (f)
-  "Add F to list draggers for `my-drag-stuff-left'."
-  (when (-contains-p my-left-draggers f)
-    (setq my-left-draggers (remove f my-left-draggers)))
-  (setq my-left-draggers (cons f my-left-draggers)))
-
-(defun add-right-dragger (f)
-  "Add F to list draggers for `my-drag-stuff-right'."
-  (when (-contains-p my-right-draggers f)
-    (setq my-right-draggers (remove f my-right-draggers)))
-  (setq my-right-draggers (cons f my-right-draggers)))
-
-(defun add-up-dragger (f)
-  "Add F to list draggers for `my-drag-stuff-up'."
-  (when (-contains-p my-up-draggers f)
-    (setq my-up-draggers (remove f my-up-draggers)))
-  (setq my-up-draggers (cons f my-up-draggers)))
-
-(defun add-down-dragger (f)
-  "Add F to list draggers for `my-drag-stuff-down'."
-  (when (-contains-p my-down-draggers f)
-    (setq my-down-draggers (remove f my-down-draggers)))
-  (setq my-down-draggers (cons f my-down-draggers)))
-
-(defun add-right-dragger (f)
-  "Add F to list draggers for `my-drag-stuff-right'."
-  (when (-contains-p my-right-draggers f)
-    (setq my-right-draggers (remove f my-right-draggers)))
-  (setq my-right-draggers (cons f my-right-draggers)))
-
-(defcustom my-drag-stuff-functions '(my-drag-stuff-up
-                                     my-drag-stuff-down
-                                     my-drag-stuff-right
-                                     my-drag-stuff-left
-                                     my-drag-stuff-right-char
-                                     my-drag-stuff-left-char)
-  "List of my functions, which always drag stuffs.")
-
-(defun my-last-command-is-drag-stuff-p ()
-  "Get t, when last command is one of `my-drag-stuff-functions'."
-  (interactive)
-  (-contains-p my-drag-stuff-functions last-command))
-
-(defvar my-last-command-is-drag-stuff nil
-  "If last command is one of my functions which draged word then this in true.")
-
-(defun my-last-command-is-dragged-stuff-p ()
-  "Return t, when last command dragged someone stuff."
-  (or
-   (my-last-command-is-drag-stuff-p)
-   (and
-    (s-contains-p "drag-stuff" (symbol-name last-command))
-    my-last-command-is-drag-stuff)))
-
-(defmacro my-define-stuff-key (keymap key normal-command drag-command)
-  "Define in KEYMAP to KEY command when run NORMAL-COMMAND or DRAG-COMMAND."
-  (let ((command-name (intern
-                       (s-concat
-                        "my-"
-                        (symbol-name (eval normal-command))
-                        "-or-"
-                        (symbol-name (eval drag-command))))))
-    `(progn
-       (defun ,command-name ()
-         ,(s-lex-format "Run `${normal-command}' or `${drag-command}'.")
-         (interactive)
-         (let* ((is-drag (my-last-command-is-dragged-stuff-p)))
-           (setq my-last-command-is-drag-stuff is-drag)
-           (if is-drag
-               (call-interactively ,drag-command)
-             (call-interactively ,normal-command))))
-       (define-key ,keymap ,key #',command-name))))
-
-(defun stop-drag ()
-  "Stop drag, just something print, and nothing do, set to nil something."
-  (interactive)
-  (setq my-last-command-is-drag-stuff nil)
-  (message "Turn `drag' to normal!"))
-
-(define-key-when
-    my-insert-new-line-or-nothing
-    xah-fly-command-map
-  ""
-  'stop-drag
-  'my-last-command-is-dragged-stuff-p)
-
-(my-define-stuff-key
- xah-fly-command-map
- "j"
- #'backward-char
- #'my-drag-stuff-left-char)
-
-(my-define-stuff-key
- xah-fly-command-map
- "l"
- #'forward-char
- #'my-drag-stuff-right-char)
-
-(my-define-stuff-key
- xah-fly-command-map
- "o"
- #'syntax-subword-forward
- #'my-drag-stuff-right)
-
-(my-define-stuff-key
- xah-fly-command-map
- "u"
- #'syntax-subword-backward
- #'my-drag-stuff-left)
-
-(my-define-stuff-key
- xah-fly-command-map
- "i"
- #'previous-line
- #'my-drag-stuff-up)
-
-(my-define-stuff-key
- xah-fly-command-map
- "k"
- #'next-line
- #'my-drag-stuff-down)
-
-(use-package drag-stuff
-    :ensure t
-    :config
-    (drag-stuff-global-mode t)
-    :bind
-    ((:map xah-fly-command-map)
-     ("SPC TAB j" . 'my-drag-stuff-left-char)
-     ("SPC TAB l" . 'my-drag-stuff-right-char)
-     ("SPC TAB i" . 'my-drag-stuff-up)
-     ("SPC TAB k" . 'my-drag-stuff-down)
-     ("SPC TAB o" . 'my-drag-stuff-right)
-     ("SPC TAB u" . 'my-drag-stuff-left)
-     ("SPC TAB ." . 'transpose-sexps)
-     ("SPC TAB m" . 'transpose-sexps)
-     ("SPC TAB n" . 'avy-transpose-lines-in-region)
-     ("SPC TAB t" . 'transpose-regions)))
 
 (add-left-dragger  #'drag-stuff-left)
 (add-right-dragger #'drag-stuff-right)
@@ -1196,17 +1126,15 @@ Is used in `my-drag-stuff-down'.")
   "Delete current line and instroduce to insert mode."
   (interactive)
   (beginning-of-line-text)
-  (kill-line)
-  (xah-fly-insert-mode-init)
-  )
+  (sp-kill-whole-line)
+  (xah-fly-insert-mode-init))
 
 (define-key xah-fly-command-map (kbd "w") 'delete-and-edit-current-line)
 
 (defun clear-current-line ()
   "Clear content of current line (including whitespaces)."
   (interactive)
-  (kill-region (line-beginning-position) (line-end-position))
-  )
+  (kill-region (line-beginning-position) (line-end-position)))
 
 (define-key xah-fly-command-map (kbd "SPC w") 'clear-current-line)
 
@@ -1215,8 +1143,7 @@ Is used in `my-drag-stuff-down'.")
   (interactive)
   (if (use-region-p)
       (forward-word)
-    (xah-extend-selection))
-  )
+    (xah-extend-selection)))
 
 (define-key xah-fly-command-map (kbd "8") 'select-current-or-next-word)
 
@@ -1227,8 +1154,8 @@ Is used in `my-drag-stuff-down'.")
       (deactivate-mark)
     (xah-delete-current-text-block)))
 
-(define-key xah-fly-command-map (kbd "g") nil)
-(define-key xah-fly-command-map (kbd "g") 'delete-current-text-block-or-cancel-selection)
+(define-key xah-fly-command-map
+    (kbd "g") 'delete-current-text-block-or-cancel-selection)
 
 (define-key-when
     my-exchange-point-and-mark-or-splice-sexp
@@ -1453,7 +1380,8 @@ List of functions: `xah-toggle-letter-case', `my-change-case-of-current-line'."
 (define-key xah-fly-command-map (kbd ".") 'forward-sexp)
 
 (use-package rect
-    :bind (("SPC t" . 'rectangle-mark-mode)
+    :bind ((:map xah-fly-command-map)
+           ("SPC t" . 'rectangle-mark-mode)
            ("SPC v" . 'yank-rectangle)))
 
 (defun rectangle-mark-mode-p ()
@@ -3135,6 +3063,20 @@ If caption isn't empty string, then insert image with the caption CAPTION."
                 ([remap helm-imenu]
                  . helm-org-in-buffer-headings)))
 
+(use-package ox
+
+    ;; bound of the keybinding for the `org-export' is already defined in the
+    ;; start of the Heading "Org"
+
+    :custom ((org-export-coding-system     'utf-8)
+             (org-export-with-smart-quotes t)))
+
+(use-package ox-latex
+    :after (ox)
+    :custom ((org-latex-listings 'minted)
+             (org-latex-caption-above '(table image))
+             (org-latex-packages-alist '(("AUTO" "babel" nil ("pdflatex"))))))
+
 (use-package org-ql
     :ensure t
     :config
@@ -3857,34 +3799,32 @@ List of racket expressions in which this function should work:
 
 (use-package helpful
     :ensure t
-    :init
-    (global-set-key (kbd "C-h f") #'helpful-callable)
-    (global-set-key (kbd "C-h v") #'helpful-variable)
-    (global-set-key (kbd "C-h k") #'helpful-key)
-    (global-set-key (kbd "C-c C-d") #'helpful-at-point)
-    (global-set-key (kbd "C-h F") #'helpful-function)
-    (global-set-key (kbd "C-h C") #'helpful-command))
+    :bind
+    (("C-h f"   . 'helpful-callable)
+     ("C-h v"   . 'helpful-variable)
+     ("C-h k"   . 'helpful-key)
+     ("C-c C-d" . 'helpful-at-point)
+     ("C-h F"   . 'helpful-function)
+     ("C-h C"   . 'helpful-command)))
 
 (use-package helm
     :ensure t
+    :after (helm-core)
+    :config (helm-mode t)
+    :init (defvar helm-completion-style nil)
+    :hook (helm-mode . helm-autoresize-mode)
     :custom
-    (helm-M-x-fuzzy-match        t)
-    (helm-buffers-fuzzy-matching t)
-    (helm-recentf-fuzzy-match    t)
-    (helm-imenu-fuzzy-match      t)
-    (helm-autoresize-min-height 20)
-    (helm-left-margin-width 2)
+    (helm-M-x-fuzzy-match           t)
+    (helm-buffers-fuzzy-matching    t)
+    (helm-recentf-fuzzy-match       t)
+    (helm-imenu-fuzzy-match         t)
+    (helm-autoresize-min-height    20)
+    (helm-left-margin-width         2)
     (helm-buffers-left-margin-width 2)
     :bind (("C-h a"     . 'helm-apropos)
            (:map xah-fly-command-map)
            ("SPC SPC f" . 'helm-find-files)
-           ("SPC k r"   . 'helm-regexp))
-
-    :init
-    (helm-autoresize-mode +1)
-    (helm-mode +1)
-    ;; this fix one bug
-    (defvar helm-completion-style nil))
+           ("SPC k r"   . 'helm-regexp)))
 
 (use-package helm-ext
     :ensure t
