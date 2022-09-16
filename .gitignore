@@ -44,3 +44,5 @@ devdocs/
 *.org_archive
 /.emacs.d/xenops/
 /test/
+/.org-timestamps/
+/Emacs.pdf
