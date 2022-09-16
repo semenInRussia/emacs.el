@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: film
-# key: film
-# type: command
-# --
-(call-interactively 'my-films-add)
