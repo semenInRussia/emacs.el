@@ -223,7 +223,7 @@ Info take from var `user-os`, user must set it."
 (use-package xah-fly-keys
     :config
   (xah-fly-keys-set-layout "qwerty")
-  (xah-fly-keys 1)
+  (xah-fly-keys )
   :bind ((:map xah-fly-command-map)
          ("SPC l"   . nil)
          ("SPC j"   . nil)
@@ -283,8 +283,10 @@ Info take from var `user-os`, user must set it."
     (use-package-process-keywords name rest)))
 
 (use-package fast-exec
+    :demand t
+    :load-path "~/projects/fast-exec.el/"
     :bind ((:map xah-fly-command-map)
-           ("=" . 'fast-exec/exec))
+           ("=" . fast-exec/exec))
     :config
     (fast-exec/enable-some-builtin-supports
      haskell-mode
@@ -375,14 +377,8 @@ string and TEMPLATE is a `yas--template' structure."
 (setq company-backends
       (mapcar #'company-mode/backend-with-yas company-backends))
 
-(use-package company-box
-    :ensure t
-    :hook (company-mode . company-box-mode))
-
 (use-package format-all
     :ensure t)
-
-
 
 (defmacro define-key-when (fun-name map key def pred)
   "Define to KEY in MAP DEF when PRED return t or run old command.
@@ -413,34 +409,32 @@ Instead of KEY will command FUN-NAME"
 
 (use-package helm-swoop
     :ensure t
-    :bind ((:map xah-fly-command-map)
-           ("'" . 'helm-swoop)
-           ("SPC k '" . 'helm-multi-swoop-current-mode)
-           (:map helm-swoop-map)
+    :bind
+    ((:map xah-fly-command-map)
+     ("'" . helm-swoop)
+     ("SPC k '" . helm-multi-swoop-current-mode))
+    :bind ((:map helm-swoop-map)
            ("M-j" . 'helm-swoop-edit)
            (:map helm-swoop-edit-map)
            ([remap save-buffer] . 'helm-swoop--edit-complete)))
 
 (use-package deadgrep
     :ensure t
-    :bind (:map
-           xah-fly-command-map
-           ("SPC '" . deadgrep)))
+    :bind
+    ((:map xah-fly-command-map)
+     ("SPC '" . deadgrep)))
 
 (use-package projectile
     :ensure t
-    :bind ((:map xah-fly-command-map)
-           ("SPC SPC r" . 'projectile-replace)))
+    :bind
+    ((:map xah-fly-command-map)
+     ("SPC SPC r" . projectile-replace)))
 
 (use-package visual-regexp
     :ensure t
-    :bind ((:map xah-fly-command-map)
-           ("SPC r" . 'vr/query-replace)))
-
-(use-package string-inflection
-    :ensure t
-    :bind ((:map xah-fly-command-map)
-           ("b" . 'string-inflection-cycle)))
+    :bind
+    ((:map xah-fly-command-map)
+     ("SPC r" . vr/query-replace)))
 
 (defcustom my-aggresive-indent-in-modes '(racket-mode
                                           css-mode
@@ -460,20 +454,22 @@ Instead of KEY will command FUN-NAME"
                 #'aggressive-indent-mode)))
 
 (use-package imenu
-    :custom (imenu-auto-rescan t))
-
-(bind-keys :map xah-fly-command-map
-           ("SPC SPC SPC" . helm-imenu))
+    :custom (imenu-auto-rescan t)
+    :bind
+    ((:map xah-fly-command-map)
+     ("SPC SPC SPC" . helm-imenu)))
 
 (use-package imenu-anywhere
     :ensure t
-    :bind (:map xah-fly-command-map
-                ("SPC SPC n" . imenu-anywhere)))
+    :bind
+    ((:map xah-fly-command-map)
+     ("SPC SPC n" . imenu-anywhere)))
 
 (use-package comment-dwim-2
     :ensure t
-    :bind (:map xah-fly-command-map
-                ("z" . comment-dwim-2)))
+    :bind
+    ((:map xah-fly-command-map)
+     ("z" . comment-dwim-2)))
 
 (use-package rg
     :ensure t)
@@ -481,10 +477,13 @@ Instead of KEY will command FUN-NAME"
 (use-package dumb-jump
     :ensure t
     :custom
-    (dumb-jump-force-searcher 'rg)
-    (dumb-jump-prefer-searcher 'rg)
-    :bind (:map xah-fly-command-map ("SPC SPC ." . dumb-jump-back))
-    :init
+    ((dumb-jump-force-searcher 'rg)
+     (dumb-jump-prefer-searcher 'rg))
+    :bind
+    ((:map xah-fly-command-map)
+     ("SPC SPC ." . dumb-jump-back)
+     ("SPC ."     . xref-find-definitions))
+    :config
     (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (defun my-buffer-list-or-edit-lines ()
@@ -526,8 +525,6 @@ EOB - is `end-of-buffer'"
       (call-interactively 'mc/edit-lines)
     (call-interactively 'mc/mark-next-like-this-word)))
 
-(use-package multiple-cursors :ensure t)
-
 (use-package multiple-cursors
     :config
   (add-to-list 'mc--default-cmds-to-run-once 'my-mark-all)
@@ -542,49 +539,48 @@ EOB - is `end-of-buffer'"
   (add-to-list 'mc--default-cmds-to-run-once
                'toggle-input-method)
   :bind
-  (:map xah-fly-command-map
-        ("SPC f"         . 'my-buffer-list-or-edit-lines)
-        ("7"         . my-mc-mark-like-this-or-edit-lines)
-        ("SPC 7"     . mc/mark-previous-like-this-word)
-        ("SPC TAB 7" . mc/reverse-regions)
-        ("SPC d 7"   . mc/unmark-next-like-this)
-        ("SPC h"     . my-bob-or-mc-align)
-        ("SPC n"     . my-eob-or-mc-align-with-space)
-        ("SPC a"     . my-mark-all)))
+  ((:map xah-fly-command-map)
+   ("SPC f"     . my-buffer-list-or-edit-lines)
+   ("7"         . my-mc-mark-like-this-or-edit-lines)
+   ("SPC 7"     . mc/mark-previous-like-this-word)
+   ("SPC TAB 7" . mc/reverse-regions)
+   ("SPC d 7"   . mc/unmark-next-like-this)
+   ("SPC h"     . my-bob-or-mc-align)
+   ("SPC n"     . my-eob-or-mc-align-with-space)
+   ("SPC a"     . my-mark-all)))
 
 (use-package avy
     :ensure t
     :custom
     (avy-background t)
     :bind ((:map xah-fly-command-map)
-           ("n"     . nil)              ;by default this is `isearch', so i turn
-                                        ;this to keymap
-           ("n n"   . 'avy-goto-char)
-           ("n v"   . 'avy-yank-word)
-           ("n x"   . 'avy-teleport-word)
-           ("n c"   . 'avy-copy-word)
-           ("n 8"   . 'avy-mark-word)
-           ("n d"   . 'avy-kill-word-stay)
-           ("n s ;" . 'avy-insert-new-line-at-eol)
-           ("n s h" . 'avy-insert-new-line-at-bol)
-           ("n 5"   . 'avy-zap)
-           ("n TAB" . 'avy-transpose-words)
-           ("n w"   . 'avy-clear-line)
-           ("n -"   . 'avy-sp-splice-sexp-in-word)
-           ("n r"   . 'avy-kill-word-move)
-           ("n o"   . 'avy-change-word)
-           ("n 9"   . 'avy-sp-change-enclosing-in-word)
-           ("n z"   . 'avy-comment-line)
-           ("n t v" . 'avy-copy-region)
-           ("n t d" . 'avy-kill-region)
-           ("n t x" . 'avy-move-region)
-           ("n t c" . 'avy-kill-ring-save-region)
-           ("n ;"   . 'avy-goto-end-of-line)
-           ("n h"   . 'avy-goto-begin-of-line-text)
-           ("n k v" . 'avy-copy-line)
-           ("n k x" . 'avy-move-line)
-           ("n k c" . 'avy-kill-ring-save-whole-line)
-           ("n k d" . 'avy-kill-whole-line)))
+           ("n" . nil)
+           ("n n"   . avy-goto-char)
+           ("n v"   . avy-yank-word)
+           ("n x" . avy-teleport-word)
+           ("n c"   . avy-copy-word)
+           ("n 8"   . avy-mark-word)
+           ("n d"   . avy-kill-word-stay)
+           ("n s ;" . avy-insert-new-line-at-eol)
+           ("n s h" . avy-insert-new-line-at-bol)
+           ("n 5"   . avy-zap)
+           ("n TAB" . avy-transpose-words)
+           ("n w"   . avy-clear-line)
+           ("n -"   . avy-sp-splice-sexp-in-word)
+           ("n r"   . avy-kill-word-move)
+           ("n o"   . avy-change-word)
+           ("n 9"   . avy-sp-change-enclosing-in-word)
+           ("n z"   . avy-comment-line)
+           ("n t v" . avy-copy-region)
+           ("n t d" . avy-kill-region)
+           ("n t x" . avy-move-region)
+           ("n t c" . avy-kill-ring-save-region)
+           ("n ;"   . avy-goto-end-of-line)
+           ("n h"   . avy-goto-begin-of-line-text)
+           ("n k v" . avy-copy-line)
+           ("n k x" . avy-move-line)
+           ("n k c" . avy-kill-ring-save-whole-line)
+           ("n k d" . avy-kill-whole-line)))
 
 (defun avy-goto-word-1-with-action (char action &optional arg beg end symbol)
   "Jump to the currently visible CHAR at a word start.
@@ -818,9 +814,18 @@ Action of `avy', see `avy-action-yank' for example"
     :bind ((:map xah-fly-command-map)
            ("/"         . 'embrace-commander)
            ("SPC SPC /" . 'xah-goto-matching-bracket))
-    :config ;nofmt
-    (add-hook 'emacs-lisp-mode-hook 'embrace-emacs-lisp-mode-hook)
-    (add-hook 'org-mode-hook 'embrace-org-mode-hook))
+    :hook
+    (emacs-lisp-mode   . embrace-emacs-lisp-mode-hook)
+    (org-mode          . embrace-org-mode-hook)
+    :config
+    (unless (assq ?n embrace-semantic-units-alist)
+      (setq-default embrace-semantic-units-alist
+                    (cons '(?n . embrace-avy-semantic-unit)
+                          embrace-semantic-units-alist))))
+
+(defun embrace-avy-semantic-unit ()
+  "Semantic unit for `embrace' which ask expression with the `avy'."
+  (call-interactively 'avy-mark-word))
 
 (defun mark-inner-or-expand-region ()
   "If text is selected, expand region, otherwise then mark inner of brackets."
@@ -1127,9 +1132,10 @@ True dragger mean that its function return non-nil when called interactively."
   (interactive)
   (beginning-of-line-text)
   (sp-kill-whole-line)
+  (open-line-above)
   (xah-fly-insert-mode-init))
 
-(define-key xah-fly-command-map (kbd "w") 'delete-and-edit-current-line)
+(define-key xah-fly-command-map "w" 'delete-and-edit-current-line)
 
 (defun clear-current-line ()
   "Clear content of current line (including whitespaces)."
@@ -1460,11 +1466,12 @@ List of functions: `xah-toggle-letter-case', `my-change-case-of-current-line'."
 (defun my-visit-last-opened-buffer ()
   "Visit buffer which was opened recently."
   (interactive)
-  (->>
-   (buffer-list)
-   (cdr)
-   (--find (not (my--visit-last-opened-buffer-ignore-p it)))
-   (switch-to-buffer)))
+  (switch-to-buffer (my-last-opened-buffer)))
+
+(defun my-last-opened-buffer ()
+  "Get buffer which was visited most recently."
+  (--find (not (my--visit-last-opened-buffer-ignore-p it))
+          (cdr (buffer-list))))
 
 (defun my--visit-last-opened-buffer-ignore-p (buffer)
   "Take object of BUFFER and return nil when don't need visit its."
@@ -2169,7 +2176,8 @@ Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
     :hook ((cdlatex-tab . yas-expand)
            (cdlatex-tab . cdlatex-in-yas-field))
     :custom (cdlatex-math-modify-alist
-             '((?q "\\sqrt" nil t nil nil))))
+             '((?q "\\sqrt" nil t nil nil)
+               (?u "\\breve" "\\uline" t nil nil))))
 
 (use-package yasnippet
     :bind ((:map yas-keymap)
@@ -2251,21 +2259,23 @@ Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
   "My additional `embrace-LaTeX-mode-hook'."
   (interactive)
   (setq-local embrace-show-help-p nil)
-  (--each cdlatex-math-modify-alist-default
+  (--each (-concat cdlatex-math-modify-alist-default
+                   cdlatex-math-modify-alist)
     (my-embrace-add-paren-of-cdlatex-math it))
   (my-embrace-add-paren-latex-command ?a "answer")
-  (embrace-add-pair-regexp
-   ?\\
-   (rx "\\" (1+ wordchar) (* space) (? "[" (*? any) "]" (1+ space)) "{")
-   "}"
-   'my-embrace-with-latex-command
-   (embrace-build-help "\\name{" "}"))
-  (embrace-add-pair-regexp
-   ?d
-   "\\\\left."
-   "\\\\right."
-   'my-embrace-with-latex-left-right
-   (embrace-build-help "\\name{" "}"))
+  (embrace-add-pair-regexp ?\\
+                           (rx "\\"
+                               (1+ wordchar)
+                               (* space) (? "[" (*? any) "]" (* space))
+                               "{")
+                           "}"
+                           'my-embrace-with-latex-command
+                           (embrace-build-help "\\name{" "}"))
+  (embrace-add-pair-regexp ?d
+                           "\\\\left."
+                           "\\\\right."
+                           'my-embrace-with-latex-left-right
+                           (embrace-build-help "\\left(" "\\right)"))
   (embrace-add-pair-regexp
    ?e
    "\\\\begin{\\(.*?\\)}\\(\\[.*?\\]\\)*"
@@ -2277,13 +2287,16 @@ Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
 (defun my-embrace-add-paren-of-cdlatex-math (element)
   "Add an ELEMENT of the `cdlatex-math-modify-alist' to the `embrace' parens."
   (let* ((key (-first-item element))
-         (cmd (and (-third-item element)
-                   (s-chop-prefix "\\" (-third-item element))))
+         (cmd
+          (s-chop-prefix
+           "\\"
+           (or
+            (-third-item element)
+            (-second-item element))))
          (type (-fourth-item element)))
-    (when cmd
-      (if type
-          (my-embrace-add-paren-latex-command key cmd)
-        (my-embrace-add-paren-latex-style-command key cmd)))))
+    (if type
+        (my-embrace-add-paren-latex-command key cmd)
+      (my-embrace-add-paren-latex-style-command key cmd))))
 
 (defun my-embrace-add-paren-latex-command (key name)
   "Add paren at KEY for the LaTeX command with NAME in `embrace'."
@@ -2307,12 +2320,13 @@ Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
 
 (defun my-embrace-add-paren-latex-style-command (key name)
   "Add paren at KEY for the style LaTeX command with NAME in `embrace'."
-  (embrace-add-pair-regexp
-   key
-   (my-latex-style-command-left-paren-regexp name)
-   "}"
-   (-const (cons (my-latex-style-command-left-paren name) "}"))
-   (embrace-build-help (my-latex-style-command-left-paren name) "}")))
+  (embrace-add-pair-regexp key
+                           (my-latex-style-command-left-paren-regexp name)
+                           "}"
+                           (-const
+                            (cons (my-latex-style-command-left-paren name) "}"))
+                           (embrace-build-help
+                            (my-latex-style-command-left-paren name) "}")))
 
 (defun my-latex-style-command-left-paren (name)
   "Return paren right of the LaTeX command named NAME."
@@ -2362,8 +2376,7 @@ Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
     (toggle-input-method)
     (if (use-region-p)
         (sp-wrap-with-pair "$")
-      (sp-insert-pair "$")
-      (forward-char -1))))
+      (sp-insert-pair "$"))))
 
 (use-package cdlatex
     :ensure t
@@ -3236,17 +3249,12 @@ exist after each headings's drawers."
     :bind (:map xah-fly-command-map
                 ("SPC /" . emr-show-refactor-menu)))
 
-(use-package cask-mode
-    :ensure t
-    )
-
 (use-package elfmt
     :config
   (elfmt-global-mode 1))
 
 (use-package suggest
-    :ensure t
-    )
+    :ensure t)
 
 (defun my-edit-elisp-docstring ()
   "Edit `elisp' docstring via `string-edit' and `elisp-docstring-mode'."
@@ -3259,7 +3267,8 @@ exist after each headings's drawers."
     :bind (:map emacs-lisp-mode-map
                 ([remap string-edit-at-point] . my-edit-elisp-docstring)))
 
-(setq lisp-body-indent 2)
+(use-package lisp-mode
+    :custom (lisp-body-indent 2))
 
 ;;
 
@@ -3360,6 +3369,73 @@ Only when in class defnition."
   (interactive)
   (call-interactively #'paxedit-transpose-backward)
   (repeat-at-last-keystroke))
+
+(use-package embrace
+    :hook (emacs-lisp-mode . my-embrace-emacs-lisp-mode-hook))
+
+(defun my-embrace-emacs-lisp-mode-hook ()
+  "Add some parens for the Emacs-Lisp embrace."
+  (embrace-add-pair-regexp
+   ?f
+   "(\\(\\w\\|\\)* "
+   ")"
+   'my-embrace-emacs-lisp-with-function-call
+   (embrace-build-help "(name " ")"))
+  (embrace-add-pair-regexp
+   ?d
+   "(defun \\(\\w\\|-\\)+ (.*)
+\\( *\".*?\"\\)?
+\\((interactive \".*?\")\\)?"
+   ")"
+   'my-embrace-emacs-lisp-with-defun
+   (embrace-build-help "(defun " ")"))
+  (embrace-add-pair-regexp
+   ?c
+   "(defcustom \\(\\w\\|-\\)*[\n ]"
+   "\".*?\"[\n ]*\\(:\\(type\\|group\\) .*?)\\)*"
+   'my-embrace-emacs-lisp-with-defcustom
+   (embrace-build-help "(defcustom " ")")))
+
+(defun my-embrace-emacs-lisp-with-function-call ()
+  "Return open and close pairs for the Elisp function call."
+  (cons
+   (s-concat "(" (read-string "Name of the function: ") " ")
+   ")"))
+
+(defun my-embrace-emacs-lisp-with-defun ()
+  "Return open and close pairs for the Elisp defun paren."
+  (cons
+   (s-concat
+    "(defun "
+    (read-string "Name of the function, please: ")
+    " "
+    "(" (read-string "Args, please: ") ")"
+    "\n"
+    "\"" (read-string "Docstring, please: ") "\""
+    "\n"
+    (--if-let (my-read-string-or-nil "Ineractive preamble please: ")
+        (s-concat "\"" it "\"")
+      ""))
+   ")"))
+
+(defun my-embrace-emacs-lisp-with-defcustom ()
+  "Return open and close pairs for the Elisp defcustom paren."
+  (cons
+   (s-concat
+    "(defcustom "
+    (read-string "Name of the variable, please: ")
+    "\n")
+   (s-concat
+    "\n"
+    "\"" (read-string "Docstring, please: ") "\""
+    "\n"
+    (--if-let (my-read-string-or-nil "Group: ")
+        (s-concat ":group '" it "\n")
+      "")
+    (--if-let (my-read-string-or-nil "Type: ")
+        (s-concat ":type '" it)
+      "")
+    ")")))
 
 (use-package racket-mode
     :ensure t
@@ -3810,21 +3886,22 @@ List of racket expressions in which this function should work:
 (use-package helm
     :ensure t
     :after (helm-core)
-    :config (helm-mode t)
     :init (defvar helm-completion-style nil)
-    :hook (helm-mode . helm-autoresize-mode)
     :custom
     (helm-M-x-fuzzy-match           t)
     (helm-buffers-fuzzy-matching    t)
     (helm-recentf-fuzzy-match       t)
     (helm-imenu-fuzzy-match         t)
     (helm-autoresize-min-height    20)
-    (helm-left-margin-width         2)
-    (helm-buffers-left-margin-width 2)
+    (helm-left-margin-width         4)
+    (helm-buffers-left-margin-width 4)
     :bind (("C-h a"     . 'helm-apropos)
            (:map xah-fly-command-map)
            ("SPC SPC f" . 'helm-find-files)
-           ("SPC k r"   . 'helm-regexp)))
+           ("SPC k r"   . 'helm-regexp))
+    :config
+    (helm-mode t)
+    (helm-autoresize-mode t))
 
 (use-package helm-ext
     :ensure t
@@ -4420,7 +4497,7 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
      ("SPC j" . 'helm-projectile-find-file)
      (:map helm-projectile-find-file-map)
      ("M-<f5>" . 'my-helm-projectile-find-file-update))
-    :init
+    :config
     (defalias 'projectile-project-files 'my-projectile-project-files)
     (defalias 'projectile-root-local 'my-projectile-root-local)
     (defalias 'project-root 'my-project-root)
@@ -4449,51 +4526,45 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
           (substitute-key-definition cmd nil map))
         map))
 
-(setq
- helm-source-projectile-files-list
- (helm-build-sync-source "Projectile files"
-   :before-init-hook
-   (lambda ()
-     (add-hook 'helm-after-update-hook #'helm-projectile--move-to-real)
-     (add-hook 'helm-cleanup-hook #'helm-projectile--remove-move-to-real))
-   :candidates
-   (lambda ()
-     (when (projectile-project-p)
-       (with-helm-current-buffer
-         (let ((root (f-full (projectile-project-root))))
-           (--map
-            (cons (s-chop-prefix root (f-full it)) it)
-            (projectile-current-project-files))))))
-   :filtered-candidate-transformer
-   (lambda (files _source)
-     (with-helm-current-buffer
-       (let* ((root (projectile-project-root))
-              (file-at-root
-               (file-relative-name (expand-file-name helm-pattern root))))
-         (if (or (string-empty-p helm-pattern)
-                 (assoc helm-pattern files))
-             files
-           (if (equal helm-pattern file-at-root)
-               (cl-acons (helm-ff-prefix-filename helm-pattern nil t)
-                         (expand-file-name helm-pattern)
-                         files)
-             (cl-pairlis (list (helm-ff-prefix-filename helm-pattern nil t)
-                               (helm-ff-prefix-filename file-at-root nil t))
-                         (list (expand-file-name helm-pattern)
-                               (expand-file-name helm-pattern root))
-                         files))))))
-   :fuzzy-match helm-projectile-fuzzy-match
-   :keymap helm-projectile-find-file-map
-   :help-message 'helm-ff-help-message
-   :mode-line helm-read-file-name-mode-line-string
-   :action helm-projectile-file-actions
-   :persistent-action #'helm-projectile-file-persistent-action
-   :persistent-help "Preview file"))
-
-(use-package regex-tool
-    :ensure t
-    :init
-    (add-hook 'regex-tool-mode-hook (lambda () (toggle-frame-maximized))))
+(defvar helm-source-projectile-files-list
+  (helm-build-sync-source "Projectile files 2"
+    :before-init-hook
+    (lambda ()
+      (add-hook 'helm-after-update-hook #'helm-projectile--move-to-real)
+      (add-hook 'helm-cleanup-hook #'helm-projectile--remove-move-to-real))
+    :candidates
+    (lambda ()
+      (when (projectile-project-p)
+        (with-helm-current-buffer
+          (let ((root (f-full (projectile-project-root))))
+            (--map
+             (cons (s-chop-prefix root (f-full it)) it)
+             (projectile-current-project-files))))))
+    :filtered-candidate-transformer
+    (lambda (files _source)
+      (with-helm-current-buffer
+        (let* ((root (projectile-project-root))
+               (file-at-root
+                (file-relative-name (expand-file-name helm-pattern root))))
+          (if (or (string-empty-p helm-pattern)
+                  (assoc helm-pattern files))
+              files
+            (if (equal helm-pattern file-at-root)
+                (cl-acons (helm-ff-prefix-filename helm-pattern nil t)
+                          (expand-file-name helm-pattern)
+                          files)
+              (cl-pairlis (list (helm-ff-prefix-filename helm-pattern nil t)
+                                (helm-ff-prefix-filename file-at-root nil t))
+                          (list (expand-file-name helm-pattern)
+                                (expand-file-name helm-pattern root))
+                          files))))))
+    :fuzzy-match helm-projectile-fuzzy-match
+    :keymap helm-projectile-find-file-map
+    :help-message 'helm-ff-help-message
+    :mode-line helm-read-file-name-mode-line-string
+    :action helm-projectile-file-actions
+    :persistent-action #'helm-projectile-file-persistent-action
+    :persistent-help "Preview file"))
 
 (use-package magit :ensure t)
 
@@ -4507,17 +4578,17 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
     (blamer-face ((t :foreground "#7a88cf"
                      :background nil
                      :height 140
-                     :italic t)))
-    )
+                     :italic t))))
 
 (use-package git-undo
+    :commands git-undo
     :init
-  (defun fast-exec-define-git-undo-keymaps ()
-    "Bind `git-undo' and `fast-exec'."
-    (fast-exec/some-commands
-     ("Undo via Git" 'git-undo)))
-  (fast-exec/register-keymap-func 'fast-exec-define-git-undo-keymaps)
-  (fast-exec/reload-functions-chain))
+    (defun fast-exec-define-git-undo-keymaps ()
+      "Bind `git-undo' and `fast-exec'."
+      (fast-exec/some-commands
+       ("Undo via Git" 'git-undo)))
+    (fast-exec/register-keymap-func 'fast-exec-define-git-undo-keymaps)
+    (fast-exec/reload-functions-chain))
 
 (use-package git-modes
     :ensure t)
@@ -4534,44 +4605,46 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
 (add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
 
 (use-package dired
-    :bind ((:map dired-mode-map)
-           ("SPC"     . nil)                ; make command at space empty prefix
+    :bind
+  ((:map dired-mode-map)
+   ("SPC"     . nil)                ; make command at space empty prefix
 
-           ;; Navigation
-           ("k"       . 'next-line)
-           ("i"       . 'previous-line)
-           ("n"       . 'dired-avy)
-           ("SPC h"   . 'beginning-of-buffer)
-           ("SPC n"   . 'end-of-buffer)
-           ("'"       . 'dired-isearch-filenames)
+   ;; Navigation
+   ("k"       . 'next-line)
+   ("i"       . 'previous-line)
+   ("n"       . 'dired-avy)
+   ("SPC h"   . 'beginning-of-buffer)
+   ("SPC n"   . 'end-of-buffer)
+   ("'"       . 'dired-isearch-filenames)
 
-           ;; Open file
-           ("o"       . 'dired-find-file-other-window)
-           ("j"       . 'my-dired-goto-parent-dir)
-           ;; some other open files I define in the section "Dired Hacks: Open"
+   ;; Open file
+   ("o"       . 'dired-find-file-other-window)
+   ("j"       . 'my-dired-goto-parent-dir)
+   ;; some other open files I define in the section "Dired Hacks: Open"
 
-           ;; Manipulation with file(s)
-           ("SPC g"   . 'my-dired-delete)
-           ("SPC x"   . 'my-dired-delete-all-files)
-           ("SPC y"   . 'my-dired-duplicate)
-           ("f"       . 'my-dired-rename)
-           ("SPC TAB" . 'my-dired-move)
-           ("s"       . 'my-dired-new-file)
-           ;; copy/move/paste also defines in the section "Dired Hacks: Ranger"
+   ;; Manipulation with file(s)
+   ("SPC g"   . 'my-dired-delete)
+   ("SPC x"   . 'my-dired-delete-all-files)
+   ("SPC y"   . 'my-dired-duplicate)
+   ("f"       . 'my-dired-rename)
+   ("SPC TAB" . 'my-dired-move)
+   ("s"       . 'my-dired-new-file)
+   ;; copy/move/paste also defines in the section "Dired Hacks: Ranger"
 
-           ;; Mark files
-           ("t"       . 'dired-mark)
-           ("SPC u"   . 'dired-unmark-all-marks)
-           ("SPC a"   . 'my-dired-mark-all-files)
+   ;; Mark files
+   ("t"       . 'dired-mark)
+   ("SPC u"   . 'dired-unmark-all-marks)
+   ("SPC a"   . 'my-dired-mark-all-files)
 
-           ;; Misc.
-           ("y"       . 'dired-undo)
+   ;; Misc.
+   ("y"       . 'dired-undo)
+   ("~"       . 'my-dired-jump-to-home)
 
-           ;; Key bindings which not change your commands
-           ("a"       . 'xah-fly-M-x)
-           (","       . 'xah-next-window-or-frame))
-    :custom ((lpr-command "PDFToPrinter")) ; Command for printing file
-    :config (add-hook 'dired-mode-hook 'xah-fly-insert-mode-activate))
+   ;; Key bindings which not change your commands
+   ("a"       . 'xah-fly-M-x)
+   (","       . 'xah-next-window-or-frame))
+  :custom ((lpr-command "PDFToPrinter")) ; Command for printing file
+  :config (add-hook 'dired-mode-hook 'xah-fly-insert-mode-activate))
 
 (defun my-dired-mark-all-files ()
   "Mark all file in `dired'."
@@ -4625,7 +4698,7 @@ Return new name of FILE"
 (my-define-dired-command-taking-file my-dired-delete
     (file)
   "Delete file at dired object at current position of the cursor."
-  (f-delete file))
+  (f-delete file t))
 
 (defun my-dired-goto-parent-dir ()
   "Navigate to parent directory of current dired directory."
@@ -4657,6 +4730,11 @@ Return new name of FILE"
    (f-join
     (dired-current-directory)
     (read-string "Name of the filename, please: " (f-filename filename)))))
+
+(defun my-dired-jump-to-home ()
+  "Open a `dired' buffer of the home directory."
+  (interactive)
+  (dired-jump nil "~/"))
 
 (use-package dired-filter
     :ensure t
@@ -5060,16 +5138,64 @@ PT defaults to the current `point'"
 
 (use-package deft
     :ensure t
+    :bind
+    ((:map deft-mode-map)
+     ([remap my-kill-rectangle-or-delete-char] . "DEL")
+     ([remap syntax-subword-backward-kill]     . "M-DEL")
+     ([remap xah-paste-or-paste-previous]      . 'deft-filter-yank)
+     ([remap xah-cut-all-or-region]            . 'my-deft-filter-decrement-all))
+
+    :hook
+    (deft-filter . my-deft-titlize-regexp)
+
     :custom
-    ((deft-directory "~/notes/")
-     (deft-recursive t))
+    ((deft-directory             "~/notes/")
+     (deft-default-extension     "org")
+     (deft-recursive             t)
+     (deft-use-filename-as-title nil))
+
     :config
+    (defun my-deft-titlize-regexp ()
+      (when (= (length deft-filter-regexp) 1)
+        (setf (car deft-filter-regexp)
+              (my-upcase-first-char (car deft-filter-regexp))))
+      (deft-filter-update))
+
+    (defun my-upcase-first-char (str)
+      "Upper case first char of the STR rest chars not take."
+      (s-concat (s-upcase (substring str 0 1))
+                (substring str 1)))
+
     (defun fast-exec-deft-keys ()
       "Get some useful keymaps of  `fast-exec' for deft."
       (fast-exec/some-commands
        ("Manage Notes" 'deft)))
+
     (fast-exec/register-keymap-func 'fast-exec-deft-keys)
     (fast-exec/reload-functions-chain))
+
+(use-package ox-publish
+    :commands org-publish
+    :bind
+    ((:map xah-fly-command-map)
+     ("SPC i t" . 'org-export-stack))
+    :custom
+    (org-publish-use-timestamps-flag nil)
+    (org-publish-list-skipped-files  nil)
+    (org-publish-project-alist
+     '(("Notes"
+        :base-directory "~/notes/"
+        :publishing-directory "~/notes/html/"
+        :publishing-function org-latex-export-to-pdf
+        :recursive t
+        :author "Семён"
+        :language "ru")
+       ("ZMS"
+        :base-directory "~/zms/"
+        :publishing-directory "~/zms/destination/"
+        :publishing-function org-latex-export-to-pdf
+        :author "Семён Храмцов"
+        :language "ru"))))
 
 (defcustom my-mipt-dir "c:/Users/hrams/Documents/mipt"
   "Path to the directory in which will be saved all MIPT solutions.")

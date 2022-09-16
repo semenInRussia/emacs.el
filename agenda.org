@@ -18,19 +18,13 @@
 
 *** TODO Run the main file of the project in =run-command-reicpes= :run_command_recipes:
 
-*** TODO explore the =org-tempo=                                        :org:
-
-*** TODO explore the =org-publish=                                      :org:
-
 *** TODO explore the =org-speed-commands=                               :org:
 
 *** TODO Make =LaTeX= document class for ГОСТ                         :latex:
 
 *** TODO add support of the =org-export= to the =run-command-recipes= :run_command_recipes:
 
-*** TODO Add \underline command for =LaTeX=
-
-*** TODO CDLaTeX Math Modify for Russian imput method
+*** DONE CDLaTeX Math Modify for Russian imput method
 
 *** TODO See notes without Emacs
 
@@ -48,6 +42,8 @@
 *** TODO Auto capitalize on #+TITLE in org
 *** TODO Xenops in non \documentclass =LaTeX= documents
 *** TODO Color Picker
+*** TODO New =embrace= with support of the =smartparens=
+
 *** TODO /spc spc v/ to insert string from kill ring
 *** TODO Delete directories too in the =dired= via =SPC g=
 *** TODO Impatient modes for all =major-modes=
@@ -68,7 +64,21 @@ See on the compile command from the =latex-extra=
 #+END_EXAMPLE
 *** TODO Use =sp= instead of =paxedit= when can
 *** TODO Fix the =LaTEX= section insertion
+*** TODO New events for the =auto-save=
+*** TODO Add units for =calc=
+*** TODO Explore =calc=
+*** TODO Fix =xah-fly-keys= in =calc=
+*** TODO Map for =deft= integrated with =xah-fly-keys=
+*** TODO Instead of /C-c '/ in indirected buffers use /SPC ;/
+*** TODO Fix view of LaTeX formuls in the =org-mode=
+*** TODO Fix modeline for =drag=
 ** Targets on Day
+
+*** DONE Add \uline command for =LaTeX=
+SCHEDULED: <2022-09-14 Ср>
+
+*** explore the =org-publish=                                         :org:
+SCHEDULED: <2022-09-14 Ср>
 
 *** DONE explore the =org-export=                                     :org:
 SCHEDULED: <2022-09-14 Ср>
@@ -83,17 +93,9 @@ SCHEDULED: <2022-09-08 Чт>
 - Manage spaces for all normal commands (argument and nonargument)
 *** DONE =smartparens=
 SCHEDULED: <2022-09-11 Вс>
+*** TODO Fix autoloading of the =multiple-cursors=
+  SCHEDULED: <2022-09-16 Пт>
 * Films 
-
-** SAW The Green Mile
-:PROPERTIES:
-:name:     Зеленая миля
-:year:     1999
-:slogan:   Пол Эджкомб не верил в чудеса. Пока не столкнулся с одним из них
-:id:       435
-:rating:   91.0
-:countries: (США)
-:END:
 
 ** MUST-SEE The Batman
    :PROPERTIES:
@@ -175,3 +177,11 @@ SCHEDULED: <2022-09-11 Вс>
 :countries: (США)
 :END:
 
+
+
+|           a | name | index |  an | 0     |
+|-------------+------+-------+-----+-------|
+| 4.5 + x / 4 |    2 |     4 |   6 | 6 + x |
+|         4.5 |    9 |     0 |   8 | 6 + x |
+|       205.5 |   90 |   300 | 431 | 6 + x |
+#+TBLFM: $1=vmean($2..$5)::$5=6+x
