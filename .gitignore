@@ -1,7 +1,5 @@
 .#*
-.mc-lists.el
 /.emacs.d/.cask
-/.emacs.d/.mc-lists.el
 /.emacs.d/elpa/
 /.emacs.d/emacs-cowsay/
 /.emacs.d/eshell/
