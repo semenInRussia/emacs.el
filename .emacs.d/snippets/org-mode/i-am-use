@@ -4,4 +4,10 @@
 # key: iau
 # --
 (insert  "I am use ")
-(org-insert-link-global)
+
+(defun my-org-insert-link-for-url (url)
+"Insert an `org-mode' link to the WEB URL."
+(interactive "sURL, please: ")
+(org-insert-link nil url (f-base url)))
+
+(call-interactively #'my-org-insert-link-for-url)
