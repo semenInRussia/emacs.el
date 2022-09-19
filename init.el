@@ -28,7 +28,10 @@
 
 (use-package f :ensure t)
 
-(use-package dash :ensure t :init (global-dash-fontify-mode 1))
+(use-package dash
+    :ensure t
+    :init
+    (global-dash-fontify-mode 1))
 
 (use-package pcache
     :ensure t)
@@ -192,6 +195,17 @@ in the region.  Otherwise, read a URL from the minibuffer."
    (cons n)
    (-rotate 2)))
 
+(defun my-symbols-append (&rest symbols)
+  (->>
+   symbols
+   (-map 'symbol-name)
+   (apply 's-concat)
+   (intern)))
+
+(defun my-major-mode-hook (major-mode)
+  "Get symbol hook of MAJOR-MODE (it is symbol too)."
+  (my-symbols-append major-mode '-hook))
+
 (use-package just
     :load-path "~/projects/just/")
 
@@ -221,13 +235,17 @@ Info take from var `user-os`, user must set it."
     (animate-birthday-present))
 
 (use-package xah-fly-keys
+    :load-path "~/.emacs.d/lisp/"
+    :init
+    (defvar xah-fly-insert-state-p t)
     :config
-  (xah-fly-keys-set-layout "qwerty")
-  (xah-fly-keys )
-  :bind ((:map xah-fly-command-map)
-         ("SPC l"   . nil)
-         ("SPC j"   . nil)
-         ("SPC SPC" . nil)))
+    (xah-fly-keys-set-layout "qwerty")
+    (xah-fly-keys )
+    :bind
+    ((:map xah-fly-command-map)
+     ("SPC l"   . nil)
+     ("SPC j"   . nil)
+     ("SPC SPC" . nil)))
 
 (defvar my-local-major-mode-map nil
   "My map for current `major-mode'")
@@ -243,44 +261,105 @@ Info take from var `user-os`, user must set it."
 
 (add-to-list 'use-package-keywords :major-mode-map)
 
-(defun use-package-normalize/:major-mode-map (name keyword args)
-  "Normalizer of :major-mode-map for `use-package'."
-  (let* (map-name modes)
-    (if (eq (-first-item args) t)
-        (list (symbol-name name) (list name))
-      (cl-typecase (-first-item args)
-        (null nil)
-        (list (setq modes (-first-item args)))
-        (symbol (setq map-name (symbol-name (-first-item args))))
-        (string (setq map-name (-first-item args))))
-      (cl-typecase (-second-item args)
-        (null nil)
-        (list (setq modes (-second-item args)))
-        (symbol (setq map-name (symbol-name (-second-item args))))
-        (string (setq map-name (-second-item args))))
-      (list
-       (or map-name (symbol-name name))
-       modes))))
+(defun use-package-normalize/:major-mode-map (pkg-name keyword args)
+  "Normalizer of :major-mode-map for `use-package'.
 
-(defun use-package-handler/:major-mode-map (name keyword
-                                            map-name-and-modes rest state)
-  (let* ((map-name (car map-name-and-modes))
-         (modes (-second-item map-name-and-modes))
-         (modes-hooks (--map (intern (s-append "-hook" (symbol-name it)))
-                             modes))
-         (map (intern (s-concat "my-" map-name "-local-map"))))
-    (setq rest
-          (-concat
-           rest
-           `(:config
-             ((unless (boundp ',map)
-                (define-prefix-command ',map))
-              (--each ',modes-hooks
-                (add-hook it
-                          (lambda ()
-                            (setq-local my-local-major-mode-map
-                                        ',map))))))))
-    (use-package-process-keywords name rest)))
+Should return `plist' with followed keywords
+
+:keymap-name
+Name of the keymap without special prefixes and suffixes.
+
+:major-modes
+List of the major-modes in which should work keymap
+
+:parent
+Parent of the `major-mode' keymap"
+  (let* ((args-plist (car args))
+         keymap-name
+         parent
+         major-modes)
+    (cond
+      ((eq args-plist t)
+       (setq keymap-name pkg-name)
+       (setq major-modes (list pkg-name)))
+      ((symbolp args-plist)
+       (setq keymap-name args-plist)
+       (setq major-modes (list pkg-name)))
+      (t
+       (setq keymap-name (or (-first 'symbolp args-plist)
+                             pkg-name))
+       (setq major-modes (or (-first 'listp args-plist)
+                             (list pkg-name)))
+       (setq parent (plist-get args-plist :parent))))
+    (list
+     :keymap-name keymap-name
+     :major-modes major-modes
+     :parent parent)))
+
+(defcustom my-major-mode-map-prefix "my-"
+  "Prefix for the local `major-mode' keymap variable name."
+  :type 'string)
+
+(defcustom my-major-mode-map-suffix "-local-map"
+  "Suffix for the local `major-mode' keymap variable name."
+  :type 'string)
+
+(defvar my-major-mode-local-maps
+  (make-hash-table :test 'eql)
+  "Hashtable of the `major-mode's and respective keymaps.")
+
+(defun use-package-handler/:major-mode-map (pkg-name
+                                            keyword
+                                            keymap-info
+                                            rest
+                                            state)
+  (let ((body (use-package-process-keywords pkg-name rest state))
+        (keymap-name (plist-get keymap-info :keymap-name))
+        (major-modes (plist-get keymap-info :major-modes))
+        (parent (plist-get keymap-info :parent)))
+    (cons
+     `(my-define-local-major-mode-map ',keymap-name ',major-modes ,parent)
+     body)))
+
+(defun my-define-local-major-mode-map (keymap-name major-modes &optional parent)
+  "Define local keymap for the MAJOR-MODES.
+
+Name of the local keymap will be KEYMAP-NAME + some suffixes and
+prefixes (KEYMAP-NAME is a symbol).
+
+PARENT is the parent keymap for the local map."
+  (let ((keymap-symbol (define-prefix-command-for-major-mode keymap-name)))
+    (set-keymap-parent (eval keymap-symbol) parent)
+    (--each major-modes
+      (puthash it
+               keymap-symbol
+               my-major-mode-local-maps))))
+
+(defun define-prefix-command-for-major-mode (keymap-name)
+  "Define prefix command for the `major-mode' with the KEYMAP-NAME.
+
+KEYMAP-NAME has type symbol.
+
+Name of the keymap variable will has the followed form:
+my-{keymap-name}-local-map"
+  (->
+   keymap-name
+   (symbol-name)
+   (s-prepend my-major-mode-map-suffix)
+   (s-append my-major-mode-map-prefix)
+   (intern)
+   (define-prefix-command)))
+
+(defun my-change-local-major-mode-map (&optional mode)
+  "Change local major mode keymap for the MODE.
+
+MODE defaults to the current `major-mode'.  See `my-local-major-mode-map-run'"
+  (interactive)
+  (or mode (setq mode major-mode))
+  (setq-local my-local-major-mode-map (gethash mode
+                                               my-major-mode-local-maps)))
+
+(add-hook 'after-change-major-mode-hook 'my-change-local-major-mode-map)
 
 (use-package fast-exec
     :demand t
@@ -411,12 +490,13 @@ Instead of KEY will command FUN-NAME"
     :ensure t
     :bind
     ((:map xah-fly-command-map)
-     ("'" . helm-swoop)
+     ("'"       . helm-swoop)
      ("SPC k '" . helm-multi-swoop-current-mode))
-    :bind ((:map helm-swoop-map)
-           ("M-j" . 'helm-swoop-edit)
-           (:map helm-swoop-edit-map)
-           ([remap save-buffer] . 'helm-swoop--edit-complete)))
+    :bind
+    ((:map helm-swoop-map)
+     ("M-j" . 'helm-swoop-edit)
+     (:map helm-swoop-edit-map)
+     ([remap save-buffer] . 'helm-swoop--edit-complete)))
 
 (use-package deadgrep
     :ensure t
@@ -486,68 +566,65 @@ Instead of KEY will command FUN-NAME"
     :config
     (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
-(defun my-buffer-list-or-edit-lines ()
-  "Do `helm-buffer-list' or `mc/edit-lines'."
-  (interactive)
-  (if (use-region-p)
-      (call-interactively #'mc/edit-lines)
-    (call-interactively #'helm-multi-files)))
-
-(defun my-mark-all ()
-  "If enable `multiple-cursors', then mark all like this, other mark buffer."
-  (interactive)
-  (if multiple-cursors-mode
-      (mc/mark-all-words-like-this)
-    (mark-whole-buffer)))
-
-(defun my-bob-or-mc-align ()
-  "If enable `multiple-cursors', then mark then align by regexp, other bob.
-BOB - is `beginning-of-buffer'"
-  (interactive)
-  (if multiple-cursors-mode
-      (call-interactively 'mc/vertical-align)
-    (beginning-of-buffer)))
-
-(defun my-eob-or-mc-align-with-space ()
-  "If enable `multiple-cursors', then align by spaces, other bob.
-EOB - is `end-of-buffer'"
-  (interactive)
-  (if multiple-cursors-mode
-      (mc/vertical-align-with-space)
-    (end-of-buffer)))
-
-(defun my-mc-mark-like-this-or-edit-lines ()
-  "If region on some lines, `mc/edit-lines' other `mc/mark-next-like-this'."
-  (interactive)
-  (if (and (region-active-p)
-           (not (eq (line-number-at-pos (region-beginning))
-                    (line-number-at-pos (region-end)))))
-      (call-interactively 'mc/edit-lines)
-    (call-interactively 'mc/mark-next-like-this-word)))
-
 (use-package multiple-cursors
+    :ensure t
+    :custom
+    (my-mc-cmds-to-run-once . '(my-mark-all
+                                my-bob-or-mc-align
+                                my-eob-or-align-with-spaces
+                                my-mc-mark-like-this-or-edit-lines
+                                my-mc-mark-like-this-or-edit-lines
+                                toggle-input-method))
+    :bind
+    ((:map xah-fly-command-map)
+     ("SPC f"     . my-buffer-list-or-edit-lines)
+     ("7"         . my-mc-mark-like-this-or-edit-lines)
+     ("SPC 7"     . mc/mark-previous-like-this-word)
+     ("SPC TAB 7" . mc/reverse-regions)
+     ("SPC d 7"   . mc/unmark-next-like-this)
+     ("SPC h"     . my-bob-or-mc-align)
+     ("SPC n"     . my-eob-or-mc-align-with-space)
+     ("SPC a"     . my-mark-all))
+
     :config
-  (add-to-list 'mc--default-cmds-to-run-once 'my-mark-all)
-  (add-to-list 'mc--default-cmds-to-run-once
-               'my-mc-mark-like-this-or-edit-lines)
-  (add-to-list 'mc--default-cmds-to-run-once
-               'my-bob-or-mc-align)
-  (add-to-list 'mc--default-cmds-to-run-once
-               'my-eob-or-align-with-spaces)
-  (add-to-list 'mc--default-cmds-to-run-once
-               'my-mc-mark-like-this-or-edit-lines)
-  (add-to-list 'mc--default-cmds-to-run-once
-               'toggle-input-method)
-  :bind
-  ((:map xah-fly-command-map)
-   ("SPC f"     . my-buffer-list-or-edit-lines)
-   ("7"         . my-mc-mark-like-this-or-edit-lines)
-   ("SPC 7"     . mc/mark-previous-like-this-word)
-   ("SPC TAB 7" . mc/reverse-regions)
-   ("SPC d 7"   . mc/unmark-next-like-this)
-   ("SPC h"     . my-bob-or-mc-align)
-   ("SPC n"     . my-eob-or-mc-align-with-space)
-   ("SPC a"     . my-mark-all)))
+    (defun my-buffer-list-or-edit-lines ()
+      "Do `helm-buffer-list' or `mc/edit-lines'."
+      (interactive)
+      (if (use-region-p)
+          (call-interactively #'mc/edit-lines)
+        (call-interactively #'helm-multi-files)))
+
+    (defun my-mark-all ()
+      "Mark all words like this for `multiple-cursors', otherwise mark buffer."
+      (interactive)
+      (if multiple-cursors-mode
+          (mc/mark-all-words-like-this)
+        (mark-whole-buffer)))
+
+    (defun my-bob-or-mc-align ()
+      "If enabled `multiple-cursors', then mark then align by regexp, other bob.
+BOB - is `beginning-of-buffer'"
+      (interactive)
+      (if multiple-cursors-mode
+          (call-interactively 'mc/vertical-align)
+        (beginning-of-buffer)))
+
+    (defun my-eob-or-mc-align-with-space ()
+      "If enabled `multiple-cursors', then align by spaces, other eob.
+EOB - is `end-of-buffer'"
+      (interactive)
+      (if multiple-cursors-mode
+          (mc/vertical-align-with-space)
+        (end-of-buffer)))
+
+    (defun my-mc-mark-like-this-or-edit-lines ()
+      "If region on some lines, `mc/edit-lines' other `mc/mark-next-like-this'."
+      (interactive)
+      (if (and (region-active-p)
+               (not (eq (line-number-at-pos (region-beginning))
+                        (line-number-at-pos (region-end)))))
+          (call-interactively 'mc/edit-lines)
+        (call-interactively 'mc/mark-next-like-this-word))))
 
 (use-package avy
     :ensure t
@@ -771,6 +848,7 @@ Action of `avy', see `avy-action-yank' for example"
            ("SPC k e"   . 'sp-backward-kill-sexp)
            ("SPC SPC g" . 'sp-kill-hybrid-sexp)
            ("SPC SPC e" . 'sp-splice-sexp-killing-backward)
+           ("SPC -"     . 'sp-rewrap-sexp)
            ("-"         . 'sp-splice-sexp)
            ("SPC 9"     . 'sp-change-enclosing)
 
@@ -881,6 +959,13 @@ Action of `avy', see `avy-action-yank' for example"
   "Functions, which drag stuff to left, or return nil.
 
 It is used in `my-drag-stuff-left'.")
+
+(defun my-drag-p ()
+  "Return non-nil, when last command is drag-command."
+  (memq last-command '(my-drag-stuff-right
+                       my-drag-stuff-left
+                       my-drag-stuff-up
+                       my-drag-stuff-down)))
 
 (defun my-drag-stuff-left ()
   "My more general and functional version of `drag-stuff-left'."
@@ -1321,43 +1406,6 @@ List of functions: `xah-toggle-letter-case', `my-change-case-of-current-line'."
         (my-change-case-of-current-line)
       (xah-toggle-letter-case))))
 
-(defun insert-space-before-line ()
-  "Saving position, insert space to beginning of current line."
-  (interactive)
-  (save-excursion (beginning-of-line-text)
-                  (xah-insert-space-before))
-  )
-
-(defun insert-spaces-before-each-line-by-line-nums (start-line end-line)
-  "Insert space before each line in region (`START-LINE`; `END-LINE`)."
-  (unless (= 0 (+ 1 (- end-line start-line)))
-    (goto-line start-line)
-    (insert-space-before-line)
-    (insert-spaces-before-each-line-by-line-nums (+ start-line 1) end-line))
-  )
-
-(defun insert-spaces-before-each-line (beg end)
-  "Insert spaces before each selected line, selected line indentifier with `BEG` & `END`."
-  (interactive "r")
-  (save-excursion
-    (let (deactivate-mark)
-      (let ((begining-line-num (line-number-at-pos beg))
-            (end-line-num (line-number-at-pos end)))
-        (insert-spaces-before-each-line-by-line-nums begining-line-num end-line-num))))
-  )
-
-(defun insert-spaces-before-or-to-beginning-of-each-line (beg end)
-  "Insert space, and if selected region, insert space to beginning of each line, text is should will indentifier with `BEG` & `END`."
-  (interactive (list (if (use-region-p) (region-beginning))
-                     (if (use-region-p) (region-end))))
-  (if (use-region-p)
-      (insert-spaces-before-each-line beg end)
-    (xah-insert-space-before))
-  )
-
-(define-key xah-fly-command-map (kbd "p") nil)
-(define-key xah-fly-command-map (kbd "p") 'insert-spaces-before-or-to-beginning-of-each-line)
-
 (defun my-duplicate-last-block ()
   "Take last text block and insert."
   (interactive)
@@ -1381,6 +1429,8 @@ List of functions: `xah-toggle-letter-case', `my-change-case-of-current-line'."
 (bind-keys*
  :map xah-fly-command-map
  ("SPC k 6" . my-duplicate-last-block))
+
+(define-key xah-fly-command-map (kbd "SPC SPC v") 'helm-show-kill-ring)
 
 (define-key xah-fly-command-map (kbd "m") 'backward-sexp)
 (define-key xah-fly-command-map (kbd ".") 'forward-sexp)
@@ -1614,7 +1664,7 @@ See `just-line-is-whitespaces-p'"
 
 (use-package tex
     :ensure auctex
-    :major-mode-map latex
+    :major-mode-map (latex (LaTeX-mode latex-mode))
     (LaTeX-mode)
     :hook ((latex-mode . my-latex-find-master-file)
            (latex-mode . LaTeX-mode)))
@@ -2835,7 +2885,10 @@ If IGNORE-SPACES is non-nil, then ignore backward-spaces"
      "\\\\sim"))
 
 (use-package org
-    :major-mode-map (org-mode)
+    :major-mode-map ((org-mode))
+    :custom
+    (org-refile-use-outline-path nil)
+    (org-refile-targets '((org-agenda-files :maxlevel . 2)))
     :bind
     ((:map xah-fly-command-map)
      ("SPC z" . 'org-capture)
@@ -2864,6 +2917,11 @@ If IGNORE-SPACES is non-nil, then ignore backward-spaces"
      ("b t" . 'org-babel-tangle)
      ("b f" . 'org-babel-tangle-file)
      ("b e" . 'org-babel-execute)
+     ("b e" . 'org-edit-special)
+     (:map org-src-mode-map)
+     ([remap save-buffer] . 'org-edit-src-exit)
+
+     (:map my-org-local-map)
 
      ;; Manipulations with a table
      ("t n" . 'org-table-create-or-convert-from-region)
@@ -3070,11 +3128,73 @@ If caption isn't empty string, then insert image with the caption CAPTION."
     :hook
     (dired-mode-hook . org-download-enable))
 
+(use-package org-keys
+    :after (org)
+    :bind ((:map my-org-local-map)
+           ("h" . 'my-org-to-heading-start))
+    :custom
+    (org-use-speed-commands
+     (lambda ()
+       (or
+        (and
+         (looking-back "^\**")
+         (not (looking-back "[^*]")))
+        (looking-at "\*+ "))))
+    (org-speed-commands-default
+     '(("k" . org-forward-heading-same-level)
+       ("i" . org-backward-heading-same-level)
+       ("j" . org-previous-visible-heading)
+       ("l" . org-next-visible-heading)
+       ("z" . org-toggle-comment)
+       ("x" . org-cut-subtree)
+       ("d" . org-deadline)
+       ("s" . org-schedule)
+       ("w" . my-org-schedule-to-today)
+       (" " . my-add-org-subtree-to-targets-on-day)
+       ("'" . org-toggle-narrow-to-subtree)
+       ("f" . (progn
+                (skip-chars-forward "*")
+                (forward-char)))
+       ("B" . org-previous-block)
+       ("F" . org-next-block)
+       ("g" . (org-refile t))
+       ("c" . org-cycle)
+       ("=" . org-columns)
+       ("I" . org-metaup)
+       ("K" . org-metadown)
+       ("o" . org-metaright)
+       ("u" . org-metaleft)
+       ("O" . org-shiftmetaright)
+       ("U" . org-shiftmetaleft)
+       ("n"
+        . (progn
+            (forward-char 1)
+            (call-interactively 'org-insert-heading-respect-content)))
+       ("a" . org-archive-subtree-default-with-confirmation)
+       ("6" . org-mark-subtree)
+       ("t" . org-todo)
+       ("," . (org-priority))
+       ("0" . (org-priority 32))
+       ("1" . (org-priority 65))
+       ("2" . (org-priority 66))
+       ("3" . (org-priority 67))
+       (":" . org-set-tags-command)
+       ("e" . org-set-effort)
+       ("E" . org-inc-effort)
+       ("/" . org-sparse-tree)
+       ("?" . org-speed-command-help)))
+    :config
+    (defun my-org-to-heading-start ()
+      "Go to the beginning of the heading after activate insert mode."
+      (interactive)
+      (end-of-line)
+      (search-backward-regexp "^\*" nil t)
+      (xah-fly-insert-mode-activate)))
+
 (use-package helm-org
     :ensure t
-    :bind (:map org-mode-map
-                ([remap helm-imenu]
-                 . helm-org-in-buffer-headings)))
+    :bind ((:map org-mode-map)
+           ([remap helm-imenu] . helm-org-in-buffer-headings)))
 
 (use-package ox
 
@@ -3233,8 +3353,64 @@ exist after each headings's drawers."
   ((:map my-org-local-map)
    ("k" . 'my-org-tidy)))
 
+(define-prefix-command 'my-lisp-map)
+
+(use-package paxedit
+    :ensure t
+    :bind ((:map paxedit-mode-map)
+           (";" . 'paxedit-insert-semicolon)
+           ("(" . 'paxedit-open-round)
+           ("[" . 'paxedit-open-bracket)
+           ("{" . 'paxedit-open-curly)
+           (:map my-lisp-map)
+           ("o" . 'my-paxedit-transpose-forward)
+           ("u" . 'my-paxedit-transpose-backward)
+           ("x" . 'paxedit-kill)
+           ("w" . 'my-paxedit-change)
+           ("d" . 'paxedit-symbol-kill)
+           ("q" . 'paxedit-compress)
+           ("k" . 'paxedit-delete-whitespace)
+           ("y" . 'my-paxedit-duplicate))
+    :config
+
+    (defun my-paxedit-change ()
+      "Kill the Lisp expression at the cursor and activate insert mode."
+      (interactive)
+      (paxedit-delete)
+      (xah-fly-insert-mode-activate))
+
+    (defun my-paxedit-duplicate ()
+      "Make copy of the Lisp expression at the cursor."
+      (interactive)
+      (let* ((reg (paxedit-sexp-region))
+             (beg (car reg))
+             (end (cdr reg))
+             (sexp (buffer-substring beg end))
+             (sep (if (my-lisp-sexp-whole-line-p) "\n" " ")))
+        (goto-char end)
+        (insert sep sexp)))
+
+    (defun my-lisp-sexp-whole-line-p ()
+      "Return t, when the Lisp sexp at the point being at whole of line."
+      (interactive "P")
+      (and (= beg (save-excursion (beginning-of-line-text)
+                                  (point)))
+           (= end (point-at-eol))))
+
+    (defun my-paxedit-transpose-forward ()
+      (interactive)
+      (call-interactively #'paxedit-transpose-forward)
+      (repeat-at-last-keystroke))
+
+    (defun my-paxedit-transpose-backward ()
+      (interactive)
+      (call-interactively #'paxedit-transpose-backward)
+      (repeat-at-last-keystroke)))
+
 (use-package elisp-mode
-    :major-mode-map elisp (emacs-lisp-mode inferior-emacs-lisp-mode))
+    :major-mode-map (elisp
+                     (emacs-lisp-mode inferior-emacs-lisp-mode)
+                     :parent my-lisp-map))
 
 (use-package package-lint
     :ensure t)
@@ -3246,8 +3422,8 @@ exist after each headings's drawers."
 
 (use-package emr
     :ensure t
-    :bind (:map xah-fly-command-map
-                ("SPC /" . emr-show-refactor-menu)))
+    :bind ((:map xah-fly-command-map)
+           ("SPC /" . emr-show-refactor-menu)))
 
 (use-package elfmt
     :config
@@ -3255,17 +3431,6 @@ exist after each headings's drawers."
 
 (use-package suggest
     :ensure t)
-
-(defun my-edit-elisp-docstring ()
-  "Edit `elisp' docstring via `string-edit' and `elisp-docstring-mode'."
-  (interactive)
-  (string-edit-at-point)
-  (elisp-docstring-mode))
-
-(use-package elisp-docstring-mode
-    :ensure t
-    :bind (:map emacs-lisp-mode-map
-                ([remap string-edit-at-point] . my-edit-elisp-docstring)))
 
 (use-package lisp-mode
     :custom (lisp-body-indent 2))
@@ -3317,58 +3482,6 @@ Only when in class defnition."
              (my-elisp-defclass-name)))))
 
 (define-key emacs-lisp-mode-map (kbd "M-RET") 'my-elisp-new-field-of-class)
-
-(use-package paxedit
-    :ensure t
-    :hook (emacs-lisp-mode . paxedit-mode)
-    :bind ((:map paxedit-mode-map)
-           (";" . 'paxedit-insert-semicolon)
-           ("(" . 'paxedit-open-round)
-           ("[" . 'paxedit-open-bracket)
-           ("{" . 'paxedit-open-curly)
-           (:map my-elisp-local-map)
-           ("o" . 'my-paxedit-transpose-forward)
-           ("u" . 'my-paxedit-transpose-backward)
-           ("x" . 'paxedit-kill)
-           ("w" . 'my-paxedit-change)
-           ("d" . 'paxedit-symbol-kill)
-           ("q" . 'paxedit-compress)
-           ("k" . 'paxedit-delete-whitespace)
-           ("y" . 'my-paxedit-duplicate)))
-
-(defun my-paxedit-change ()
-  "Kill the Lisp expression at the cursor and activate insert mode."
-  (interactive)
-  (paxedit-delete)
-  (xah-fly-insert-mode-activate))
-
-(defun my-paxedit-duplicate ()
-  "Make copy of the Lisp expression at the cursor."
-  (interactive)
-  (let* ((reg (paxedit-sexp-region))
-         (beg (car reg))
-         (end (cdr reg))
-         (sexp (buffer-substring beg end))
-         (sep (if (my-lisp-sexp-whole-line-p) "\n" " ")))
-    (goto-char end)
-    (insert sep sexp)))
-
-(defun my-lisp-sexp-whole-line-p ()
-  "Return t, when the Lisp sexp at the point being at whole of line."
-  (interactive "P")
-  (and (= beg (save-excursion (beginning-of-line-text)
-                              (point)))
-       (= end (point-at-eol))))
-
-(defun my-paxedit-transpose-forward ()
-  (interactive)
-  (call-interactively #'paxedit-transpose-forward)
-  (repeat-at-last-keystroke))
-
-(defun my-paxedit-transpose-backward ()
-  (interactive)
-  (call-interactively #'paxedit-transpose-backward)
-  (repeat-at-last-keystroke))
 
 (use-package embrace
     :hook (emacs-lisp-mode . my-embrace-emacs-lisp-mode-hook))
@@ -3439,19 +3552,17 @@ Only when in class defnition."
 
 (use-package racket-mode
     :ensure t
-    :defer t
-    :config
-
-    ;; this is enable some useful functions
-    (add-hook 'racket-mode-hook #'racket-xp-mode)
-
-    ;; `flycheck' is very slow, and
-    ;;`racket-xp-mode' also highlight errors, so i disable `flycheck' for
-    ;; the Racket
-    (add-hook 'racket-mode-hook #'turn-off-flycheck)
-
-    ;; fix a bug
-    (setq racket-xp-mode-hook nil))
+    :major-mode-map racket (racket-mode racket-repl-mode)
+    :config (set-keymap-parent my-local-major-mode-map my-lisp-map)
+    :hook
+    ;; this is enable some useful functions for the Racket
+    (racket-mode . 'racket-xp-mode)
+    ;; `flycheck' is very slow and `racket-xp-mode' highlight
+    ;; errors too, so i disable `flycheck' for the Racket
+    (racket-mode . 'turn-off-flycheck)
+    :custom
+    (racket-xp-mode-hook nil)           ; fix a bug
+    )
 
 (defcustom my-racket-meta-return-functions
   '()
@@ -3614,31 +3725,13 @@ List of racket expressions in which this function should work:
 
 (setq python-shell-interpreter "python")
 
-(defun py-nav-to-imports ()
-  "Navigate to imports in Python mode."
-  (interactive)
-  (push-mark)
-  (let ((old-pos (point)))
-    (goto-char (point-min))
-    (search-forward-regexp py/imports-regexp old-pos old-pos))
-  )
-
-(add-nav-to-imports-for-language
- python-mode
- py-nav-to-imports)
-
-(setq flycheck-python-flake8-command "python -m flake8")
-(setq flycheck-python-mypy-executable "python -m mypy")
-(setq flycheck-python-pylint-executable "python -m pylint")
-
 (use-package pydoc
     :ensure t)
 
 (defun enable-dabbrev-company-backend ()
   "Add `company-dabbrev' backend to `company-backends' for local major mode."
   (interactive)
-  (setq-local company-backends (cons 'company-dabbrev company-backends))
-  )
+  (setq-local company-backends (cons 'company-dabbrev company-backends)))
 
 (add-hook 'python-mode-hook 'enable-dabbrev-company-backend)
 
@@ -3886,7 +3979,6 @@ List of racket expressions in which this function should work:
 (use-package helm
     :ensure t
     :after (helm-core)
-    :init (defvar helm-completion-style nil)
     :custom
     (helm-M-x-fuzzy-match           t)
     (helm-buffers-fuzzy-matching    t)
@@ -3895,13 +3987,15 @@ List of racket expressions in which this function should work:
     (helm-autoresize-min-height    20)
     (helm-left-margin-width         4)
     (helm-buffers-left-margin-width 4)
-    :bind (("C-h a"     . 'helm-apropos)
-           (:map xah-fly-command-map)
-           ("SPC SPC f" . 'helm-find-files)
-           ("SPC k r"   . 'helm-regexp))
+    :bind
+    (("C-h a"     . 'helm-apropos)
+     (:map xah-fly-command-map)
+     ("SPC SPC f" . 'helm-find-files)
+     ("SPC k r"   . 'helm-regexp))
     :config
     (helm-mode t)
-    (helm-autoresize-mode t))
+    (helm-autoresize-mode t)
+    (defvar helm-completion-style nil))
 
 (use-package helm-ext
     :ensure t
@@ -4040,6 +4134,25 @@ List of racket expressions in which this function should work:
                       (set-window-buffer nil (current-buffer))))
     :init
     (pomidor))
+
+(use-package google-translate
+    :ensure t
+    :custom
+    (google-translate-default-source-language "auto")
+    (google-translate-default-target-language "ru")
+    :config
+    (defun google-translate--search-tkk ()
+      "Search TKK."
+      (list 430675 2721866130))
+
+    (defun fast-exec-google-translate-keys ()
+      "Get some useful keymaps of `fast-exec' for google-translate."
+      (fast-exec/some-commands
+       ("Google Translate" 'google-translate-at-point)
+       ("Query to Google Translate" 'google-translate-query-translate-reverse)))
+
+    (fast-exec/register-keymap-func 'fast-exec-google-translate-keys)
+    (fast-exec/reload-functions-chain))
 
 (use-package pacmacs
     :ensure t
@@ -4237,12 +4350,13 @@ numbers of lines, otherwise don't display."
 (use-package doom-modeline :ensure t)
 
 (doom-modeline-def-segment drag
-    (when (my-last-command-is-dragged-stuff-p)
+    (when (my-drag-p)
       (propertize
        " DRG "
-       'face (if (doom-modeline--active)
-                 'doom-modeline-panel
-               'mode-line-inactive))))
+       'face
+       (if (doom-modeline--active)
+           'doom-modeline-panel
+         'mode-line-inactive))))
 
 (doom-modeline-def-segment my-matches
     "Display `macro-recoring', `multiple-cursors' and `buffer-size'."
@@ -4988,20 +5102,18 @@ Return new name of FILE"
     :ensure t
     :custom
     (run-command-completion-method 'helm)
-
-    :bind ((:map xah-fly-command-map)
-           ("SPC , c" . 'run-command)
-           ("S-<f5>"  . 'my-run-last-command))
-
+    :bind
+    ((:map xah-fly-command-map)
+     ("SPC , c" . 'run-command)
+     ("S-<f5>"  . 'my-run-last-command))
     :config
-    (defun run-command--run (command-spec)
-      "Run `COMMAND-SPEC'.  Back end for helm and ivy actions."
-      (message "ok?")
-      (setq-local run-command-last-recipe command-spec)
-      (eval (run-command--from-spec command-spec)))
+
+    (defadvice run-command--run (before run-command-set-last-recipe (recipe))
+      "Set `run-command-last-recipe'."
+      (setq-local run-command-last-recipe recipe))
 
     (defun my-run-last-command ()
-      "Run command which was runned last, if commands wasn't run, then `quickrun'."
+      "Run command which was runned last, if commands wasn't run do nothing."
       (interactive)
       (if run-command-last-recipe
           (run-command--run run-command-last-recipe)
@@ -5047,7 +5159,9 @@ Return new name of FILE"
 
 (defun my-org-archive-done-and-saw-headings ()
   "Archieve all `org-mode' headings which has the label done."
-  (org-map-entries 'org-archive-subtree "/+DONE" 'file))
+  (save-excursion
+    (goto-char (point-min))
+    (org-map-entries 'org-archive-subtree "/+DONE" nil)))
 
 (defun my-open-main-agenda-file ()
   "Open agenda.org."
@@ -5073,14 +5187,15 @@ Return new name of FILE"
 (defun my-add-org-subtree-to-targets-on-day ()
   "Add  a `org-mode' subtree at the point to the targets on day."
   (interactive)
-  (let ((subtree-text (my-delete-and-get-text-of-org-subtree)))
-    (my-goto-targets-on-day)
-    (newline)
-    (insert subtree-text)
-    (delete-char -1)
-    (beginning-of-line)
-    (my-org-headline-set-todo-keyword "TODO")
-    (org-schedule t (format-time-string "%Y-%m-%d"))))
+  (save-excursion
+    (let ((subtree-text (my-delete-and-get-text-of-org-subtree)))
+      (my-goto-targets-on-day)
+      (newline)
+      (insert subtree-text)
+      (delete-char -1)
+      (beginning-of-line)
+      (my-org-headline-set-todo-keyword "TODO")
+      (org-schedule t (format-time-string "%Y-%m-%d")))))
 
 (defun my-goto-targets-on-day ()
   "Visit `org-mode' subtree of the targets on day."
@@ -5092,18 +5207,10 @@ Return new name of FILE"
 (defun my-delete-and-get-text-of-org-subtree (&optional pt)
   "Parse a `org-mode' subtree at the PT, delete it and return text of subtree."
   (or pt (setq pt (point)))
-  (let* ((node (org-ml-parse-subtree-at pt))
-         (node-beg (org-ml-get-property :begin node))
-         (node-end (org-ml-get-property :end node))
-         (node-text (buffer-substring node-beg node-end)))
-    (--each (->>
-             node
-             (-second-item)
-             (-partition-all 2)
-             (-map 'car))
-      (print it))
-    (delete-region node-beg node-end)
-    node-text))
+  (org-mark-subtree)
+  (prog1
+      (just-text-in-region)
+    (delete-region (region-beginning) (region-end))))
 
 (defun my-org-headline-set-todo-keyword (new-keyword &optional pt)
   "Set todo keyword of a headline at PT to NEW-KEYWORD.
@@ -5175,27 +5282,26 @@ PT defaults to the current `point'"
     (fast-exec/reload-functions-chain))
 
 (use-package ox-publish
-    :commands org-publish
-    :bind
-    ((:map xah-fly-command-map)
-     ("SPC i t" . 'org-export-stack))
+    :commands (org-publish org-export-stack)
+    :hook (kill-emacs-hook . my-org-publish-notes)
+    :bind ((:map xah-fly-command-map)
+           ("SPC i t" . 'org-export-stack))
     :custom
     (org-publish-use-timestamps-flag nil)
     (org-publish-list-skipped-files  nil)
     (org-publish-project-alist
      '(("Notes"
         :base-directory "~/notes/"
-        :publishing-directory "~/notes/html/"
-        :publishing-function org-latex-export-to-pdf
+        :publishing-directory "~/notes/destination/"
+        :publishing-function org-latex-publish-to-latex
         :recursive t
         :author "Семён"
-        :language "ru")
-       ("ZMS"
-        :base-directory "~/zms/"
-        :publishing-directory "~/zms/destination/"
-        :publishing-function org-latex-export-to-pdf
-        :author "Семён Храмцов"
         :language "ru"))))
+
+(defun my-org-publish-notes ()
+  "Publish my notes to the LaTeX files."
+  (interactive)
+  (org-publish-project "Notes"))
 
 (defcustom my-mipt-dir "c:/Users/hrams/Documents/mipt"
   "Path to the directory in which will be saved all MIPT solutions.")

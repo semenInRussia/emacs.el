@@ -10,92 +10,117 @@
 
 *** TODO explore the =xetex=                                          :latex:
 
-*** TODO see on the =org-store-link=                                    :org:
-
-*** TODO explore the =which-function-mode=
-
-*** TODO fix the =org-refile=                                           :org:
-
-*** TODO Run the main file of the project in =run-command-reicpes= :run_command_recipes:
-
-*** TODO explore the =org-speed-commands=                               :org:
-
-*** TODO Make =LaTeX= document class for ГОСТ                         :latex:
-
 *** TODO add support of the =org-export= to the =run-command-recipes= :run_command_recipes:
-
-*** DONE CDLaTeX Math Modify for Russian imput method
-
-*** TODO See notes without Emacs
-
 *** TODO Print current buffer command for =fast-exec=
-
-**** TODO More pretty =helm-projectile-files=
-
 *** TODO Enable prettify mode in latex
+
+*** TODO More pretty =helm-projectile-files=
 
 *** TODO Change defnition of =insert-new-counter=
 
 *** TODO Multicolumn expansion latex
 
 *** TODO Latex expansion : wrapfig, wraptable
+
 *** TODO Auto capitalize on #+TITLE in org
+
 *** TODO Xenops in non \documentclass =LaTeX= documents
+
 *** TODO Color Picker
+
 *** TODO New =embrace= with support of the =smartparens=
 
-*** TODO /spc spc v/ to insert string from kill ring
-*** TODO Delete directories too in the =dired= via =SPC g=
+
+*** DONE Delete directories too in the =dired= via =SPC g=
+SCHEDULED: <2022-09-19 Пн>
+
 *** TODO Impatient modes for all =major-modes=
-*** TODO When "I am use" after insert description last uri
+SCHEDULED: <2022-09-19 Пн>
+
 *** TODO Fix =my-copy-buffer-content-as-mipt-solution=
+SCHEDULED: <2022-09-19 Пн>
+
 *** TODO View list of possible LaTeX expansion
+SCHEDULED: <2022-09-19 Пн>
+
 *** TODO Fix coding
+SCHEDULED: <2022-09-19 Пн>
+
 *** TODO Find /jwiegley/ way to refactor Emacs Lisp programs
-*** TODO =paxedit-mode= for =racket-mode=
+SCHEDULED: <2022-09-19 Пн>
+
 *** TODO More useful way to run =run-command-recipes= recipes
+SCHEDULED: <2022-09-19 Пн>
+
 
 See on the compile command from the =latex-extra=
 *** TODO Keybinding =SPC l z= for =peaxedit=
+SCHEDULED: <2022-09-19 Пн>
+
 *** TODO ZMS PDF files should be names in special format
+SCHEDULED: <2022-09-19 Пн>
+
 
 #+BEGIN_EXAMPLE
 9_Иванов И._ЛФ-1.pdf
 #+END_EXAMPLE
 *** TODO Use =sp= instead of =paxedit= when can
+SCHEDULED: <2022-09-19 Пн>
+
 *** TODO Fix the =LaTEX= section insertion
+SCHEDULED: <2022-09-19 Пн>
+
 *** TODO New events for the =auto-save=
+SCHEDULED: <2022-09-19 Пн>
+
 *** TODO Add units for =calc=
-*** TODO Explore =calc=
+SCHEDULED: <2022-09-19 Пн>
+
 *** TODO Fix =xah-fly-keys= in =calc=
+SCHEDULED: <2022-09-19 Пн>
+
 *** TODO Map for =deft= integrated with =xah-fly-keys=
-*** TODO Instead of /C-c '/ in indirected buffers use /SPC ;/
-*** TODO Fix view of LaTeX formuls in the =org-mode=
-*** TODO Fix modeline for =drag=
+SCHEDULED: <2022-09-19 Пн>
+
 ** Targets on Day
 
-*** DONE Add \uline command for =LaTeX=
-SCHEDULED: <2022-09-14 Ср>
+*** DONE When "I am use" after insert description last uri
+SCHEDULED: <2022-09-19 Пн>
+SCHEDULED: <2022-09-19 Пн>
 
-*** explore the =org-publish=                                         :org:
-SCHEDULED: <2022-09-14 Ср>
+*** DONE /spc spc v/ to insert string from kill ring
+SCHEDULED: <2022-09-19 Пн>
 
-*** DONE explore the =org-export=                                     :org:
-SCHEDULED: <2022-09-14 Ср>
+*** DONE =paxedit-mode= for =racket-mode=
+SCHEDULED: <2022-09-18 Вс>
 
-Also use some themes for exporting to the =html=
+*** DONE See notes without Emacs
+SCHEDULED: <2022-09-18 Вс>
 
-*** DONE Complete a automatic management of the spaces to =LaTeX=
-SCHEDULED: <2022-09-08 Чт>
 
-- Add functions for declaring binary ops/parens
-- Manage spaces for parens
-- Manage spaces for all normal commands (argument and nonargument)
-*** DONE =smartparens=
-SCHEDULED: <2022-09-11 Вс>
-*** TODO Fix autoloading of the =multiple-cursors=
-  SCHEDULED: <2022-09-16 Пт>
+*** TODO Run the main file of the project in =run-command-reicpes= :run_command_recipes:
+SCHEDULED: <2022-09-18 Вс>
+
+*** DONE explore the =which-function-mode=
+SCHEDULED: <2022-09-18 Вс>
+
+*** DONE Fix modeline for =drag=
+SCHEDULED: <2022-09-18 Вс>
+
+*** DONE Explore =calc=
+SCHEDULED: <2022-09-18 Вс>
+*** DONE Instead of /C-c '/ in indirected buffers use /SPC ;/
 * Films 
+
+** MUST-SEE Thor: Love and Thunder
+   :PROPERTIES:
+   :name:     Тор: Любовь и гром
+   :year:     2022
+   :slogan:   Not every god has a plan.
+   :id:       1282688
+   :rating:   65.0
+   :countries: (Австралия США)
+   :END:
 
 ** MUST-SEE The Batman
    :PROPERTIES:
@@ -127,16 +152,6 @@ SCHEDULED: <2022-09-11 Вс>
    :countries: (США)
    :END:
 
-** MUST-SEE Thor: Love and Thunder
-   :PROPERTIES:
-   :name:     Тор: Любовь и гром
-   :year:     2022
-   :slogan:   Not every god has a plan.
-   :id:       1282688
-   :rating:   65.0
-   :countries: (Австралия США)
-   :END:
-
 ** MUST-SEE Doctor Strange in the Multiverse of Madness
    :PROPERTIES:
    :name:     Доктор Стрэндж: В мультивселенной безумия
@@ -147,16 +162,8 @@ SCHEDULED: <2022-09-11 Вс>
    :countries: (США)
    :END:
 
-** MUST-SEE The Matrix Reloaded
-:PROPERTIES:
-:name:     Матрица: Перезагрузка
-:year:     2003
-:slogan:   Одни машины помогают нам жить, другие – пытаются нас убить
-:id:       299
-:rating:   77.0
-:countries: (США)
+** MUST-SEE The Matrix ReloadedlСША)
 :END:
-
 ** MUST-SEE Borat: Cultural Learnings of America for Make Benefit Glorious Nation of Kazakhstan
    :PROPERTIES:
    :name:     Борат
@@ -185,3 +192,13 @@ SCHEDULED: <2022-09-11 Вс>
 |         4.5 |    9 |     0 |   8 | 6 + x |
 |       205.5 |   90 |   300 | 431 | 6 + x |
 #+TBLFM: $1=vmean($2..$5)::$5=6+x
+** MUST-SEE Dumb and Dumber
+:PROPERTIES:
+:name:     Тупой и еще тупее
+:year:     1994
+:slogan:   Для них каждый новый день безумнее предыдущего
+:id:       5185
+:rating:   72.0
+:countries: (США)
+:END:
+

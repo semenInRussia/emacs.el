@@ -39,6 +39,7 @@ I'm use followed repositories as a template for my Emacs config:
     - [[#work-with-lisp-sexps][Work with Lisp Sexps]]
     - [[#read-anything-from-the-user][Read Anything from the User]]
     - [[#work-with-math][Work with Math]]
+    - [[#work-with-symbols][Work with Symbols]]
   - [[#function-for-work-with-the-emacs][Function for work with the Emacs]]
   - [[#auto-tangle-this-file][Auto Tangle This File]]
 - [[#info-about-me-for-emacs][Info about Me for Emacs]]
@@ -126,6 +127,7 @@ I'm use followed repositories as a template for my Emacs config:
       - [[#auto-format-in-org][Auto Format in Org]]
       - [[#load-from-wiki][Load from Wiki]]
       - [[#drag-and-drop-images-to-org][Drag and Drop Images to Org]]
+      - [[#org-speed-commands][Org Speed commands]]
       - [[#navigation-beetween-org-headings-in-current-buffer][Navigation beetween Org Headings in Current Buffer]]
       - [[#export-org-to-other][Export Org to Other]]
       - [[#improvement-navigation-beetween-the-org-mode-headings][Improvement Navigation beetween the =org-mode= Headings]]
@@ -134,29 +136,17 @@ I'm use followed repositories as a template for my Emacs config:
       - [[#startup-of-org-mode][Startup of =org-mode=]]
       - [[#org--cdlatex][Org + CDLaTeX]]
       - [[#keep-your-org-files-tidy][Keep your Org files tidy]]
-    - [[#elisp][Elisp]]
-      - [[#emacs-local-keys-map][Emacs Local Keys Map]]
-      - [[#special-linters][Special Linters]]
-      - [[#emacs-refactoring][Emacs Refactoring]]
-      - [[#elisp-format-code][Elisp Format Code]]
-      - [[#emacs-lisp-suggest-documentation][Emacs Lisp Suggest Documentation]]
-      - [[#elisp-docstrings-mode][Elisp Docstrings Mode]]
-      - [[#elisp-indent-code][Elisp Indent Code]]
-      - [[#insertion-new-class-fields-in-emacs-lisp][Insertion New Class Fields in Emacs Lisp]]
-      - [[#editing-and-refactoring-lisp][Editing And Refactoring LISP]]
-      - [[#some-special-parens-for-the-elisp][Some Special "Parens" for the Elisp]]
-    - [[#racket][Racket]]
-      - [[#smart-insertion-in-racket-m-ret][Smart Insertion in Racket (=M-ret=)]]
-      - [[#scribble-the-racket-documentation-tool][Scribble: The Racket Documentation Tool]]
+    - [[#lisp-laguages][Lisp Laguages]]
+      - [[#for-each-of-lisp-languages][For Each of Lisp Languages]]
+      - [[#elisp][Elisp]]
+      - [[#racket][Racket]]
     - [[#markdown][Markdown]]
       - [[#create-table-of-contents-in-markdown][Create Table of Contents in Markdown]]
       - [[#auto-format-in-markdown][Auto Format in markdown]]
     - [[#python][Python]]
-      - [[#vars][Vars]]
-      - [[#navigation][Navigation]]
-      - [[#linters][Linters]]
+      - [[#python-vars][Python Vars]]
       - [[#helping-info][Helping info]]
-      - [[#autocomplete-1][Autocomplete]]
+      - [[#python-autocomplete][Python Autocomplete]]
     - [[#rust][Rust]]
       - [[#auto-completion-in-rust][Auto Completion in Rust]]
       - [[#check-errors-in-rust][Check Errors in Rust]]
@@ -168,8 +158,8 @@ I'm use followed repositories as a template for my Emacs config:
     - [[#javascript-nodejs][JavaScript (Node.js)]]
       - [[#variables][Variables]]
       - [[#repl][Repl]]
-      - [[#linters-1][Linters]]
-      - [[#navigation-1][Navigation]]
+      - [[#linters][Linters]]
+      - [[#navigation][Navigation]]
     - [[#json][JSON]]
     - [[#html][HTML]]
       - [[#variables-for-html][Variables for HTML]]
@@ -206,6 +196,7 @@ I'm use followed repositories as a template for my Emacs config:
   - [[#auto-save][Auto Save]]
   - [[#read-documentation-for-developers][Read Documentation for Developers]]
   - [[#pomidor][Pomidor]]
+  - [[#translater][Translater]]
   - [[#pacman][Pacman]]
   - [[#wikipedia][Wikipedia]]
   - [[#view-github-stars][View Github Stars]]
@@ -224,7 +215,7 @@ I'm use followed repositories as a template for my Emacs config:
     - [[#some-other-themes][Some other themes]]
     - [[#load-theme][Load Theme]]
   - [[#numbers-of-lines][Numbers of lines]]
-    - [[#vars-1][Vars]]
+    - [[#vars][Vars]]
     - [[#enable-and-disable][Enable and Disable]]
   - [[#modeline][Modeline]]
     - [[#modeline-for-drag][Modeline for =drag=]]
@@ -265,7 +256,7 @@ I'm use followed repositories as a template for my Emacs config:
   - [[#organization][Organization]]
     - [[#fast-organiztion][Fast Organiztion]]
   - [[#notes][Notes]]
-    - [[#view-notes-outside-of-the-emacs][View Notes outside of the Emacs]]
+    - [[#watch-notes-outside-of-the-emacs][Watch Notes outside of the Emacs]]
 - [[#mipt][MIPT]]
   - [[#management-of-mipt-files][Management of MIPT Files]]
   - [[#copy-content-of-file-as-mipt-solution][Copy Content of File as MIPT Solution]]
@@ -343,9 +334,12 @@ This is [[https://github.com/rejeep/f.el][f]]:
 This is [[https://github.com/magnars/dash.el][dash:]]
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
 
-  (use-package dash :ensure t :init (global-dash-fontify-mode 1))
+  (use-package dash
+      :ensure t
+      :init
+      (global-dash-fontify-mode 1))
 
-  #+END_SRC
+#+END_SRC
 
 *** Caching
 
@@ -633,6 +627,29 @@ function in Emacs and know result
      (-rotate 2)))
      #+END_SRC
 
+*** Work with Symbols
+
+Function =my-symbols-append= take 2 symbols, transform their to
+strings and return their concatanaition as symbol.
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (defun my-symbols-append (&rest symbols)
+    (->>
+     symbols
+     (-map 'symbol-name)
+     (apply 's-concat)
+     (intern)))
+#+END_SRC
+
+Function =my-major-mode-hook= take =major-mode= symbol and return
+symbol hook for that =major-mode=
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (defun my-major-mode-hook (major-mode)
+    "Get symbol hook of MAJOR-MODE (it is symbol too)."
+    (my-symbols-append major-mode '-hook))
+#+END_SRC
+
 ** Function for work with the Emacs
 
 I created library =just= which has a lot of power functions for
@@ -643,7 +660,7 @@ work with Emacs
   (use-package just
       :load-path "~/projects/just/")
 
-      #+END_SRC
+#+END_SRC
 
 ** Auto Tangle This File
 
@@ -697,13 +714,17 @@ I am use [[https://github.com/xahlee/xah-fly-keys][xah-fly-keys]], this as VIM, 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (use-package xah-fly-keys
+      :load-path "~/.emacs.d/lisp/"
+      :init
+      (defvar xah-fly-insert-state-p t)
       :config
-    (xah-fly-keys-set-layout "qwerty")
-    (xah-fly-keys )
-    :bind ((:map xah-fly-command-map)
-           ("SPC l"   . nil)
-           ("SPC j"   . nil)
-           ("SPC SPC" . nil)))
+      (xah-fly-keys-set-layout "qwerty")
+      (xah-fly-keys )
+      :bind
+      ((:map xah-fly-command-map)
+       ("SPC l"   . nil)
+       ("SPC j"   . nil)
+       ("SPC SPC" . nil)))
 #+END_SRC
 
 *** Easy Create Major Modes Maps
@@ -732,58 +753,117 @@ I am use =use-package=, so I'm add flag =:major-mode-map= for create major modes
 
   (add-to-list 'use-package-keywords :major-mode-map)
 
-  #+END_SRC
+#+END_SRC
 
 **** Normalizer for =:major-mode-map=
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
-  (defun use-package-normalize/:major-mode-map (name keyword args)
-    "Normalizer of :major-mode-map for `use-package'."
-    (let* (map-name modes)
-      (if (eq (-first-item args) t)
-          (list (symbol-name name) (list name))
-        (cl-typecase (-first-item args)
-          (null nil)
-          (list (setq modes (-first-item args)))
-          (symbol (setq map-name (symbol-name (-first-item args))))
-          (string (setq map-name (-first-item args))))
-        (cl-typecase (-second-item args)
-          (null nil)
-          (list (setq modes (-second-item args)))
-          (symbol (setq map-name (symbol-name (-second-item args))))
-          (string (setq map-name (-second-item args))))
-        (list
-         (or map-name (symbol-name name))
-         modes))))
+  (defun use-package-normalize/:major-mode-map (pkg-name keyword args)
+    "Normalizer of :major-mode-map for `use-package'.
 
-         #+END_SRC
+  Should return `plist' with followed keywords
+
+  :keymap-name
+  Name of the keymap without special prefixes and suffixes.
+
+  :major-modes
+  List of the major-modes in which should work keymap
+
+  :parent
+  Parent of the `major-mode' keymap"
+    (let* ((args-plist (car args))
+           keymap-name
+           parent
+           major-modes)
+      (cond
+        ((eq args-plist t)
+         (setq keymap-name pkg-name)
+         (setq major-modes (list pkg-name)))
+        ((symbolp args-plist)
+         (setq keymap-name args-plist)
+         (setq major-modes (list pkg-name)))
+        (t
+         (setq keymap-name (or (-first 'symbolp args-plist)
+                               pkg-name))
+         (setq major-modes (or (-first 'listp args-plist)
+                               (list pkg-name)))
+         (setq parent (plist-get args-plist :parent))))
+      (list
+       :keymap-name keymap-name
+       :major-modes major-modes
+       :parent parent)))
+
+#+END_SRC
 
 **** =major-mode-map='s Handler
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (defcustom my-major-mode-map-prefix "my-"
+    "Prefix for the local `major-mode' keymap variable name."
+    :type 'string)
 
-  (defun use-package-handler/:major-mode-map (name keyword
-                                              map-name-and-modes rest state)
-    (let* ((map-name (car map-name-and-modes))
-           (modes (-second-item map-name-and-modes))
-           (modes-hooks (--map (intern (s-append "-hook" (symbol-name it)))
-                               modes))
-           (map (intern (s-concat "my-" map-name "-local-map"))))
-      (setq rest
-            (-concat
-             rest
-             `(:config
-               ((unless (boundp ',map)
-                  (define-prefix-command ',map))
-                (--each ',modes-hooks
-                  (add-hook it
-                            (lambda ()
-                              (setq-local my-local-major-mode-map
-                                          ',map))))))))
-      (use-package-process-keywords name rest)))
+  (defcustom my-major-mode-map-suffix "-local-map"
+    "Suffix for the local `major-mode' keymap variable name."
+    :type 'string)
 
-      #+END_SRC
+  (defvar my-major-mode-local-maps
+    (make-hash-table :test 'eql)
+    "Hashtable of the `major-mode's and respective keymaps.")
+
+  (defun use-package-handler/:major-mode-map (pkg-name
+                                              keyword
+                                              keymap-info
+                                              rest
+                                              state)
+    (let ((body (use-package-process-keywords pkg-name rest state))
+          (keymap-name (plist-get keymap-info :keymap-name))
+          (major-modes (plist-get keymap-info :major-modes))
+          (parent (plist-get keymap-info :parent)))
+      (cons
+       `(my-define-local-major-mode-map ',keymap-name ',major-modes ,parent)
+       body)))
+
+  (defun my-define-local-major-mode-map (keymap-name major-modes &optional parent)
+    "Define local keymap for the MAJOR-MODES.
+
+  Name of the local keymap will be KEYMAP-NAME + some suffixes and
+  prefixes (KEYMAP-NAME is a symbol).
+
+  PARENT is the parent keymap for the local map."
+    (let ((keymap-symbol (define-prefix-command-for-major-mode keymap-name)))
+      (set-keymap-parent (eval keymap-symbol) parent)
+      (--each major-modes
+        (puthash it
+                 keymap-symbol
+                 my-major-mode-local-maps))))
+
+  (defun define-prefix-command-for-major-mode (keymap-name)
+    "Define prefix command for the `major-mode' with the KEYMAP-NAME.
+
+  KEYMAP-NAME has type symbol.
+
+  Name of the keymap variable will has the followed form:
+  my-{keymap-name}-local-map"
+    (->
+     keymap-name
+     (symbol-name)
+     (s-prepend my-major-mode-map-suffix)
+     (s-append my-major-mode-map-prefix)
+     (intern)
+     (define-prefix-command)))
+
+  (defun my-change-local-major-mode-map (&optional mode)
+    "Change local major mode keymap for the MODE.
+
+  MODE defaults to the current `major-mode'.  See `my-local-major-mode-map-run'"
+    (interactive)
+    (or mode (setq mode major-mode))
+    (setq-local my-local-major-mode-map (gethash mode
+                                                 my-major-mode-local-maps)))
+
+  (add-hook 'after-change-major-mode-hook 'my-change-local-major-mode-map)
+#+END_SRC
 
 ** Fast Executing Command
 
@@ -1058,12 +1138,13 @@ major mode.
       :ensure t
       :bind
       ((:map xah-fly-command-map)
-       ("'" . helm-swoop)
+       ("'"       . helm-swoop)
        ("SPC k '" . helm-multi-swoop-current-mode))
-      :bind ((:map helm-swoop-map)
-             ("M-j" . 'helm-swoop-edit)
-             (:map helm-swoop-edit-map)
-             ([remap save-buffer] . 'helm-swoop--edit-complete)))
+      :bind
+      ((:map helm-swoop-map)
+       ("M-j" . 'helm-swoop-edit)
+       (:map helm-swoop-edit-map)
+       ([remap save-buffer] . 'helm-swoop--edit-complete)))
 
 #+END_SRC
 
@@ -1207,72 +1288,69 @@ I am use [[https://github.com/jacktasia/dumb-jump][cool package dumb-jump]] for 
 
 ** Multiple Cursors
 
-I am use package of magnars [[https://github.com/magnars/multiple-cursors.el][multiple-cursors]]:
+I am use package [[https://github.com/magnars/multiple-cursors.el][multiple-cursors]] of the cool =magnars=:
 
 #+BEGIN_SRC emacs-lisp  :tangle  ~/init.el
 
-  (defun my-buffer-list-or-edit-lines ()
-    "Do `helm-buffer-list' or `mc/edit-lines'."
-    (interactive)
-    (if (use-region-p)
-        (call-interactively #'mc/edit-lines)
-      (call-interactively #'helm-multi-files)))
-
-  (defun my-mark-all ()
-    "If enable `multiple-cursors', then mark all like this, other mark buffer."
-    (interactive)
-    (if multiple-cursors-mode
-        (mc/mark-all-words-like-this)
-      (mark-whole-buffer)))
-
-  (defun my-bob-or-mc-align ()
-    "If enable `multiple-cursors', then mark then align by regexp, other bob.
-  BOB - is `beginning-of-buffer'"
-    (interactive)
-    (if multiple-cursors-mode
-        (call-interactively 'mc/vertical-align)
-      (beginning-of-buffer)))
-
-  (defun my-eob-or-mc-align-with-space ()
-    "If enable `multiple-cursors', then align by spaces, other bob.
-  EOB - is `end-of-buffer'"
-    (interactive)
-    (if multiple-cursors-mode
-        (mc/vertical-align-with-space)
-      (end-of-buffer)))
-
-  (defun my-mc-mark-like-this-or-edit-lines ()
-    "If region on some lines, `mc/edit-lines' other `mc/mark-next-like-this'."
-    (interactive)
-    (if (and (region-active-p)
-             (not (eq (line-number-at-pos (region-beginning))
-                      (line-number-at-pos (region-end)))))
-        (call-interactively 'mc/edit-lines)
-      (call-interactively 'mc/mark-next-like-this-word)))
-
   (use-package multiple-cursors
+      :ensure t
+      :custom
+      (my-mc-cmds-to-run-once . '(my-mark-all
+                                  my-bob-or-mc-align
+                                  my-eob-or-align-with-spaces
+                                  my-mc-mark-like-this-or-edit-lines
+                                  my-mc-mark-like-this-or-edit-lines
+                                  toggle-input-method))
+      :bind
+      ((:map xah-fly-command-map)
+       ("SPC f"     . my-buffer-list-or-edit-lines)
+       ("7"         . my-mc-mark-like-this-or-edit-lines)
+       ("SPC 7"     . mc/mark-previous-like-this-word)
+       ("SPC TAB 7" . mc/reverse-regions)
+       ("SPC d 7"   . mc/unmark-next-like-this)
+       ("SPC h"     . my-bob-or-mc-align)
+       ("SPC n"     . my-eob-or-mc-align-with-space)
+       ("SPC a"     . my-mark-all))
+
       :config
-    (add-to-list 'mc--default-cmds-to-run-once 'my-mark-all)
-    (add-to-list 'mc--default-cmds-to-run-once
-                 'my-mc-mark-like-this-or-edit-lines)
-    (add-to-list 'mc--default-cmds-to-run-once
-                 'my-bob-or-mc-align)
-    (add-to-list 'mc--default-cmds-to-run-once
-                 'my-eob-or-align-with-spaces)
-    (add-to-list 'mc--default-cmds-to-run-once
-                 'my-mc-mark-like-this-or-edit-lines)
-    (add-to-list 'mc--default-cmds-to-run-once
-                 'toggle-input-method)
-    :bind
-    ((:map xah-fly-command-map)
-     ("SPC f"     . my-buffer-list-or-edit-lines)
-     ("7"         . my-mc-mark-like-this-or-edit-lines)
-     ("SPC 7"     . mc/mark-previous-like-this-word)
-     ("SPC TAB 7" . mc/reverse-regions)
-     ("SPC d 7"   . mc/unmark-next-like-this)
-     ("SPC h"     . my-bob-or-mc-align)
-     ("SPC n"     . my-eob-or-mc-align-with-space)
-     ("SPC a"     . my-mark-all)))
+      (defun my-buffer-list-or-edit-lines ()
+        "Do `helm-buffer-list' or `mc/edit-lines'."
+        (interactive)
+        (if (use-region-p)
+            (call-interactively #'mc/edit-lines)
+          (call-interactively #'helm-multi-files)))
+
+      (defun my-mark-all ()
+        "Mark all words like this for `multiple-cursors', otherwise mark buffer."
+        (interactive)
+        (if multiple-cursors-mode
+            (mc/mark-all-words-like-this)
+          (mark-whole-buffer)))
+
+      (defun my-bob-or-mc-align ()
+        "If enabled `multiple-cursors', then mark then align by regexp, other bob.
+  BOB - is `beginning-of-buffer'"
+        (interactive)
+        (if multiple-cursors-mode
+            (call-interactively 'mc/vertical-align)
+          (beginning-of-buffer)))
+
+      (defun my-eob-or-mc-align-with-space ()
+        "If enabled `multiple-cursors', then align by spaces, other eob.
+  EOB - is `end-of-buffer'"
+        (interactive)
+        (if multiple-cursors-mode
+            (mc/vertical-align-with-space)
+          (end-of-buffer)))
+
+      (defun my-mc-mark-like-this-or-edit-lines ()
+        "If region on some lines, `mc/edit-lines' other `mc/mark-next-like-this'."
+        (interactive)
+        (if (and (region-active-p)
+                 (not (eq (line-number-at-pos (region-beginning))
+                          (line-number-at-pos (region-end)))))
+            (call-interactively 'mc/edit-lines)
+          (call-interactively 'mc/mark-next-like-this-word))))
 #+END_SRC
 
 ** Very Fast Jump
@@ -1513,6 +1591,7 @@ splice parens I am use =-= , for navigating I am use =.= and =m=:
              ("SPC k e"   . 'sp-backward-kill-sexp)
              ("SPC SPC g" . 'sp-kill-hybrid-sexp)
              ("SPC SPC e" . 'sp-splice-sexp-killing-backward)
+             ("SPC -"     . 'sp-rewrap-sexp)
              ("-"         . 'sp-splice-sexp)
              ("SPC 9"     . 'sp-change-enclosing)
 
@@ -1659,7 +1738,7 @@ I am use [[https://github.com/magnars/string-edit.el][string-edit]]:
       :bind (:map xah-fly-command-map
                   ("SPC `" . string-edit-at-point)))
 
-                  #+END_SRC
+#+END_SRC
 
 ** Documentation on Fly
 
@@ -1671,7 +1750,7 @@ moment when I type something, so I decrease eldoc's delay
   (use-package eldoc
       :custom ((eldoc-idle-delay 0.01)))
 
-      #+END_SRC
+#+END_SRC
 
 ** Transpose
 
@@ -1700,6 +1779,13 @@ followed functions:
         "Functions, which drag stuff to left, or return nil.
 
       It is used in `my-drag-stuff-left'.")
+
+      (defun my-drag-p ()
+        "Return non-nil, when last command is drag-command."
+        (memq last-command '(my-drag-stuff-right
+                             my-drag-stuff-left
+                             my-drag-stuff-up
+                             my-drag-stuff-down)))
 
       (defun my-drag-stuff-left ()
         "My more general and functional version of `drag-stuff-left'."
@@ -2234,50 +2320,6 @@ I am use =SPC b= to change case of current line:
 
         #+END_SRC
 
-And I am press =p= for inserting space, and if I am selected region,  for inserting space
-to beginning of each line:
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  (defun insert-space-before-line ()
-    "Saving position, insert space to beginning of current line."
-    (interactive)
-    (save-excursion (beginning-of-line-text)
-                    (xah-insert-space-before))
-    )
-
-  (defun insert-spaces-before-each-line-by-line-nums (start-line end-line)
-    "Insert space before each line in region (`START-LINE`; `END-LINE`)."
-    (unless (= 0 (+ 1 (- end-line start-line)))
-      (goto-line start-line)
-      (insert-space-before-line)
-      (insert-spaces-before-each-line-by-line-nums (+ start-line 1) end-line))
-    )
-
-  (defun insert-spaces-before-each-line (beg end)
-    "Insert spaces before each selected line, selected line indentifier with `BEG` & `END`."
-    (interactive "r")
-    (save-excursion
-      (let (deactivate-mark)
-        (let ((begining-line-num (line-number-at-pos beg))
-              (end-line-num (line-number-at-pos end)))
-          (insert-spaces-before-each-line-by-line-nums begining-line-num end-line-num))))
-    )
-
-  (defun insert-spaces-before-or-to-beginning-of-each-line (beg end)
-    "Insert space, and if selected region, insert space to beginning of each line, text is should will indentifier with `BEG` & `END`."
-    (interactive (list (if (use-region-p) (region-beginning))
-                       (if (use-region-p) (region-end))))
-    (if (use-region-p)
-        (insert-spaces-before-each-line beg end)
-      (xah-insert-space-before))
-    )
-
-  (define-key xah-fly-command-map (kbd "p") nil)
-  (define-key xah-fly-command-map (kbd "p") 'insert-spaces-before-or-to-beginning-of-each-line)
-
-  #+END_SRC
-
 I press =SPC k 6= and Emacs duplicate last text block:
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
@@ -2304,8 +2346,16 @@ I press =SPC k 6= and Emacs duplicate last text block:
   (bind-keys*
    :map xah-fly-command-map
    ("SPC k 6" . my-duplicate-last-block))
-   #+END_SRC
+#+END_SRC
 
+Also I press =SPC SPC v= for inserting of the text from the
+=kill-ring=
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (define-key xah-fly-command-map (kbd "SPC SPC v") 'helm-show-kill-ring)
+
+#+END_SRC
 ** Custom Navigation
 
 I am press =m= and =.= for go to next, previous sexp:
@@ -2622,7 +2672,7 @@ Main skeleton of my LaTeX configuration is package =tex-mode= with
 
   (use-package tex
       :ensure auctex
-      :major-mode-map latex
+      :major-mode-map (latex (LaTeX-mode latex-mode))
       (LaTeX-mode)
       :hook ((latex-mode . my-latex-find-master-file)
              (latex-mode . LaTeX-mode)))
@@ -4052,7 +4102,10 @@ I am consider that Org Mode built in Emacs:
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (use-package org
-      :major-mode-map (org-mode)
+      :major-mode-map ((org-mode))
+      :custom
+      (org-refile-use-outline-path nil)
+      (org-refile-targets '((org-agenda-files :maxlevel . 2)))
       :bind
       ((:map xah-fly-command-map)
        ("SPC z" . 'org-capture)
@@ -4081,6 +4134,11 @@ I am consider that Org Mode built in Emacs:
        ("b t" . 'org-babel-tangle)
        ("b f" . 'org-babel-tangle-file)
        ("b e" . 'org-babel-execute)
+       ("b e" . 'org-edit-special)
+       (:map org-src-mode-map)
+       ([remap save-buffer] . 'org-edit-src-exit)
+
+       (:map my-org-local-map)
 
        ;; Manipulations with a table
        ("t n" . 'org-table-create-or-convert-from-region)
@@ -4163,9 +4221,8 @@ I am consider that Org Mode built in Emacs:
     (interactive)
     (call-interactively #'org-todo)
     (one-shot-keybinding "1" 'my-org-todo))
-
     #+END_SRC
-
+    
 **** Insert Images in the Org Mode
 
 Defnition of the =my-org-insert-image=:
@@ -4334,7 +4391,79 @@ I am use [[https://github.com/abo-abo/org-download][org-download]] for this:
       :hook
       (dired-mode-hook . org-download-enable))
 
-      #+END_SRC
+#+END_SRC
+
+**** Org Speed commands
+
+I am use =org-speed= built-in =org-mode=.  So, when the cursor placed
+at the beginning of a =org-mode= heading, each of the special keys
+(see [[elisp:org-speed-command-help][org-speed-command-help]]) change function to a function for =org=
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+  (use-package org-keys
+      :after (org)
+      :bind ((:map my-org-local-map)
+             ("h" . 'my-org-to-heading-start))
+      :custom
+      (org-use-speed-commands
+       (lambda ()
+         (or
+          (and
+           (looking-back "^\**")
+           (not (looking-back "[^*]")))
+          (looking-at "\*+ "))))
+      (org-speed-commands-default
+       '(("k" . org-forward-heading-same-level)
+         ("i" . org-backward-heading-same-level)
+         ("j" . org-previous-visible-heading)
+         ("l" . org-next-visible-heading)
+         ("z" . org-toggle-comment)
+         ("x" . org-cut-subtree)
+         ("d" . org-deadline)
+         ("s" . org-schedule)
+         ("w" . my-org-schedule-to-today)
+         (" " . my-add-org-subtree-to-targets-on-day)
+         ("'" . org-toggle-narrow-to-subtree)
+         ("f" . (progn
+                  (skip-chars-forward "*")
+                  (forward-char)))
+         ("B" . org-previous-block)
+         ("F" . org-next-block)
+         ("g" . (org-refile t))
+         ("c" . org-cycle)
+         ("=" . org-columns)
+         ("I" . org-metaup)
+         ("K" . org-metadown)
+         ("o" . org-metaright)
+         ("u" . org-metaleft)
+         ("O" . org-shiftmetaright)
+         ("U" . org-shiftmetaleft)
+         ("n"
+          . (progn
+              (forward-char 1)
+              (call-interactively 'org-insert-heading-respect-content)))
+         ("a" . org-archive-subtree-default-with-confirmation)
+         ("6" . org-mark-subtree)
+         ("t" . org-todo)
+         ("," . (org-priority))
+         ("0" . (org-priority 32))
+         ("1" . (org-priority 65))
+         ("2" . (org-priority 66))
+         ("3" . (org-priority 67))
+         (":" . org-set-tags-command)
+         ("e" . org-set-effort)
+         ("E" . org-inc-effort)
+         ("/" . org-sparse-tree)
+         ("?" . org-speed-command-help)))
+      :config
+      (defun my-org-to-heading-start ()
+        "Go to the beginning of the heading after activate insert mode."
+        (interactive)
+        (end-of-line)
+        (search-backward-regexp "^\*" nil t)
+        (xah-fly-insert-mode-activate)))
+
+#+END_SRC
 
 **** Navigation beetween Org Headings in Current Buffer
 
@@ -4344,11 +4473,10 @@ I am use [[https://github.com/emacs-helm/helm-org][helm-org]] for navigation in 
 
   (use-package helm-org
       :ensure t
-      :bind (:map org-mode-map
-                  ([remap helm-imenu]
-                   . helm-org-in-buffer-headings)))
+      :bind ((:map org-mode-map)
+             ([remap helm-imenu] . helm-org-in-buffer-headings)))
 
-                   #+END_SRC
+#+END_SRC
 
 **** Export Org to Other
 
@@ -4609,16 +4737,90 @@ with command =my-org-tidy=
 
 #+END_SRC
 
-*** Elisp
+*** Lisp Laguages
 
-**** Emacs Local Keys Map
+**** For Each of Lisp Languages
+***** Define Lisp Keymap
 
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
-  (use-package elisp-mode
-      :major-mode-map elisp (emacs-lisp-mode inferior-emacs-lisp-mode))
+
+  (define-prefix-command 'my-lisp-map)
+
+#+END_SRC
+***** Structured Editing and Refactoring of LISP
+
+I am use [[https://github.com/promethial/paxedit][paxedit]], which has some useful commands for edititing of the
+Lisp a source code
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package paxedit
+      :ensure t
+      :bind ((:map paxedit-mode-map)
+             (";" . 'paxedit-insert-semicolon)
+             ("(" . 'paxedit-open-round)
+             ("[" . 'paxedit-open-bracket)
+             ("{" . 'paxedit-open-curly)
+             (:map my-lisp-map)
+             ("o" . 'my-paxedit-transpose-forward)
+             ("u" . 'my-paxedit-transpose-backward)
+             ("x" . 'paxedit-kill)
+             ("w" . 'my-paxedit-change)
+             ("d" . 'paxedit-symbol-kill)
+             ("q" . 'paxedit-compress)
+             ("k" . 'paxedit-delete-whitespace)
+             ("y" . 'my-paxedit-duplicate))
+      :config
+
+      (defun my-paxedit-change ()
+        "Kill the Lisp expression at the cursor and activate insert mode."
+        (interactive)
+        (paxedit-delete)
+        (xah-fly-insert-mode-activate))
+
+      (defun my-paxedit-duplicate ()
+        "Make copy of the Lisp expression at the cursor."
+        (interactive)
+        (let* ((reg (paxedit-sexp-region))
+               (beg (car reg))
+               (end (cdr reg))
+               (sexp (buffer-substring beg end))
+               (sep (if (my-lisp-sexp-whole-line-p) "\n" " ")))
+          (goto-char end)
+          (insert sep sexp)))
+
+      (defun my-lisp-sexp-whole-line-p ()
+        "Return t, when the Lisp sexp at the point being at whole of line."
+        (interactive "P")
+        (and (= beg (save-excursion (beginning-of-line-text)
+                                    (point)))
+             (= end (point-at-eol))))
+
+      (defun my-paxedit-transpose-forward ()
+        (interactive)
+        (call-interactively #'paxedit-transpose-forward)
+        (repeat-at-last-keystroke))
+
+      (defun my-paxedit-transpose-backward ()
+        (interactive)
+        (call-interactively #'paxedit-transpose-backward)
+        (repeat-at-last-keystroke)))
+
 #+END_SRC
 
-**** Special Linters
+**** Elisp
+***** Emacs Keymap
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package elisp-mode
+      :major-mode-map (elisp
+                       (emacs-lisp-mode inferior-emacs-lisp-mode)
+                       :parent my-lisp-map))
+
+#+END_SRC
+
+***** Special Linters
 
 ***** Package Linter
 
@@ -4635,9 +4837,9 @@ am use [[https://github.com/purcell/flycheck-package][flycheck-package]]:
       :init
       (flycheck-package-setup))
 
-      #+END_SRC
+#+END_SRC
 
-**** Emacs Refactoring
+***** Emacs Refactoring
 
 I am use [[https://github.com/Wilfred/emacs-refactor][emacs-refactor]] for refactor not only in =emacs-lisp=:
 
@@ -4645,12 +4847,12 @@ I am use [[https://github.com/Wilfred/emacs-refactor][emacs-refactor]] for refac
 
   (use-package emr
       :ensure t
-      :bind (:map xah-fly-command-map
-                  ("SPC /" . emr-show-refactor-menu)))
+      :bind ((:map xah-fly-command-map)
+             ("SPC /" . emr-show-refactor-menu)))
 
 #+END_SRC
 
-**** Elisp Format Code
+***** Elisp Format Code
 
 I am use [[https://github.com/riscy/elfmt][elfmt]] of the awesome man =Riscky=:
 
@@ -4661,7 +4863,7 @@ I am use [[https://github.com/riscy/elfmt][elfmt]] of the awesome man =Riscky=:
 
 #+END_SRC
 
-**** Emacs Lisp Suggest Documentation
+***** Emacs Lisp Suggest Documentation
 
 I am use [[https://github.com/Wilfred/suggest.el][suggest]], I am just type print input and excepted output and see suggesting examples as this do:
 
@@ -4672,7 +4874,7 @@ I am use [[https://github.com/Wilfred/suggest.el][suggest]], I am just type prin
 
 #+END_SRC
 
-**** Elisp Docstrings Mode
+***** COMMENT Elisp Docstrings Mode
 
 I am use [[https://github.com/Fuco1/elisp-docstring-mode][elisp-docstring-mode]] with [[https://github.com/Fuco1/elisp-docstring-mode][string-edit]]:
 
@@ -4686,12 +4888,12 @@ I am use [[https://github.com/Fuco1/elisp-docstring-mode][elisp-docstring-mode]]
 
   (use-package elisp-docstring-mode
       :ensure t
-      :bind (:map emacs-lisp-mode-map
-                  ([remap string-edit-at-point] . my-edit-elisp-docstring)))
+      :bind ((:map emacs-lisp-mode-map)
+             ([remap string-edit-at-point] . my-edit-elisp-docstring)))
 
 #+END_SRC
 
-**** Elisp Indent Code
+***** Elisp Indent Code
 
 I am use standard functions of indenting lisp code, but some
 variables set to non normal values:
@@ -4701,7 +4903,7 @@ variables set to non normal values:
       :custom (lisp-body-indent 2))
 #+END_SRC
 
-**** Insertion New Class Fields in Emacs Lisp
+***** Insertion New Class Fields in Emacs Lisp
 
 In =org-mode= I am press =M-RET= for insertion heading, in
 =elisp= I need to press =M-RET= for insetion of class' fields
@@ -4786,68 +4988,7 @@ In =org-mode= I am press =M-RET= for insertion heading, in
 #        (my-use-autoformat-in-mode 'emacs-lisp-mode elsip-docstring-capitalization)
 #      #+END_SRC
 
-**** Editing And Refactoring LISP
-
-I am use [[https://github.com/promethial/paxedit][paxedit]], which has some useful commands for ediniting of the
-LISP a source code
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  (use-package paxedit
-      :ensure t
-      :hook (emacs-lisp-mode . paxedit-mode)
-      :bind ((:map paxedit-mode-map)
-             (";" . 'paxedit-insert-semicolon)
-             ("(" . 'paxedit-open-round)
-             ("[" . 'paxedit-open-bracket)
-             ("{" . 'paxedit-open-curly)
-             (:map my-elisp-local-map)
-             ("o" . 'my-paxedit-transpose-forward)
-             ("u" . 'my-paxedit-transpose-backward)
-             ("x" . 'paxedit-kill)
-             ("w" . 'my-paxedit-change)
-             ("d" . 'paxedit-symbol-kill)
-             ("q" . 'paxedit-compress)
-             ("k" . 'paxedit-delete-whitespace)
-             ("y" . 'my-paxedit-duplicate)))
-
-  (defun my-paxedit-change ()
-    "Kill the Lisp expression at the cursor and activate insert mode."
-    (interactive)
-    (paxedit-delete)
-    (xah-fly-insert-mode-activate))
-
-  (defun my-paxedit-duplicate ()
-    "Make copy of the Lisp expression at the cursor."
-    (interactive)
-    (let* ((reg (paxedit-sexp-region))
-           (beg (car reg))
-           (end (cdr reg))
-           (sexp (buffer-substring beg end))
-           (sep (if (my-lisp-sexp-whole-line-p) "\n" " ")))
-      (goto-char end)
-      (insert sep sexp)))
-
-  (defun my-lisp-sexp-whole-line-p ()
-    "Return t, when the Lisp sexp at the point being at whole of line."
-    (interactive "P")
-    (and (= beg (save-excursion (beginning-of-line-text)
-                                (point)))
-         (= end (point-at-eol))))
-
-  (defun my-paxedit-transpose-forward ()
-    (interactive)
-    (call-interactively #'paxedit-transpose-forward)
-    (repeat-at-last-keystroke))
-
-  (defun my-paxedit-transpose-backward ()
-    (interactive)
-    (call-interactively #'paxedit-transpose-backward)
-    (repeat-at-last-keystroke))
-
-#+END_SRC
-
-**** Some Special "Parens" for the Elisp
+***** Some Special "Parens" for the Elisp
 
 I am use [[embrace][embrace]] for the insertion of the special parens.  Special
 parens is pairs which normal peoples don't cosider as parens, for
@@ -4921,8 +5062,7 @@ example in my config of =embrace= function defnition is a paren
         "")
       ")")))
 #+END_SRC
-
-*** Racket
+**** Racket
 
 I am use [[https://www.racket-mode.com][racket-mode]] for =racket=.  Because checker for =racket=
 so slow, I disable it.
@@ -4931,23 +5071,21 @@ so slow, I disable it.
 
   (use-package racket-mode
       :ensure t
-      :defer t
-      :config
+      :major-mode-map racket (racket-mode racket-repl-mode)
+      :config (set-keymap-parent my-local-major-mode-map my-lisp-map)
+      :hook
+      ;; this is enable some useful functions for the Racket
+      (racket-mode . 'racket-xp-mode)
+      ;; `flycheck' is very slow and `racket-xp-mode' highlight
+      ;; errors too, so i disable `flycheck' for the Racket
+      (racket-mode . 'turn-off-flycheck)
+      :custom
+      (racket-xp-mode-hook nil)           ; fix a bug
+      )
 
-      ;; this is enable some useful functions
-      (add-hook 'racket-mode-hook #'racket-xp-mode)
+  #+END_SRC
 
-      ;; `flycheck' is very slow, and
-      ;;`racket-xp-mode' also highlight errors, so i disable `flycheck' for
-      ;; the Racket
-      (add-hook 'racket-mode-hook #'turn-off-flycheck)
-
-      ;; fix a bug
-      (setq racket-xp-mode-hook nil))
-
-      #+END_SRC
-
-**** Smart Insertion in Racket (=M-ret=)
+***** Smart Insertion in Racket (=M-ret=)
 
 I create small system of smart insertion in =racket= inspired by
 =org-meta-return=
@@ -4973,7 +5111,7 @@ I create small system of smart insertion in =racket= inspired by
 
     #+END_SRC
 
-***** Smart insertion in Racket: let bindings
+****** Smart insertion in Racket: let bindings
 
 The =racket= has the macros for bindings values to identifiers.
 If you are a normal programmer, then you should know followed
@@ -5008,7 +5146,7 @@ Without =M-ret= add new binding isn't fast thing, but with
 
   #+END_SRC
 
-***** Smart insertion in Racket: test cases
+****** Smart insertion in Racket: test cases
 
 Each cool programmer of 21th century should use tests.  Racket
 also has tests.  See to following example of =racket= tests:
@@ -5053,7 +5191,7 @@ With =my-racket-meta-return= you should:
 #+RESULTS:
 | my-racket-meta-return-test-case | my-racket-meta-return-cond-clauses |
 
-***** Smart insertion in Racket: =cond= and =match= and other clauses
+****** Smart insertion in Racket: =cond= and =match= and other clauses
 
 The Racket Programming Language has the macro called =cond= and
 =match=, each programmer of the racket for add a new clause to a
@@ -5108,7 +5246,7 @@ like on syntax of the =cond=, see to the followed list
 #+RESULTS:
 | my-racket-meta-return-cond-clauses |
 
-***** Smart insertion in Racket: =contracted=
+****** Smart insertion in Racket: =contracted=
 
 Here example of usage =contracted=:
 
@@ -5158,7 +5296,7 @@ name and it contract
                #'my-racket-meta-return-contracted)
                #+END_SRC
 
-**** Scribble: The Racket Documentation Tool
+***** Scribble: The Racket Documentation Tool
 
 I am use [[https://docs.racket-lang.org/scribble/][scribble]].  The =scribble= is special for =racket=
 documentation tool, each racket package documentated via
@@ -5171,7 +5309,7 @@ documentation tool, each racket package documentated via
 
       #+END_SRC
 
-***** Auto Format in Scribble
+****** Auto Format in Scribble
 
 I am use my autoformat system, which I am taked from [[https://github.com/jkitchin/scimax/][scimax]]
 
@@ -5263,7 +5401,7 @@ I am use my own [[*Functions for Auto Format Code]] to auto format in
 
 *** Python
 
-**** Vars
+**** Python Vars
 
 Var =py/imports-regexp= is regexp of import statements in python:
 
@@ -5281,35 +5419,6 @@ Var =python-shell-interpreter= is builtin Emacs var, see docs in Emacs:
 
   #+END_SRC
 
-**** Navigation
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  (defun py-nav-to-imports ()
-    "Navigate to imports in Python mode."
-    (interactive)
-    (push-mark)
-    (let ((old-pos (point)))
-      (goto-char (point-min))
-      (search-forward-regexp py/imports-regexp old-pos old-pos))
-    )
-
-  (add-nav-to-imports-for-language
-   python-mode
-   py-nav-to-imports)
-
-   #+END_SRC
-
-**** Linters
-
-#+BEGIN_SRC emacs-lisp :tangle ~/init.el
-
-  (setq flycheck-python-flake8-command "python -m flake8")
-  (setq flycheck-python-mypy-executable "python -m mypy")
-  (setq flycheck-python-pylint-executable "python -m pylint")
-
-  #+END_SRC
-
 **** Helping info
 
 I am use [[https://www.emacswiki.org/emacs/pydoc-info.el][pydoc-info]]:
@@ -5319,22 +5428,23 @@ I am use [[https://www.emacswiki.org/emacs/pydoc-info.el][pydoc-info]]:
   (use-package pydoc
       :ensure t)
 
-      #+END_SRC
+#+END_SRC
 
-**** Autocomplete
+**** Python Autocomplete
 
-I am hasn't autocompletion special for python, so I enable default =dabbrev-autocompletion=:
+I am hasn't autocompletion special for python, so I enable default
+=dabbrev-autocompletion=:
+
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (defun enable-dabbrev-company-backend ()
     "Add `company-dabbrev' backend to `company-backends' for local major mode."
     (interactive)
-    (setq-local company-backends (cons 'company-dabbrev company-backends))
-    )
+    (setq-local company-backends (cons 'company-dabbrev company-backends)))
 
   (add-hook 'python-mode-hook 'enable-dabbrev-company-backend)
 
-  #+END_SRC
+#+END_SRC
 
 *** Rust
 
@@ -5821,7 +5931,6 @@ I am use [[https://github.com/emacs-helm/helm][HELM]]:
   (use-package helm
       :ensure t
       :after (helm-core)
-      :init (defvar helm-completion-style nil)
       :custom
       (helm-M-x-fuzzy-match           t)
       (helm-buffers-fuzzy-matching    t)
@@ -5830,13 +5939,15 @@ I am use [[https://github.com/emacs-helm/helm][HELM]]:
       (helm-autoresize-min-height    20)
       (helm-left-margin-width         4)
       (helm-buffers-left-margin-width 4)
-      :bind (("C-h a"     . 'helm-apropos)
-             (:map xah-fly-command-map)
-             ("SPC SPC f" . 'helm-find-files)
-             ("SPC k r"   . 'helm-regexp))
+      :bind
+      (("C-h a"     . 'helm-apropos)
+       (:map xah-fly-command-map)
+       ("SPC SPC f" . 'helm-find-files)
+       ("SPC k r"   . 'helm-regexp))
       :config
       (helm-mode t)
-      (helm-autoresize-mode t))
+      (helm-autoresize-mode t)
+      (defvar helm-completion-style nil))
 
 #+END_SRC
 
@@ -5876,7 +5987,7 @@ I am enable whitespaces mode on =prog-mode=:
 
   (add-hook 'prog-mode-hook 'whitespace-mode)
 
-  #+END_SRC
+#+END_SRC
 
 ** Visual Fill Line Mode
 
@@ -5997,6 +6108,7 @@ hot keys, so I am use builtin emacs =input-method=:
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (setq buffer-file-coding-system 'utf-8)
+
 #+END_SRC
 
 ** Disable or Enable Modes
@@ -6111,6 +6223,32 @@ For pomidor I am use [[https://github.com/TatriX/pomidor][pomidor]]:
       (pomidor))
 
       #+END_SRC
+
+** Translater
+
+I am use [[https://github.com/atykhonov/google-translate][google-translate]] for translating words to the my language.
+
+#+BEGIN_SRC emacs-lisp :tangle ~/init.el
+
+  (use-package google-translate
+      :ensure t
+      :custom
+      (google-translate-default-source-language "auto")
+      (google-translate-default-target-language "ru")
+      :config
+      (defun google-translate--search-tkk ()
+        "Search TKK."
+        (list 430675 2721866130))
+
+      (defun fast-exec-google-translate-keys ()
+        "Get some useful keymaps of `fast-exec' for google-translate."
+        (fast-exec/some-commands
+         ("Google Translate" 'google-translate-at-point)
+         ("Query to Google Translate" 'google-translate-query-translate-reverse)))
+
+      (fast-exec/register-keymap-func 'fast-exec-google-translate-keys)
+      (fast-exec/reload-functions-chain))
+#+END_SRC
 
 ** Pacman
 
@@ -6477,14 +6615,15 @@ I need to see when keys will readed as =drag=:
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (doom-modeline-def-segment drag
-      (when (my-last-command-is-dragged-stuff-p)
+      (when (my-drag-p)
         (propertize
          " DRG "
-         'face (if (doom-modeline--active)
-                   'doom-modeline-panel
-                 'mode-line-inactive))))
+         'face
+         (if (doom-modeline--active)
+             'doom-modeline-panel
+           'mode-line-inactive))))
 
-                 #+END_SRC
+#+END_SRC
 
 *** Disable View of =xah-fly-keys= State
 
@@ -6895,7 +7034,6 @@ I am use offical [[https://github.com/bbatsov/helm-projectile][helm-projectile]]
       :persistent-help "Preview file"))
 
      #+END_SRC
-
 
 ** COMMENT Regexp IDE
 
@@ -7454,20 +7592,18 @@ I am use [[https://github.com/bard/emacs-run-command][run-command]] for run spec
       :ensure t
       :custom
       (run-command-completion-method 'helm)
-
-      :bind ((:map xah-fly-command-map)
-             ("SPC , c" . 'run-command)
-             ("S-<f5>"  . 'my-run-last-command))
-
+      :bind
+      ((:map xah-fly-command-map)
+       ("SPC , c" . 'run-command)
+       ("S-<f5>"  . 'my-run-last-command))
       :config
-      (defun run-command--run (command-spec)
-        "Run `COMMAND-SPEC'.  Back end for helm and ivy actions."
-        (message "ok?")
-        (setq-local run-command-last-recipe command-spec)
-        (eval (run-command--from-spec command-spec)))
+
+      (defadvice run-command--run (before run-command-set-last-recipe (recipe))
+        "Set `run-command-last-recipe'."
+        (setq-local run-command-last-recipe recipe))
 
       (defun my-run-last-command ()
-        "Run command which was runned last, if commands wasn't run, then `quickrun'."
+        "Run command which was runned last, if commands wasn't run do nothing."
         (interactive)
         (if run-command-last-recipe
             (run-command--run run-command-last-recipe)
@@ -7561,7 +7697,9 @@ I'm press =SPC i p= for visit the main organization file, also
 
   (defun my-org-archive-done-and-saw-headings ()
     "Archieve all `org-mode' headings which has the label done."
-    (org-map-entries 'org-archive-subtree "/+DONE" 'file))
+    (save-excursion
+      (goto-char (point-min))
+      (org-map-entries 'org-archive-subtree "/+DONE" nil)))
 
   (defun my-open-main-agenda-file ()
     "Open agenda.org."
@@ -7594,14 +7732,15 @@ on day:
   (defun my-add-org-subtree-to-targets-on-day ()
     "Add  a `org-mode' subtree at the point to the targets on day."
     (interactive)
-    (let ((subtree-text (my-delete-and-get-text-of-org-subtree)))
-      (my-goto-targets-on-day)
-      (newline)
-      (insert subtree-text)
-      (delete-char -1)
-      (beginning-of-line)
-      (my-org-headline-set-todo-keyword "TODO")
-      (org-schedule t (format-time-string "%Y-%m-%d"))))
+    (save-excursion
+      (let ((subtree-text (my-delete-and-get-text-of-org-subtree)))
+        (my-goto-targets-on-day)
+        (newline)
+        (insert subtree-text)
+        (delete-char -1)
+        (beginning-of-line)
+        (my-org-headline-set-todo-keyword "TODO")
+        (org-schedule t (format-time-string "%Y-%m-%d")))))
 
   (defun my-goto-targets-on-day ()
     "Visit `org-mode' subtree of the targets on day."
@@ -7613,18 +7752,10 @@ on day:
   (defun my-delete-and-get-text-of-org-subtree (&optional pt)
     "Parse a `org-mode' subtree at the PT, delete it and return text of subtree."
     (or pt (setq pt (point)))
-    (let* ((node (org-ml-parse-subtree-at pt))
-           (node-beg (org-ml-get-property :begin node))
-           (node-end (org-ml-get-property :end node))
-           (node-text (buffer-substring node-beg node-end)))
-      (--each (->>
-               node
-               (-second-item)
-               (-partition-all 2)
-               (-map 'car))
-        (print it))
-      (delete-region node-beg node-end)
-      node-text))
+    (org-mark-subtree)
+    (prog1
+        (just-text-in-region)
+      (delete-region (region-beginning) (region-end))))
 
   (defun my-org-headline-set-todo-keyword (new-keyword &optional pt)
     "Set todo keyword of a headline at PT to NEW-KEYWORD.
@@ -7713,7 +7844,7 @@ I am use [[https://github.com/jrblevin/deft][deft]] for the managing of the note
 
   #+END_SRC
 
-*** View Notes outside of the Emacs
+*** Watch Notes outside of the Emacs
 
 All my notes written in =org-mode=, so I tranform its to the =html=
 with =org-publish= tool
@@ -7721,28 +7852,26 @@ with =org-publish= tool
 #+BEGIN_SRC emacs-lisp :tangle ~/init.el
 
   (use-package ox-publish
-      :commands org-publish
-      :bind
-      ((:map xah-fly-command-map)
-       ("SPC i t" . 'org-export-stack))
+      :commands (org-publish org-export-stack)
+      :hook (kill-emacs-hook . my-org-publish-notes)
+      :bind ((:map xah-fly-command-map)
+             ("SPC i t" . 'org-export-stack))
       :custom
       (org-publish-use-timestamps-flag nil)
       (org-publish-list-skipped-files  nil)
       (org-publish-project-alist
        '(("Notes"
           :base-directory "~/notes/"
-          :publishing-directory "~/notes/html/"
-          :publishing-function org-latex-export-to-pdf
+          :publishing-directory "~/notes/destination/"
+          :publishing-function org-latex-publish-to-latex
           :recursive t
           :author "Семён"
-          :language "ru")
-         ("ZMS"
-          :base-directory "~/zms/"
-          :publishing-directory "~/zms/destination/"
-          :publishing-function org-latex-export-to-pdf
-          :author "Семён Храмцов"
           :language "ru"))))
 
+  (defun my-org-publish-notes ()
+    "Publish my notes to the LaTeX files."
+    (interactive)
+    (org-publish-project "Notes"))
 #+END_SRC
 
 * MIPT
@@ -8344,3 +8473,6 @@ I have some functions for the management of the ZMS:
   (add-to-list 'run-command-recipes 'my-zms-run-command-recipe)
 
   #+END_SRC
+
+
+
