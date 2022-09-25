@@ -2,7 +2,8 @@
 ;; It keeps track of your preferences for running commands with multiple cursors.
 
 (setq mc/cmds-to-run-for-all
-      '(LaTeX-babel-insert-hyphen
+      '(
+        LaTeX-babel-insert-hyphen
         LaTeX-insert-item
         LaTeX-insert-left-brace
         TeX-insert-backslash
@@ -29,6 +30,7 @@
         kill-to-beginning-of-line
         kill-visual-line
         kmacro-call-macro-or-apply-to-lines
+        kmacro-start-or-end-macro
         mark-inner-or-expand-region
         markdown-outdent-or-delete
         my-activate-insert-mode-or-edit-lines
@@ -36,6 +38,7 @@
         my-backward-word-or-drag-stuff-left
         my-calc-simplify-region-change
         my-calc-simplify-region-copy
+        my-cancel-selection-or-delete-text-block
         my-copy-rectangle-or-copy-line
         my-drag-stuff-left
         my-drag-stuff-left-char
@@ -73,6 +76,7 @@
         rectangle-backward-char
         rectangle-mark-mode
         rectangle-next-line
+        repeat
         ryo-modal-mode
         ryo:130cc23a4daeb4a5e1d91040266d3b00:mc/edit-lines
         ryo:37943079fa1140633b807dda2635fc75:my-buffer-list-or-edit-lines
@@ -107,6 +111,7 @@
         xah-fly-command-mode-activate
         xah-fly-insert-mode-activate
         xah-goto-matching-bracket
+        xah-insert-space-before
         xah-paste-or-paste-previous
         xah-pop-local-mark-ring
         xah-select-line
@@ -117,12 +122,7 @@
         ))
 
 (setq mc/cmds-to-run-once
-      '(my-mark-all
-        my-bob-or-mc-align
-        my-eob-or-align-with-spaces
-        my-mc-mark-like-this-or-edit-lines
-        my-mc-mark-like-this-or-edit-lines
-        toggle-input-method
+      '(
         backward-transpose-words
         cdlatex-math-symbol
         dired-ranger-copy
@@ -131,9 +131,15 @@
         eval-print-last-sexp
         iedit-switch-to-mc-mode
         indent-for-tab-command
+        my-bob-or-mc-align
         my-buffer-list-or-edit-lines
+        my-eob-or-align-with-spaces
+        my-mark-all
+        my-mc-mark-like-this-or-edit-lines
+        my-mc-mark-like-this-or-edit-lines
         swiper-helm
         text-scale-decrease
+        toggle-input-method
         xah-next-window-or-frame
         xah-previous-emacs-buffer
         ))

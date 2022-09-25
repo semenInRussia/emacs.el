@@ -180,6 +180,18 @@ in the region.  Otherwise, read a URL from the minibuffer."
     (when (my-url-p copied)
       copied)))
 
+(defun my-read-string-or-nil ;nofmt
+    (prompt &optional initial-input history default-value inherit-input-method)
+  "Read string from the minibuffer, if the user type nothing, return nil.
+
+Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
+`read-string'"
+  (let ((input
+         (read-string prompt initial-input history default-value
+                      inherit-input-method)))
+    (unless (s-blank-p input)
+      input)))
+
 (defun prime-p (n)
   "Return non-nil, when N is prime."
   ;; `n' has divisors greater than 1 and `n'
@@ -218,21 +230,13 @@ in the region.  Otherwise, read a URL from the minibuffer."
 
 (add-hook 'after-save-hook 'if-Emacs-org-then-org-babel-tangle)
 
-(setq user-full-name    "Semen Khramtsov"
-      user-mail-address "hrams205@gmail.com"
-      user-birthday     "2007-01-29"
-      user-name         "semenInRussia"
-      user-os           "Windows" ; "Windows" or "Linux"
-      )
+(setq user-full-name    "Semen Khramtsova"
+  user-mail-address "hrams205@gmail.com"
+  user-birthday     "2007-01-29"
+  user-name         "semenInRussia")
 
-(defun user-os-windows-p ()
-  "If user have os Windows, then return t.
-Info take from var `user-os`, user must set it."
-  (interactive)
-  (s-equals? user-os "Windows"))
-
-(if (s-equals? (format-time-string "%Y-%m-%d") user-birthday)
-    (animate-birthday-present))
+(when (s-equals-p (format-time-string "%Y-%m-%d") user-birthday)
+  (animate-birthday-present))
 
 (use-package xah-fly-keys
     :load-path "~/.emacs.d/lisp/"
@@ -391,8 +395,7 @@ MODE defaults to the current `major-mode'.  See `my-local-major-mode-map-run'"
 
 (use-package yasnippet
     :ensure t
-    :init
-    (yas-global-mode 1)
+    :config (yas-global-mode +1)
     :custom
     (yas-snippet-dirs '("~/.emacs.d/snippets"))
     (yas-wrap-around-region t))
@@ -419,9 +422,6 @@ string and TEMPLATE is a `yas--template' structure."
 (use-package flycheck
     :ensure t
     :config
-    '(custom-set-variables
-      '(flycheck-display-errors-function
-        #'flycheck-pos-tip-error-messages))
     (global-flycheck-mode 1))
 
 (defun turn-off-flycheck ()
@@ -459,19 +459,27 @@ string and TEMPLATE is a `yas--template' structure."
 (use-package format-all
     :ensure t)
 
+(defun my-call-interactivelly-or-funcall (symbol)
+  "If SYBMOL function is command, `call-interactively', otherwise `funcall'."
+  (if (commandp symbol)
+      (call-interactively symbol)
+    (funcall symbol)))
+
 (defmacro define-key-when (fun-name map key def pred)
   "Define to KEY in MAP DEF when PRED return t or run old command.
+
 Instead of KEY will command FUN-NAME"
-  (let ((old-def (key-binding key)))
-    `(unless (eq (key-binding ,key) #',fun-name)
-       (defun ,fun-name ()
-         ,(s-lex-format "Run `${old-def}' or `${def}'.")
-         (interactive)
-         (call-interactively
-          (if (funcall ,pred)
-              ,def
-            #',old-def)))
-       (define-key ,map ,key #',fun-name))))
+  (declare (indent 0))
+  (let ((old-def (lookup-key (eval map) key)))
+    (unless (eq old-def fun-name)
+      `(progn
+         (defun ,fun-name ()
+           ,(s-lex-format "Run `${old-def}' or `${def}'.")
+           (interactive)
+           (if (my-call-interactivelly-or-funcall ,pred)
+               (my-call-interactivelly-or-funcall ,def)
+             (my-call-interactivelly-or-funcall ',old-def)))
+         (define-key ,map ,key #',fun-name)))))
 
 (defun repeat-at-last-keystroke ()
   "Define in the tempory keymap at last pressed keystroke `this-command'."
@@ -628,207 +636,208 @@ EOB - is `end-of-buffer'"
 
 (use-package avy
     :ensure t
-    :custom
-    (avy-background t)
+    :custom (avy-background t)
     :bind ((:map xah-fly-command-map)
            ("n" . nil)
-           ("n n"   . avy-goto-char)
-           ("n v"   . avy-yank-word)
-           ("n x" . avy-teleport-word)
-           ("n c"   . avy-copy-word)
-           ("n 8"   . avy-mark-word)
-           ("n d"   . avy-kill-word-stay)
-           ("n s ;" . avy-insert-new-line-at-eol)
-           ("n s h" . avy-insert-new-line-at-bol)
-           ("n 5"   . avy-zap)
-           ("n TAB" . avy-transpose-words)
-           ("n w"   . avy-clear-line)
-           ("n -"   . avy-sp-splice-sexp-in-word)
-           ("n r"   . avy-kill-word-move)
-           ("n o"   . avy-change-word)
-           ("n 9"   . avy-sp-change-enclosing-in-word)
-           ("n z"   . avy-comment-line)
-           ("n t v" . avy-copy-region)
-           ("n t d" . avy-kill-region)
-           ("n t x" . avy-move-region)
-           ("n t c" . avy-kill-ring-save-region)
-           ("n ;"   . avy-goto-end-of-line)
-           ("n h"   . avy-goto-begin-of-line-text)
-           ("n k v" . avy-copy-line)
-           ("n k x" . avy-move-line)
-           ("n k c" . avy-kill-ring-save-whole-line)
-           ("n k d" . avy-kill-whole-line)))
+           ("n n"   . 'avy-goto-char)
+           ("n v"   . 'avy-yank-word)
+           ("n x"   . 'avy-teleport-word)
+           ("n c"   . 'avy-copy-word)
+           ("n 8"   . 'avy-mark-word)
+           ("n d"   . 'avy-kill-word-stay)
+           ("n s ;" . 'avy-insert-new-line-at-eol)
+           ("n s h" . 'avy-insert-new-line-at-bol)
+           ("n 5"   . 'avy-zap)
+           ("n TAB" . 'avy-transpose-words)
+           ("n w"   . 'avy-clear-line)
+           ("n -"   . 'avy-sp-splice-sexp-in-word)
+           ("n r"   . 'avy-kill-word-move)
+           ("n o"   . 'avy-change-word)
+           ("n 9"   . 'avy-sp-change-enclosing-in-word)
+           ("n z"   . 'avy-comment-line)
+           ("n t v" . 'avy-copy-region)
+           ("n t d" . 'avy-kill-region)
+           ("n t x" . 'avy-move-region)
+           ("n t c" . 'avy-kill-ring-save-region)
+           ("n ;"   . 'avy-goto-end-of-line)
+           ("n h"   . 'avy-goto-begin-of-line-text)
+           ("n k v" . 'avy-copy-line)
+           ("n k x" . 'avy-move-line)
+           ("n k c" . 'avy-kill-ring-save-whole-line)
+           ("n k d" . 'avy-kill-whole-line))
+    :config
 
-(defun avy-goto-word-1-with-action (char action &optional arg beg end symbol)
-  "Jump to the currently visible CHAR at a word start.
+    (defun avy-goto-word-1-with-action (char action ;nofmt
+                                        &optional arg beg end symbol)
+      "Jump to the currently visible CHAR at a word start.
 The window scope is determined by `avy-all-windows'.
 When ARG is non-nil, do the opposite of `avy-all-windows'.
 BEG and END narrow the scope where candidates are searched.
 When SYMBOL is non-nil, jump to symbol start instead of word start.
 Do action of `avy' ACTION.'"
-  (interactive (list (read-char "char: " t) current-prefix-arg))
-  (avy-with avy-goto-word-1
-    (let* ((str (string char))
-           (regex
-            (cond
-              ((string= str ".")
-               "\\.")
-              ((and avy-word-punc-regexp
-                    (string-match avy-word-punc-regexp str))
-               (regexp-quote str))
-              ((<= char 26)
-               str)
-              (t (concat (if symbol "\\_<" "\\b") str)))))
-      (avy-jump regex
-                :window-flip arg
-                :beg beg
-                :end end
-                :action action))))
+      (interactive (list (read-char "char: " t) current-prefix-arg))
+      (avy-with avy-goto-word-1
+        (let* ((str (string char))
+               (regex
+                (cond
+                  ((string= str ".")
+                   "\\.")
+                  ((and avy-word-punc-regexp
+                        (string-match avy-word-punc-regexp str))
+                   (regexp-quote str))
+                  ((<= char 26)
+                   str)
+                  (t (concat (if symbol "\\_<" "\\b") str)))))
+          (avy-jump regex
+                    :window-flip arg
+                    :beg beg
+                    :end end
+                    :action action))))
 
-(defun avy-zap (char &optional arg)
-  "Zapping to next CHAR navigated by `avy'."
-  (interactive "cchar:\nP")
-  (avy-jump
-   (s-concat (char-to-string char))
-   :window-flip arg
-   :beg (point-min)
-   :end (point-max)
-   :action 'avy-action-zap-to-char))
+    (defun avy-zap (char &optional arg)
+      "Zapping to next CHAR navigated by `avy'."
+      (interactive "cchar:\nP")
+      (avy-jump
+       (s-concat (char-to-string char))
+       :window-flip arg
+       :beg (point-min)
+       :end (point-max)
+       :action 'avy-action-zap-to-char))
 
-(defun avy-teleport-word (char &optional arg)
-  "Teleport word searched by `arg' with CHAR.
+    (defun avy-teleport-word (char &optional arg)
+      "Teleport word searched by `arg' with CHAR.
 Pass ARG to `avy-jump'."
-  (interactive "cchar:\nP")
-  (avy-goto-word-1-with-action char 'avy-action-teleport))
+      (interactive "cchar:\nP")
+      (avy-goto-word-1-with-action char 'avy-action-teleport))
 
-(defun avy-mark-word (char)
-  "Mark word begining with CHAR searched by `avy'."
-  (interactive "cchar: ")
-  (avy-goto-word-1-with-action char 'avy-action-mark))
+    (defun avy-mark-word (char)
+      "Mark word begining with CHAR searched by `avy'."
+      (interactive "cchar: ")
+      (avy-goto-word-1-with-action char 'avy-action-mark))
 
-(defun avy-copy-word (char &optional arg)
-  "Copy word searched by `arg' with CHAR.
+    (defun avy-copy-word (char &optional arg)
+      "Copy word searched by `arg' with CHAR.
 Pass ARG to `avy-jump'."
-  (interactive "cchar:\nP")
-  (avy-goto-word-1-with-action char 'avy-action-copy))
+      (interactive "cchar:\nP")
+      (avy-goto-word-1-with-action char 'avy-action-copy))
 
-(defun avy-yank-word (char &optional arg)
-  "Paste word searched by `arg' with CHAR.
+    (defun avy-yank-word (char &optional arg)
+      "Paste word searched by `arg' with CHAR.
 Pass ARG to `avy-jump'."
-  (interactive "cchar:\nP")
-  (avy-goto-word-1-with-action char 'avy-action-yank))
+      (interactive "cchar:\nP")
+      (avy-goto-word-1-with-action char 'avy-action-yank))
 
-(defun avy-kill-word-stay (char &optional arg)
-  "Paste word searched by `arg' with CHAR.
+    (defun avy-kill-word-stay (char &optional arg)
+      "Paste word searched by `arg' with CHAR.
 Pass ARG to `avy-jump'."
-  (interactive "cchar:\nP")
-  (avy-goto-word-1-with-action char 'avy-action-kill-stay))
+      (interactive "cchar:\nP")
+      (avy-goto-word-1-with-action char 'avy-action-kill-stay))
 
-(defun avy-kill-word-move (char &optional arg)
-  "Paste word searched by `arg' with CHAR.
+    (defun avy-kill-word-move (char &optional arg)
+      "Paste word searched by `arg' with CHAR.
 Pass ARG to `avy-jump'."
-  (interactive "cchar:\nP")
-  (avy-goto-word-1-with-action char 'avy-action-kill-move))
+      (interactive "cchar:\nP")
+      (avy-goto-word-1-with-action char 'avy-action-kill-move))
 
-(defun avy-goto-line-1-with-action (action)
-  "Goto line via `avy' with CHAR and do ACTION."
-  (interactive)
-  (avy-jump "^." :action action))
+    (defun avy-goto-line-1-with-action (action)
+      "Goto line via `avy' with CHAR and do ACTION."
+      (interactive)
+      (avy-jump "^." :action action))
 
-(defun avy-comment-line ()
-  "With `avy' move to line and comment its."
-  (interactive)
-  (avy-goto-line-1-with-action 'avy-action-comment))
+    (defun avy-comment-line ()
+      "With `avy' move to line and comment its."
+      (interactive)
+      (avy-goto-line-1-with-action 'avy-action-comment))
 
-(defun avy-action-comment (pt)
-  "Saving excursion comment line at point PT."
-  (save-excursion (goto-char pt) (comment-line 1)))
+    (defun avy-action-comment (pt)
+      "Saving excursion comment line at point PT."
+      (save-excursion (goto-char pt) (comment-line 1)))
 
-(defun avy-sp-change-enclosing-in-word (ch)
-  "With `avy' move to word starting with CH and `sp-change-enclosing'."
-  (interactive "cchar:")
-  (avy-goto-word-1-with-action ch 'avy-action-sp-change-enclosing))
+    (defun avy-sp-change-enclosing-in-word (ch)
+      "With `avy' move to word starting with CH and `sp-change-enclosing'."
+      (interactive "cchar:")
+      (avy-goto-word-1-with-action ch 'avy-action-sp-change-enclosing))
 
-(defun avy-action-sp-change-enclosing (pt)
-  "Saving excursion `sp-change-enclosing' in word at point PT."
-  (save-excursion (goto-char pt) (sp-change-enclosing)))
+    (defun avy-action-sp-change-enclosing (pt)
+      "Saving excursion `sp-change-enclosing' in word at point PT."
+      (save-excursion (goto-char pt) (sp-change-enclosing)))
 
-(defun avy-sp-splice-sexp-in-word (ch)
-  "With `avy' move to word starting with CH and `sp-splice-sexp'."
-  (interactive "cchar:")
-  (avy-goto-word-1-with-action ch 'avy-action-sp-splice-sexp))
+    (defun avy-sp-splice-sexp-in-word (ch)
+      "With `avy' move to word starting with CH and `sp-splice-sexp'."
+      (interactive "cchar:")
+      (avy-goto-word-1-with-action ch 'avy-action-sp-splice-sexp))
 
-(defun avy-action-sp-splice-sexp (pt)
-  "Saving excursion `sp-splice-sexp' in word at point PT."
-  (save-excursion (goto-char pt) (sp-splice-sexp)))
+    (defun avy-action-sp-splice-sexp (pt)
+      "Saving excursion `sp-splice-sexp' in word at point PT."
+      (save-excursion (goto-char pt) (sp-splice-sexp)))
 
-(defun avy-change-word (ch)
-  "With `avy' move to word starting with CH and change its any other."
-  (interactive "cchar:")
-  (avy-goto-word-1-with-action ch 'avy-action-change-word))
+    (defun avy-change-word (ch)
+      "With `avy' move to word starting with CH and change its any other."
+      (interactive "cchar:")
+      (avy-goto-word-1-with-action ch 'avy-action-change-word))
 
-(defun avy-action-change-word (pt)
-  "Saving excursion navigate to word at point PT and change its."
-  (save-excursion
-    (avy-action-kill-move pt)
-    (insert (read-string "new word, please: " (current-kill 0)))))
+    (defun avy-action-change-word (pt)
+      "Saving excursion navigate to word at point PT and change its."
+      (save-excursion
+        (avy-action-kill-move pt)
+        (insert (read-string "new word, please: " (current-kill 0)))))
 
-(defun avy-transpose-words (char)
-  "Goto CHAR via `avy' and transpose at point word to word at prev point."
-  (interactive "cchar: ")
-  (avy-goto-word-1-with-action char 'avy-action-transpose-words))
+    (defun avy-transpose-words (char)
+      "Goto CHAR via `avy' and transpose at point word to word at prev point."
+      (interactive "cchar: ")
+      (avy-goto-word-1-with-action char 'avy-action-transpose-words))
 
-(defun avy-action-transpose-words (second-pt)
-  "Goto SECOND-PT via `avy' and transpose at point to word at point ago."
-  (avy-action-yank second-pt)
-  (kill-sexp)
-  (goto-char second-pt)
-  (yank)
-  (kill-sexp))
+    (defun avy-action-transpose-words (second-pt)
+      "Goto SECOND-PT via `avy' and transpose at point to word at point ago."
+      (avy-action-yank second-pt)
+      (kill-sexp)
+      (goto-char second-pt)
+      (yank)
+      (kill-sexp))
 
-(defun avy-goto-begin-of-line-text (&optional arg)
-  "Call `avy-goto-line' and move to the begin of the text of line.
+    (defun avy-goto-begin-of-line-text (&optional arg)
+      "Call `avy-goto-line' and move to the begin of the text of line.
 ARG is will be passed to `avy-goto-line'"
-  (interactive "p")
-  (avy-goto-line arg)
-  (beginning-of-line-text))
+      (interactive "p")
+      (avy-goto-line arg)
+      (beginning-of-line-text))
 
-(defun avy-clear-line (&optional arg)
-  "Move to any line via `avy' and clear this line from begin to end.
+    (defun avy-clear-line (&optional arg)
+      "Move to any line via `avy' and clear this line from begin to end.
 ARG is will be passed to `avy-goto-line'"
-  (interactive "p")
-  (avy-goto-line-1-with-action #'avy-action-clear-line))
+      (interactive "p")
+      (avy-goto-line-1-with-action #'avy-action-clear-line))
 
-(defun avy-action-clear-line (pt)
-  "Move to PT, and clear current line, move back.
+    (defun avy-action-clear-line (pt)
+      "Move to PT, and clear current line, move back.
 Action of `avy', see `avy-action-yank' for example"
-  (save-excursion (goto-char pt) (clear-current-line)))
+      (save-excursion (goto-char pt) (clear-current-line)))
 
-(defun avy-insert-new-line-at-eol ()
-  "Move to any line via `avy' and insert new line at end of line."
-  (interactive)
-  (avy-goto-line-1-with-action #'avy-action-insert-new-line-at-eol))
+    (defun avy-insert-new-line-at-eol ()
+      "Move to any line via `avy' and insert new line at end of line."
+      (interactive)
+      (avy-goto-line-1-with-action #'avy-action-insert-new-line-at-eol))
 
-(defun avy-action-insert-new-line-at-eol (pt)
-  "Move to PT, and insert new line at end of line, move back.
+    (defun avy-action-insert-new-line-at-eol (pt)
+      "Move to PT, and insert new line at end of line, move back.
 Action of `avy', see `avy-action-yank' for example"
-  (save-excursion
-    (goto-char pt)
-    (end-of-line)
-    (newline)))
+      (save-excursion
+        (goto-char pt)
+        (end-of-line)
+        (newline)))
 
-(defun avy-insert-new-line-at-bol ()
-  "Move to any line via `avy' and insert new at beginning of line."
-  (interactive)
-  (avy-goto-line-1-with-action #'avy-action-insert-new-line-at-bol))
+    (defun avy-insert-new-line-at-bol ()
+      "Move to any line via `avy' and insert new at beginning of line."
+      (interactive)
+      (avy-goto-line-1-with-action #'avy-action-insert-new-line-at-bol))
 
-(defun avy-action-insert-new-line-at-bol (pt)
-  "Move to PT, and insert new at beginning of line, move back.
+    (defun avy-action-insert-new-line-at-bol (pt)
+      "Move to PT, and insert new at beginning of line, move back.
 Action of `avy', see `avy-action-yank' for example"
-  (save-excursion
-    (goto-char pt)
-    (beginning-of-line)
-    (newline)))
+      (save-excursion
+        (goto-char pt)
+        (beginning-of-line)
+        (newline))))
 
 (use-package smartparens
     :ensure t
@@ -882,8 +891,7 @@ Action of `avy', see `avy-action-yank' for example"
   "Delete only 1 character before point."
   (interactive)
   (backward-char)
-  (delete-char 1)
-  )
+  (delete-char 1))
 
 (define-key xah-fly-command-map (kbd "DEL") 'delete-only-1-char)
 
@@ -893,39 +901,37 @@ Action of `avy', see `avy-action-yank' for example"
            ("/"         . 'embrace-commander)
            ("SPC SPC /" . 'xah-goto-matching-bracket))
     :hook
-    (emacs-lisp-mode   . embrace-emacs-lisp-mode-hook)
-    (org-mode          . embrace-org-mode-hook)
+    (emacs-lisp-mode . embrace-emacs-lisp-mode-hook)
+    (org-mode        . embrace-org-mode-hook)
     :config
     (unless (assq ?n embrace-semantic-units-alist)
       (setq-default embrace-semantic-units-alist
                     (cons '(?n . embrace-avy-semantic-unit)
-                          embrace-semantic-units-alist))))
+                          embrace-semantic-units-alist)))
 
-(defun embrace-avy-semantic-unit ()
-  "Semantic unit for `embrace' which ask expression with the `avy'."
-  (call-interactively 'avy-mark-word))
-
-(defun mark-inner-or-expand-region ()
-  "If text is selected, expand region, otherwise then mark inner of brackets."
-  (interactive)
-  (if (use-region-p)
-      (call-interactively 'er/expand-region)
-    (progn
-      (-when-let (ok (sp-get-sexp))
-        (sp-get ok
-          (set-mark :beg-in)
-          (goto-char :end-in))))))
+    (defun embrace-avy-semantic-unit ()
+      "Semantic unit for `embrace' which ask expression with the `avy'."
+      (call-interactively 'avy-mark-word)))
 
 (use-package expand-region
     :ensure t
-    :bind
-    (:map xah-fly-command-map
-          ("1" . er/expand-region)
-          ("9" . mark-inner-or-expand-region)
-          ("m" . sp-backward-up-sexp)))
+    :bind ((:map xah-fly-command-map)
+           ("1" . er/expand-region)
+           ("9" . mark-inner-or-expand-region)
+           ("m" . sp-backward-up-sexp))
+    :config
+    (defun mark-inner-or-expand-region ()
+      "If text is selected, expand region, otherwise mark inner of brackets."
+      (interactive)
+      (if (use-region-p)
+          (call-interactively 'er/expand-region)
+        (progn
+          (-when-let (ok (sp-get-sexp))
+            (sp-get ok
+              (set-mark :beg-in)
+              (goto-char :end-in)))))))
 
 (use-package kmacro
-    :ensure t
     :bind ((:map xah-fly-command-map)
            ("\\"      . 'kmacro-start-or-end-macro)
            ("SPC RET" . 'kmacro-call-macro-or-apply-to-lines)))
@@ -946,11 +952,6 @@ Action of `avy', see `avy-action-yank' for example"
   (if (use-region-p)
       (apply-macro-to-region-lines top bottom)
     (kmacro-call-macro 1)))
-
-(use-package string-edit
-    :ensure t
-    :bind (:map xah-fly-command-map
-                ("SPC `" . string-edit-at-point)))
 
 (use-package eldoc
     :custom ((eldoc-idle-delay 0.01)))
@@ -1238,19 +1239,16 @@ True dragger mean that its function return non-nil when called interactively."
 
 (define-key xah-fly-command-map (kbd "8") 'select-current-or-next-word)
 
-(defun delete-current-text-block-or-cancel-selection ()
-  "If text is selected, then cancel selection, otherwise delete current block."
-  (interactive)
-  (if (use-region-p)
-      (deactivate-mark)
-    (xah-delete-current-text-block)))
-
-(define-key xah-fly-command-map
-    (kbd "g") 'delete-current-text-block-or-cancel-selection)
+(define-key-when
+  my-cancel-selection-or-delete-text-block
+  xah-fly-command-map
+  "g"
+  'deactivate-mark
+  'use-region-p)
 
 (define-key-when
-    my-exchange-point-and-mark-or-splice-sexp
-    xah-fly-command-map
+  my-exchange-point-and-mark-or-splice-sexp
+  xah-fly-command-map
   "-"
   'exchange-point-and-mark
   'use-region-p)
@@ -1535,17 +1533,6 @@ List of functions: `xah-toggle-letter-case', `my-change-case-of-current-line'."
  :map xah-fly-command-map
  ("SPC 0" . my-visit-last-opened-buffer))
 
-(defmacro add-nav-to-imports-for-language (language to-imports-function)
-  "Bind `TO-IMPORTS-FUNCTION` to `LANGUAGE`-map."
-  `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
-     (add-hook
-      language-hook
-      (lambda ()
-        (define-key
-            xah-fly-command-map
-            (kbd "SPC SPC i")
-          ',to-imports-function)))))
-
 (require 'face-remap)
 
 (use-package visual-fill-column
@@ -1558,17 +1545,6 @@ List of functions: `xah-toggle-letter-case', `my-change-case-of-current-line'."
                 visual-fill-column-center-text t)
   (text-scale-mode 0)
   (visual-fill-column-mode 1))
-
-(defmacro add-import-keymap-for-language (language add-import-function)
-  "Bind `ADD-IMPORT-FUNCTION` to `LANGUAGE`-map."
-  `(let ((language-hook (intern (s-append "-hook" (symbol-name ',language)))))
-     (add-hook
-      language-hook
-      (lambda ()
-        (define-key
-            xah-fly-command-map
-            (kbd "SPC i")
-          ',add-import-function)))))
 
 (defvar my-autoformat-functions nil
   "Current used autoformat functions.")
@@ -1773,6 +1749,9 @@ See `just-line-is-whitespaces-p'"
 (defvar my-latex-insert-at-start-arg-type 'optional
   "Type of argument (optional or required) which will be inserted at start.")
 
+(defvar my-latex-insert-commands nil
+  "Alist from the keys for LaTeX insertion, values - their insert functions.")
+
 (defun my-latex-insert-command (name &rest args)
   "Insert a LaTeX command named NAME with required arguments ARGS.
 
@@ -1883,10 +1862,25 @@ See `my-latex-insert-command' for understand of use ARGS"
       (setq end (point)))
     (run-hook-with-args LaTeX-after-insert-env-hook name beg end)))
 
+(defun my-latex-in-env-p (expected)
+  "Get non-nil, when the cursor placed in the LaTeX environment named EXPECTED."
+  (let ((arg 1)
+        (found nil)
+        (actual (LaTeX-current-environment)))
+    (while (and
+            (not (string-equal actual "document"))
+            (not found))
+      (setq actual (LaTeX-current-environment arg))
+      (setq found (string-equal expected actual))
+      (incf arg))
+    found))
+
 (defun my-latex-expand-define-function (key fun)
   "Bind call of FUN at KEY in the LaTeX.
 
 FUN will be called when the user press KEY and dot"
+  (add-to-list 'my-latex-insert-commands
+               (cons key fun))
   (aas-set-snippets 'latex-mode
     (s-concat key ".") fun))
 
@@ -1899,6 +1893,43 @@ BODY will be evaluated when the user press KEY and dot"
      (defun ,name ,args
        ,@body)
      (my-latex-expand-define-function ,key ',name)))
+
+(defun my-latex-insert-commands-help ()
+  "View help info about each of the LaTeX insert commands."
+  (interactive)
+  (let ((buffer (get-buffer-create "*Help for LaTeX insert*"))
+        (longest-key-length
+         (-max (--map (length (car it))
+                      my-latex-insert-commands))))
+    (switch-to-buffer-other-window buffer)
+    (erase-buffer)
+    (--each my-latex-insert-commands
+      (my-latex-insert-command-insert-key it longest-key-length)
+      (insert "   ")
+      (my-latex-insert-command-insert-name it)
+      (newline))))
+
+(defun my-latex-insert-command-insert-key (command
+                                           &optional min-len)
+  "Insert the key of a LaTeX insert command.
+
+COMMAND is pair from the key which will be activate that command, and function
+which will be do insertion.
+
+If MIN-LEN is lower then length of the key, then insert extra spaces to the
+start of the key."
+  (let ((key (car command)))
+    (and min-len
+         (> min-len (length key))
+         (self-insert-command (- min-len (length key)) ? ))
+    (insert key)))
+
+(defun my-latex-insert-command-insert-name (command)
+  "Insert the name of a LaTeX insert command.
+
+COMMAND is pair from the key which will be activate that command, and function
+which will be do insertion."
+  (insert (symbol-name (cdr command))))
 
 (define-minor-mode my-latex-expansion-mode
     "Which expands certain text fragments to LaTeX objects."
@@ -2041,13 +2072,39 @@ downloaded file"
     (-last-item
      (s-match "\\\\usepackage\\(\\[.*\\]\\)?{\\(.*\\)}" it)))))
 
-(my-latex-expand-define "t" my-latex-insert-table ;nofmt
-    (preamble &optional centering-p)
-  "Insert the LaTeX environment table to the current buffer with PREAMBLE."
+(my-latex-expand-define "wt" my-latex-insert-table ;nofmt
+    (preamble wrapfig-pos width &optional placement centering-p)
+  "Insert the LaTeX environment table to the current buffer with PREAMBLE.
+
+If CENTERING-P is non-nil make table centered.  Pass to the environment
+PLACEMENT"
   (interactive (list
                 (my-latex-read-preamble)
+                (my-latex-read-wrapfig-pos)
+                (my-latex-read-width)
+                (my-latex-read-placement)
                 (my-latex-read-centering)))
-  (my-latex-insert-env "table")
+  (my-latex-insert-env "wraptable" wrapfig-pos width)
+  (my-latex--insert-inner-of-table preamble centering-p))
+
+(my-latex-expand-define "t" my-latex-insert-table ;nofmt
+    (preamble &optional placement centering-p)
+  "Insert the LaTeX environment table to the current buffer with PREAMBLE.
+
+If CENTERING-P is non-nil make table centered.  Pass to the environment
+PLACEMENT"
+  (interactive (list
+                (my-latex-read-preamble)
+                (my-latex-read-placement)
+                (my-latex-read-centering)))
+  (my-latex-insert-env "table" :optional placement)
+  (my-latex--insert-inner-of-table preamble centering-p))
+
+(defun my-latex--insert-inner-of-table (preamble centering-p)
+  "Insert the inner of the LaTeX environment tables sush as table.
+
+If CENTERING-P is non-nil make table centered.  Pass to the environment
+PREAMBLE"
   (when centering-p
     (my-latex-insert-centering))
   (my-latex-insert-tabular preamble))
@@ -2137,9 +2194,7 @@ downloaded file"
    (buffer-string)
    (s-lines)
    (--keep
-    (-when-let ((all name)
-                (s-match "\\newcounter\\(?:\[.*?\]\\)?{\\(.*\\)}" it))
-      name))))
+    (-second-item (s-match "\\newcounter\\(?:\[.*?\]\\)?{\\(.*\\)}" name)))))
 
 (my-latex-expand-define "ncr" my-latex-insert-newcounter
     (counter &optional sub-counter)
@@ -2175,18 +2230,6 @@ SUB-COUNTER is optional argument of that LaTeX command."
   (interactive (list (my-latex-read-counter-name)))
   (my-latex-insert-command "stepcounter" counter))
 
-(defun my-read-string-or-nil ;nofmt
-    (prompt &optional initial-input history default-value inherit-input-method)
-  "Read string from the minibuffer, if the user type nothing, return nil.
-
-Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
-`read-string'"
-  (let ((input
-         (read-string prompt initial-input history default-value
-                      inherit-input-method)))
-    (unless (s-blank-p input)
-      input)))
-
 (my-latex-expand-define "au" my-latex-insert-author
     (name)
   "Insert the latex command author with NAME."
@@ -2211,8 +2254,40 @@ Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
   "Insert the LaTeX command section with NAME and name for the TOC NAME-TOC."
   (interactive (list
                 (read-string "Name of the new section: ")
-                (read-string "Name for the TOC of the section: ")))
-  (run-hooks 'LaTeX-section-hook))
+                (my-read-string-or-nil "Name for the TOC of the section: ")))
+  (my-latex-insert-command "section" name :optional toc-name))
+
+(my-latex-expand-define "mc" my-latex-insert-multicolumn
+    (cols text &optional preamble)
+  "Insert the LaTeX environment multicolumn, if in table, otherwise command."
+  (interactive (list
+                (read-number "Number of the columns" 2)
+                ""
+                (and
+                 (my-latex-in-env-p "tabular")
+                 (my-latex-read-preamble))))
+  (or
+   (my-latex-maybe-insert-table-multicolumn cols preamble text)
+   (my-latex-insert-text-multicolumn cols text)))
+
+(defun my-latex-insert-text-multicolumn (cols text)
+  "Insert the LaTeX environemnt multicolumn, pass to the command COLS and TEXT."
+  (interactive)
+  (my-latex-use-package "multicol")
+  (my-latex-insert-env "multicols" cols text))
+
+(defun my-latex-maybe-insert-table-multicolumn (cols preamble text)
+  "Call the `my-latex-insert-table-multicolumn', when in the LaTeX table env.
+
+Pass COLS, PREAMBLE and TEXT to the function."
+  (when (my-latex-in-env-p "tabular")
+    (my-latex-insert-table-multicolumn cols preamble text)))
+
+(defun my-latex-insert-table-multicolumn (cols preamble text)
+  "Insert the LaTeX command multicolumn.
+
+Pass to the command COLS, PREAMBLE and TEXT."
+  (my-latex-insert-command "multicols" cols preamble text))
 
 (use-package cdlatex
     :ensure t
@@ -2618,12 +2693,22 @@ width.
 
 If CENTERING is non-nil, then image will be centered via \\centering"
   (interactive (my--get-arguments-for-latex-insert-image))
-  (my-latex-graphics-init)
   (my-latex-insert-figure placement)
+  (my-latex--insert-inner-of-figure filename caption width centering))
+
+(defun my-latex--insert-inner-of-figure (filename ;nofmt
+                                         &optional caption width centering)
+  "Insert inner of the figure image environemnts sush as figure.
+
+Insert \\includegraphics for image at FILENAME with WIDTH (if it's non-nil).
+
+If CENTERING is non-nil make image centered.  By default, doesn't insert
+CAPTION, but if CAPTION is non-nil, insert."
   (when centering ;nofmt
     (my-latex-insert-centering))
   (my-latex-insert-includegraphics filename width)
-  (my-latex-insert-caption caption))
+  (when caption
+    (my-latex-insert-caption caption)))
 
 (defun my-latex-insert-centering ()
   "Insert the LaTeX command \"centering\"."
@@ -2651,23 +2736,20 @@ If CENTERING is non-nil, then image will be centered via \\centering"
   "Read from the minibuffer a caption for the LaTeX.
 
   If the user typed nothing, then return nil"
-  (let ((typed (read-string "Caption, please: ")))
-    (unless (s-blank? typed) typed)))
+  (read-string "Caption, please: "))
 
-(defun my-latex-read-width ()
-  "Read a LaTeX width from the minibuffer.
+(defun my-latex-read-width (&optional for)
+  "Read a LaTeX width of FOR from the minibuffer.
 
   If the user typed nothing, then return nil"
-  (let ((typed (read-string "Width, please: ")))
-    (unless (s-blank? typed) typed)))
+  (setq for (or for "the thing"))
+  (my-read-string-or-nil "Width of %s, please: " for))
 
 (defun my-latex-read-placement ()
   "Read a LaTeX placement from the minibuffer.
 
   If the user typed nothing, then return nil"
-  (let ((typed
-         (read-string "Placement, please (some chars of h t b p ! H): ")))
-    (unless (s-blank? typed) typed)))
+  (read-string "Placement, please (some chars of h t b p ! H): "))
 
 (defun my-latex-read-centering ()
   "Return t, when the user need to centering of the LaTeX block."
@@ -2704,10 +2786,42 @@ the `kill-ring', the selected region or the minibuffer"
      (my-latex-read-width)
      (my-latex-read-centering))))
 
+(defun my-latex-insert-wrapimage        ;nofmt
+    (filename pos width &optional line-height caption image-width centering)
+  "Insert an wraped image at FILENAME with the LaTeX syntax.
+
+Pass to \\wrapfig POS (one of R L I O | r l i o), WIDTH and LINE-HEIGHT.
+
+Insert caption for wrapfigure, if CAPTION is non-nil.  If CENTERING
+is non-nil, then make wrapfigure centered.
+
+Insert \\includegraphics for FILENAME with IMAGE-WIDTH (if is non-nil)."
+  (interactive (list
+                (my-latex-read-wrapfig-pos)
+                (my-latex-read-width "wrapfigure")
+                nil
+                (my-latex-read-caption)
+                (my-latex-read-centering)
+                (my-latex-read-width "image")))
+  (my-latex-insert-figure pos width line-height)
+  (my-latex--insert-inner-of-figure filename caption image-width centering))
+
+(defun my-latex-insert-wrapfigure (pos width &optional line-height)
+  "Insert the LaTEX wrapfigure environment.
+
+Pass to environment POS (one of R L I O | r l i o), WIDTH and LINE-HEIGHT."
+  (my-latex-insert-env "wrapfigure" pos width :optional line-height))
+
+(defun my-latex-read-wrapfig-pos ()
+  "Read a position for the wrapfig environment from the minibuffer."
+  (read-string "Position of the wrap figure, please (one of RLIO): "))
+
 (defun my-latex-read-new-filename-of-image-at-url (url)
   "Read from the minibuffer new filename of the downloaded image at URL."
   (read-string "New filename of the downloaded image: "
                (my-uri-of-url url)))
+
+(my-latex-expand-define-function "wi" 'my-latex-insert-wrapimage)
 
 (bind-keys
  :map my-latex-local-map
@@ -3089,16 +3203,23 @@ If caption isn't empty string, then insert image with the caption CAPTION."
  'org-mode
  org-sentence-capitalization)
 
-(defvar autoformat-org-non-text-line-prefix
-  (rx (or (1+ "*")                      ; heading
-          (seq (0+ " ")
-               "-"))                  ; itemized list item
+(defvar autoformat-org-title-line-start-regexp
+  (rx (or (1+ "*")                      ; Headline
+          (seq (0+ " ")                 ; List Items
+               "-"                      ;    itemized
+               (seq digit ".")          ;    enumerated
+               )
+          (seq "#+"                     ; Attributes which start with #+
+               (or "AUTHOR"
+                   "TITLE")
+               ":"
+               (0+ " ")))
       (1+ " ")))
 
 (defvar autoformat-org-line-for-capitalization-regexp
   (rx line-start
       (optional
-       (regexp autoformat-org-non-text-line-prefix)
+       (regexp autoformat-org-title-line-start-regexp)
        (optional (or "TODO" "DONE") (1+ " ")))
       letter)
   "Regular expression indicates the necessary of the last word capitalization.")
@@ -3116,9 +3237,9 @@ If caption isn't empty string, then insert image with the caption CAPTION."
 (defun autoformat-org-at-non-text-line-p ()
   "Return t, when the cursor being at non-text position for `org-mode'."
   (or
-   (just-line-regexp-prefix-p autoformat-org-non-text-line-prefix)
+   (just-line-regexp-prefix-p autoformat-org-title-line-start-regexp)
    (just-call-on-prev-line*
-    (just-line-regexp-prefix-p autoformat-org-non-text-line-prefix))))
+    (just-line-regexp-prefix-p autoformat-org-title-line-start-regexp))))
 
 (use-package wikinforg
     :ensure t)
@@ -3130,21 +3251,18 @@ If caption isn't empty string, then insert image with the caption CAPTION."
 
 (use-package org-keys
     :after (org)
-    :bind ((:map my-org-local-map)
-           ("h" . 'my-org-to-heading-start))
     :custom
     (org-use-speed-commands
      (lambda ()
-       (or
-        (and
-         (looking-back "^\**")
-         (not (looking-back "[^*]")))
-        (looking-at "\*+ "))))
+       (and
+        (not (bobp))
+        (looking-back "^\**"))))
     (org-speed-commands-default
      '(("k" . org-forward-heading-same-level)
        ("i" . org-backward-heading-same-level)
        ("j" . org-previous-visible-heading)
        ("l" . org-next-visible-heading)
+       ("h" . my-org-goto-parent)
        ("z" . org-toggle-comment)
        ("x" . org-cut-subtree)
        ("d" . org-deadline)
@@ -3154,7 +3272,8 @@ If caption isn't empty string, then insert image with the caption CAPTION."
        ("'" . org-toggle-narrow-to-subtree)
        ("f" . (progn
                 (skip-chars-forward "*")
-                (forward-char)))
+                (forward-char)
+                (xah-fly-command-mode-activate)))
        ("B" . org-previous-block)
        ("F" . org-next-block)
        ("g" . (org-refile t))
@@ -3183,13 +3302,28 @@ If caption isn't empty string, then insert image with the caption CAPTION."
        ("E" . org-inc-effort)
        ("/" . org-sparse-tree)
        ("?" . org-speed-command-help)))
+    :bind ((:map my-org-local-map)
+           ("h" . 'my-org-to-heading-start))
     :config
     (defun my-org-to-heading-start ()
       "Go to the beginning of the heading after activate insert mode."
       (interactive)
       (end-of-line)
       (search-backward-regexp "^\*" nil t)
-      (xah-fly-insert-mode-activate)))
+      (xah-fly-insert-mode-activate))
+
+    (defun my-org-goto-parent ()
+      "Go to the parent of the `org-mode' heading at the cursor."
+      (interactive)
+      (->>
+       (->
+        (org-current-level)
+        (1-)
+        (s-repeat "*")
+        (regexp-quote))
+       (s-prepend "^")
+       (s-append " ")
+       (re-search-backward))))
 
 (use-package helm-org
     :ensure t
@@ -3366,12 +3500,18 @@ exist after each headings's drawers."
            ("o" . 'my-paxedit-transpose-forward)
            ("u" . 'my-paxedit-transpose-backward)
            ("x" . 'paxedit-kill)
+           ("z" . 'my-paxedit-comment)
            ("w" . 'my-paxedit-change)
            ("d" . 'paxedit-symbol-kill)
            ("q" . 'paxedit-compress)
            ("k" . 'paxedit-delete-whitespace)
            ("y" . 'my-paxedit-duplicate))
     :config
+    (defun my-paxedit-comment ()
+      "Comment the Lisp expression at the cursor."
+      (interactive)
+      (-let (((beg . end) (paxedit-sexp-region)))
+        (comment-region beg end)))
 
     (defun my-paxedit-change ()
       "Kill the Lisp expression at the cursor and activate insert mode."
@@ -3550,19 +3690,23 @@ Only when in class defnition."
       "")
     ")")))
 
+(use-package elisp-mode
+    :hook (emacs-lisp-mode . paxedit-mode))
+
 (use-package racket-mode
     :ensure t
-    :major-mode-map racket (racket-mode racket-repl-mode)
-    :config (set-keymap-parent my-local-major-mode-map my-lisp-map)
+    :major-mode-map (racket (racket-mode racket-repl-mode)
+                            :parent my-lisp-map)
     :hook
     ;; this is enable some useful functions for the Racket
-    (racket-mode . 'racket-xp-mode)
+    (racket-mode . racket-xp-mode)
     ;; `flycheck' is very slow and `racket-xp-mode' highlight
     ;; errors too, so i disable `flycheck' for the Racket
-    (racket-mode . 'turn-off-flycheck)
-    :custom
-    (racket-xp-mode-hook nil)           ; fix a bug
-    )
+    (racket-mode . turn-off-flycheck)
+    ;; this enable structured editing for the `racket-mode'
+    (racket-mode . paxedit-mode)
+    :custom (racket-xp-mode-hook nil)           ; fix a bug
+    :config (remove-hook 'racket-mode-hook 'racket-mode))
 
 (defcustom my-racket-meta-return-functions
   '()
@@ -3746,14 +3890,16 @@ List of racket expressions in which this function should work:
     (flycheck-rust-setup))
 
 (use-package go-mode
-    :ensure t)
+    :ensure t
+    :major-mode-map (go (go-mode)))
 
 (use-package go-eldoc
     :ensure t
-    :hook (go-mode-hook . 'go-eldoc-setup))
+    :hook (go-mode . 'go-eldoc-setup))
 
-(add-import-keymap-for-language go-mode
-                                go-import-add)
+(use-package go-mode
+    :bind ((:map my-go-local-map)
+           ("i" . go-import-add)))
 
 (use-package pdf-tools
     :ensure t
@@ -3761,32 +3907,19 @@ List of racket expressions in which this function should work:
 
 (use-package haskell-mode
     :ensure t
-    :hook (haskell-mode . haskell-indent-mode))
-
-(add-import-keymap-for-language
- haskell-mode
- haskell-add-import)
-
-(add-nav-to-imports-for-language
- haskell-mode
- haskell-navigate-imports)
+    :major-mode-map haskell (haskell-mode haskell-interactive-mode)
+    :hook
+    (haskell-mode . haskell-indent-mode)
+    (haskell-mode . interactive-haskell-mode)
+    :bind ((:map my-haskell-local-map)
+           ("i" . 'haskell-add-import)))
 
 (use-package company-ghci
     :ensure t
-    :init
-    (push 'company-ghci company-backends)
-    (add-hook 'haskell-mode-hook 'company-mode)
-    (add-hook 'haskell-interactive-mode-hook 'company-mode))
-
-(setq js/imports-regexp "import")
-
-(setq js/function-or-class-regexp "function \\|class ")
+    :config (push 'company-ghci company-backends))
 
 (use-package js-comint
     :ensure t)
-
-(if (user-os-windows-p)
-    (setq js-comint-program-command "C:/Program Files/nodejs/node.exe"))
 
 (use-package web-mode
     :ensure t)
@@ -3829,19 +3962,6 @@ List of racket expressions in which this function should work:
     (js2-strict-trailing-comma-warning t)
     :hook (js2-mode . my-enable-flycheck))
 
-(defun js/nav-to-imports ()
-  "Navigate to imports in JS mode."
-  (interactive)
-  (push-mark)
-  (let ((old-pos (point)))
-    (goto-char (point-min))
-    (search-forward-regexp js/imports-regexp old-pos old-pos))
-  )
-
-(add-nav-to-imports-for-language
- js2-mode
- js/nav-to-imports)
-
 (use-package json-mode
     :major-mode-map t)
 
@@ -3873,16 +3993,14 @@ List of racket expressions in which this function should work:
 
 (use-package emmet-mode
     :ensure t
-    :custom (emmet-move-cursor-between-quotes t)
-    :hook
-    (web-mode . emmet-mode)
-    (mhtml-mode . emmet-mode)
-    (css-mode . emmet-mode)
-    (html-mode . emmet-mode))
+    :custom ((emmet-preview-default t)
+             (emmet-move-cursor-between-quotes t))
+    :hook ((web-mode mhtml-mode css-mode html-mode) . emmet-mode))
 
 (use-package helm-emmet
+    :after (helm emmet-mode)
     :ensure t
-    :init
+    :config
     (defun fast-exec-helm-emmet-keys ()
       "Keymaps for `helm-emmet'."
       (fast-exec/some-commands
@@ -3942,13 +4060,26 @@ List of racket expressions in which this function should work:
    (s-prepend "http://localhost:8080/imp/live/")
    (browse-url)))
 
-(use-package css-mode)
+(use-package css-mode
+    :ensure t)
 
 (use-package css-eldoc
     :ensure t
-    :init
-    (dolist (hook (list 'web-mode-hook 'css-mode-hook))
-      (add-hook hook 'css-eldoc-enable)))
+    :hook
+    (((css-mode web-mode) . css-eldoc-enable)))
+
+(use-package helm-color
+    :commands (my-css-pick-color)
+    :ensure helm
+    :bind ((:map  css-mode-map)
+           ("#" . 'my-css-pick-color))
+    :config
+    (defun my-css-pick-color ()
+      "Pick a color in format hex for css, wrapper to `helm-colors'."
+      (interactive)
+      (flet ((helm-color-kill-name (candidate)
+               (helm-colors-get-rgb candidate)))
+        (insert (helm-colors)))))
 
 (setq make-backup-files         nil)
 (setq auto-save-list-file-name  nil)
@@ -4105,13 +4236,12 @@ List of racket expressions in which this function should work:
     (fast-exec/register-keymap-func 'fast-exec-define-cowsay-keymaps)
     (fast-exec/reload-functions-chain))
 
-(add-to-list 'load-path "~/projects/super-save/")
-
 (use-package super-save
+    :ensure t
+    :custom (super-save-exclude '("Emacs\\.org"))
     :config
-  (setq super-save-exclude '("Emacs.org"))
-  (setq auto-save-default nil)
-  (super-save-mode 38))
+    (add-to-list 'super-save-triggers 'dired-jump)
+    (super-save-mode 38))
 
 (use-package devdocs
     :ensure t
@@ -4487,14 +4617,21 @@ Return value at `projectile-project-root' when DIR is nil, otherwise return nil"
   (unless dir
     projectile-project-root))
 
-(defun my-projectile-project-files (root)
-  "Return filenames list of the project at ROOT, with caching!."
-  (let ((root (f-full root)))
+(defun my-projectile-project-files (root &optional relatieve-paths)
+  "Return filenames list of the project at ROOT, with caching.
+
+If RELATIEVE-PATHS is non-nil, instead of the returns path relatieve to the
+ROOT"
+  (let ((root (f-full root))
+        files)
     (unless (gethash root my-project-files-hash)
       (puthash root
                (my-no-cache-project-files root)
                my-project-files-hash))
-    (gethash root my-project-files-hash)))
+    (--when-let (gethash root my-project-files-hash)
+      (if relatieve-paths
+          (--map (s-chop-prefix root (f-full it)) it)
+        it))))
 
 (defun my-no-cache-project-files (root)
   "Return filenames list of the project at ROOT, without caching."
@@ -4606,79 +4743,78 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
 
 (use-package helm-projectile
     :ensure t
-    :bind
-    ((:map xah-fly-command-map)
-     ("SPC j" . 'helm-projectile-find-file)
-     (:map helm-projectile-find-file-map)
-     ("M-<f5>" . 'my-helm-projectile-find-file-update))
+    :bind ((:map xah-fly-command-map)
+           ("SPC j" . 'helm-projectile-find-file)
+           (:map helm-projectile-find-file-map)
+           ("M-<f5>" . 'my-helm-projectile-find-file-update))
     :config
     (defalias 'projectile-project-files 'my-projectile-project-files)
     (defalias 'projectile-root-local 'my-projectile-root-local)
     (defalias 'project-root 'my-project-root)
-    (defalias 'projectile-files-with-string 'my-projectile-files-with-string))
+    (defalias 'projectile-files-with-string 'my-projectile-files-with-string)
 
-(defun my-helm-projectile-find-file-update ()
-  "Update function for `helm-projectile-find-file'."
-  (interactive)
-  (projectile-project-files-clear-cache (projectile-acquire-root))
-  (helm-update))
+    (defun my-helm-projectile-find-file-update ()
+      "Update function for `helm-projectile-find-file'."
+      (interactive)
+      (projectile-project-files-clear-cache (projectile-acquire-root))
+      (helm-update))
 
-(setq helm-projectile-find-file-map
-      (let ((map (copy-keymap helm-find-files-map)))
-        (helm-projectile-define-key
-            map
-            (kbd "C-c f") #'helm-projectile-dired-files-new-action
-            (kbd "C-c a") #'helm-projectile-dired-files-add-action
-            (kbd "M-e") #'helm-projectile-switch-to-shell
-            (kbd "M-.") #'helm-projectile-ff-etags-select-action
-            (kbd "M-!")
-            #'helm-projectile-find-files-eshell-command-on-file-action)
-        (define-key map (kbd "<left>") #'helm-previous-source)
-        (define-key map (kbd "<right>") #'helm-next-source)
-        (dolist (cmd '(helm-find-files-up-one-level
-                       helm-find-files-down-last-level))
-          (substitute-key-definition cmd nil map))
-        map))
+    (defun projectile--find-file (invalidate-cache &optional ff-variant)
+      "Jump to a project's file using completion.
 
-(defvar helm-source-projectile-files-list
-  (helm-build-sync-source "Projectile files 2"
-    :before-init-hook
-    (lambda ()
-      (add-hook 'helm-after-update-hook #'helm-projectile--move-to-real)
-      (add-hook 'helm-cleanup-hook #'helm-projectile--remove-move-to-real))
-    :candidates
-    (lambda ()
-      (when (projectile-project-p)
-        (with-helm-current-buffer
-          (let ((root (f-full (projectile-project-root))))
-            (--map
-             (cons (s-chop-prefix root (f-full it)) it)
-             (projectile-current-project-files))))))
-    :filtered-candidate-transformer
-    (lambda (files _source)
-      (with-helm-current-buffer
-        (let* ((root (projectile-project-root))
-               (file-at-root
-                (file-relative-name (expand-file-name helm-pattern root))))
-          (if (or (string-empty-p helm-pattern)
-                  (assoc helm-pattern files))
-              files
-            (if (equal helm-pattern file-at-root)
-                (cl-acons (helm-ff-prefix-filename helm-pattern nil t)
-                          (expand-file-name helm-pattern)
-                          files)
-              (cl-pairlis (list (helm-ff-prefix-filename helm-pattern nil t)
-                                (helm-ff-prefix-filename file-at-root nil t))
-                          (list (expand-file-name helm-pattern)
-                                (expand-file-name helm-pattern root))
-                          files))))))
-    :fuzzy-match helm-projectile-fuzzy-match
-    :keymap helm-projectile-find-file-map
-    :help-message 'helm-ff-help-message
-    :mode-line helm-read-file-name-mode-line-string
-    :action helm-projectile-file-actions
-    :persistent-action #'helm-projectile-file-persistent-action
-    :persistent-help "Preview file"))
+With INVALIDATE-CACHE invalidates the cache first.  With FF-VARIANT set to a
+defun, use that instead of `find-file'.   A typical example of such a defun
+would be `find-file-other-window' or `find-file-other-frame'"
+      (interactive "P")
+      (projectile-maybe-invalidate-cache invalidate-cache)
+      (let* ((project-root (projectile-acquire-root))
+             (file (projectile-completing-read
+                    "Find file: "
+                    (projectile-project-files project-root t)))
+             (ff (or ff-variant #'find-file)))
+        (when file
+          (funcall ff (expand-file-name file project-root))
+          (run-hooks 'projectile-find-file-hook))))
+
+    (defvar helm-source-projectile-files-list
+      (helm-build-sync-source "Projectile files 2"
+        :before-init-hook
+        (lambda ()
+          (add-hook 'helm-after-update-hook #'helm-projectile--move-to-real)
+          (add-hook 'helm-cleanup-hook #'helm-projectile--remove-move-to-real))
+        :candidates
+        (lambda ()
+          (when (projectile-project-p)
+            (with-helm-current-buffer
+              (let ((root (f-full (projectile-project-root))))
+                (--map
+                 (cons (s-chop-prefix root (f-full it)) it)
+                 (projectile-project-files root))))))
+        :filtered-candidate-transformer
+        (lambda (files _source)
+          (with-helm-current-buffer
+            (let* ((root (projectile-project-root))
+                   (file-at-root
+                    (file-relative-name (expand-file-name helm-pattern root))))
+              (if (or (string-empty-p helm-pattern)
+                      (assoc helm-pattern files))
+                  files
+                (if (equal helm-pattern file-at-root)
+                    (cl-acons (helm-ff-prefix-filename helm-pattern nil t)
+                              (expand-file-name helm-pattern)
+                              files)
+                  (cl-pairlis (list (helm-ff-prefix-filename helm-pattern nil t)
+                                    (helm-ff-prefix-filename file-at-root nil t))
+                              (list (expand-file-name helm-pattern)
+                                    (expand-file-name helm-pattern root))
+                              files))))))
+        :fuzzy-match helm-projectile-fuzzy-match
+        :keymap helm-projectile-find-file-map
+        :help-message 'helm-ff-help-message
+        :mode-line helm-read-file-name-mode-line-string
+        :action helm-projectile-file-actions
+        :persistent-action #'helm-projectile-file-persistent-action
+        :persistent-help "Preview file")))
 
 (use-package magit :ensure t)
 
@@ -5102,15 +5238,16 @@ Return new name of FILE"
     :ensure t
     :custom
     (run-command-completion-method 'helm)
-    :bind
-    ((:map xah-fly-command-map)
-     ("SPC , c" . 'run-command)
-     ("S-<f5>"  . 'my-run-last-command))
+    :bind ((:map xah-fly-command-map)
+           ("SPC , c" . 'run-command)
+           ("S-<f5>"  . 'my-run-last-command))
     :config
 
-    (defadvice run-command--run (before run-command-set-last-recipe (recipe))
+    (defun run-command--run--set-last-recipe (recipe)
       "Set `run-command-last-recipe'."
       (setq-local run-command-last-recipe recipe))
+
+    (advice-add 'run-command--run :before #'run-command--run--set-last-recipe)
 
     (defun my-run-last-command ()
       "Run command which was runned last, if commands wasn't run do nothing."
@@ -5224,24 +5361,25 @@ PT defaults to the current `point'"
  :map xah-fly-command-map
  ("SPC i a" . my-add-org-subtree-to-targets-on-day))
 
-(use-package org
-    :custom
-  (org-capture-templates
-   '(("d"
-      "Target on Day"
-      entry
-      (file+headline "~/agenda.org" "Targets on Day")
-      "* TODO %?\n  SCHEDULED: %t\n  \n")
-     ("w"
-      "Target on Week"
-      entry
-      (file+headline "~/agenda.org" "Targets on Week")
-      "* TODO %?\n  \n")
-     ("f"
-      "Film for See"
-      entry
-      (file+headline "~/agenda.org" "Films")
-      (function my-films-format-as-org-heading)))))
+(use-package org-capture
+    :custom ((org-capture-templates
+              '(("d"
+                 "Target on Day"
+                 entry
+                 (file+headline "~/agenda.org" "Targets on Day")
+                 "* TODO %?\n  SCHEDULED: %t\n  \n")
+                ("w"
+                 "Target on Week"
+                 entry
+                 (file+headline "~/agenda.org" "Targets on Week")
+                 "* TODO %?\n  \n")
+                ("f"
+                 "Film for See"
+                 entry
+                 (file+headline "~/agenda.org" "Films")
+                 (function my-films-format-as-org-heading)))))
+    :bind ((:map org-capture-mode-map)
+           ([remap save-buffer] . 'org-capture-finalize)))
 
 (use-package deft
     :ensure t
@@ -5304,9 +5442,17 @@ PT defaults to the current `point'"
   (org-publish-project "Notes"))
 
 (defcustom my-mipt-dir "c:/Users/hrams/Documents/mipt"
-  "Path to the directory in which will be saved all MIPT solutions.")
+  "Path to the directory in which will be saved all MIPT solutions."
+  :type 'string)
 
-(defcustom my-mipt-lessons '("f" "m" "i") "Lessons of the MIPT.")
+(defcustom my-mipt-lessons
+  '("f" "m" "i")
+  "Lessons of the MIPT."
+  :type '(repeat string))
+
+(defcustom my-mipt-courses-ids-file "~/.mipt"
+  "File in which will be saved identifiers for web-urls of the MIPT courses."
+  :type 'string)
 
 (defclass my-mipt-task ()
   ((class :initform nil :initarg :class :accessor my-mipt-task-class)
@@ -5369,35 +5515,41 @@ Object of the `my-mipt-task', will set automatically when find task.")
    (f-join my-mipt-dir)))
 
 (defun my-mipt-last-task ()
-  "Return last opened task via `recentf'."
+  "Return the last opened MIPT task via `recentf'."
   (-some->>
       recentf-list
     (-concat (-keep #'buffer-file-name (buffer-list)))
     (-first #'my-mipt-task-parse)
     (my-mipt-task-parse)))
 
+(defalias 'my-mipt-current-task 'my-mipt-last-task)
+
 (defun my-mipt-visit-last-task ()
   "Visit last opened task searched via `my-mipt-last-task'."
   (interactive)
   (my-mipt-task-visit (my-mipt-last-task)))
 
-(defun my-mipt-next-task ()
-  "Return the next task after the last found task.
+(defun my-mipt-next-task (&optional is-visit)
+  "Return the next MIPT task after the current MIPT task.
 
-When run interactively visit that task."
-  (interactive)
-  (let ((next-task (my-mipt-last-task)))
+If IS-VISIT is t, then also visit the next mipt task"
+  (interactive (list t))
+  (let ((next-task (my-mipt-current-task)))
     (incf (my-mipt-task-number next-task))
-    (if (interactive-p) (my-mipt-task-visit next-task) next-task)))
+    (when is-visit
+      (my-mipt-task-visit next-task))
+    next-task))
 
-(defun my-mipt-prev-task ()
+(defun my-mipt-prev-task (&optional is-visit)
   "Return previous task, before the last found task.
 
-When run interactively visit that task."
-  (interactive)
-  (let ((prev-task (my-mipt-last-task)))
+If IS-VISIT is t, then also visit the next mipt task."
+  (interactive (list t))
+  (let ((prev-task (my-mipt-current-task)))
     (decf (my-mipt-task-number prev-task))
-    (if (interactive-p) (my-mipt-task-visit prev-task) prev-task)))
+    (when is-visit
+      (my-mipt-task-visit next-task))
+    next-task))
 
 (defun my-mipt-task-visit (task)
   "Visit file of the TASK's solution."
@@ -5406,7 +5558,8 @@ When run interactively visit that task."
 
 (defun my-mipt-all-tasks ()
   "Return all mipt tasks in the directory `my-mipt-dir'."
-  (->> my-mipt-dir (f-files) (-keep #'my-mipt-task-parse)))
+  (-keep 'my-mipt-task-parse
+         (f-files my-mipt-dir)))
 
 (defun my-mipt-find-task ()
   "Find the task from the minibuffer, take default info from the last task."
@@ -5529,13 +5682,100 @@ Special variable is `my-mipt-found-task'"
    :kind (or (my-mipt-task-kind task) (my-mipt-read-kind))
    :number (or (my-mipt-task-number task) (my-mipt-read-number))))
 
+(defun my-mipt-task-browse-course-url (&optional task)
+  "Browse URL of the MIPT TASK course."
+  (interactive (list (my-mipt-current-task)))
+  (browse-url
+   (my-mipt-task-course-url task)))
+
+(defun my-mipt-task-course-url (task)
+  "Return URL to the MIPT course of the TASK."
+  (my-mipt-course-url (my-mipt-task-course-name task)))
+
+(defun my-mipt-course-url (course-name)
+  "Return URL to the MIPT course named COURSE-NAME."
+  (my-mipt-course-ensure-saved-id course-name)
+  (->>
+   course-name
+   (my-mipt-course-id)
+   (s-prepend
+    "https://zftsh.online/course/")))
+
+(defun my-mipt-course-ensure-saved-id (course-name)
+  "Ensure that the MIPT course named COURSE-NAME is saved in the file.
+
+The file is the file at the path `my-mipt-courses-ids-file'.  If the course is
+not saved, then save with ID readed from the minibuffer"
+  (unless (my-mipt-course-id course-name)
+    (let ((prompt (format "ID of the course %s: " course-name)))
+      (my-mipt-course-save-id course-name
+                              (read-string prompt)))))
+
+(defun my-mipt-task-course-id (task)
+  "Return ID of the MIPT TASK course."
+  (let ((name (my-mipt-task-course-name task)))
+    (my-mipt-course-id name)))
+
+(defun my-mipt-course-id (name)
+  "Return ID of the MIPT course named NAME."
+  (let ((alist (my-mipt-all-saved-courses-ids)))
+    (-second-item
+     (assoc name alist))))
+
+(defun my-mipt-task-course-name (task)
+  "Return MIPT course of the TASK as string with a form sush as 9-i-1."
+  (format "%s-%s-%s"
+          (my-mipt-task-class task)
+          (my-mipt-task-lesson task)
+          (my-mipt-task-section task)))
+
+(defun my-mipt-all-saved-courses-ids ()
+  "Return the list of the MIPT courses names and their IDS saved in the file.
+
+The file is file at the path `my-mipt-courses-ids-file'"
+  (->>
+   my-mipt-courses-ids-file
+   (f-read)
+   (s-trim)
+   (s-lines)
+   (--map (s-split " " it))))
+
+(defun my-mipt-task-save-course-id (task id)
+  "Save ID of MIPT TASK course in file `my-mipt-courses-ids-file'."
+  (my-mipt-course-save-id (my-mipt-task-course-name task)
+                          id))
+
+(defun my-mipt-course-save-id (name id)
+  "Save ID of MIPT course named NAME in file `my-mipt-courses-ids-file'."
+  (->>
+   (my-mipt-all-saved-courses-ids)
+   (cons (list name id))
+   (my-mipt-task-set-saved-courses-ids)))
+
+(defun my-mipt-task-set-saved-courses-ids (courses)
+  "Set the list of the MIPT courses IDS and their names to COURSES.
+
+That information will be saved in the file at the path
+`my-mipt-courses-ids-file'.  COURSES is list from the list from a MIPT course
+ID and a course name."
+  (f-write (s-join
+            "\n"
+            (--map
+             (let ((id (car it))
+                   (name (-second-item it)))
+               (s-concat name " " id))
+             courses))
+           'utf-8
+           my-mipt-courses-ids-file))
+
 (defun fast-exec-mipt-keys ()
   "Get some useful keymaps of  `fast-exec' for MIPT."
   (fast-exec/some-commands
    ("Next MIPT Task" 'my-mipt-next-task)
    ("Previous MIPT Task" 'my-mipt-prev-task)
    ("Open Last MIPT Task" 'my-mipt-visit-last-task)
-   ("Find MIPT Task" 'my-mipt-task-visit)))
+   ("Find MIPT Task" 'my-mipt-task-visit)
+   ("Open MIPT Task in Web Browser" 'my-mipt-task-browse-web)))
 
 (fast-exec/register-keymap-func 'fast-exec-mipt-keys)
 (fast-exec/reload-functions-chain)

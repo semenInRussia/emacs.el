@@ -6,110 +6,124 @@
 
 ** Targets on Week
 
+*** TODO Run the main file of the project in =run-command-reicpes= :run_command_recipes:
+
 *** TODO =racket-mmanager=
+
+*** TODO Complete ICT of the =MIPT=
+DEADLINE: <2022-10-06 -20d Чт>
 
 *** TODO explore the =xetex=                                          :latex:
 
 *** TODO add support of the =org-export= to the =run-command-recipes= :run_command_recipes:
-*** TODO Print current buffer command for =fast-exec=
-*** TODO Enable prettify mode in latex
-
-*** TODO More pretty =helm-projectile-files=
-
-*** TODO Change defnition of =insert-new-counter=
-
-*** TODO Multicolumn expansion latex
-
-*** TODO Latex expansion : wrapfig, wraptable
-
-*** TODO Auto capitalize on #+TITLE in org
-
 *** TODO Xenops in non \documentclass =LaTeX= documents
-
-*** TODO Color Picker
+SCHEDULED: <2022-09-24 Сб>
 
 *** TODO New =embrace= with support of the =smartparens=
-
-
-*** DONE Delete directories too in the =dired= via =SPC g=
-SCHEDULED: <2022-09-19 Пн>
+SCHEDULED: <2022-09-24 Сб>
 
 *** TODO Impatient modes for all =major-modes=
-SCHEDULED: <2022-09-19 Пн>
+SCHEDULED: <2022-09-24 Сб>
 
 *** TODO Fix =my-copy-buffer-content-as-mipt-solution=
-SCHEDULED: <2022-09-19 Пн>
-
-*** TODO View list of possible LaTeX expansion
-SCHEDULED: <2022-09-19 Пн>
-
-*** TODO Fix coding
-SCHEDULED: <2022-09-19 Пн>
-
-*** TODO Find /jwiegley/ way to refactor Emacs Lisp programs
-SCHEDULED: <2022-09-19 Пн>
+SCHEDULED: <2022-09-24 Сб>
 
 *** TODO More useful way to run =run-command-recipes= recipes
-SCHEDULED: <2022-09-19 Пн>
+SCHEDULED: <2022-09-24 Сб>
+
 
 
 See on the compile command from the =latex-extra=
-*** TODO Keybinding =SPC l z= for =peaxedit=
-SCHEDULED: <2022-09-19 Пн>
+*** TODO Keys for the centering =org-mode= table columns
+SCHEDULED: <2022-09-24 Сб>
 
-*** TODO ZMS PDF files should be names in special format
-SCHEDULED: <2022-09-19 Пн>
+*** TODO Live evaluating of the =org-mode= table formulas
+SCHEDULED: <2022-09-24 Сб>
 
+*** TODO From the =use-package= to the =leaf=
+SCHEDULED: <2022-09-24 Сб>
 
-#+BEGIN_EXAMPLE
-9_Иванов И._ЛФ-1.pdf
-#+END_EXAMPLE
-*** TODO Use =sp= instead of =paxedit= when can
-SCHEDULED: <2022-09-19 Пн>
+*** TODO From the =org-mode= configuration to the pure =elisp= config
+SCHEDULED: <2022-09-24 Сб>
 
-*** TODO Fix the =LaTEX= section insertion
-SCHEDULED: <2022-09-19 Пн>
+Should be byte-compile clearly
+*** TODO Fix the /f/ key binding for the =org-speed-keys=
+SCHEDULED: <2022-09-24 Сб>
+*** TODO Kill =sp-kill-whole-line=
+SCHEDULED: <2022-09-24 Сб>
+*** TODO Post commit hook for Emacs.org (delete DONE =org-mode= heading)
+** Targets on Day
+SCHEDULED: <2022-09-24 Сб>
 
-*** TODO New events for the =auto-save=
-SCHEDULED: <2022-09-19 Пн>
+*** TODO Use =latex-extra-run-all= in the =org-export=
+SCHEDULED: <2022-09-24 Сб>
 
-*** TODO Add units for =calc=
-SCHEDULED: <2022-09-19 Пн>
+*** TODO Command for the =org-mode= options setting
+SCHEDULED: <2022-09-24 Сб>
 
-*** TODO Fix =xah-fly-keys= in =calc=
-SCHEDULED: <2022-09-19 Пн>
+*** DONE Fix =org-speed-commands= at beginning of the buffer
+SCHEDULED: <2022-09-24 Сб>
+
+*** DONE Function for the openning of the MIPT task web-page
+SCHEDULED: <2022-09-24 Сб>
 
 *** TODO Map for =deft= integrated with =xah-fly-keys=
-SCHEDULED: <2022-09-19 Пн>
+SCHEDULED: <2022-09-24 Сб>
 
-** Targets on Day
-
-*** DONE When "I am use" after insert description last uri
-SCHEDULED: <2022-09-19 Пн>
-SCHEDULED: <2022-09-19 Пн>
-
-*** DONE /spc spc v/ to insert string from kill ring
-SCHEDULED: <2022-09-19 Пн>
-
-*** DONE =paxedit-mode= for =racket-mode=
-SCHEDULED: <2022-09-18 Вс>
-
-*** DONE See notes without Emacs
-SCHEDULED: <2022-09-18 Вс>
+*** DONE New events for the =auto-save=
+SCHEDULED: <2022-09-24 Сб>
 
 
-*** TODO Run the main file of the project in =run-command-reicpes= :run_command_recipes:
-SCHEDULED: <2022-09-18 Вс>
+For example =dired-jump=
+SCHEDULED: <2022-09-24 Сб>
 
-*** DONE explore the =which-function-mode=
-SCHEDULED: <2022-09-18 Вс>
+*** DONE Fix coding
+SCHEDULED: <2022-09-24 Сб>
 
-*** DONE Fix modeline for =drag=
-SCHEDULED: <2022-09-18 Вс>
+*** DONE More pretty =helm-projectile-files=
+*** DONE Finish =org= captures by =SPC ;=
+SCHEDULED: <2022-09-23 Пт>
 
-*** DONE Explore =calc=
-SCHEDULED: <2022-09-18 Вс>
-*** DONE Instead of /C-c '/ in indirected buffers use /SPC ;/
+*** DONE Enable =paxedit= in lisp modes
+SCHEDULED: <2022-09-23 Пт>
+
+*** DONE Change/delete obsolete fragments of the config
+SCHEDULED: <2022-09-23 Пт>
+=import= and =nav=
+
+*** TODO Fix =xah-fly-keys= in =calc=
+SCHEDULED: <2022-09-23 Пт>
+
+*** DONE Fix the =LaTEX= section insertion
+SCHEDULED: <2022-09-23 Пт>
+
+*** DONE Keybinding =SPC l z= for =peaxedit=
+SCHEDULED: <2022-09-23 Пт>
+
+*** DONE Color Picker
+SCHEDULED: <2022-09-23 Пт>
+
+*** DONE Auto capitalize on #+TITLE in org
+SCHEDULED: <2022-09-23 Пт>
+
+*** DONE Latex expansion : wrapfig, wraptable
+SCHEDULED: <2022-09-23 Пт>
+
+*** DONE Multicolumn expansion latex
+SCHEDULED: <2022-09-23 Пт>
+
+*** DONE Change defnition of =insert-new-counter=
+SCHEDULED: <2022-09-22 Чт>
+
+*** DONE View list of possible LaTeX expansion
+SCHEDULED: <2022-09-22 Чт>
+SCHEDULED: <2022-09-22 Чт>
+
+*** DONE Enable prettify mode in latex
+SCHEDULED: <2022-09-22 Чт>
+SCHEDULED: <2022-09-22 Чт>
+
+*** DONE Print current buffer command for =fast-exec=
 * Films 
 
 ** MUST-SEE Thor: Love and Thunder
@@ -132,7 +146,7 @@ SCHEDULED: <2022-09-18 Вс>
    :countries: (США)
    :END:
 
-** MUST-SEE Sound of Metal
+** SAW Sound of Metal
    :PROPERTIES:
    :name:     Звук металла
    :year:     2019
@@ -162,9 +176,7 @@ SCHEDULED: <2022-09-18 Вс>
    :countries: (США)
    :END:
 
-** MUST-SEE The Matrix ReloadedlСША)
-:END:
-** MUST-SEE Borat: Cultural Learnings of America for Make Benefit Glorious Nation of Kazakhstan
+** SAW Borat: Cultural Learnings of America for Make Benefit Glorious Nation of Kazakhstan
    :PROPERTIES:
    :name:     Борат
    :year:     2006
@@ -192,7 +204,7 @@ SCHEDULED: <2022-09-18 Вс>
 |         4.5 |    9 |     0 |   8 | 6 + x |
 |       205.5 |   90 |   300 | 431 | 6 + x |
 #+TBLFM: $1=vmean($2..$5)::$5=6+x
-** MUST-SEE Dumb and Dumber
+** SAW Dumb and Dumber
 :PROPERTIES:
 :name:     Тупой и еще тупее
 :year:     1994
@@ -200,5 +212,23 @@ SCHEDULED: <2022-09-18 Вс>
 :id:       5185
 :rating:   72.0
 :countries: (США)
+:END:
+** MUST-SEE The Matrix Resurrections
+:PROPERTIES:
+:name:     Матрица: Воскрешение
+:year:     2021
+:slogan:   Выбор за тобой
+:id:       1294123
+:rating:   58.0
+:countries: (Австралия США)
+:END:
+** MUST-SEE Gladiator
+:PROPERTIES:
+:name:     Гладиатор
+:year:     2000
+:slogan:   Генерал, ставший рабом. Раб, ставший гладиатором. Гладиатор, бросивший вызов империи
+:id:       474
+:rating:   86.0
+:countries: (Великобритания Мальта Марокко США)
 :END:
 

@@ -16,7 +16,7 @@
 [[elisp:(helm-projectile-switch-project)][Open Project]]
 [[elisp:org-todo-list][See TODOs]]
 [[elisp:(dired "~/projects")][Open Directory of Projects]]
-[[file:Emacs.org][Open Main Emacs Config]]
+[[file:Emacs.org][Open Main Emacs Config]]3 в
 [[elisp:(call-interactively 'helm-find-files)][Open File]]
 [[file+emacs:(xah-new-empty-buffer)][New File]]
 [[elisp:(let* ((link-on-github (read-string "Enter Link on Github: ")) (repository-name (-last-item (-last-item (s-match-strings-all "/\\(.*\\).git$" link-on-github)))) (project-name (read-string "Enter project's name: " repository-name)) (project-repo-path (f-join "~/projects/" repository-name)) (project-path (f-join "~/projects/" project-name))) (cd "~/projects/") (shell-command (s-concat "git clone " link-on-github)) (rename-file project-repo-path project-path) (projectile-add-known-project project-path) (projectile-switch-project-by-name project-name))][Project from GitHub]]
