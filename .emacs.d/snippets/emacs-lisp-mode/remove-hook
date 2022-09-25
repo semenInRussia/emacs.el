@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: remove-hook
+# key: remh
+# --
+(remove-hook $0)
