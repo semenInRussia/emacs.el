@@ -49,9 +49,11 @@ SCHEDULED: <2022-09-24 Сб>
 Should be byte-compile clearly
 *** TODO Fix the /f/ key binding for the =org-speed-keys=
 SCHEDULED: <2022-09-24 Сб>
-*** TODO Kill =sp-kill-whole-line=
+*** TODO Fix =sp-kill-whole-line=
 SCHEDULED: <2022-09-24 Сб>
 *** TODO Post commit hook for Emacs.org (delete DONE =org-mode= heading)
+*** TODO Key bind for =org-kill-special=
+*** TODO Make wrapper for birthday congurlation
 ** Targets on Day
 SCHEDULED: <2022-09-24 Сб>
 
@@ -61,69 +63,12 @@ SCHEDULED: <2022-09-24 Сб>
 *** TODO Command for the =org-mode= options setting
 SCHEDULED: <2022-09-24 Сб>
 
-*** DONE Fix =org-speed-commands= at beginning of the buffer
-SCHEDULED: <2022-09-24 Сб>
-
-*** DONE Function for the openning of the MIPT task web-page
-SCHEDULED: <2022-09-24 Сб>
-
 *** TODO Map for =deft= integrated with =xah-fly-keys=
 SCHEDULED: <2022-09-24 Сб>
-
-*** DONE New events for the =auto-save=
-SCHEDULED: <2022-09-24 Сб>
-
-
-For example =dired-jump=
-SCHEDULED: <2022-09-24 Сб>
-
-*** DONE Fix coding
-SCHEDULED: <2022-09-24 Сб>
-
-*** DONE More pretty =helm-projectile-files=
-*** DONE Finish =org= captures by =SPC ;=
-SCHEDULED: <2022-09-23 Пт>
-
-*** DONE Enable =paxedit= in lisp modes
-SCHEDULED: <2022-09-23 Пт>
-
-*** DONE Change/delete obsolete fragments of the config
-SCHEDULED: <2022-09-23 Пт>
-=import= and =nav=
 
 *** TODO Fix =xah-fly-keys= in =calc=
 SCHEDULED: <2022-09-23 Пт>
 
-*** DONE Fix the =LaTEX= section insertion
-SCHEDULED: <2022-09-23 Пт>
-
-*** DONE Keybinding =SPC l z= for =peaxedit=
-SCHEDULED: <2022-09-23 Пт>
-
-*** DONE Color Picker
-SCHEDULED: <2022-09-23 Пт>
-
-*** DONE Auto capitalize on #+TITLE in org
-SCHEDULED: <2022-09-23 Пт>
-
-*** DONE Latex expansion : wrapfig, wraptable
-SCHEDULED: <2022-09-23 Пт>
-
-*** DONE Multicolumn expansion latex
-SCHEDULED: <2022-09-23 Пт>
-
-*** DONE Change defnition of =insert-new-counter=
-SCHEDULED: <2022-09-22 Чт>
-
-*** DONE View list of possible LaTeX expansion
-SCHEDULED: <2022-09-22 Чт>
-SCHEDULED: <2022-09-22 Чт>
-
-*** DONE Enable prettify mode in latex
-SCHEDULED: <2022-09-22 Чт>
-SCHEDULED: <2022-09-22 Чт>
-
-*** DONE Print current buffer command for =fast-exec=
 * Films 
 
 ** MUST-SEE Thor: Love and Thunder
@@ -146,16 +91,6 @@ SCHEDULED: <2022-09-22 Чт>
    :countries: (США)
    :END:
 
-** SAW Sound of Metal
-   :PROPERTIES:
-   :name:     Звук металла
-   :year:     2019
-   :slogan:   Music was his world. Then silence revealed a new one.
-   :id:       957883
-   :rating:   73.0
-   :countries: (Бельгия США)
-   :END:
-
 ** MUST-SEE Missionary: Impossible
    :PROPERTIES:
    :name:     Миссия невыполнима
@@ -176,16 +111,6 @@ SCHEDULED: <2022-09-22 Чт>
    :countries: (США)
    :END:
 
-** SAW Borat: Cultural Learnings of America for Make Benefit Glorious Nation of Kazakhstan
-   :PROPERTIES:
-   :name:     Борат
-   :year:     2006
-   :slogan:   Come to Kazakhstan, It's Nice!
-   :id:       102474
-   :rating:   67.0
-   :countries: (Великобритания США)
-   :END:
-
 ** MUST-SEE Raiders of the Lost Ark
 :PROPERTIES:
 :name:     Индиана Джонс: В поисках утраченного ковчега
@@ -204,15 +129,6 @@ SCHEDULED: <2022-09-22 Чт>
 |         4.5 |    9 |     0 |   8 | 6 + x |
 |       205.5 |   90 |   300 | 431 | 6 + x |
 #+TBLFM: $1=vmean($2..$5)::$5=6+x
-** SAW Dumb and Dumber
-:PROPERTIES:
-:name:     Тупой и еще тупее
-:year:     1994
-:slogan:   Для них каждый новый день безумнее предыдущего
-:id:       5185
-:rating:   72.0
-:countries: (США)
-:END:
 ** MUST-SEE The Matrix Resurrections
 :PROPERTIES:
 :name:     Матрица: Воскрешение

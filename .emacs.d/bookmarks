@@ -9,7 +9,7 @@
  (position . 2076))
 ("org-capture-last-stored"
  (filename . "~/agenda.org")
- (front-context-string . "** MUST-SEE Glad")
- (rear-context-string . "алия США)\n:END:\n")
- (position . 5013))
+ (front-context-string . "*** TODO Make wr")
+ (rear-context-string . "g-kill-special=\n")
+ (position . 1560))
 )

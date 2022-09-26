@@ -131,6 +131,7 @@
         eval-print-last-sexp
         iedit-switch-to-mc-mode
         indent-for-tab-command
+        mouse-set-region
         my-bob-or-mc-align
         my-buffer-list-or-edit-lines
         my-eob-or-align-with-spaces
