@@ -45,3 +45,8 @@ devdocs/
 /.org-timestamps/
 /Emacs.pdf
 /sol.*
+/.cache/
+/ghc/
+*.elc
+/.emacs.d/pomm
+/.emacs.d/.hl-save
