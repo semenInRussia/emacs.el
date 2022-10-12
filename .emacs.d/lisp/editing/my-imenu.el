@@ -1,4 +1,4 @@
-;;; my-imenu.el --- my-imenu
+;;; my-imenu.el --- My configuration of the `imenu'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,12 +23,16 @@
 
 ;;; Commentary:
 
+;; My configuration of the `imenu'
+
 ;;; Code:
-(use-package imenu
-    :custom (imenu-auto-rescan t)
-    :bind
-    ((:map xah-fly-command-map)
-     ("SPC SPC SPC" . helm-imenu)))
+
+(leaf helm-imenu
+  :after helm
+  :custom (imenu-auto-rescan . t)
+  :bind (:xah-fly-command-map
+         :package xah-fly-keys
+         ("SPC SPC SPC" . helm-imenu)))
 
 (provide 'my-imenu)
 ;;; my-imenu.el ends here

@@ -1,4 +1,4 @@
-;;; my-command-log-mode.el --- my-command-log-mode
+;;; my-command-log-mode.el --- My config for `command-log-mode'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,9 +23,10 @@
 
 ;;; Commentary:
 
+;; My config for `command-log-mode'
+
 ;;; Code:
-(use-package command-log-mode
-    :ensure t)
+(leaf command-log-mode :ensure t)
 
 (provide 'my-command-log-mode)
 ;;; my-command-log-mode.el ends here

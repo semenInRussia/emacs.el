@@ -1,4 +1,4 @@
-;;; my-rust.el --- my-rust
+;;; my-rust.el --- My configuration for rust
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,16 +23,22 @@
 
 ;;; Commentary:
 
-;;; Code:
-(use-package racer
-    :ensure t
-    :hook ((rust-mode  . racer-mode)
-           (racer-mode . eldoc-mode)))
+;; My configuration for rust
 
-(use-package flycheck-rust
+;;; Code:
+(leaf rust-mode
+  :ensure t
+  :config                               ;nofmt
+  (leaf racer                           ;nofmt
     :ensure t
-    :config
-    (flycheck-rust-setup))
+    :hook ((rust-mode-mode  . racer-mode)
+           ;; (racer-mode-mode . eldoc-mode)
+           ))
+
+  (leaf flycheck-rust
+    :ensure t
+    :require t
+    :config (flycheck-rust-setup)))
 
 (provide 'my-rust)
 ;;; my-rust.el ends here

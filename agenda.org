@@ -1,3 +1,6 @@
+#+TITLE: Agenda
+#+AUTHOR: semenInRussia
+#+OPTIONS: *:t ':t
 #+TODO: TODO | DONE
 #+TODO: MUST-SEE | SAW
 #+TODO: FAIL | GOAL DONE
@@ -16,6 +19,7 @@ DEADLINE: <2022-10-06 -20d Чт>
 *** TODO explore the =xetex=                                          :latex:
 
 *** TODO add support of the =org-export= to the =run-command-recipes= :run_command_recipes:
+
 *** TODO Xenops in non \documentclass =LaTeX= documents
 SCHEDULED: <2022-09-24 Сб>
 
@@ -34,40 +38,71 @@ SCHEDULED: <2022-09-24 Сб>
 
 
 See on the compile command from the =latex-extra=
+
 *** TODO Keys for the centering =org-mode= table columns
 SCHEDULED: <2022-09-24 Сб>
 
 *** TODO Live evaluating of the =org-mode= table formulas
 SCHEDULED: <2022-09-24 Сб>
 
-*** TODO From the =use-package= to the =leaf=
+*** DONE From the =use-package= to the =leaf=
 SCHEDULED: <2022-09-24 Сб>
 
-*** TODO From the =org-mode= configuration to the pure =elisp= config
+*** DONE From the =org-mode= configuration to the pure =elisp= config
 SCHEDULED: <2022-09-24 Сб>
 
 Should be byte-compile clearly
-*** TODO Fix the /f/ key binding for the =org-speed-keys=
+
+*** DONE Fix the /f/ key binding for the =org-speed-keys=
 SCHEDULED: <2022-09-24 Сб>
+
 *** TODO Fix =sp-kill-whole-line=
 SCHEDULED: <2022-09-24 Сб>
+
 *** TODO Post commit hook for Emacs.org (delete DONE =org-mode= heading)
+
 *** TODO Key bind for =org-kill-special=
+
 *** TODO Make wrapper for birthday congurlation
+
+*** TODO Insert ;nofmt in elisp keybinding
+*** TODO Byte compile all config after kill =Emacs=
+*** TODO After /s/ revert buffer and change the position in the =dired=
+*** DONE Embrace for =emacs-lisp-mode=
+*** DONE Save Time of the loading config modules
+*** DONE My leaf keywords : simple as may
+*** TODO System for the reformat for certain =major-modes= at overwrited /SPC SPC q/ keybinding
+*** TODO New refactor library for the =emacs-lisp=
+- add/change group/type for defcustom
+- extract code to defun or lambda argument/let binding/defun/defvar/defcustom and etc.
+- lambda => defun, defun => lambda
+- add/delete interactive binding for defun/lib (depends on args)
+- add/delete docstring for defun
+- add/delete autoload
+- defcustom=>defvar, defvar=>defcustom
+*** TODO Explore =lsp-mode=
+*** DONE Automatically sorting =org-mode= options
+*** TODO Autload after /:fast-exec/ keyword in =leaf=
+*** TODO Explore =ov=
+*** TODO Explore =coq=
+*** TODO New =fast-exec=
+*** TODO Fix =my-projectile=
+*** TODO Fix =M-ret= in =Emacs-lisp=
+*** TODO Fix tests
+*** TODO Auto reloading of the =fast-exec=
+**** TODO More cool readme (provided by =leaf= statisitcs)
+*** TODO Finish commit editing =magit= on /SPC ;/
 ** Targets on Day
-SCHEDULED: <2022-09-24 Сб>
 
 *** TODO Use =latex-extra-run-all= in the =org-export=
 SCHEDULED: <2022-09-24 Сб>
 
-*** TODO Command for the =org-mode= options setting
+*** DONE Command for the =org-mode= options setting
 SCHEDULED: <2022-09-24 Сб>
 
-*** TODO Map for =deft= integrated with =xah-fly-keys=
-SCHEDULED: <2022-09-24 Сб>
-
-*** TODO Fix =xah-fly-keys= in =calc=
+*** DONE Fix =xah-fly-keys= in =calc=
 SCHEDULED: <2022-09-23 Пт>
+
 
 * Films 
 
@@ -129,6 +164,7 @@ SCHEDULED: <2022-09-23 Пт>
 |         4.5 |    9 |     0 |   8 | 6 + x |
 |       205.5 |   90 |   300 | 431 | 6 + x |
 #+TBLFM: $1=vmean($2..$5)::$5=6+x
+
 ** MUST-SEE The Matrix Resurrections
 :PROPERTIES:
 :name:     Матрица: Воскрешение
@@ -138,6 +174,7 @@ SCHEDULED: <2022-09-23 Пт>
 :rating:   58.0
 :countries: (Австралия США)
 :END:
+
 ** MUST-SEE Gladiator
 :PROPERTIES:
 :name:     Гладиатор

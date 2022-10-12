@@ -1,4 +1,4 @@
-;;; my-fast-exec.el --- my-fast-exec
+;;; my-fast-exec.el --- My configuration of the `fast-exec'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,29 +23,32 @@
 
 ;;; Commentary:
 
+;; My configuration of the `fast-exec'
+
 ;;; Code:
-(use-package fast-exec
-    :demand t
-    :load-path "~/projects/fast-exec.el/"
-    :bind ((:map xah-fly-command-map)
-           ("=" . fast-exec/exec))
-    :config
-    (fast-exec/enable-some-builtin-supports
-     haskell-mode
-     flycheck
-     magit
-     org-agenda
-     deadgrep
-     projectile
-     package
-     skeletor
-     yasnippet
-     format-all
-     wikinforg
-     suggest
-     devdocs
-     helm-wikipedia)
-    (fast-exec/initialize))
+(leaf fast-exec
+  :load-path "~/projects/fast-exec.el/"
+  :require fast-exec-initial-keymaps
+  :defun fast-exec-use
+  :bind (:xah-fly-command-map           ;nofmt
+         :package xah-fly-keys
+         ("=" . fast-exec-exec))
+  :config                               ;nofmt
+  (fast-exec-use
+   deadgrep
+   devdocs
+   flycheck
+   format-all
+   magit
+   package
+   projectile
+   skeletor
+   suggest
+   wikinforg
+   yasnippet
+   haskell-mode
+   helm-wikipedia)
+  (fast-exec-reload))
 
 (provide 'my-fast-exec)
 ;;; my-fast-exec.el ends here

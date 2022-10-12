@@ -1,4 +1,4 @@
-;;; my-recentf.el --- my-recentf
+;;; my-recentf.el --- My config for `recentf'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,12 +23,15 @@
 
 ;;; Commentary:
 
+;; My config for `recentf'
+
 ;;; Code:
-(use-package recentf
-    :config (recentf-mode 69) ; Lol!
-    :bind ((:map xah-fly-command-map)
-           ("SPC k f" . 'recentf-open-files))
-    :hook ((recentf-dialog-mode) . 'xah-fly-insert-mode-activate))
+(leaf recentf
+  :global-minor-mode recentf-mode
+  :bind (:xah-fly-command-map
+         :package xah-fly-keys
+         ("SPC k f" . recentf-open-files))
+  :hook (recentf-dialog-mode-hook . xah-fly-insert-mode-activate))
 
 (provide 'my-recentf)
 ;;; my-recentf.el ends here

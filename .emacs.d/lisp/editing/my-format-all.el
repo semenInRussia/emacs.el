@@ -1,4 +1,4 @@
-;;; my-format-all.el --- my-format-all
+;;; my-format-all.el --- My configuration of the `format-all'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,9 +23,12 @@
 
 ;;; Commentary:
 
+;; My configuration of the `format-all'
+
 ;;; Code:
-(use-package format-all
-    :ensure t)
+
+(leaf format-all                        ;nofmt
+  :ensure t)
 
 (provide 'my-format-all)
 ;;; my-format-all.el ends here

@@ -1,4 +1,4 @@
-;;; my-markdown.el --- my-markdown
+;;; my-markdown.el --- My configuration for `markdown-mode'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,61 +23,69 @@
 
 ;;; Commentary:
 
+;; My configuration for `markdown-mode'
+
 ;;; Code:
-(use-package markdown-mode
+
+(defcustom my-markdown-imenu-generic-expression
+  '(("title""^\\(.*\\)[\n]=+$" 1)
+    ("h2-" "^\\(.*\\)[\n]-+$" 1)
+    ("h1"   "^# \\(.*\\)$" 1)
+    ("h2"   "^## \\(.*\\)$" 1)
+    ("h3"   "^### \\(.*\\)$" 1)
+    ("h4"   "^#### \\(.*\\)$" 1)
+    ("h5"   "^##### \\(.*\\)$" 1)
+    ("h6"   "^###### \\(.*\\)$" 1)
+    ("fn" "^\\[\\^\\(.*\\)\\]" 1))
+  "List of the specific for `markdown-mode' generic expressions.
+
+See `imenu-generic-expression'"
+  :group 'my
+  :type '(repeat string))
+
+(leaf markdown-mode
+  :ensure t
+  :major-mode-map markdown
+  :bind (:my-markdown-local-map
+         ("<SPC>" . markdown-toggle-gfm-checkbox)
+         ("b"     . markdown-insert-bold)
+         ("i"     . markdown-insert-italic)
+         ("l"     . markdown-insert-link)
+         ("p"     . markdown-live-preview-mode)
+         ("'"     . markdown-edit-code-block)
+         ("<RET>" . markdown-follow-thing-at-point))
+  :hook ((markdown-mode-hook . visual-fill)
+         (markdown-mode-hook .
+                             (lambda ()
+                               (setq-local
+                                imenu-generic-expression
+                                my-markdown-imenu-generic-expression))))
+  :config                               ;nofmt
+  (leaf markdown-toc
     :ensure t
-    :bind (:map
-           my-markdown-mode-local-map
-           ("<SPC>"     . markdown-toggle-gfm-checkbox)
-           ("b"     . markdown-insert-bold)
-           ("i"     . markdown-insert-italic)
-           ("l"     . markdown-insert-link)
-           ("p"     . markdown-live-preview-mode)
-           ("'"     . markdown-edit-code-block)
-           ("<RET>" . markdown-follow-thing-at-point))
-    :hook (markdown-mode . visual-fill)
-    :custom (markdown-imenu-generic-expression
-             '(("title""^\\(.*\\)[\n]=+$" 1)
-               ("h2-" "^\\(.*\\)[\n]-+$" 1)
-               ("h1"   "^# \\(.*\\)$" 1)
-               ("h2"   "^## \\(.*\\)$" 1)
-               ("h3"   "^### \\(.*\\)$" 1)
-               ("h4"   "^#### \\(.*\\)$" 1)
-               ("h5"   "^##### \\(.*\\)$" 1)
-               ("h6"   "^###### \\(.*\\)$" 1)
-               ("fn" "^\\[\\^\\(.*\\)\\]" 1)))
-    :config (add-hook 'markdown-mode-hook
-                      (lambda ()
-                        (setq-local imenu-generic-expression
-                                    markdown-imenu-generic-expression)))
-    (my-define-local-major-mode-map 'markdown-mode '(markdown-mode)))
+    :bind (:my-markdown-local-map
+           :package markdown-mode
+           ("t" . markdown-toc-generate-or-refresh-toc)))
 
-(use-package markdown-toc
-    :ensure t
-    :bind (:map
-           my-markdown-mode-local-map
-           ("t" . 'markdown-toc-generate-or-refresh-toc)))
+  (my-also-use-autoformat-in-mode 'markdown-mode
+                                  markdown-capitalize-heading-line)
+  (my-also-use-autoformat-in-mode 'gfm-mode
+                                  markdown-capitalize-heading-line)
 
-(my-also-use-autoformat-in-mode 'markdown-mode
-                                markdown-capitalize-heading-line)
-(my-also-use-autoformat-in-mode 'gfm-mode
-                                markdown-capitalize-heading-line)
+  (defun autoformat-markdown-capitalize-heading-line ()
+    "Capitalize first letter of a heading line (lines which started with #)."
+    (when (and
+           (just-line-prefix-p "#")
+           (my-markdown-first-letter-of-heading))
+      (undo-boundary)
+      (capitalize-word -1)))
 
-(defun autoformat-markdown-capitalize-heading-line ()
-  "Capitalize first letter of a heading line (lines which started with #)."
-  (when (and
-         (just-line-prefix-p "#")
-         (my-markdown-first-letter-of-heading))
-    (undo-boundary)
-    (capitalize-word -1)))
-
-(defun my-markdown-first-letter-of-heading ()
-  "Get t, when backward character is first letter of current markdown heading."
-  (save-excursion
-    (forward-char -1)
-    (skip-chars-backward " ")
-    (skip-chars-backward "#")
-    (bolp)))
+  (defun my-markdown-first-letter-of-heading ()
+    "Get t, when backward character is first letter of current markdown heading."
+    (save-excursion
+      (forward-char -1)
+      (skip-chars-backward " #")
+      (bolp))))
 
 (provide 'my-markdown)
 ;;; my-markdown.el ends here

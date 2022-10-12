@@ -1,4 +1,4 @@
-;;; my-pacman.el --- my-pacman
+;;; my-pacman.el --- My config for `pacmacs'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,17 +23,12 @@
 
 ;;; Commentary:
 
+;; My config for `pacmacs'
+
 ;;; Code:
-(use-package pacmacs
-    :ensure t
-    :init
-    (defun fast-exec-define-pacmacs-keys ()
-      "Bind `fast-exec' and `pacmacs'."
-      (fast-exec/some-commands
-       ("Play to Pacmacs" 'pacmacs-start))
-      )
-    (fast-exec/register-keymap-func 'fast-exec-define-pacmacs-keys)
-    (fast-exec/reload-functions-chain))
+(leaf pacmacs
+  :ensure t
+  :fast-exec ("Play to Pacmacs" 'pacmacs-start))
 
 (provide 'my-pacman)
 ;;; my-pacman.el ends here

@@ -1,4 +1,4 @@
-;;; my-run-command.el --- my-run-command
+;;; my-run-command.el --- My configuration for `run-command'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,36 +23,39 @@
 
 ;;; Commentary:
 
+;; My configuration for `run-command'
+
 ;;; Code:
-(use-package run-command
+(leaf run-command
+  :ensure t
+  :defun run-command--run
+  :custom (run-command-completion-method . 'helm)
+  :bind (:xah-fly-command-map
+         :package xah-fly-keys
+         ("SPC , c" . run-command)
+         ("S-<f5>"  . my-run-last-command))
+  :config                               ;nofmt
+  (leaf run-command-recipes
     :ensure t
-    :custom
-    (run-command-completion-method 'helm)
-    :bind ((:map xah-fly-command-map)
-           ("SPC , c" . 'run-command)
-           ("S-<f5>"  . 'my-run-last-command))
-    :config
+    :require t
+    :defun run-command-recipes-use-all
+    :config (run-command-recipes-use-all))
 
-    (defun run-command--run--set-last-recipe (recipe)
-      "Set `run-command-last-recipe'."
-      (setq-local run-command-last-recipe recipe))
+  (defvar run-command-last-recipe nil
+    "Last runned recipe of `run-command'.")
 
-    (advice-add 'run-command--run :before #'run-command--run--set-last-recipe)
+  (defun run-command--run--set-last-recipe (recipe)
+    "Set `run-command-last-recipe'."
+    (setq-local run-command-last-recipe recipe))
 
-    (defun my-run-last-command ()
-      "Run command which was runned last, if commands wasn't run do nothing."
-      (interactive)
-      (if run-command-last-recipe
-          (run-command--run run-command-last-recipe)
-        (message "NOT FOUND!")))
+  (advice-add 'run-command--run :before #'run-command--run--set-last-recipe)
 
-    (defvar run-command-last-recipe nil
-      "Last runned recipe of `run-command'."))
-
-(use-package run-command-recipes
-    :ensure t
-    :config
-    (run-command-recipes-use-all))
+  (defun my-run-last-command ()
+    "Run command which was runned last, if commands wasn't run do nothing."
+    (interactive)
+    (if run-command-last-recipe
+        (run-command--run run-command-last-recipe)
+      (message "NOT FOUND!"))))
 
 (provide 'my-run-command)
 ;;; my-run-command.el ends here

@@ -1,4 +1,4 @@
-;;; my-json.el --- my-json
+;;; my-json.el --- My configuration for json
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,14 +23,18 @@
 
 ;;; Commentary:
 
-;;; Code:
-(use-package json-mode
-    :ensure t
-    :config (my-define-local-major-mode-map 'json-mode '(json-mode)))
+;; My configuration for json
 
-(use-package json-snatcher
+;;; Code:
+(leaf json-mode
+  :ensure t
+  :major-mode-map json
+  :config                               ;nofmt
+  (leaf json-snatcher
     :ensure t
-    :bind (:map my-json-mode-local-map ("c" . jsons-print-path)))
+    :bind (:my-json-mode-local-map
+           :package json-mode
+           ("c" . jsons-print-path))))
 
 (provide 'my-json)
 ;;; my-json.el ends here

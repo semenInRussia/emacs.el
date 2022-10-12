@@ -1,4 +1,4 @@
-;;; my-deft.el --- my-deft
+;;; my-deft.el --- My configuration for `deft'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,44 +23,40 @@
 
 ;;; Commentary:
 
+;; My configuration for `deft'
+
 ;;; Code:
-(use-package deft
-    :ensure t
-    :bind
-    ((:map deft-mode-map)
-     ([remap my-kill-rectangle-or-delete-char] . "DEL")
-     ([remap syntax-subword-backward-kill]     . "M-DEL")
-     ([remap xah-paste-or-paste-previous]      . 'deft-filter-yank)
-     ([remap xah-cut-all-or-region]            . 'my-deft-filter-decrement-all))
+(require 's)
 
-    :hook
-    (deft-filter . my-deft-titlize-regexp)
+(leaf deft
+  :ensure t
+  :defvar deft-filter-regexp
+  :defun deft-filter-update
+  :commands deft
+  :bind (:deft-mode-map
+         ([remap my-kill-rectangle-or-delete-char]
+          . 'deft-filter-decrement)
+         ([remap syntax-subword-backward-kill]
+          . 'deft-filter-decrement-word)
+         ([remap xah-paste-or-paste-previous] . 'deft-filter-yank)
+         ([remap xah-cut-all-or-region] . 'my-deft-filter-decrement-all))
+  :hook (deft-filter-hook . my-deft-titlize-regexp)
+  :custom ((deft-directory             . "~/notes/")
+           (deft-default-extension     . "org")
+           (deft-recursive             . t)
+           (deft-use-filename-as-title . nil))
+  :fast-exec ("Manage Notes" 'deft)
+  :config                               ;nofmt
+  (defun my-deft-titlize-regexp ()
+    (when (= (length deft-filter-regexp) 1)
+      (setf
+       (car deft-filter-regexp)
+       (my-upcase-first-char (car deft-filter-regexp))))
+    (deft-filter-update))
 
-    :custom
-    ((deft-directory             "~/notes/")
-     (deft-default-extension     "org")
-     (deft-recursive             t)
-     (deft-use-filename-as-title nil))
-
-    :config
-    (defun my-deft-titlize-regexp ()
-      (when (= (length deft-filter-regexp) 1)
-        (setf (car deft-filter-regexp)
-              (my-upcase-first-char (car deft-filter-regexp))))
-      (deft-filter-update))
-
-    (defun my-upcase-first-char (str)
-      "Upper case first char of the STR rest chars not take."
-      (s-concat (s-upcase (substring str 0 1))
-                (substring str 1)))
-
-    (defun fast-exec-deft-keys ()
-      "Get some useful keymaps of  `fast-exec' for deft."
-      (fast-exec/some-commands
-       ("Manage Notes" 'deft)))
-
-    (fast-exec/register-keymap-func 'fast-exec-deft-keys)
-    (fast-exec/reload-functions-chain))
+  (defun my-upcase-first-char (str)
+    "Upper case first char of the STR rest chars not take."
+    (s-concat (s-upcase (substring str 0 1)) (substring str 1))))
 
 (provide 'my-deft)
 ;;; my-deft.el ends here

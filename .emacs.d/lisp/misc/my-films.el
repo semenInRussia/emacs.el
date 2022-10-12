@@ -1,4 +1,4 @@
-;;; my-films.el --- my-films
+;;; my-films.el --- My config for management of the films
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -22,6 +22,8 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
+
+;; My config for management of the films
 
 ;;; Code:
 (defun my-films-format-as-org-heading ()
@@ -50,7 +52,9 @@
   (->>
    key-and-val
    (--map
-    `(org-set-property ,(symbol-name (car it)) (format "%s" ,(cdr it))))
+    `(org-set-property
+      ,(symbol-name (car it))
+      (format "%s" ,(cdr it))))
    (cons 'progn)))
 
 (defun my-films--search-new ()
@@ -74,26 +78,21 @@
   (interactive)
   (helm
    :buffer "*saved-films*"
-   :sources
-   '((name       . "List of Saved Films")
-     (candidates . my-films--list-candidates)
-     (action     . helm-kinonpoisk-search-source))))
+   :sources '((name       . "List of Saved Films")
+              (candidates . my-films--list-candidates)
+              (action     . helm-kinonpoisk-search-source))))
 
 (defun my-films--list-candidates ()
   "Helm candidates for `my-films-list'."
   (->>
-   (org-ql-query
-     :from (my-all-buffers-with-ext "org")
-     :where '(todo "MUST-SEE")
-     :select #'my-films--from-org-heading)
-   (--map
-    (cons (helm-kinopoisk--format-film-for-display it) it))))
+   (my-org-mapcar-entries #'my-films--from-org-heading "\+MUST-SEE" 'agenda)
+   (--map (cons (helm-kinopoisk--format-film-for-display it) it))))
 
 (defun my-films--from-org-heading ()
   "Parse org heading at current position to `kinopoisk-film'."
   (when (just-line-prefix-p "*")
     (kinopoisk-film
-     :id (car (string-to-number (org-property-values "id")))
+     :id (string-to-number (car (org-property-values "id")))
      :year (car (org-property-values "year"))
      :name (car (org-property-values "name")))))
 

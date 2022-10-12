@@ -1,4 +1,4 @@
-;;; my-deleting.el --- my-deleting
+;;; my-deleting.el --- My confing for some deleting functions
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,7 +23,11 @@
 
 ;;; Commentary:
 
+;; My confing for some deleting functions
+
 ;;; Code:
+
+
 (defun delete-and-edit-current-line ()
   "Delete current line and instroduce to insert mode."
   (interactive)
@@ -32,37 +36,30 @@
   (open-line-above)
   (xah-fly-insert-mode-init))
 
-(define-key xah-fly-command-map "w" 'delete-and-edit-current-line)
-
 (defun clear-current-line ()
   "Clear content of current line (including whitespaces)."
   (interactive)
   (kill-region (line-beginning-position) (line-end-position)))
 
-(define-key xah-fly-command-map (kbd "SPC w") 'clear-current-line)
-
 (defun select-current-or-next-word ()
   "If word was selected, then move to next word, otherwise select word."
   (interactive)
-  (if (use-region-p)
-      (forward-word)
-    (xah-extend-selection)))
+  (if (use-region-p) (forward-word) (xah-extend-selection)))
 
-(define-key xah-fly-command-map (kbd "8") 'select-current-or-next-word)
+(leaf-keys
+ (xah-fly-command-map
+  :package xah-fly-keys
+  ("8"     . select-current-or-next-word)
+  ("SPC w" . clear-current-line)
+  ("w"     . delete-and-edit-current-line)))
 
-(define-key-when
-  my-cancel-selection-or-delete-text-block
-  xah-fly-command-map
-  "g"
-  'deactivate-mark
-  'use-region-p)
-
-(define-key-when
-  my-exchange-point-and-mark-or-splice-sexp
-  xah-fly-command-map
-  "-"
-  'exchange-point-and-mark
-  'use-region-p)
+(eval-after-load 'xah-fly-keys
+  '(define-key-when
+     my-cancel-selection-or-delete-text-block
+     xah-fly-command-map
+     "g"
+     'deactivate-mark
+     'use-region-p))
 
 (provide 'my-deleting)
 ;;; my-deleting.el ends here

@@ -23,48 +23,41 @@
 
 ;;; Commentary:
 
+;; My config of `git'
+
 ;;; Code:
-(use-package git-gutter
-    :ensure t
-    :hook
-    (prog-mode . git-gutter-mode))
 
-(use-package magit :ensure t)
+(leaf git-gutter                        ;nofmt
+  :ensure t
+  :hook (prog-mode-hook . git-gutter-mode))
 
-(use-package blamer
-    :ensure t
-    :defer 20
-    :custom
-    (blamer-idle-time 0.3)
-    (blamer-min-offset 70)
-    :custom-face
-    (blamer-face ((t :foreground "#7a88cf"
-                     :background nil
-                     :height 140
-                     :italic t))))
+(leaf magit                             ;nofmt
+  :ensure t
+  :custom (magit-refresh-status-buffer . nil))
 
-(use-package git-undo
-    :commands git-undo
-    :init
-    (defun fast-exec-define-git-undo-keymaps ()
-      "Bind `git-undo' and `fast-exec'."
-      (fast-exec/some-commands
-       ("Undo via Git" 'git-undo)))
-    (fast-exec/register-keymap-func 'fast-exec-define-git-undo-keymaps)
-    (fast-exec/reload-functions-chain))
+(leaf blamer
+  :ensure t
+  :custom ((blamer-idle-time . 0.3)
+           (blamer-min-offset . 70))
+  :custom-face (blamer-face .
+                            '((t
+                               (:foreground "#7a88cf"
+                                            :background nil
+                                            :height 140
+                                            :italic t)))))
 
-(use-package git-modes
-    :ensure t)
+(leaf git-undo
+  :commands git-undo
+  :after fast-exec
+  :init                                 ;nofmt
+  :fast-exec ("Undo via Git" 'git-undo))
 
-(use-package helm-gitignore
-    :load-path "site-lisp"
-    :init
-    (defun fast-exec-helm-gitignore-keys ()
-      "Bind of `helm-gitignore' and `fast-exec'."
-      (fast-exec/some-commands
-       ("Generate Gitignore" 'helm-gitignore)))
-    (fast-exec/register-keymap-func 'fast-exec-helm-gitignore-keys)
-    (fast-exec/reload-functions-chain))
+(leaf git-modes :ensure t)
+
+(leaf helm-gitignore
+  :after fast-exec
+  :config                               ;nofmt
+  :fast-exec ("Generate Gitignore" 'helm-gitignore))
 
 (provide 'my-git)
 ;;; my-git.el ends here

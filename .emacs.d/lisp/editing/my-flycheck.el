@@ -1,4 +1,4 @@
-;;; my-flycheck.el --- my-flycheck
+;;; my-flycheck.el --- My configuration of the `flycheck'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,16 +23,19 @@
 
 ;;; Commentary:
 
-;;; Code:
-(use-package flycheck
-    :ensure t
-    :config
-    (global-flycheck-mode 1))
+;; My configuration of the `flycheck'
 
-(defun turn-off-flycheck ()
-  "Disable `flycheck-mode' locally for current buffer."
-  (interactive)
-  (flycheck-mode 0))
+;;; Code:
+
+(leaf flycheck                          ;nofmt
+  :ensure t
+  :defun flycheck-mode
+  :global-minor-mode global-flycheck-mode
+  :config                             ;nofmt
+  (defun turn-off-flycheck ()
+    "Disable `flycheck-mode' locally for current buffer."
+    (interactive)
+    (flycheck-mode 0)))
 
 (provide 'my-flycheck)
 ;;; my-flycheck.el ends here

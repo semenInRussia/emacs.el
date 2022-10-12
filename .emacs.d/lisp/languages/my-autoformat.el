@@ -1,4 +1,4 @@
-;;; my-autoformat.el --- my-autoformat
+;;; my-autoformat.el --- My function for `autoformat'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,13 +23,16 @@
 
 ;;; Commentary:
 
+;; My function for `autoformat'
+
 ;;; Code:
 (defvar my-autoformat-functions nil
   "Current used autoformat functions.")
 
 (defcustom my-autoformat-all-functions
   '(sentence-capitalization)
-  "All my autoformat functions.")
+  "All my autoformat functions."
+  :type '(repeat symbol))
 
 (defun my-use-autoformat-function-p (f)
   "Return t, when must use F as autoformat function."
@@ -104,11 +107,10 @@ See `just-line-is-whitespaces-p'"
 (defun my-autoformat ()
   "Call all autoformat functions."
   (interactive)
-  (--each my-autoformat-functions
-    (funcall it)))
+  (--each my-autoformat-functions (funcall it)))
 
 (define-minor-mode my-autoformat-mode
-    "Toggle `my-autoformat-mode'."
+  "Toggle `my-autoformat-mode'."
   :init-value nil
   (if my-autoformat-mode
       (add-hook 'post-self-insert-hook #'my-autoformat)

@@ -1,4 +1,4 @@
-;;; my-google-translate.el --- my-google-translate
+;;; my-google-translate.el --- My config `google-translate'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,25 +23,20 @@
 
 ;;; Commentary:
 
+;; My config `google-translate'
+
 ;;; Code:
-(use-package google-translate
-    :ensure t
-    :custom
-    (google-translate-default-source-language "auto")
-    (google-translate-default-target-language "ru")
-    :config
-    (defun google-translate--search-tkk ()
-      "Search TKK."
-      (list 430675 2721866130))
-
-    (defun fast-exec-google-translate-keys ()
-      "Get some useful keymaps of `fast-exec' for google-translate."
-      (fast-exec/some-commands
-       ("Google Translate" 'google-translate-at-point)
-       ("Query to Google Translate" 'google-translate-query-translate-reverse)))
-
-    (fast-exec/register-keymap-func 'fast-exec-google-translate-keys)
-    (fast-exec/reload-functions-chain))
+(leaf google-translate
+  :ensure t
+  :custom ((google-translate-default-source-language . "auto")
+           (google-translate-default-target-language . "ru"))
+  :fast-exec (("Google Translate" 'google-translate-at-point)
+              ("Query to Google Translate"
+               'google-translate-query-translate-reverse))
+  :config                               ;nofmt
+  (defun google-translate--search-tkk ()
+    "Search TKK."                       ; a issue from the original GitHub repo
+    (list 430675 2721866130)))
 
 (provide 'my-google-translate)
 ;;; my-google-translate.el ends here

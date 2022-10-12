@@ -1,4 +1,4 @@
-;;; my-helm-mode-manager.el --- my-helm-mode-manager
+;;; my-helm-mode-manager.el --- My config for `helm-mode-manager'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,19 +23,15 @@
 
 ;;; Commentary:
 
-;;; Code:
-(use-package helm-mode-manager
-    :ensure t
-    :config
-    (defun fast-exec-helm-mode-manager-keys ()
-      "Get some useful keymaps of  `fast-exec' for helm-mode-manager."
-      (fast-exec/some-commands
-       ("Switch Major Mode" 'helm-switch-major-mode)
-       ("Enable Minor Mode" 'helm-enable-minor-mode)
-       ("Disable Minor Mode" 'helm-disable-minor-mode)))
+;; My config for `helm-mode-manager'
 
-    (fast-exec/register-keymap-func 'fast-exec-helm-mode-manager-keys)
-    (fast-exec/reload-functions-chain))
+;;; Code:
+(leaf helm-mode-manager
+  :ensure t
+  :config				; nofmt
+  :fast-exec (("Switch Major Mode" 'helm-switch-major-mode)
+              ("Enable Minor Mode" 'helm-enable-minor-mode)
+              ("Disable Minor Mode" 'helm-disable-minor-mode)))
 
 (provide 'my-helm-mode-manager)
 ;;; my-helm-mode-manager.el ends here

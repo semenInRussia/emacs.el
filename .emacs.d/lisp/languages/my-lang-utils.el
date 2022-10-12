@@ -1,4 +1,4 @@
-;;; my-lang-utils.el --- my-lang-utils
+;;; my-lang-utils.el --- My utils for language configuration
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -26,16 +26,16 @@
 ;;; Code:
 (require 'face-remap)
 
-(use-package visual-fill-column
-    :ensure t)
-
-(defun visual-fill (&optional width)
-  (interactive)
-  (or width (setq width 70))
-  (setq-default visual-fill-column-width width
-                visual-fill-column-center-text t)
-  (text-scale-mode 0)
-  (visual-fill-column-mode 1))
+(leaf visual-fill-column
+  :ensure t
+  :config                               ;nofmt
+  (defun visual-fill (&optional width)
+    (interactive)
+    (or width (setq width 70))
+    (setq-default visual-fill-column-width width
+                  visual-fill-column-center-text t)
+    (text-scale-mode 0)
+    (visual-fill-column-mode 1)))
 
 (provide 'my-lang-utils)
 ;;; my-lang-utils.el ends here

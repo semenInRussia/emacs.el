@@ -1,4 +1,4 @@
-;;; my-search.el --- my-search
+;;; my-search.el --- My configuration of the search
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,36 +23,34 @@
 
 ;;; Commentary:
 
+;; My configuration of the search
+
 ;;; Code:
-(use-package helm-swoop
-    :ensure t
-    :bind
-    ((:map xah-fly-command-map)
-     ("'"       . helm-swoop)
-     ("SPC k '" . helm-multi-swoop-current-mode))
-    :bind
-    ((:map helm-swoop-map)
-     ("M-j" . 'helm-swoop-edit)
-     (:map helm-swoop-edit-map)
-     ([remap save-buffer] . 'helm-swoop--edit-complete)))
+(leaf helm-swoop
+  :ensure t
+  :bind ((:xah-fly-command-map
+          :package xah-fly-keys
+          ("'"       . helm-swoop)
+          ("SPC k '" . helm-multi-swoop-current-mode))
+         (:helm-swoop-map              ;nofmt
+          ("M-j"     . helm-swoop-edit))
+         (:helm-swoop-edit-map         ;nofmt
+          ([remap save-buffer] . helm-swoop--edit-complete))))
 
-(use-package deadgrep
-    :ensure t
-    :bind
-    ((:map xah-fly-command-map)
-     ("SPC '" . deadgrep)))
+(leaf deadgrep
+  :ensure t
+  :bind (:xah-fly-command-map :package xah-fly-keys ("SPC '" . deadgrep)))
 
-(use-package projectile
-    :ensure t
-    :bind
-    ((:map xah-fly-command-map)
-     ("SPC SPC r" . projectile-replace)))
+(leaf projectile
+  :bind (:xah-fly-command-map
+         :package xah-fly-keys
+         ("SPC SPC r" . projectile-replace)))
 
-(use-package visual-regexp
-    :ensure t
-    :bind
-    ((:map xah-fly-command-map)
-     ("SPC r" . vr/query-replace)))
+(leaf visual-regexp
+  :ensure t
+  :bind (:xah-fly-command-map
+         :package xah-fly-keys
+         ("SPC r" . vr/query-replace)))
 
 (provide 'my-search)
 ;;; my-search.el ends here

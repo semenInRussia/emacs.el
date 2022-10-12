@@ -1,4 +1,4 @@
-;;; my-haskell.el --- my-haskell
+;;; my-haskell.el --- My config for `haskell'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,20 +23,53 @@
 
 ;;; Commentary:
 
-;;; Code:
-(use-package haskell-mode
-    :ensure t
-    :config (my-define-local-major-mode-map 'haskell
-                                            '(haskell-mode
-                                              haskell-interactive-mode))
-    :hook (haskell-mode . haskell-indent-mode)
-    (haskell-mode . interactive-haskell-mode)
-    :bind ((:map my-haskell-local-map)
-           ("i" . 'haskell-add-import)))
+;; My config for `haskell'.  Heavily inspired with `emacs-haskell-tutorial'
+;; https://github.com/serras/emacs-haskell-tutorial/
 
-(use-package company-ghci
+;;; Code:
+(leaf haskell-mode
+  :ensure t
+  :major-mode-map (haskell (haskell-mode haskell-interactive-mode))
+  :ensure-system-package (("hoogle" . "cabal install hoogle"))
+  :hook ((haskell-mode-hook . haskell-indent-mode)
+         (haskell-mode-hook . interactive-haskell-mode))
+  :bind (:my-haskell-local-map          ;nofmt
+         ("e" . haskell-compile)
+         ("i" . haskell-add-import)
+         ("g" . haskell-process-load)
+         ("p" . haskell-process-do-type))
+  :config                               ;nofmt
+  (leaf company-ghci
     :ensure t
-    :config (push 'company-ghci company-backends))
+    :push ((company-backends . 'company-ghci))
+    :custom (company-ghc-show-info . t))
+
+  (leaf hindent
+    :ensure t
+    :ensure-system-package (hindent . "cabal install hindent")
+    :bind (:xah-fly-command-map
+           :package xah-fly-keys
+           ("SPC SPC q" . hindent-reformat-decl-or-fill)))
+
+  (leaf hlint-refactor
+    :ensure t
+    :ensure-system-package ((hlint    . "cabal install hlint")
+                            (refactor . "cabal install apply-refact"))
+    :bind (:my-haskell-local-map
+           :package haskell-mode
+           ("l" . hlint-refactor-refactor-at-point)))
+
+  (leaf hare
+    :ensure-system-package (ghc-hare . "cabal install HaRe")
+    :hook (haskell-mode-hook . hare-init))
+
+  (leaf shm
+    :ensure t
+    :ensure-system-package (shm . "cabal install structured-haskell-mode")
+    :hook (haskell-mode-hook . structured-haskell-mode))
+
+  (leaf format-all
+    :ensure-system-package (stylish-haskell . "cabal install stylish-haskell")))
 
 (provide 'my-haskell)
 ;;; my-haskell.el ends here

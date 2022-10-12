@@ -1,4 +1,4 @@
-;;; my-dumb-jump.el --- my-dumb-jump
+;;; my-dumb-jump.el --- My configuration of the `dumb-jump'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,21 +23,22 @@
 
 ;;; Commentary:
 
-;;; Code:
-(use-package rg
-    :ensure t)
+;; My configuration of the `dumb-jump'
 
-(use-package dumb-jump
-    :ensure t
-    :custom
-    ((dumb-jump-force-searcher 'rg)
-     (dumb-jump-prefer-searcher 'rg))
-    :bind
-    ((:map xah-fly-command-map)
-     ("SPC SPC ." . dumb-jump-back)
-     ("SPC ."     . xref-find-definitions))
-    :config
-    (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+;;; Code:
+
+
+(leaf rg :ensure t)
+
+(leaf dumb-jump
+  :ensure t
+  :custom ((dumb-jump-prefer-searcher dumb-jump-force-searcher)
+           . 'rg)
+  :bind (:xah-fly-command-map
+         :package xah-fly-keys
+         ("SPC SPC ." . xref-pop-marker-stack)
+         ("SPC ."     . xref-find-definitions))
+  :hook (xref-backend-functions . dumb-jump-xref-activate))
 
 (provide 'my-dumb-jump)
 ;;; my-dumb-jump.el ends here

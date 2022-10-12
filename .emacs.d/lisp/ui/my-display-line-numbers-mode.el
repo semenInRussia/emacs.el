@@ -1,4 +1,4 @@
-;;; my-display-line-numbers-mode.el --- my-display-line-numbers-mode
+;;; my-display-line-numbers-mode.el --- My config for display line numbers
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,26 +23,11 @@
 
 ;;; Commentary:
 
+;; My config for display line numbers
+
 ;;; Code:
-(setq dont-display-lines-modes
-      '(org-mode
-        term-mode
-        shell-mode
-        treemacs-mode
-        eshell-mode
-        helm-mode))
 
-(defun display-or-not-display-numbers-of-lines ()
-  "Display numbers of lines OR don't display numbers of lines.
-If current `major-mode` need to display numbers of lines, then display
-numbers of lines, otherwise don't display."
-  (interactive)
-  (if (-contains? dont-display-lines-modes major-mode)
-      (display-line-numbers-mode 0)
-    (display-line-numbers-mode 38))
-  )
-
-(add-hook 'prog-mode-hook 'display-or-not-display-numbers-of-lines)
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
 (provide 'my-display-line-numbers-mode)
 ;;; my-display-line-numbers-mode.el ends here

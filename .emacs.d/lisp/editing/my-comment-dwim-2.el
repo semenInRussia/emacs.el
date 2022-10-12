@@ -1,4 +1,4 @@
-;;; my-comment-dwim-2.el --- my-comment-dwim-2
+;;; my-comment-dwim-2.el --- My configuration for the `comment-dwim-2'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,12 +23,14 @@
 
 ;;; Commentary:
 
+;; My configuration for the `comment-dwim-2'
+
 ;;; Code:
-(use-package comment-dwim-2
-    :ensure t
-    :bind
-    ((:map xah-fly-command-map)
-     ("z" . comment-dwim-2)))
+(leaf comment-dwim-2
+  :ensure t
+  :bind (:xah-fly-command-map         ;nofmt
+         :package xah-fly-keys
+         ("z" . comment-dwim-2)))
 
 (provide 'my-comment-dwim-2)
 ;;; my-comment-dwim-2.el ends here

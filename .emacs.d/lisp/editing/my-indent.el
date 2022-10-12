@@ -1,4 +1,4 @@
-;;; my-indent.el --- my-indent
+;;; my-indent.el --- My configuration for the indentation
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,36 +23,28 @@
 
 ;;; Commentary:
 
+;; My configuration for the indentation
+
 ;;; Code:
+
+(require 'leaf)
+
 (setq-default indent-tabs-mode nil)
-(setq-default tab-width          4)
-(setq-default c-basic-offset     4)
-(setq-default standart-indent    4)
-(setq-default lisp-body-indent   4)
 
-(defun select-current-line ()
-  "Select as region current line."
-  (interactive)
-  (forward-line 0)
-  (set-mark (point))
-  (end-of-line)
-  )
-
-(defun indent-line-or-region ()
+(defun my-indent-line-or-region ()
   "If text selected, then indent it, otherwise indent current line."
   (interactive)
   (save-excursion
     (if (use-region-p)
         (indent-region (region-beginning) (region-end))
-      (funcall indent-line-function)
-      ))
-  )
+      (funcall indent-line-function))))
 
-(global-set-key (kbd "RET") 'newline-and-indent)
-(define-key xah-fly-command-map (kbd "q") 'indent-line-or-region)
-(define-key xah-fly-command-map (kbd "SPC q") 'join-line)
-
-(setq lisp-indent-function  'common-lisp-indent-function)
+(leaf-keys
+ ((xah-fly-command-map
+   :package xah-fly-keys
+   ("RET"   . newline-and-indent)
+   ("q"     . my-indent-line-or-region)
+   ("SPC q" . join-line))))
 
 (provide 'my-indent)
 ;;; my-indent.el ends here

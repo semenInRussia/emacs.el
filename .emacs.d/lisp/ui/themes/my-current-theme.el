@@ -30,7 +30,7 @@
 ;; - `gruber-darker'
 ;; - `doom-monokai-classic'
 
-(load-theme 'doom-monokai-pro t)
+(eval-after-load 'doom-themes '(load-theme 'doom-monokai-pro t))
 
 (provide 'my-current-theme)
 ;;; my-current-theme.el ends here

@@ -1,4 +1,4 @@
-;;; my-devdocs.el --- my-devdocs
+;;; my-devdocs.el --- My config for `devdocs'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,13 +23,15 @@
 
 ;;; Commentary:
 
+;; My config for `devdocs'
+
 ;;; Code:
-(use-package devdocs
-    :ensure t
-    :hook (python-mode . (lambda ()
-                           (setq-local devdocs-current-docs
-                                       '("python~3.9"))))
-    )
+(leaf devdocs
+  :ensure t
+  :hook (python-mode-hook .
+                          (lambda ()
+                            (setq-local devdocs-current-docs
+                                        '("python~3.9")))))
 
 (provide 'my-devdocs)
 ;;; my-devdocs.el ends here

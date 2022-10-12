@@ -1,4 +1,4 @@
-;;; my-projectile.el --- my-projectile
+;;; my-projectile.el --- My configration of `projectile'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,15 +23,24 @@
 
 ;;; Commentary:
 
+;; My configration of `projectile'
+
 ;;; Code:
+
+(require 'dash)
+(require 'f)
+(require 's)
+
 (defvar my-project-files-hash (make-hash-table :test 'equal))
 
 (defcustom my-project-gitignore-default-patterns
   '(".git/" "*.exe")
   "Patterns in .gitignore sytax style which should be ignore by default."
-  :type '(repeat string))
+  :type '(repeat string)
+  :group 'my)
 
 (defun my-project-root (&optional dir)
+  "Root of the project at DIR."
   (or dir (setq dir default-directory))
   (->>
    projectile-known-projects
@@ -42,8 +51,7 @@
   "A simple wrapper around `projectile-project-root'.
 
 Return value at `projectile-project-root' when DIR is nil, otherwise return nil"
-  (unless dir
-    projectile-project-root))
+  (unless dir projectile-project-root))
 
 (defun my-projectile-project-files (root &optional relatieve-paths)
   "Return filenames list of the project at ROOT, with caching.
@@ -56,7 +64,8 @@ ROOT"
       (puthash root
                (my-no-cache-project-files root)
                my-project-files-hash))
-    (--when-let (gethash root my-project-files-hash)
+    (--when-let
+        (gethash root my-project-files-hash)
       (if relatieve-paths
           (--map (s-chop-prefix root (f-full it)) it)
         it))))
@@ -71,13 +80,13 @@ ROOT"
   "Return files list of ROOT each of it don't match with one of REGEXPS."
   (--reduce-from
    (cond
-     ((my-matches-with-one-of-p it regexps)
-      (message "Ignore %s" it)
-      acc)
-     ((f-directory-p it)
-      (append acc (my-files-of-root-not-match-with-regexps it regexps)))
-     (t
-      (cons it acc)))
+    ((my-matches-with-one-of-p it regexps)
+     (message "Ignore %s" it)
+     acc)
+    ((f-directory-p it)
+     (append acc
+             (my-files-of-root-not-match-with-regexps it regexps)))
+    (t (cons it acc)))
    nil
    (f-entries root)))
 
@@ -93,27 +102,27 @@ ROOT"
 
 (defun my-project-gitignore-patterns (root)
   "Get patterns list with syntax of .gitignore files for the project at ROOT."
-  (append (my-project-specific-gitignore-patterns root)
-          my-project-gitignore-default-patterns))
+  (append
+   (my-project-specific-gitignore-patterns root)
+   my-project-gitignore-default-patterns))
 
 (defun my-project-specific-gitignore-patterns (root)
   "Parse .gitignore file of project at ROOT into list of ignored patterns."
-  (--when-let (my-project-gitignore root)
+  (--when-let
+      (my-project-gitignore root)
     (->>
      it
      (f-read)
      (s-lines)
-     (--remove (or
-                (string-equal "" it)
-                (my-gitignore-comment-line-p it))))))
+     (--remove
+      (or (string-equal "" it) (my-gitignore-comment-line-p it))))))
 
 (defun my-project-gitignore (root)
   "Return path to .gitignore file of the project at ROOT.
 
 If the project not contains .gitignore file, then return nil"
   (let ((path (f-join root ".gitignore")))
-    (when (f-exists-p path)
-      path)))
+    (when (f-exists-p path) path)))
 
 (defun my-regexp-from-gitignore-pattern (regexp gitignore-root)
   "From REGEXP of .gitignore file to real Elisp regular expression.
@@ -147,44 +156,54 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
 (defun projectile-project-files-clear-cache (root)
   "Function `projectile-project-files' is cached, clear this cache for ROOT."
   (interactive (list (projectile-acquire-root)))
-  (remhash (f-full root)
-           my-project-files-hash))
+  (remhash (f-full root) my-project-files-hash))
 
 (defun my-projectile-files-with-string (string directory)
   "Return a list of all files containing STRING in DIRECTORY."
   (->>
    directory
    (projectile-project-files)
-   (--filter
-    (s-contains-p string (f-read it)))))
+   (--filter (s-contains-p string (f-read it)))))
 
-(use-package projectile
+(leaf projectile
+  :ensure t
+  :defun (projectile-acquire-root
+          projectile-project-p
+          projectile-project-root
+          projectile-completing-read
+          projectile-project-files
+          projectile-maybe-invalidate-cache)
+  :defvar (projectile-known-projects projectile-project-root)
+  :custom ((projectile-project-search-path . '("~/projects/"))
+           (projectile-completion-system . 'helm)
+           (projectile-project-root-functions .
+                                              '(projectile-root-local
+                                                my-project-root))
+           (projectile-enable-caching . nil))
+  :global-minor-mode projectile-mode
+  :config                               ;nofmt
+  (leaf helm-projectile
     :ensure t
-    :custom                             ;nofmt
-    (projectile-project-search-path '("~/projects/"))
-    (projectile-completion-system 'helm)
-    (projectile-project-root-functions
-     '(projectile-root-local my-project-root))
-    (projectile-enable-caching nil)
-    :init                               ;nofmt
-    (projectile-mode 1))
-
-(use-package helm-projectile
-    :ensure t
-    :bind ((:map xah-fly-command-map)
-           ("SPC j" . 'helm-projectile-find-file)
-           (:map helm-projectile-find-file-map)
-           ("M-<f5>" . 'my-helm-projectile-find-file-update))
-    :config
-    (defalias 'projectile-project-files 'my-projectile-project-files)
-    (defalias 'projectile-root-local 'my-projectile-root-local)
-    (defalias 'project-root 'my-project-root)
-    (defalias 'projectile-files-with-string 'my-projectile-files-with-string)
-
+    :defvar (helm-projectile-file-actions helm-pattern)
+    :defun ((helm-ff-prefix-filename  . helm-files)
+            (with-helm-current-buffer . helm-lib)
+            (helm-build-sync-source   . helm-source)
+            (helm-update              . helm-core)
+            (helm-projectile--move-to-real
+             helm-projectile--remove-move-to-real
+             helm-projectile-file-persistent-action))
+    :commands (helm-projectile-find-file)
+    :bind ((:xah-fly-command-map
+            :package xah-fly-keys
+            ("SPC j"  . helm-projectile-find-file))
+           (:helm-projectile-find-file-map
+            ("M-<f5>" . my-helm-projectile-find-file-update)))
+    :config                             ;nofmt
     (defun my-helm-projectile-find-file-update ()
       "Update function for `helm-projectile-find-file'."
       (interactive)
-      (projectile-project-files-clear-cache (projectile-acquire-root))
+      (projectile-project-files-clear-cache
+       (projectile-acquire-root))
       (helm-update))
 
     (defun projectile--find-file (invalidate-cache &optional ff-variant)
@@ -196,9 +215,10 @@ would be `find-file-other-window' or `find-file-other-frame'"
       (interactive "P")
       (projectile-maybe-invalidate-cache invalidate-cache)
       (let* ((project-root (projectile-acquire-root))
-             (file (projectile-completing-read
-                    "Find file: "
-                    (projectile-project-files project-root t)))
+             (file
+              (projectile-completing-read
+               "Find file: "
+               (projectile-project-files project-root t)))
              (ff (or ff-variant #'find-file)))
         (when file
           (funcall ff (expand-file-name file project-root))
@@ -206,11 +226,11 @@ would be `find-file-other-window' or `find-file-other-frame'"
 
     (defvar helm-source-projectile-files-list
       (helm-build-sync-source "Projectile files 2"
-        :before-init-hook
+        :before-init-hook                 ;nofmt
         (lambda ()
           (add-hook 'helm-after-update-hook #'helm-projectile--move-to-real)
           (add-hook 'helm-cleanup-hook #'helm-projectile--remove-move-to-real))
-        :candidates
+        :candidates                       ;nofmt
         (lambda ()
           (when (projectile-project-p)
             (with-helm-current-buffer
@@ -218,31 +238,42 @@ would be `find-file-other-window' or `find-file-other-frame'"
                 (--map
                  (cons (s-chop-prefix root (f-full it)) it)
                  (projectile-project-files root))))))
-        :filtered-candidate-transformer
+        :filtered-candidate-transformer   ;nofmt
         (lambda (files _source)
           (with-helm-current-buffer
             (let* ((root (projectile-project-root))
                    (file-at-root
-                    (file-relative-name (expand-file-name helm-pattern root))))
-              (if (or (string-empty-p helm-pattern)
-                      (assoc helm-pattern files))
+                    (file-relative-name
+                     (expand-file-name helm-pattern root))))
+              (if (or
+                   (string-empty-p helm-pattern)
+                   (assoc helm-pattern files))
                   files
                 (if (equal helm-pattern file-at-root)
-                    (cl-acons (helm-ff-prefix-filename helm-pattern nil t)
-                              (expand-file-name helm-pattern)
-                              files)
-                  (cl-pairlis (list (helm-ff-prefix-filename helm-pattern nil t)
-                                    (helm-ff-prefix-filename file-at-root nil t))
-                              (list (expand-file-name helm-pattern)
-                                    (expand-file-name helm-pattern root))
-                              files))))))
+                    (cl-acons
+                     (helm-ff-prefix-filename helm-pattern nil t)
+                     (expand-file-name helm-pattern)
+                     files)
+                  (cl-pairlis
+                   (list
+                    (helm-ff-prefix-filename helm-pattern nil t)
+                    (helm-ff-prefix-filename file-at-root nil t))
+                   (list
+                    (expand-file-name helm-pattern)
+                    (expand-file-name helm-pattern root))
+                   files))))))
         :fuzzy-match helm-projectile-fuzzy-match
         :keymap helm-projectile-find-file-map
         :help-message 'helm-ff-help-message
         :mode-line helm-read-file-name-mode-line-string
         :action helm-projectile-file-actions
         :persistent-action #'helm-projectile-file-persistent-action
-        :persistent-help "Preview file")))
+        :persistent-help "Preview file"))))
+
+(defalias 'projectile-project-files 'my-projectile-project-files)
+(defalias 'projectile-root-local 'my-projectile-root-local)
+(defalias 'project-root 'my-project-root)
+(defalias 'projectile-files-with-string 'my-projectile-files-with-string)
 
 (provide 'my-projectile)
 ;;; my-projectile.el ends here

@@ -1,4 +1,4 @@
-;;; my-buffer-navigation.el --- my-buffer-navigation
+;;; my-buffer-navigation.el --- My config for navigation beetween buffers
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,7 +23,16 @@
 
 ;;; Commentary:
 
+;; My config for navigation beetween buffers
+
 ;;; Code:
+(require 'leaf)
+
+(declare-function --find "dash")
+(declare-function ->> "dash")
+(declare-function s-trim "s")
+(declare-function s-prefix-p "s")
+
 (defun my-visit-last-opened-buffer ()
   "Visit buffer which was opened recently."
   (interactive)
@@ -31,20 +40,24 @@
 
 (defun my-last-opened-buffer ()
   "Get buffer which was visited most recently."
-  (--find (not (my--visit-last-opened-buffer-ignore-p it))
-          (cdr (buffer-list))))
+  (--find
+   (not (my--visit-last-opened-buffer-ignore-p it))
+   (cdr (buffer-list))))
 
 (defun my--visit-last-opened-buffer-ignore-p (buffer)
   "Take object of BUFFER and return nil when don't need visit its."
-  (->>
-   buffer
-   (buffer-name)
-   (s-trim)
-   (s-prefix-p "*Minibuf")))
+  (->> buffer (buffer-name) (s-trim) (s-prefix-p "*Minibuf")))
 
-(bind-keys
- :map xah-fly-command-map
- ("SPC 0" . my-visit-last-opened-buffer))
+(defun my-kill-current-buffer ()
+  "Kill current opened buffer."
+  (interactive)
+  (kill-buffer (current-buffer)))
+
+(leaf-keys
+ (xah-fly-command-map
+  :package xah-fly-keys
+  ("SPC 0" . my-visit-last-opened-buffer)
+  ("SPC u" . my-kill-current-buffer)))
 
 (provide 'my-buffer-navigation)
 ;;; my-buffer-navigation.el ends here

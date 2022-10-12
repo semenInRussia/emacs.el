@@ -1,4 +1,4 @@
-;;; my-syntax-subword.el --- my-syntax-subword
+;;; my-syntax-subword.el --- My config for `syntax-subword'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,13 +23,13 @@
 
 ;;; Commentary:
 
+;; My config for `syntax-subword'
+
 ;;; Code:
-(use-package syntax-subword
-    :ensure t
-    :custom
-    (syntax-subword-skip-spaces t)
-    :config
-    (global-syntax-subword-mode))
+(leaf syntax-subword
+  :ensure t
+  :custom (syntax-subword-skip-spaces . t)
+  :global-minor-mode global-syntax-subword-mode)
 
 (provide 'my-syntax-subword)
 ;;; my-syntax-subword.el ends here

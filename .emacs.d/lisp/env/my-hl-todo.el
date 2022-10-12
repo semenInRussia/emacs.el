@@ -1,4 +1,4 @@
-;;; my-hl-todo.el --- my-hl-todo
+;;; my-hl-todo.el --- My config source code for highlight todo commentaries
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,10 +23,12 @@
 
 ;;; Commentary:
 
+;; My config source code for highlight todo commentaries
+
 ;;; Code:
-(use-package hl-todo
-    :ensure t
-    :config (global-hl-todo-mode))
+(leaf hl-todo                           ;nofmt
+  :ensure t
+  :global-minor-mode global-hl-todo-mode)
 
 (provide 'my-hl-todo)
 ;;; my-hl-todo.el ends here

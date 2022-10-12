@@ -1,4 +1,4 @@
-;;; my-skeletor.el --- my-skeletor
+;;; my-skeletor.el --- My configuration of the `skeletor'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,13 +23,14 @@
 
 ;;; Commentary:
 
+;; My configuration of the `skeletor'
+
 ;;; Code:
-(use-package skeletor
-    :ensure t
-    :custom
-    (skeletor-init-with-git nil)
-    (skeletor-project-directory "~/projects")
-    (skeletor-completing-read-function completing-read-function))
+(leaf skeletor
+  :ensure t
+  :custom ((skeletor-init-with-git            . nil)
+           (skeletor-completing-read-function . completing-read-function)
+           (skeletor-project-directory        . "~/projects")))
 
 (provide 'my-skeletor)
 ;;; my-skeletor.el ends here

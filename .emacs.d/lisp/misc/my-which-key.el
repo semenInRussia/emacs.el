@@ -1,4 +1,4 @@
-;;; my-which-key.el --- my-which-key
+;;; my-which-key.el --- My config for `which-key'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,12 +23,13 @@
 
 ;;; Commentary:
 
+;; My config for `which-key'
+
 ;;; Code:
-(use-package which-key
-    :ensure t
-    :config
-    (which-key-setup-side-window-bottom)
-    (which-key-mode))
+(leaf which-key
+  :ensure t
+  :global-minor-mode which-key-mode
+  :config (which-key-setup-side-window-bottom))
 
 (provide 'my-which-key)
 ;;; my-which-key.el ends here

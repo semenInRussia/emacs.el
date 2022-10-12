@@ -24,49 +24,47 @@
 ;;; Commentary:
 
 ;;; Code:
-(use-package js-comint
-    :ensure t)
 
-(use-package web-mode
-    :ensure t)
+(defun my-enable-flycheck () (flycheck-mode 1))
 
-(defun my-enable-flycheck ()
-  (flycheck-mode 1))
-
-(use-package js2-mode
-    :ensure t
-    :mode "\\.js$"
-    :custom
-    (js2-allow-rhino-new-expr-initializer nil)
-    (js2-auto-indent-p nil)
-    (js2-enter-indents-newline nil)
-    (js2-global-externs '("module"
-                          "require"
-                          "buster"
-                          "sinon"
-                          "assert"
-                          "refute"
-                          "setTimeout"
-                          "clearTimeout"
-                          "setInterval"
-                          "clearInterval"
-                          "location"
-                          "__dirname"
-                          "console"
-                          "JSON"))
-    (js2-idle-timer-delay 0.1)
-    (js2-indent-on-enter-key nil)
-    (js2-mirror-mode nil)
-    (js2-strict-inconsistent-return-warning nil)
-    (js2-auto-indent-p t)
-    (js2-include-rhino-externs nil)
-    (js2-include-gears-externs nil)
-    (js2-concat-multiline-strings 'eol)
-    (js2-rebind-eol-bol-keys nil)
-    (js2-show-parse-errors nil)
-    (js2-strict-missing-semi-warning nil)
-    (js2-strict-trailing-comma-warning t)
-    :hook (js2-mode . my-enable-flycheck))
+(leaf js2-mode
+  :ensure t
+  :mode "\\.js$"
+  :custom ((js2-allow-rhino-new-expr-initializer . nil)
+           (js2-auto-indent-p . nil)
+           (js2-enter-indents-newline . nil)
+           (js2-global-externs .
+                               '("module"
+                                 "require"
+                                 "buster"
+                                 "sinon"
+                                 "assert"
+                                 "refute"
+                                 "setTimeout"
+                                 "clearTimeout"
+                                 "setInterval"
+                                 "clearInterval"
+                                 "location"
+                                 "__dirname"
+                                 "console"
+                                 "JSON"))
+           (js2-idle-timer-delay . 0.1)
+           (js2-indent-on-enter-key . t)
+           (js2-mirror-mode . nil)
+           (js2-strict-inconsistent-return-warning . nil)
+           (js2-auto-indent-p . t)
+           (js2-include-rhino-externs . nil)
+           (js2-include-gears-externs . nil)
+           (js2-concat-multiline-strings . 'eol)
+           (js2-rebind-eol-bol-keys . nil)
+           (js2-show-parse-errors . nil)
+           (js2-strict-missing-semi-warning . nil)
+           (js2-strict-trailing-comma-warning . t)
+           (js-indent-level . 2))
+  :hook (js2-mode . my-enable-flycheck)
+  :config                               ;nofmt
+  (leaf web-mode :ensure t)
+  (leaf js-comint :ensure t))
 
 (provide 'my-js)
 ;;; my-js.el ends here

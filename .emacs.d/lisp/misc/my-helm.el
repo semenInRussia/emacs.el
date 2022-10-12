@@ -1,4 +1,4 @@
-;;; my-helm.el --- my-helm
+;;; my-helm.el --- My config for `helm'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,48 +23,34 @@
 
 ;;; Commentary:
 
+;; My config for `helm'
+
 ;;; Code:
-(use-package helm
+(leaf helm
+  :ensure t
+  :defvar helm-completion-style
+  :custom ((helm-M-x-fuzzy-match   . t)
+           (helm-buffers-fuzzy-matching    . t)
+           (helm-recentf-fuzzy-match       . t)
+           (helm-imenu-fuzzy-match         . t)
+           (helm-autoresize-min-height     . 20)
+           (helm-left-margin-width         . 4)
+           (helm-buffers-left-margin-width . 4))
+  :bind (("C-h a"      . helm-apropos)
+         (:xah-fly-command-map
+          :package xah-fly-keys
+          ("SPC SPC f" . helm-find-files)
+          ("SPC k r"   . helm-regexp)))
+  :global-minor-mode helm-mode
+  :fast-exec (("Search via Google" 'helm-google-suggest)
+              ("Get Color" 'helm-colors))
+  :config                               ;nofmt
+  (leaf helm-ext
     :ensure t
-    :after (helm-core)
-    :custom
-    (helm-M-x-fuzzy-match           t)
-    (helm-buffers-fuzzy-matching    t)
-    (helm-recentf-fuzzy-match       t)
-    (helm-imenu-fuzzy-match         t)
-    (helm-autoresize-min-height    20)
-    (helm-left-margin-width         4)
-    (helm-buffers-left-margin-width 4)
-    :bind
-    (("C-h a"     . 'helm-apropos)
-     (:map xah-fly-command-map)
-     ("SPC SPC f" . 'helm-find-files)
-     ("SPC k r"   . 'helm-regexp))
-    :config
-    (helm-mode t)
-    (helm-autoresize-mode t)
-    (defvar helm-completion-style nil))
-
-(use-package helm-ext
-    :ensure t
-    :config
-    (helm-ext-ff-enable-skipping-dots +1)
-    (helm-ext-ff-enable-auto-path-expansion t))
-
-(defun fast-exec-helm-net-define-keys ()
-  "Keymaps for `helm-net' and `fast-exec'."
-  (fast-exec/some-commands
-   ("Search via Google" 'helm-google-suggest)))
-
-(fast-exec/register-keymap-func 'fast-exec-helm-net-define-keys)
-(fast-exec/reload-functions-chain)
-
-(defun fast-exec-helm-colors-keys ()
-  "Get some useful keymaps of  `fast-exec' for helm-colors."
-  (fast-exec/some-commands ("Get Color" 'helm-colors)))
-
-(fast-exec/register-keymap-func 'fast-exec-helm-colors-keys)
-(fast-exec/reload-functions-chain)
+    :require t
+    :config                             ;nofmt
+    (helm-ext-ff-enable-skipping-dots t)
+    (helm-ext-ff-enable-auto-path-expansion t)))
 
 (provide 'my-helm)
 ;;; my-helm.el ends here

@@ -1,4 +1,4 @@
-;;; my-smartparens.el --- my-smartparens
+;;; my-smartparens.el --- My configuration for the `smartparens'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,62 +23,62 @@
 
 ;;; Commentary:
 
+;; My configuration for the `smartparens'
+
 ;;; Code:
-(use-package smartparens
-    :ensure t
-    :init
-    (smartparens-global-mode 1)
-    (show-smartparens-global-mode 1)
-    :bind (
-           ;; Wrap anything
-           ("M-("       . 'sp-wrap-round)
-           ("M-["       . 'sp-wrap-square)
-           ("M-{"       . 'sp-wrap-curly)
 
-           (:map xah-fly-command-map)
-           ;; Kill anything
-           ("x"         . 'sp-kill-whole-line)
-           ("SPC 8"     . 'sp-kill-sexp)
-           ("SPC k e"   . 'sp-backward-kill-sexp)
-           ("SPC SPC g" . 'sp-kill-hybrid-sexp)
-           ("SPC SPC e" . 'sp-splice-sexp-killing-backward)
-           ("SPC -"     . 'sp-rewrap-sexp)
-           ("-"         . 'sp-splice-sexp)
-           ("SPC 9"     . 'sp-change-enclosing)
+(require 'my-lib)
 
-           ;; Change wrap placement
-           ("]"         . 'sp-forward-slurp-sexp)
-           ("["         . 'sp-forward-barf-sexp)
-           ("SPC ["     . 'sp-backward-slurp-sexp)
-           ("SPC ]"     . 'sp-backward-barf-sexp)
-           ("SPC ="     . 'sp-raise-sexp)
+(leaf smartparens
+  :ensure t
+  :global-minor-mode (smartparens-global-mode show-smartparens-global-mode)
+  :require smartparens-config
+  :defun sp-clone-sexp
+  :bind (;; Wrap anything
+         (global-map
+          :package xah-fly-keys
+          ("M-("       . sp-wrap-round)
+          ("M-["       . sp-wrap-square)
+          ("M-{"       . sp-wrap-curly))
+         (:xah-fly-command-map
+          :package xah-fly-keys
+          ;; Kill anything
+          ("x"         . sp-kill-whole-line)
+          ("DEL"       . delete-only-1-char)
+          ("SPC 8"     . sp-kill-sexp)
+          ("SPC k e"   . sp-backward-kill-sexp)
+          ("SPC SPC g" . sp-kill-hybrid-sexp)
+          ("SPC SPC e" . sp-splice-sexp-killing-backward)
+          ("SPC -"     . sp-rewrap-sexp)
+          ("-"         . sp-splice-sexp)
+          ("SPC 9"     . sp-change-enclosing)
 
-           ;; Navigation
-           ("m"         . 'sp-backward-sexp)
-           ("."         . 'sp-forward-sexp)
+          ;; Change wrap placement
+          ("]"         . sp-forward-slurp-sexp)
+          ("["         . sp-forward-barf-sexp)
+          ("SPC ["     . sp-backward-slurp-sexp)
+          ("SPC ]"     . sp-backward-barf-sexp)
+          ("SPC ="     . sp-raise-sexp)
 
-           ;; misc.
-           ("SPC 1"     . 'sp-join-sexp)
-           ("SPC SPC 1" . 'sp-split-sexp)
-           ("SPC SPC y" . 'my-sp-clone)))
+          ;; Navigation
+          ("m"         . sp-backward-sexp)
+          ("."         . sp-forward-sexp)
 
-(defun my-sp-clone ()
-  (interactive)
-  (sp-clone-sexp)
-  (repeat-at-last-keystroke))
+          ;; misc.
+          ("SPC 1"     . sp-join-sexp)
+          ("SPC SPC 1" . sp-split-sexp)
+          ("SPC SPC y" . my-sp-clone)))
+  :config                             ;nofmt
+  (defun my-sp-clone ()
+    (interactive)
+    (sp-clone-sexp)
+    (repeat-at-last-keystroke))
 
-(define-key-when my-kill-line-or-region
-    xah-fly-command-map "x" 'kill-region 'use-region-p)
-
-(require 'smartparens-config)
-
-(defun delete-only-1-char ()
-  "Delete only 1 character before point."
-  (interactive)
-  (backward-char)
-  (delete-char 1))
-
-(define-key xah-fly-command-map (kbd "DEL") 'delete-only-1-char)
+  (defun delete-only-1-char ()
+    "Delete only 1 character before point."
+    (interactive)
+    (backward-char)
+    (delete-char 1)))
 
 (provide 'my-smartparens)
 ;;; my-smartparens.el ends here

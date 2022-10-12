@@ -1,4 +1,4 @@
-;;; my-html.el --- my-html
+;;; my-html.el --- My configuration for html
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,68 +23,65 @@
 
 ;;; Commentary:
 
+;; My configuration for html
+
 ;;; Code:
-(defcustom html-modes
-  '(web-mode html-mode mhtml-mode)
-  "List of `html` major modes.")
+(defcustom my-html-modes
+  '(web-mode mhtml-mode)
+  "List of `html` major modes."
+  :group 'my
+  :type '(repeat symbol))
 
-(use-package web-mode
+(defun my-html-modes-hooks ()
+  "Return list from the hooks for each of `my-html-modes'."
+  (-map 'my-major-mode-to-hook my-html-modes))
+
+(defun my-html-modes-maps ()
+  "Return list from the maps for each of `my-html-modes'."
+  (-map 'my-major-mode-to-map my-html-modes))
+
+(leaf web-mode
+  :ensure t
+  :major-mode-map `(html ,my-html-modes)
+  :hook (web-mode-hook . yas-minor-mode-off)
+  :custom ((web-mode-script-padding . 1)
+           (web-mode-block-padding  . 0))
+  :config                               ;nofmt
+  (leaf auto-rename-tag
     :ensure t
-    :config (my-define-local-major-mode-map 'html
-                                            '(html-mode
-                                              web-mode
-                                              web-mode-prog-mode
-                                              mhtml-mode))
-    :hook (web-mode . yas-minor-mode-off)
-    :custom (web-mode-script-padding 1)
-    (web-mode-block-padding 0))
+    :hook `(,(my-html-modes-hooks)
+            . auto-rename-tag-mode))
 
-(use-package auto-rename-tag
+  (leaf tagedit
     :ensure t
-    :config :init
-    (--each html-modes
-      (add-hook
-       (intern (s-append "-hook" (symbol-name it)))
-       (lambda () (auto-rename-tag-mode 38)))))
+    :bind `(,(--map
+              `(,it
+                :package ,(my-map-to-major-mode it)
+                ([remap sp-kill-hybrid-sexp] . tagedit-kill)
+                ([remap sp-join-sexp]        . tagedit-join-tags)
+                ([remap sp-raise-sexp]       . tagedit-raise-tag)
+                ([remap sp-splice-sexp]      . tagedit-splice-tag)
+                ([remap sp-change-enclosing]  . tagedit-kill-attribute))
+              (my-html-modes-maps))))
 
-(use-package tagedit
+  (leaf company-web
     :ensure t
-    :init (--each html-modes
-            (let ((map-symbol (intern (s-append "-map" (symbol-name it))))
-                  map)
-              (when (boundp map-symbol)
-                (setq map (eval map-symbol))
-                (define-key map [remap sp-kill-hybrid-sexp] 'tagedit-kill)
-                (define-key map [remap sp-join-sexp] 'tagedit-join-tags)
-                (define-key map [remap sp-raise-sexp] 'tagedit-raise-tag)
-                (define-key map [remap sp-splice-sexp] 'tagedit-splice-tag)
-                (define-key
-                    map
-                    [remap sp-change-enclosing]
-                  'tagedit-kill-attribute)))))
+    :push ((company-backends . 'company-web-html)))
 
-(use-package company-web
+  (leaf impatient-mode
     :ensure t
-    :init (add-hook 'web-mode-hook
-                    (lambda ()
-                      (set
-                       (make-local-variable 'company-backends)
-                       '(company-web-html))
-                      (company-mode t))))
-
-(use-package impatient-mode
-    :ensure t
-    :bind ((:map my-html-local-map)
-           ("e" . 'my-enable-impatient-mode)))
-
-(defun my-enable-impatient-mode ()
-  "Enable `impatient-mode' and open the page of current browser in web browser."
-  (interactive)
-  (impatient-mode +1)
-  (->>
-   (buffer-name)
-   (s-prepend "http://localhost:8080/imp/live/")
-   (browse-url)))
+    :bind (:my-html-local-map
+           :package web-mode
+           ("e" . my-enable-impatient-mode))
+    :config                             ;nofmt
+    (defun my-enable-impatient-mode ()
+      "Enable `impatient-mode' and open the page of current browser in web browser."
+      (interactive)
+      (impatient-mode +1)
+      (->>
+       (buffer-name)
+       (s-prepend "http://localhost:8080/imp/live/")
+       (browse-url)))))
 
 (provide 'my-html)
 ;;; my-html.el ends here

@@ -24,65 +24,72 @@
 ;;; Commentary:
 
 ;;; Code:
-(define-prefix-command 'my-lisp-map)
 
-(use-package paxedit
-    :ensure t
-    :bind ((:map paxedit-mode-map)
-           (";" . 'paxedit-insert-semicolon)
-           ("(" . 'paxedit-open-round)
-           ("[" . 'paxedit-open-bracket)
-           ("{" . 'paxedit-open-curly)
-           (:map my-lisp-map)
-           ("o" . 'my-paxedit-transpose-forward)
-           ("u" . 'my-paxedit-transpose-backward)
-           ("x" . 'paxedit-kill)
-           ("z" . 'my-paxedit-comment)
-           ("w" . 'my-paxedit-change)
-           ("d" . 'paxedit-symbol-kill)
-           ("q" . 'paxedit-compress)
-           ("k" . 'paxedit-delete-whitespace)
-           ("y" . 'my-paxedit-duplicate))
-    :config
-    (defun my-paxedit-comment ()
-      "Comment the Lisp expression at the cursor."
-      (interactive)
-      (-let (((beg . end) (paxedit-sexp-region)))
-        (comment-region beg end)))
+(require 'dash)
+(require 'my-lib)
 
-    (defun my-paxedit-change ()
-      "Kill the Lisp expression at the cursor and activate insert mode."
-      (interactive)
-      (paxedit-delete)
-      (xah-fly-insert-mode-activate))
+(leaf paxedit
+  :ensure t
+  :init (define-prefix-command 'my-lisp-map)
+  :bind ((:paxedit-mode-map
+          (";" . 'paxedit-insert-semicolon)
+          ("(" . 'paxedit-open-round)
+          ("[" . 'paxedit-open-bracket)
+          ("{" . 'paxedit-open-curly))
+         (:my-lisp-map
+          ("o" . 'my-paxedit-transpose-forward)
+          ("u" . 'my-paxedit-transpose-backward)
+          ("x" . 'paxedit-kill)
+          ("z" . 'my-paxedit-comment)
+          ("w" . 'my-paxedit-change)
+          ("d" . 'paxedit-symbol-kill)
+          ("q" . 'paxedit-compress)
+          ("k" . 'paxedit-delete-whitespace)
+          ("y" . 'my-paxedit-duplicate)))
+  :config (defun my-paxedit-comment
+              ()
+            "Comment the Lisp expression at the cursor."
+            (interactive)
+            (-let
+                (((beg . end)
+                  (paxedit-sexp-region)))
+              (comment-region beg end)))
 
-    (defun my-paxedit-duplicate ()
-      "Make copy of the Lisp expression at the cursor."
-      (interactive)
-      (let* ((reg (paxedit-sexp-region))
-             (beg (car reg))
-             (end (cdr reg))
-             (sexp (buffer-substring beg end))
-             (sep (if (my-lisp-sexp-whole-line-p) "\n" " ")))
-        (goto-char end)
-        (insert sep sexp)))
+  (defun my-paxedit-change ()
+    "Kill the Lisp expression at the cursor and activate insert mode."
+    (interactive)
+    (paxedit-delete)
+    (xah-fly-insert-mode-activate))
 
-    (defun my-lisp-sexp-whole-line-p ()
-      "Return t, when the Lisp sexp at the point being at whole of line."
-      (interactive "P")
-      (and (= beg (save-excursion (beginning-of-line-text)
-                                  (point)))
-           (= end (point-at-eol))))
+  (defun my-paxedit-duplicate ()
+    "Make copy of the Lisp expression at the cursor."
+    (interactive)
+    (let* ((reg (paxedit-sexp-region))
+           (beg (car reg))
+           (end (cdr reg))
+           (sexp (buffer-substring beg end))
+           (sep (if (my-lisp-sexp-whole-line-p) "\n" " ")))
+      (goto-char end)
+      (insert sep sexp)))
 
-    (defun my-paxedit-transpose-forward ()
-      (interactive)
-      (call-interactively #'paxedit-transpose-forward)
-      (repeat-at-last-keystroke))
+  (defun my-lisp-sexp-whole-line-p ()
+    "Return t, when the Lisp sexp at the point being at whole of line."
+    (interactive "P")
+    (and
+     (= beg (save-excursion (beginning-of-line-text) (point)))
+     (= end (point-at-eol))))
 
-    (defun my-paxedit-transpose-backward ()
-      (interactive)
-      (call-interactively #'paxedit-transpose-backward)
-      (repeat-at-last-keystroke)))
+  (defun my-paxedit-transpose-forward ()
+    (interactive)
+    (call-interactively #'paxedit-transpose-forward)
+    (repeat-at-last-keystroke))
+
+  (defun my-paxedit-transpose-backward ()
+    (interactive)
+    (call-interactively #'paxedit-transpose-backward)
+    (repeat-at-last-keystroke)))
+
+(leaf lisp-mode :custom (lisp-body-indent . 2))
 
 (provide 'my-lisp)
 ;;; my-lisp.el ends here

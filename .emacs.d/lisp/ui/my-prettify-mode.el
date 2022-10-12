@@ -1,4 +1,4 @@
-;;; my-prettify-mode.el --- my-prettify-mode
+;;; my-prettify-mode.el --- My config for `prettify-mode'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,10 +23,10 @@
 
 ;;; Commentary:
 
+;; My config for `prettify-mode'
+
 ;;; Code:
-(use-package prog-mode
-    :hook
-  (LaTeX-mode . prettify-symbols-mode))
+(leaf prog-mode :hook (LaTeX-mode-hook . prettify-symbols-mode))
 
 (provide 'my-prettify-mode)
 ;;; my-prettify-mode.el ends here

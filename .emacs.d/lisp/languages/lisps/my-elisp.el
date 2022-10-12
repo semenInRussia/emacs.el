@@ -26,81 +26,164 @@
 ;; My configuration of the `emacs-lisp-mode'
 
 ;;; Code:
-(use-package elisp-mode
-    :config                             ; nofmt
-  (my-define-local-major-mode-map 'elisp
-                                  '(emacs-lisp-mode inferior-emacs-lisp-mode)
-                                  my-lisp-map)
-  :hook (emacs-lisp-mode . paxedit-mode))
+(leaf elisp-mode
+  :major-mode-map (elisp
+                   :modes (emacs-lisp-mode inferior-emacs-lisp-mode)
+                   :parent my-lisp-map)                             ; nofmt
+  :hook (emacs-lisp-mode-hook . paxedit-mode)
+  :bind (:emacs-lisp-mode-map ("M-RET" . my-elisp-new-field-of-class))
+  :config (leaf eldev
+            :ensure t
+            :require t
+            :config (leaf flycheck-eldev :ensure t)))
 
-(use-package package-lint :ensure t)
+(leaf ert
+  :unless (fboundp 'debugger-make-xrefs)
+  (defun debugger-make-xrefs ()
+    "Just mock for the original function, which I lost."
+    nil))
 
-(use-package flycheck-package
+(leaf package-lint
+  :ensure t
+  :after flycheck
+  :config                                 ;nofmt
+  (leaf flycheck-package                  ;nofmt
     :ensure t
-    :init (flycheck-package-setup))
+    :config (flycheck-package-setup)))
 
-(use-package emr
-    :ensure t
-    :bind ((:map xah-fly-command-map)
-           ("SPC /" . emr-show-refactor-menu)))
+(leaf emr
+  :ensure t
+  :bind (:xah-fly-command-map
+         :package xah-fly-keys
+         ("SPC /" . emr-show-refactor-menu)))
 
-(use-package elfmt
-    :load-path "site-lisp"
-    :config (elfmt-global-mode 1))
+(leaf elfmt :global-minor-mode elfmt-global-mode)
 
-(use-package suggest :ensure t)
+(leaf suggest :ensure t)
 
-(use-package lisp-mode :custom (lisp-body-indent 2))
+(leaf elisp-mode-class
+  :init                                 ;nofmt
+  (defun my-goto-defclass-beg ()
+    "Goto backward defclass."
+    (search-backward-regexp "(\\W*defclass" nil t)
+    (skip-chars-forward "("))
 
-(defun my-goto-defclass-beg ()
-  "Goto backward defclass."
-  (search-backward-regexp "(\\W*defclass" nil t)
-  (skip-chars-forward "("))
-
-(defun my-goto-fields-defclass-defnition ()
-  "Go to fields of `defclass' defnition."
-  (interactive)
-  (my-goto-defclass-beg)
-  (forward-sexp 4)
-  (forward-char -1)
-  (-when-let
-      (sexp (sp-get-enclosing-sexp))
-    (sp-get sexp (goto-char :end-in))))
-
-(defun my-elisp-in-defclass-p (&optional pt)
-  "Move to PT and return name of function/macros in which stay this sexp."
-  (setq pt (or pt (point)))
-  (save-excursion
-    (goto-char pt)
-    (when (my-goto-defclass-beg)
-      (-when-let
-          (sexp (sp-get-enclosing-sexp))
-        (sp-get sexp (< :beg pt :end))))))
-
-(defun my-elisp-defclass-name ()
-  "Return name of `defclass' defnition."
-  (interactive)
-  (save-excursion
+  (defun my-goto-fields-defclass-defnition ()
+    "Go to fields of `defclass' defnition."
+    (interactive)
     (my-goto-defclass-beg)
-    (forward-sexp 1)
-    (forward-char 1)
-    (sexp-at-point)))
+    (forward-sexp 4)
+    (forward-char -1)
+    (-when-let
+        (sexp (sp-get-enclosing-sexp))
+      (sp-get sexp (goto-char :end-in))))
 
-(defun my-elisp-new-field-of-class ()
-  "Insert new field of Lisp class.
+  (defun my-elisp-in-defclass-p (&optional pt)
+    "Move to PT and return name of function/macros in which stay this sexp."
+    (setq pt (or pt (point)))
+    (save-excursion
+      (goto-char pt)
+      (when (my-goto-defclass-beg)
+        (-when-let
+            (sexp (sp-get-enclosing-sexp))
+          (sp-get sexp (< :beg pt :end))))))
+
+  (defun my-elisp-defclass-name ()
+    "Return name of `defclass' defnition."
+    (interactive)
+    (save-excursion
+      (my-goto-defclass-beg)
+      (forward-sexp 1)
+      (forward-char 1)
+      (sexp-at-point)))
+
+  (defun my-elisp-new-field-of-class ()
+    "Insert new field of Lisp class.
 Only when in class defnition."
-  (interactive)
-  (when (my-elisp-in-defclass-p)
-    (my-goto-fields-defclass-defnition)
-    (unless (just-line-is-whitespaces-p) (newline-and-indent))
-    (yas-expand-snippet
-     (format
-      "(${1:name} :initarg :$1 :accessor %s-$1)"
-      (my-elisp-defclass-name)))))
+    (interactive)
+    (when (my-elisp-in-defclass-p)
+      (my-goto-fields-defclass-defnition)
+      (unless (just-line-is-whitespaces-p) (newline-and-indent))
+      (yas-expand-snippet
+       (format
+        "(${1:name} :initarg :$1 :accessor %s-$1)"
+        (my-elisp-defclass-name))))))
 
-(define-key emacs-lisp-mode-map
-    (kbd "M-RET")
-  'my-elisp-new-field-of-class)
+(leaf embrace
+  :hook (emacs-lisp-mode-hook . my-embrace-emacs-lisp-mode-hook)
+  :config                               ;nofmt
+  (defun my-embrace-emacs-lisp-mode-hook ()
+    "Add some parens for the Emacs-Lisp embrace."
+    (embrace-add-pair-regexp
+     ?f
+     "(\\(\\w\\|\\)* "
+     ")"
+     'my-embrace-emacs-lisp-with-function-call
+     (embrace-build-help "(name " ")"))
+    (embrace-add-pair-regexp
+     ?d
+     "(defun \\(\\w\\|-\\)+ (.*)
+  \\( *\".*?\"\\)?
+  \\((interactive \".*?\")\\)?"
+     ")"
+     'my-embrace-emacs-lisp-with-defun
+     (embrace-build-help "(defun " ")"))
+    (embrace-add-pair-regexp
+     ?c
+     "(defcustom \\(\\w\\|-\\)*[\n ]"
+     "\".*?\"[\n ]*\\(:\\(type\\|group\\) .*?)\\)*"
+     'my-embrace-emacs-lisp-with-defcustom
+     (embrace-build-help "(defcustom " ")")))
+
+  (defun my-embrace-emacs-lisp-with-function-call ()
+    "Return open and close pairs for the Elisp function call."
+    (cons
+     (s-concat "(" (read-string "Name of the function: ") " ")
+     ")"))
+
+  (defun my-embrace-emacs-lisp-with-defun ()
+    "Return open and close pairs for the Elisp defun paren."
+    (cons
+     (s-concat
+      "(defun "
+      (read-string "Name of the function, please: ")
+      " "
+      "("
+      (read-string "Args, please: ")
+      ")"
+      "\n"
+      "\""
+      (read-string "Docstring, please: ")
+      "\""
+      "\n"
+      (--if-let
+          (my-read-string-or-nil "Ineractive preamble please: ")
+          (s-concat "\"" it "\"")
+        ""))
+     ")"))
+
+  (defun my-embrace-emacs-lisp-with-defcustom ()
+    "Return open and close pairs for the Elisp defcustom paren."
+    (cons
+     (s-concat
+      "(defcustom "
+      (read-string "Name of the variable, please: ")
+      "\n")
+     (s-concat
+      "\n"
+      "\""
+      (read-string "Docstring, please: ")
+      "\""
+      "\n"
+      (--if-let
+          (my-read-string-or-nil "Group: ")
+          (s-concat ":group '" it "\n")
+        "")
+      (--if-let
+          (my-read-string-or-nil "Type: ")
+          (s-concat ":type '" it)
+        "")
+      ")"))))
 
 (provide 'my-elisp)
 ;;; my-elisp.el ends here

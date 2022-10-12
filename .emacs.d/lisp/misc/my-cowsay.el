@@ -1,4 +1,4 @@
-;;; my-cowsay.el --- my-cowsay
+;;; my-cowsay.el --- My config of `cowsay'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,34 +23,28 @@
 
 ;;; Commentary:
 
+;; My config of `cowsay'
+
 ;;; Code:
-(use-package cowsay
-    :ensure t
-    :custom
-    (cowsay-directories '("~/.emacs.d/cows"))
-    :config
-    (cowsay-load-cows)
-    (defun fast-exec-define-cowsay-keymaps ()
-      "Some useful keymaps for `cowsay'/`fast-exec'."
-      (fast-exec/some-commands
-       ("Cow Say String..."  'cowsay-string)
-       ("Cow Say Region..."  'cowsay-region)
-       ("Cow Say and Insert" 'cowsay-replace-region)
-       ("Load Cows"  'cowsay-load-cows)))
-
-    (defun cowsay--prompt-for-cow (&rest _ignored)
-      "Read any cow name from the minibuffer."
-      (let ((default (cowsay--get-default-cow)))
-        (completing-read
-         "Cow: "
-         cowsay-cows
-         nil t
-         default
-         'cowsay-cow-history
-         default)))
-
-    (fast-exec/register-keymap-func 'fast-exec-define-cowsay-keymaps)
-    (fast-exec/reload-functions-chain))
+(leaf cowsay
+  :ensure t
+  :custom (cowsay-directories . '("~/.emacs.d/cows"))
+  :config (cowsay-load-cows)
+  :fast-exec (("Cow Say String..."  'cowsay-string)
+              ("Cow Say Region..."  'cowsay-region)
+              ("Cow Say and Insert" 'cowsay-replace-region)
+              ("Load Cows"  'cowsay-load-cows))
+  :config ; nofmt
+  (defun cowsay--prompt-for-cow (&rest _ignored)
+    "Read any cow name from the minibuffer."
+    (let ((default (cowsay--get-default-cow)))
+      (completing-read
+       "Cow: "
+       cowsay-cows
+       nil t
+       default
+       'cowsay-cow-history
+       default))))
 
 (provide 'my-cowsay)
 ;;; my-cowsay.el ends here

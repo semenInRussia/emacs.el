@@ -1,4 +1,4 @@
-;;; my-aas.el --- my-aas
+;;; my-aas.el --- My configuration of the `auto-activating-snippets'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,11 +23,12 @@
 
 ;;; Commentary:
 
+;; My configuration of the `auto-activating-snippets'
+
 ;;; Code:
-(use-package aas
-    :ensure t
-    :config
-    (aas-global-mode))
+(leaf aas                        ;nofmt
+  :ensure t
+  :global-minor-mode aas-global-mode)
 
 (provide 'my-aas)
 ;;; my-aas.el ends here

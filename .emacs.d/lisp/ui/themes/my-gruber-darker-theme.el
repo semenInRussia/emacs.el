@@ -1,4 +1,4 @@
-;;; my-gruber-darker-theme.el --- my-gruber-darker-theme
+;;; my-gruber-darker-theme.el --- My file loading `gruber-darker-theme'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,9 +23,10 @@
 
 ;;; Commentary:
 
+;; My file loading `gruber-darker-theme'
+
 ;;; Code:
-(use-package gruber-darker-theme
-    :ensure t)
+(leaf gruber-darker-theme :ensure t :require t)
 
 (provide 'my-gruber-darker-theme)
 ;;; my-gruber-darker-theme.el ends here

@@ -1,4 +1,4 @@
-;;; my-aggresive-indent.el --- my-aggresive-indent
+;;; my-aggresive-indent.el --- My configuration for the `aggressive-indent'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,23 +23,23 @@
 
 ;;; Commentary:
 
-;;; Code:
-(defcustom my-aggresive-indent-in-modes '(racket-mode
-                                          css-mode
-                                          emacs-lisp-mode
-                                          eshell-mode)
-  "List of major modes in which should work `aggressive-indent-mode'."
-  :type '(repeat symbol))
+;; My configuration for the `aggressive-indent'
 
-(use-package aggressive-indent
+;;; Code:
+(require 'leaf)
+
+(defcustom my-aggresive-indent-hooks
+  '(racket-mode-hook
+    css-mode-hook
+    emacs-lisp-mode-hook
+    eshell-mode-hook)
+  "List of hook on which should be enabled `aggressive-indent-mode'."
+  :type '(repeat symbol)
+  :group 'my)
+
+(leaf aggressive-indent
     :ensure t
-    :init
-    (--each my-aggresive-indent-in-modes
-      (add-hook (->> it
-                     (symbol-name)
-                     (s-append "-hook")
-                     (intern))
-                #'aggressive-indent-mode)))
+    :hook `(,my-aggresive-indent-hooks . aggressive-indent-mode))
 
 (provide 'my-aggresive-indent)
 ;;; my-aggresive-indent.el ends here

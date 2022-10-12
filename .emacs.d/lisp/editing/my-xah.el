@@ -26,16 +26,6 @@
 ;; My config of the `xah-fly-keys'
 
 ;;; Code:
-(use-package xah-fly-keys
-    :load-path "site-lisp"
-    :init (defvar xah-fly-insert-state-p t)
-    :config                             ;nofmt
-    (xah-fly-keys-set-layout "qwerty")
-    (xah-fly-keys 1)
-    :bind ((:map xah-fly-command-map)
-           ("SPC l"   . nil)
-           ("SPC j"   . nil)
-           ("SPC SPC" . nil)))
 
 (defvar my-local-major-mode-map nil
   "My map for current `major-mode'.")
@@ -45,72 +35,22 @@
   (interactive)
   (set-transient-map my-local-major-mode-map))
 
-(bind-keys
- :map xah-fly-command-map
- ("SPC l" . my-local-major-mode-map-run))
-
-(add-to-list 'use-package-keywords :major-mode-map)
-
-(defun use-package-normalize/:major-mode-map (pkg-name keyword args)
-  "Normalizer of :major-mode-map for `use-package'.
-
-Should return `plist' with followed keywords
-
-:keymap-name
-Name of the keymap without special prefixes and suffixes.
-
-:major-modes
-List of the major-modes in which should work keymap
-
-:parent
-Parent of the `major-mode' keymap
-
-PKG-NAME, KEYWORD and ARGS"
-  (let* ((args-plist (car args))
-         keymap-name
-         parent
-         major-modes)
-    (cond
-      ((eq args-plist t)
-       (setq keymap-name pkg-name)
-       (setq major-modes (list pkg-name)))
-      ((symbolp args-plist)
-       (setq keymap-name args-plist)
-       (setq major-modes (list pkg-name)))
-      (t
-       (setq keymap-name
-             (or (-first 'symbolp args-plist) pkg-name))
-       (setq major-modes
-             (or (-first 'listp args-plist) (list pkg-name)))
-       (setq parent (plist-get args-plist :parent))))
-    (list
-     :keymap-name keymap-name
-     :major-modes major-modes
-     :parent parent)))
-
 (defcustom my-major-mode-map-prefix "my-"
   "Prefix for the local `major-mode' keymap variable name."
-  :type 'string)
+  :type 'string
+  :group 'my)
 
 (defcustom my-major-mode-map-suffix "-local-map"
   "Suffix for the local `major-mode' keymap variable name."
-  :type 'string)
+  :type 'string
+  :group 'my)
 
 (defvar my-major-mode-local-maps
   (make-hash-table :test 'eql)
   "Hashtable of the `major-mode's and respective keymaps.")
 
-(defun use-package-handler/:major-mode-map
-    (pkg-name keyword keymap-info rest state)
-  (let ((body (use-package-process-keywords pkg-name rest state))
-        (keymap-name (plist-get keymap-info :keymap-name))
-        (major-modes (plist-get keymap-info :major-modes))
-        (parent (plist-get keymap-info :parent)))
-    (cons
-     `(my-define-local-major-mode-map ',keymap-name ',major-modes ,parent)
-     body)))
-
-(defun my-define-local-major-mode-map (keymap-name major-modes &optional parent)
+(defun my-define-local-major-mode-map  ;nofmt
+    (keymap-name major-modes &optional parent)
   "Define local keymap for the MAJOR-MODES.
 
 Name of the local keymap will be KEYMAP-NAME + some suffixes and
@@ -129,14 +69,19 @@ PARENT is the parent keymap for the local map."
 KEYMAP-NAME has type symbol.
 
 Name of the keymap variable will has the followed form:
-my-{keymap-name}-local-map"
-  (->
-   keymap-name
-   (symbol-name)
-   (s-prepend my-major-mode-map-suffix)
-   (s-append my-major-mode-map-prefix)
-   (intern)
-   (define-prefix-command)))
+my-{keymap-name}-local-map.
+
+If keymap have defined already, then do nothing."
+  (let ((prefix-command
+         (->
+          keymap-name
+          (symbol-name)
+          (s-prepend my-major-mode-map-suffix)
+          (s-append my-major-mode-map-prefix)
+          (intern))))
+    (unless (boundp prefix-command)
+      (define-prefix-command prefix-command))
+    prefix-command))
 
 (defun my-change-local-major-mode-map (&optional mode)
   "Change local major mode keymap for the MODE.
@@ -147,7 +92,21 @@ MODE defaults to the current `major-mode'.  See `my-local-major-mode-map-run'"
   (setq-local my-local-major-mode-map
               (gethash mode my-major-mode-local-maps)))
 
-(add-hook 'after-change-major-mode-hook 'my-change-local-major-mode-map)
+(add-hook 'after-change-major-mode-hook
+          'my-change-local-major-mode-map)
+
+(leaf xah-fly-keys
+  :commands xah-fly-insert-mode-activate
+  :require t
+  :bind (("M-SPC" . xah-fly-command-mode-activate)
+         (:xah-fly-command-map ("SPC l"   . my-local-major-mode-map)))
+  :config                               ;nofmt
+  (xah-fly-keys-set-layout "qwerty")
+  (xah-fly-keys 1)
+  (leaf-keys
+   (xah-fly-command-map
+    ("SPC l"   . my-local-major-mode-map-run)
+    ("SPC SPC" . nil))))
 
 (provide 'my-xah)
 ;;; my-xah.el ends here

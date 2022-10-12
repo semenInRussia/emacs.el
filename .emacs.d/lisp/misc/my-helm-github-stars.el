@@ -1,4 +1,4 @@
-;;; my-helm-github-stars.el --- my-helm-github-stars
+;;; my-helm-github-stars.el --- My config of `helm-github-stars'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,18 +23,14 @@
 
 ;;; Commentary:
 
+;; My config of `helm-github-stars'
+
 ;;; Code:
-(use-package helm-github-stars
-    :ensure t
-    :custom
-    (helm-github-stars-username "semeninrussia")
-    :init
-    (defun fast-exec-define-helm-github-stars ()
-      "Bind `helm-github-stars' and `fast-exec'."
-      (fast-exec/some-commands
-       ("View Github Stars" 'helm-github-stars-fetch)))
-    (fast-exec/register-keymap-func 'fast-exec-define-helm-github-stars)
-    (fast-exec/reload-functions-chain))
+(leaf helm-github-stars
+  :ensure t
+  :commands helm-github-stars-fetch
+  :custom (helm-github-stars-username . "semeninrussia")
+  :fast-exec ("View Github Stars" 'helm-github-stars-fetch))
 
 (provide 'my-helm-github-stars)
 ;;; my-helm-github-stars.el ends here

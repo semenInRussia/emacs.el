@@ -1,4 +1,4 @@
-;;; my-go.el --- my-go
+;;; my-go.el --- My configuration of the `go'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,16 +23,14 @@
 
 ;;; Commentary:
 
+;; My configuration of the `go'
+
 ;;; Code:
-(use-package go-mode
-    :ensure t
-    :config (my-define-local-major-mode-map 'go '(go-mode)))
-
-(use-package go-eldoc :ensure t :hook (go-mode . 'go-eldoc-setup))
-
-(use-package go-mode
-    :bind ((:map my-go-local-map)
-           ("i" . go-import-add)))
+(leaf go-mode
+  :ensure t
+  :major-mode-map go
+  :bind (:my-go-local-map ("i" . go-import-add))
+  :config (leaf go-eldoc :ensure t :hook (go-mode-hook . go-eldoc-setup)))
 
 (provide 'my-go)
 ;;; my-go.el ends here

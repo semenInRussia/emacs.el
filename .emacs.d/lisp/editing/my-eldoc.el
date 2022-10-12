@@ -1,4 +1,4 @@
-;;; my-eldoc.el --- my-eldoc
+;;; my-eldoc.el --- My configuration of the `eldoc'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,9 +23,13 @@
 
 ;;; Commentary:
 
+;; My configuration of the `eldoc'
+
 ;;; Code:
-(use-package eldoc
-    :custom ((eldoc-idle-delay 0.01)))
+
+(leaf eldoc                             ;elfmt
+  :ensure t
+  :custom (eldoc-idle-delay . 0.01))
 
 (provide 'my-eldoc)
 ;;; my-eldoc.el ends here

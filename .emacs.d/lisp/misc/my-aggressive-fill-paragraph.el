@@ -1,4 +1,4 @@
-;;; my-aggressive-fill-paragraph.el --- my-aggressive-fill-paragraph
+;;; my-aggressive-fill-paragraph.el --- My config for `aggressive-fill-paragraph'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,24 +23,24 @@
 
 ;;; Commentary:
 
-;;; Code:
-(defcustom my-aggresive-fill-paragraph-modes
-  '(org-mode
-    markdown-mode)
-  "List of major modes in which `aggressive-fill-paragraph' should work."
-  :type '(repeat symbol))
+;; My config for `aggressive-fill-paragraph'
 
-(use-package aggressive-fill-paragraph
-    :ensure t
-    :config
-    (--each my-aggresive-fill-paragraph-modes
-      (add-hook
-       (->>
-        it
-        (symbol-name)
-        (s-append "-hook")
-        (intern))
-       #'aggressive-fill-paragraph-mode)))
+;;; Code:
+(require 'dash)
+(require 'my-lib)
+
+(defcustom my-aggresive-fill-paragraph-modes
+  '(org-mode markdown-mode)
+  "List of major modes in which `aggressive-fill-paragraph' should work."
+  :type '(repeat symbol)
+  :group 'my)
+
+(leaf aggressive-fill-paragraph
+  :ensure t
+  :config (--each my-aggresive-fill-paragraph-modes
+            (add-hook
+             (my-major-mode-to-hook it)
+             #'aggressive-fill-paragraph-mode)))
 
 (provide 'my-aggressive-fill-paragraph)
 ;;; my-aggressive-fill-paragraph.el ends here

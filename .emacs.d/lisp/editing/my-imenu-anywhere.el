@@ -1,4 +1,4 @@
-;;; my-imenu-anywhere.el --- my-imenu-anywhere
+;;; my-imenu-anywhere.el --- My configuration of the `imenu-anywhere'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,12 +23,15 @@
 
 ;;; Commentary:
 
+;; My configuration of the `imenu-anywhere'
+
 ;;; Code:
-(use-package imenu-anywhere
-    :ensure t
-    :bind
-    ((:map xah-fly-command-map)
-     ("SPC SPC n" . imenu-anywhere)))
+
+(leaf imenu-anywhere
+  :ensure t
+  :bind (:xah-fly-command-map
+         :package xah-fly-keys
+         ("SPC SPC n" . imenu-anywhere)))
 
 (provide 'my-imenu-anywhere)
 ;;; my-imenu-anywhere.el ends here

@@ -1,4 +1,4 @@
-;;; my-misc.el --- my-misc
+;;; my-misc.el --- My some little miscellaneous feautures
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,18 +23,18 @@
 
 ;;; Commentary:
 
+;; My some little miscellaneous feautures
+
 ;;; Code:
+(require 'dash)
+(require 'f)
+
 (setq make-backup-files         nil)
 (setq auto-save-list-file-name  nil)
 (defalias 'yes-or-no-p 'y-or-n-p)
-(toggle-truncate-lines 38)
-
+(toggle-truncate-lines t)
 (add-hook 'prog-mode-hook 'whitespace-mode)
-
-(add-hook 'change-major-mode-hook 'visual-line-mode)
-
 (setq default-input-method "russian-computer")
-
 (setq buffer-file-coding-system 'utf-8)
 
 (defun my-new-fake-pptx-file ()
@@ -43,12 +43,11 @@
   (->> "~/broken.pptx" (f-read) (insert))
   (text-mode))
 
-(defun fast-exec-fake-pptx-keys ()
-  "Get some useful keymaps of  `fast-exec' for fake-pptx."
-  (fast-exec/some-commands ("New Fake PPTX File" 'my-new-fake-pptx-file)))
-
-(fast-exec/register-keymap-func 'fast-exec-fake-pptx-keys)
-(fast-exec/reload-functions-chain)
+(eval-after-load 'fast-exec
+  '(progn
+     (fast-exec-bind 'pptx
+       (fast-exec-make-some-commands
+        ("New Fake PPTX File" 'my-new-fake-pptx-file)))))
 
 (provide 'my-misc)
 ;;; my-misc.el ends here

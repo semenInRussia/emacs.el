@@ -1,4 +1,4 @@
-;;; my-editing.el --- my-editing
+;;; my-editing.el --- My configuration for the custom editing
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,7 +23,14 @@
 
 ;;; Commentary:
 
+;; My configuration for the custom editing
+
 ;;; Code:
+
+(require 'dash)
+(require 'leaf)
+(require 's)
+
 (defun open-line-saving-indent ()
   "Inserting new line, saving position and inserting new line."
   (interactive)
@@ -34,31 +41,24 @@
   (end-of-line)
   (delete-horizontal-space t))
 
-(define-key xah-fly-command-map (kbd "s") 'open-line-saving-indent)
-
 (defun open-line-below ()
+  "Make new empty line below current."
   (interactive)
   (end-of-line)
   (newline)
   (indent-for-tab-command))
 
 (defun open-line-above ()
+  "Make new empty line below current."
   (interactive)
   (beginning-of-line)
   (newline)
   (forward-line -1)
   (indent-for-tab-command))
 
-(defun new-line-in-between ()
-  (interactive)
-  (newline)
-  (save-excursion
-    (newline)
-    (indent-for-tab-command))
-  (indent-for-tab-command))
-
 (defun duplicate-current-line-or-region (arg)
   "Duplicates the current line or region ARG times.
+
 If there's no region, the current line will be duplicated."
   (interactive "p")
   (if (region-active-p)
@@ -67,118 +67,99 @@ If there's no region, the current line will be duplicated."
         (duplicate-region arg beg end)
         (one-shot-keybinding
          "y"
-         (lambda (interactive)
-           (duplicate-region 1 beg end))))
+         (lambda (interactive) (duplicate-region 1 beg end))))
     (duplicate-current-line arg)
     (one-shot-keybinding "y" 'duplicate-current-line)))
 
 (defun duplicate-region (&optional num start end)
   "Duplicates the region bounded by START and END NUM times.
-If no START and END is provided, the current region-beginning and
-region-end is used."
+
+If no START and END is provided, the current `region-beginning' and
+`region-end' is used."
   (interactive "p")
   (save-excursion
     (let* ((start (or start (region-beginning)))
            (end (or end (region-end)))
            (region (buffer-substring start end)))
       (goto-char end)
-      (dotimes (i num)
-        (insert region)))))
+      (dotimes (i num) (insert region)))))
 
 (defun duplicate-current-line (&optional num)
   "Duplicate the current line NUM times."
   (interactive "p")
-  (if (bound-and-true-p paredit-mode)
-      (paredit-duplicate-current-line)
-    (save-excursion
-      (when (eq (point-at-eol) (point-max))
-        (goto-char (point-max))
-        (newline)
-        (forward-char -1))
-      (duplicate-region num (point-at-bol) (1+ (point-at-eol))))))
+  (save-excursion
+    (when (eq (point-at-eol) (point-max))
+      (goto-char (point-max))
+      (newline)
+      (forward-char -1))
+    (duplicate-region num (point-at-bol) (1+ (point-at-eol)))))
 
-(defvar yank-indent-modes '(prog-mode
-                            sgml-mode
-                            js2-mode)
-  "Modes in which to indent regions that are yanked (or yank-popped)")
+(defvar yank-indent-modes
+  '(prog-mode sgml-mode js2-mode)
+  "Modes in which to indent regions that are yanked (or yank-popped).")
 
 (defvar yank-advised-indent-threshold 1000
   "Threshold (# chars) over which indentation does not automatically occur.")
 
 (defun yank-advised-indent-function (beg end)
-  "Do indentation, as long as the region isn't too large."
-  (if (<= (- end beg) yank-advised-indent-threshold)
-      (indent-region beg end nil)))
+  "Do indentation, as long as the region beetween BEG END isn't too large."
+  (when (<= (- end beg) yank-advised-indent-threshold)
+    (indent-region beg end nil)))
 
 (defadvice yank (after yank-indent activate)
   "If current mode is one of 'yank-indent-modes, indent yanked text.
 With prefix arg don't indent."
-  (if (and (not (ad-get-arg 0))
-           (--any? (derived-mode-p it) yank-indent-modes))
+  (if (and
+       (not (ad-get-arg 0))
+       (--any? (derived-mode-p it) yank-indent-modes))
       (let ((transient-mark-mode nil))
-        (yank-advised-indent-function (region-beginning) (region-end)))))
+        (yank-advised-indent-function
+         (region-beginning)
+         (region-end)))))
 
 (defadvice yank-pop (after yank-pop-indent activate)
   "If current mode is one of 'yank-indent-modes, indent yanked text.
 With prefix arg don't indent."
-  (if (and (not (ad-get-arg 0))
-           (member major-mode yank-indent-modes))
+  (if (and
+       (not (ad-get-arg 0))
+       (member major-mode yank-indent-modes))
       (let ((transient-mark-mode nil))
-        (yank-advised-indent-function (region-beginning) (region-end)))))
+        (yank-advised-indent-function
+         (region-beginning)
+         (region-end)))))
 
-(defun yank-unindented ()
-  (interactive)
-  (yank 1))
+(defun yank-unindented () "Just `yunk'." (interactive) (yank 1))
 
 (defun kill-to-beginning-of-line ()
+  "Kill region from the current position to the beginning of line."
   (interactive)
-  (kill-region (save-excursion (beginning-of-line) (point))
-               (point)))
+  (kill-region (point-at-bol) (point)))
 
-(bind-keys :map
-           xah-fly-command-map
-           ("SPC y"     . duplicate-current-line-or-region)
-           ("SPC s"     . open-line-below)
-           ("SPC e"     . kill-to-beginning-of-line)
-           ("SPC k RET" . new-line-in-between)
-           ("SPC SPC s" . open-line-above))
+(leaf-keys
+ (:xah-fly-command-map
+  :package xah-fly-keys
+  ("SPC y"     . duplicate-current-line-or-region)
+  ("SPC s"     . open-line-below)
+  ("SPC SPC s" . open-line-above)
+  ("s"         . open-line-saving-indent)
+  ("SPC SPC b" . my-change-case-of-current-line)
+  ("SPC e"     . kill-to-beginning-of-line)))
 
 (defun my-change-case-of-current-line ()
   "Change case of current line to next (see `xah-toggle-letter-case')."
   (interactive)
   (save-mark-and-excursion
     (select-current-line)
-    (xah-toggle-letter-case)))
-
-(bind-keys
- :map xah-fly-command-map
- ("SPC SPC b" . my-change-case-of-current-line)
- ("b"         . my-toggle-change-case-of-line-or-word-or-selection))
+    (xah-toggle-letter-case))
+  (repeat-at-last-keystroke))
 
 (defvar my-last-command-is-changed-case-of-current-line
   nil "In t, when last command change case.")
 
-(defun my-toggle-change-case-of-line-or-word-or-selection ()
-  "Using one of functions, which change case.
-List of functions: `xah-toggle-letter-case', `my-change-case-of-current-line'."
-  (interactive)
-  (let* ((change-case-of-line
-          (or
-           (eq last-command 'my-change-case-of-current-line)
-           (and
-            (eq
-             last-command
-             'my-toggle-change-case-of-line-or-word-or-selection)
-            my-last-command-is-changed-case-of-current-line))))
-    (setq my-last-command-is-changed-case-of-current-line change-case-of-line)
-    (if change-case-of-line
-        (my-change-case-of-current-line)
-      (xah-toggle-letter-case))))
-
 (defun my-duplicate-last-block ()
   "Take last text block and insert."
   (interactive)
-  (while (looking-back "[\n\t ]") (delete-backward-char 1))
+  (while (looking-back "[\n\t ]" nil) (delete-char -1))
   (->>
    (buffer-substring (my-point-at-last-block-beg) (point))
    (s-trim)
@@ -195,11 +176,11 @@ List of functions: `xah-toggle-letter-case', `my-change-case-of-current-line'."
         (match-end 0)
       (point-min))))
 
-(bind-keys*
- :map xah-fly-command-map
- ("SPC k 6" . my-duplicate-last-block))
-
-(define-key xah-fly-command-map (kbd "SPC SPC v") 'helm-show-kill-ring)
+(leaf-keys
+ (xah-fly-command-map
+  :package xah-fly-keys
+  ("SPC k 6"    . my-duplicate-last-block)
+  ("SPC SPC v"  . helm-show-kill-ring)))
 
 (provide 'my-editing)
 ;;; my-editing.el ends here

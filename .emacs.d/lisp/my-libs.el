@@ -1,4 +1,4 @@
-;;; my-libs.el --- libs
+;;; my-libs.el --- Some libraries
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,18 +23,20 @@
 
 ;;; Commentary:
 
+;; Some libraries
+
 ;;; Code:
-(use-package s :ensure t)
+(leaf s :ensure t)
 
-(use-package f :ensure t)
+(leaf f :ensure t)
 
-(use-package dash :ensure t :init (global-dash-fontify-mode 1))
+(leaf dash :ensure t :global-minor-mode global-dash-fontify-mode)
 
-(use-package pcache :ensure t)
+(leaf pcache :ensure t)
 
-(use-package org-ml :ensure t)
+(leaf org-ml :ensure t)
 
-(use-package just :load-path "~/projects/just/")
+(leaf just :load-path "~/projects/just/")
 
 (provide 'my-libs)
 ;;; my-libs.el ends here

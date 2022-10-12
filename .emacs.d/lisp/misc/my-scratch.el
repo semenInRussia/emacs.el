@@ -1,4 +1,4 @@
-;;; my-scratch.el --- my-scratch
+;;; my-scratch.el --- My config for scratch
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,10 +23,10 @@
 
 ;;; Commentary:
 
+;; My config for scratch
+
 ;;; Code:
-(use-package scratch
-    :ensure t
-    :bind (("C-t" . scratch)))
+(leaf scratch :ensure t :after xah-fly-keys :bind ("C-t" . scratch))
 
 (provide 'my-scratch)
 ;;; my-scratch.el ends here

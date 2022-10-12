@@ -1,4 +1,4 @@
-;;; my-python.el --- my-python
+;;; my-python.el --- My configuration for `python'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,21 +23,21 @@
 
 ;;; Commentary:
 
+;; My configuration for `python'
+
 ;;; Code:
-(use-package python-mode
-    :ensure t
-    :custom (python-shell-interpreter "python")
-    :mode "\\.py\\'")
+(leaf python-mode
+  :ensure t
+  :custom (python-shell-interpreter . "python")
+  :hook (python-mode-hook . enable-dabbrev-company-backend)
+  :mode "\\.py\\'"
+  :config (leaf pydoc :ensure t)
 
-(use-package pydoc
-    :ensure t)
-
-(defun enable-dabbrev-company-backend ()
-  "Add `company-dabbrev' backend to `company-backends' for local major mode."
-  (interactive)
-  (setq-local company-backends (cons 'company-dabbrev company-backends)))
-
-(add-hook 'python-mode-hook 'enable-dabbrev-company-backend)
+  (defun enable-dabbrev-company-backend ()
+    "Add `company-dabbrev' backend to `company-backends' for local major mode."
+    (interactive)
+    (setq-local company-backends
+                (cons 'company-dabbrev company-backends))))
 
 (provide 'my-python)
 ;;; my-python.el ends here

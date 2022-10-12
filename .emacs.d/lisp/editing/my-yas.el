@@ -1,4 +1,4 @@
-;;; my-yas.el --- my-yas
+;;; my-yas.el --- My configuration for the `yasnippet'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,32 +23,37 @@
 
 ;;; Commentary:
 
-;;; Code:
-(use-package yasnippet
-    :ensure t
-    :config (yas-global-mode +1)
-    :custom
-    (yas-snippet-dirs '("~/.emacs.d/snippets"))
-    (yas-wrap-around-region t))
+;; My configuration for the `yasnippet'
 
-(defun yas--fetch (table key)
-  "Fetch templates in TABLE by KEY.
+;;; Code:
+(require 's)
+
+(leaf yasnippet
+  :ensure t
+  :defun (yas--table-hash
+          yas--filter-templates-by-condition
+          yas--namehash-templates-alist)
+  :global-minor-mode yas-global-mode
+  :custom `((yas-snippet-dirs .
+                              ',(list
+                                 (locate-user-emacs-file "snippets")))
+            (yas-wrap-around-region . t)))
+
+(leaf yasnippet
+  :doc "Load `fast-exec' keymaps for `yasnippet'."
+  :after fast-exec
+  :config                               ;nofmt
+  (defun yas--fetch (table key)
+    "Fetch templates in TABLE by KEY.
 
 Return a list of cons (NAME . TEMPLATE) where NAME is a
 string and TEMPLATE is a `yas--template' structure."
-  (let* ((key (s-downcase key))
-         (keyhash (yas--table-hash table))
-         (namehash (and keyhash (gethash key keyhash))))
-    (when namehash
-      (yas--filter-templates-by-condition
-       (yas--namehash-templates-alist namehash)))))
-
-(defun fast-exec-my-yas-keys ()
-  "Get some useful keymaps of  `fast-exec' for my-yas."
-  (fast-exec/some-commands ("Yasnippet Edit Snippet" 'yas-visit-snippet-file)))
-
-(fast-exec/register-keymap-func 'fast-exec-my-yas-keys)
-(fast-exec/reload-functions-chain)
+    (let* ((key (s-downcase key))
+	   (keyhash (yas--table-hash table))
+	   (namehash (and keyhash (gethash key keyhash))))
+      (when namehash
+	(yas--filter-templates-by-condition
+	 (yas--namehash-templates-alist namehash))))))
 
 (provide 'my-yas)
 ;;; my-yas.el ends here

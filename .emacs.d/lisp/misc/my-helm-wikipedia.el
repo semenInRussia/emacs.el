@@ -1,4 +1,4 @@
-;;; my-helm-wikipedia.el --- my-helm-wikipedia
+;;; my-helm-wikipedia.el --- My config for `helm-wikipedia'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,9 +23,10 @@
 
 ;;; Commentary:
 
+;; My config for `helm-wikipedia'
+
 ;;; Code:
-(use-package helm-wikipedia
-    :ensure t)
+(leaf helm-wikipedia :ensure t)
 
 (provide 'my-helm-wikipedia)
 ;;; my-helm-wikipedia.el ends here

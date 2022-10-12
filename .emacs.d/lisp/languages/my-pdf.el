@@ -1,4 +1,4 @@
-;;; my-pdf.el --- my-pdf
+;;; my-pdf.el --- My configuration for reading of `pdf' documents
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,9 +23,11 @@
 
 ;;; Commentary:
 
+;; My configuration for reading of `pdf' documents
+
 ;;; Code:
-(use-package pdf-tools
-    :ensure t)
+
+(leaf pdf-tools :ensure t)
 
 (provide 'my-pdf)
 ;;; my-pdf.el ends here

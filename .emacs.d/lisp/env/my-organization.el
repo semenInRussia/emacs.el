@@ -1,4 +1,4 @@
-;;; my-organization.el --- my-organization
+;;; my-organization.el --- My configuration for the my organization
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,38 +23,41 @@
 
 ;;; Commentary:
 
+;; My configuration for the my organization
+
 ;;; Code:
-(defun my-agenda-plan-new-day ()
-  "Switch to the new day in my organization system."
-  (interactive)
-  (my-org-archive-done-and-saw-headings))
 
-(defun my-org-archive-done-and-saw-headings ()
-  "Archieve all `org-mode' headings which has the label done."
-  (save-excursion
-    (goto-char (point-min))
-    (org-map-entries 'org-archive-subtree "/+DONE" nil)))
+(require 'just)
 
-(defun my-open-main-agenda-file ()
-  "Open agenda.org."
-  (interactive)
-  (find-file "~/agenda.org"))
+(leaf org-agenda                        ;nofmt
+  :after org
+  :custom (org-agenda-files . '("~/agenda.org"))
+  :bind (("<f9>"      . org-agenda)
+         ("S-<f9>"    . org-agenda-list)
+         (:xah-fly-command-map
+          ("SPC <f9>" . org-agenda-list)
+          ("SPC i p"  . my-open-main-agenda-file)))
+  :config                               ;nofmt
+  (defun my-agenda-plan-new-day ()
+    "Switch to the new day in my organization system."
+    (interactive)
+    (my-org-archive-done-and-saw-headings))
 
-(defun fast-exec-agenda-keys ()
-  "Get some useful keymaps of  `fast-exec' for agenda."
-  (fast-exec/some-commands ("Plane New Day" 'my-agenda-plan-new-day)))
+  (defun my-org-archive-done-and-saw-headings ()
+    "Archieve all `org-mode' headings which has the label done."
+    (save-excursion
+      (goto-char (point-min))
+      (org-map-entries 'org-archive-subtree "/+DONE" nil)))
 
-(fast-exec/register-keymap-func 'fast-exec-agenda-keys)
-(fast-exec/reload-functions-chain)
+  (defun my-open-main-agenda-file ()
+    "Open agenda.org."
+    (interactive)
+    (find-file "~/agenda.org")))
 
-(setq org-agenda-files '("~/agenda.org"))
-
-(bind-keys
- ("<f9>" . org-agenda)
- ("S-<f9>" . org-agenda-list)
- :map xah-fly-command-map
- ("SPC <f9>" . org-agenda-list)
- ("SPC i p" . my-open-main-agenda-file))
+(leaf org-agenda
+  :after (org fast-exec)
+  :config                               ; nofmt
+  :fast-exec ("Plane New Day" 'my-agenda-plan-new-day))
 
 (defun my-add-org-subtree-to-targets-on-day ()
   "Add  a `org-mode' subtree at the point to the targets on day."
@@ -66,13 +69,13 @@
       (insert subtree-text)
       (delete-char -1)
       (beginning-of-line)
-      (my-org-headline-set-todo-keyword "TODO")
+      (org-todo 'todo)
       (org-schedule t (format-time-string "%Y-%m-%d")))))
 
 (defun my-goto-targets-on-day ()
   "Visit `org-mode' subtree of the targets on day."
   (my-open-main-agenda-file)
-  (beginning-of-buffer)
+  (goto-char (point-min))
   (search-forward "* Targets on Day")
   (forward-char))
 
@@ -84,37 +87,32 @@
       (just-text-in-region)
     (delete-region (region-beginning) (region-end))))
 
-(defun my-org-headline-set-todo-keyword (new-keyword &optional pt)
-  "Set todo keyword of a headline at PT to NEW-KEYWORD.
+(leaf-keys
+ (xah-fly-command-map                   ;nofmt
+  :package xah-fly-keys
+  ("SPC i a" . my-add-org-subtree-to-targets-on-day)))
 
-PT defaults to the current `point'"
-  (or pt (setq pt (point)))
-  (org-ml-update-subtree-at* pt
-    (org-ml-set-property :todo-keyword new-keyword it)))
-
-(bind-keys
- :map xah-fly-command-map
- ("SPC i a" . my-add-org-subtree-to-targets-on-day))
-
-(use-package org-capture
-    :custom ((org-capture-templates
-              '(("d"
-                 "Target on Day"
-                 entry
-                 (file+headline "~/agenda.org" "Targets on Day")
-                 "* TODO %?\n  SCHEDULED: %t\n  \n")
-                ("w"
-                 "Target on Week"
-                 entry
-                 (file+headline "~/agenda.org" "Targets on Week")
-                 "* TODO %?\n  \n")
-                ("f"
-                 "Film for See"
-                 entry
-                 (file+headline "~/agenda.org" "Films")
-                 (function my-films-format-as-org-heading)))))
-    :bind ((:map org-capture-mode-map)
-           ([remap save-buffer] . 'org-capture-finalize)))
+(leaf org-capture
+  :commands org-capture
+  :custom ((org-capture-templates
+            .
+            '(("d"
+               "Target on Day"
+               entry
+               (file+headline "~/agenda.org" "Targets on Day")
+               "* TODO %?\n  SCHEDULED: %t\n  \n")
+              ("w"
+               "Target on Week"
+               entry
+               (file+headline "~/agenda.org" "Targets on Week")
+               "* TODO %?\n  \n")
+              ("f"
+               "Film for See"
+               entry
+               (file+headline "~/agenda.org" "Films")
+               (function my-films-format-as-org-heading)))))
+  :bind (:org-capture-mode-map
+         ([remap save-buffer] . org-capture-finalize)))
 
 (provide 'my-organization)
 ;;; my-organization.el ends here

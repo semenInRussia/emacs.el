@@ -1,4 +1,4 @@
-;;; my-racket.el --- my-racket
+;;; my-racket.el --- My Configuration For The Lanugage `racket'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,77 +23,83 @@
 
 ;;; Commentary:
 
-;;; Code:
-(use-package racket-mode
-    :ensure t
-    :config (my-define-local-major-mode-map 'racket
-                                            '(racket-mode racket-repl-mode))
-    :hook ;; this is enable some useful functions for the Racket
-    (racket-mode . racket-xp-mode)
-    ;; `flycheck' is very slow and `racket-xp-mode' highlight
-    ;; errors too, so i disable `flycheck' for the Racket
-    (racket-mode . turn-off-flycheck)
-    ;; this enable structured editing for the `racket-mode'
-    (racket-mode . paxedit-mode)
-    :custom (racket-xp-mode-hook nil)           ; fix a bug
-    :config (remove-hook 'racket-mode-hook 'racket-mode))
+;; My Configuration For The Lanugage `racket'
 
-(defcustom my-racket-meta-return-functions
-  '()
-  "List of functions for M-ret in racket.
+;;; Code:
+
+(leaf racket-mode
+  :ensure t
+  :major-mode-map (racket               ;nofmt
+                   :modes (racket-mode racket-repl-mode)
+                   :parent my-lisp-map)
+  :bind (:racket-mode-map               ;nofmt
+         ("M-RET" . my-racket-meta-return))
+  :hook ((racket-mode . racket-xp-mode)
+         ;; `flycheck' is very slow and `racket-xp-mode' highlight
+         ;; errors too, so i disable `flycheck' for the Racket
+         (racket-mode . turn-off-flycheck)
+         ;; this enable structured editing for the `racket-mode'
+         (racket-mode . paxedit-mode)
+         ;; `racket-xp-mode' has built-in feauture which highlhight a
+         ;; symbol at `point'
+         (racket-mode . my-turn-off-highlight-thing-mode))
+  :custom (racket-xp-mode-hook . nil)
+  :config                               ;nofmt
+  (remove-hook 'racket-mode-hook 'racket-mode) ;fix a bug
+
+  (defcustom my-racket-meta-return-functions nil
+    "List of functions for M-ret in racket.
 Each function should return t, if it should be called and should stop next
 calls of functions."
-  :type '(repeat function))
+    :type '(repeat function)
+    :group 'my)
 
-(defun my-racket-meta-return ()
-  "Try use one of M-ret functions for racket.
+  (defun my-racket-meta-return ()
+    "Try use one of M-ret functions for racket.
 Depends on `my-racket-meta-return-functions'."
-  (interactive)
-  (unless (-find #'funcall my-racket-meta-return-functions)
-    (message "Sorry, function not found!")))
+    (interactive)
+    (unless (-find #'funcall my-racket-meta-return-functions)
+      (message "Sorry, function not found!")))
 
-(use-package racket-mode
-    :ensure t
-    :bind ((:map racket-mode-map)
-           ("M-RET" . 'my-racket-meta-return)))
-
-(defun my-racket-meta-return-let ()
-  "Add a binding to the let expression of the Racket.
+  (defun my-racket-meta-return-let ()
+    "Add a binding to the let expression of the Racket.
 One of `my-racket-meta-return-functions'"
-  (when (my-in-lisp-sexp-p "let")
-    (my-goto-lisp-sexp-begin "let")
-    (search-forward "(." nil t)
-    (sp-get
-        (sp-get-sexp)
-      (goto-char :end-in)
-      (newline-and-indent)
-      (insert "[]")
+    (when (my-in-lisp-sexp-p "let")
+      (my-goto-lisp-sexp-begin "let")
+      (search-forward "(." nil t)
+      (sp-get
+          (sp-get-sexp)
+        (goto-char :end-in)
+        (newline-and-indent)
+        (insert "[]")
+        (forward-char -1)
+        t)))
+
+  (add-to-list 'my-racket-meta-return-functions #'my-racket-meta-return-let)
+
+  (defun my-racket-meta-return-test-case ()
+    "Add a test case to current test module in racket.
+One of `my-racket-meta-return-functions'"
+    (when (my-in-lisp-sexp-p "module\+\\W*test")
+      (my-goto-lisp-sexp-begin "module\+\\W*test")
       (forward-char -1)
-      t)))
+      (sp-get (sp-get-sexp) (goto-char :end-in))
+      (newline-and-indent)
+      (insert "(check-equal? )")
+      (forward-char -1)
+      t))
 
-(add-to-list 'my-racket-meta-return-functions #'my-racket-meta-return-let)
+  (add-to-list 'my-racket-meta-return-functions
+               #'my-racket-meta-return-test-case)
 
-(defun my-racket-meta-return-test-case ()
-  "Add a test case to current test module in racket.
-One of `my-racket-meta-return-functions'"
-  (when (my-in-lisp-sexp-p "module\+\\W*test")
-    (my-goto-lisp-sexp-begin "module\+\\W*test")
-    (forward-char -1)
-    (sp-get (sp-get-sexp) (goto-char :end-in))
-    (newline-and-indent)
-    (insert "(check-equal? )")
-    (forward-char -1)
-    t))
+  (defcustom my-racket-meta-return-cond-clauses-expression-names
+    '("cond" "match" "define/match")
+    "List of the racket expressions names in which should work `M-ret'."
+    :type '(repeat string)
+    :group 'my)
 
-(add-to-list 'my-racket-meta-return-functions #'my-racket-meta-return-test-case)
-
-(defcustom my-racket-meta-return-cond-clauses-expression-names
-  '("cond" "match" "define/match")
-  "List of the racket expressions names in which should work `M-ret' function."
-  :type '(repeat string))
-
-(defun my-racket-meta-return-cond-clauses ()
-  "Add new clause to racket expression which has syntax like on `cond'.
+  (defun my-racket-meta-return-cond-clauses ()
+    "Add new clause to racket expression which has syntax like on `cond'.
 
 One of `my-racket-meta-return-functions'.
 
@@ -102,46 +108,46 @@ List of racket expressions in which this function should work:
 - `cond'
 - `match'
 - `define/match'"
-  (interactive)
-  (--when-let
-      (-find
-       #'my-in-lisp-sexp-p
-       my-racket-meta-return-cond-clauses-expression-names)
-    (my-goto-lisp-sexp-begin it)
-    (forward-char -1)
-    (forward-sexp)
-    (forward-char -1)
-    (newline-and-indent)
-    (insert "[]")
-    (forward-char -1)
-    t))
+    (interactive)
+    (--when-let
+        (-find
+         #'my-in-lisp-sexp-p
+         my-racket-meta-return-cond-clauses-expression-names)
+      (my-goto-lisp-sexp-begin it)
+      (forward-char -1)
+      (forward-sexp)
+      (forward-char -1)
+      (newline-and-indent)
+      (insert "[]")
+      (forward-char -1)
+      t))
 
-(add-to-list
- 'my-racket-meta-return-functions
- 'my-racket-meta-return-cond-clauses)
+  (add-to-list
+   'my-racket-meta-return-functions
+   'my-racket-meta-return-cond-clauses)
 
-(defun my-racket-meta-return-contracted ()
-  "Add new argument form to the expression of the Racket `contracted'."
-  (interactive)
-  (when (my-in-lisp-sexp-p "contracted")
-    (my-goto-lisp-sexp-end "contracted")
-    (newline)
-    (insert "[]")
-    (my-mark-lisp-sexp-inner "contracted")
-    (align-regexp
-     (region-beginning)
-     (region-end)
-     "\\[[^ ]+ *\\( \\)[^ ]")
-    (beginning-of-line-text)
-    (forward-char 1)
-    t))
+  (defun my-racket-meta-return-contracted ()
+    "Add new argument form to the expression of the Racket `contracted'."
+    (interactive)
+    (when (my-in-lisp-sexp-p "contracted")
+      (my-goto-lisp-sexp-end "contracted")
+      (newline)
+      (insert "[]")
+      (my-mark-lisp-sexp-inner "contracted")
+      (align-regexp
+       (region-beginning)
+       (region-end)
+       "\\[[^ ]+ *\\( \\)[^ ]")
+      (beginning-of-line-text)
+      (forward-char 1)
+      t))
 
-(add-to-list 'my-racket-meta-return-functions
-             #'my-racket-meta-return-contracted)
+  (add-to-list 'my-racket-meta-return-functions
+               #'my-racket-meta-return-contracted))
 
-(use-package scribble-mode :ensure t)
-
-(my-use-all-autoformat-in-mode 'scribble-mode)
+(leaf scribble-mode
+  :ensure t
+  :config (my-use-all-autoformat-in-mode 'scribble-mode))
 
 (provide 'my-racket)
 ;;; my-racket.el ends here

@@ -1,4 +1,4 @@
-;;; my-supersave.el --- my-supersave
+;;; my-supersave.el --- My config for `supersave'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,13 +23,14 @@
 
 ;;; Commentary:
 
+;; My config for `supersave'
+
 ;;; Code:
-(use-package super-save
-    :ensure t
-    :custom (super-save-exclude '("Emacs\\.org"))
-    :config
-    (add-to-list 'super-save-triggers 'dired-jump)
-    (super-save-mode 38))
+(leaf super-save
+  :ensure t
+  :global-minor-mode super-save-mode
+  :custom (super-save-exclude . '("Emacs\\.org"))
+  :config (add-to-list 'super-save-triggers 'dired-jump))
 
 (provide 'my-supersave)
 ;;; my-supersave.el ends here

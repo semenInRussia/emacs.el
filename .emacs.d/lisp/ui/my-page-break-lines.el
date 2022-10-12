@@ -1,4 +1,4 @@
-;;; my-page-break-lines.el --- my-page-break-lines
+;;; my-page-break-lines.el --- My config for `page-break-lines'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,11 +23,12 @@
 
 ;;; Commentary:
 
+;; My config for `page-break-lines'
+
 ;;; Code:
-(use-package page-break-lines
-    :ensure t
-    :init
-    (global-page-break-lines-mode 38))
+(leaf page-break-lines
+  :ensure t
+  :global-minor-mode global-page-break-lines-mode)
 
 (provide 'my-page-break-lines)
 ;;; my-page-break-lines.el ends here

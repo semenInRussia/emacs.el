@@ -1,4 +1,4 @@
-;;; my-default.el --- my-default
+;;; my-default.el --- My some default config
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -22,6 +22,8 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
+
+;; My some default config
 
 ;;; Code:
 (menu-bar-mode -1)

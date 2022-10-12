@@ -1,4 +1,4 @@
-;;; my-doom-themes.el --- my-doom-themes
+;;; my-doom-themes.el --- My file loading `doom-themes'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,9 +23,10 @@
 
 ;;; Commentary:
 
+;; My file loading `doom-themes'
+
 ;;; Code:
-(use-package doom-themes
-    :ensure t)
+(leaf doom-themes :ensure t :require t)
 
 (provide 'my-doom-themes)
 ;;; my-doom-themes.el ends here

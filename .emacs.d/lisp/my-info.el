@@ -1,4 +1,4 @@
-;;; my-info.el --- info
+;;; my-info.el --- Info about me
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,11 +23,20 @@
 
 ;;; Commentary:
 
+;; Info about me
+
 ;;; Code:
+
+(require 'animate)
+(require 's)
+
 (setq user-full-name    "Semen Khramtsov"
-      user-mail-address "hrams205@gmail.com"
-      user-birthday     "2007-01-29"
-      user-name         "semenInRussia")
+      user-mail-address "hrams205@gmail.com")
+
+(defvar user-birthday "2007-01-29"
+  "My birthday in the format YEAR-MONTH-DAY.")
+
+(defvar user-name "semenInRussia" "My nickname.")
 
 (when (s-equals-p (format-time-string "%Y-%m-%d") user-birthday)
   (animate-birthday-present))

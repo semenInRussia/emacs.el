@@ -1,4 +1,4 @@
-;;; my-kmacro.el --- my-kmacro
+;;; my-kmacro.el --- My configuration for the macros
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,28 +23,31 @@
 
 ;;; Commentary:
 
+;; My configuration for the macros
+
 ;;; Code:
-(use-package kmacro
-    :bind ((:map xah-fly-command-map)
-           ("\\"      . 'kmacro-start-or-end-macro)
-           ("SPC RET" . 'kmacro-call-macro-or-apply-to-lines)))
+(leaf kmacro
+  :bind (:xah-fly-command-map
+         :package xah-fly-keys
+         ("\\"      . kmacro-start-or-end-macro)
+         ("SPC RET" . kmacro-call-macro-or-apply-to-lines))
+  :config                             ;nofmt
+  (defun kmacro-call-macro-or-apply-to-lines (&optional top bottom)
+    "If has region, call macro to lines beetween TOP BOTTOM, else call macro."
+    (interactive
+     (and
+      (use-region-p)
+      (list (region-beginning) (region-end))))
+    (if (use-region-p)
+        (apply-macro-to-region-lines top bottom)
+      (kmacro-call-macro 1)))
 
-(defun kmacro-start-or-end-macro ()
-  "If macro record have just started, then stop this record, otherwise start."
-  (interactive)
-  (if defining-kbd-macro
-      (kmacro-end-macro 1)
-    (kmacro-start-macro 1)))
-
-(defun kmacro-call-macro-or-apply-to-lines (&optional top bottom)
-  "If selected region, then apply macro to selected lines, otherwise call macro."
-  (interactive
-   (if (use-region-p)
-       (list (region-beginning) (region-end))
-     (list nil nil)))
-  (if (use-region-p)
-      (apply-macro-to-region-lines top bottom)
-    (kmacro-call-macro 1)))
+  (defun kmacro-start-or-end-macro ()
+    "Start macro record (if not started) or stop record."
+    (interactive)
+    (if defining-kbd-macro
+        (kmacro-end-macro 1)
+      (kmacro-start-macro 1))))
 
 (provide 'my-kmacro)
 ;;; my-kmacro.el ends here

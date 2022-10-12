@@ -1,4 +1,4 @@
-;;; my-helm-spotify-plus.el --- my-helm-spotify-plus
+;;; my-helm-spotify-plus.el --- My config for `helm-spotify-plus'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,9 +23,11 @@
 
 ;;; Commentary:
 
+;; My config for `helm-spotify-plus'
+
 ;;; Code:
-(use-package helm-spotify-plus
-    :ensure t)
+
+(leaf helm-spotify-plus :ensure t)
 
 (provide 'my-helm-spotify-plus)
 ;;; my-helm-spotify-plus.el ends here

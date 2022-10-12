@@ -1,4 +1,4 @@
-;;; my-embrace.el --- my-embrace
+;;; my-embrace.el --- My configuration of the `embrace'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,24 +23,28 @@
 
 ;;; Commentary:
 
-;;; Code:
-(use-package embrace
-    :ensure t
-    :bind ((:map xah-fly-command-map)
-           ("/"         . 'embrace-commander)
-           ("SPC SPC /" . 'xah-goto-matching-bracket))
-    :hook
-    (emacs-lisp-mode . embrace-emacs-lisp-mode-hook)
-    (org-mode        . embrace-org-mode-hook)
-    :config
-    (unless (assq ?n embrace-semantic-units-alist)
-      (setq-default embrace-semantic-units-alist
-                    (cons '(?n . embrace-avy-semantic-unit)
-                          embrace-semantic-units-alist)))
+;; My configuration of the `embrace'
 
-    (defun embrace-avy-semantic-unit ()
-      "Semantic unit for `embrace' which ask expression with the `avy'."
-      (call-interactively 'avy-mark-word)))
+;;; Code:
+(leaf embrace
+  :ensure t
+  :defvar (embrace-semantic-units-alist)
+  :bind (:xah-fly-command-map
+         :package xah-fly-keys
+         ("/"         . embrace-commander)
+         ("SPC SPC /" . xah-goto-matching-bracket))
+  :hook ((emacs-lisp-mode-hook . embrace-emacs-lisp-mode-hook)
+         (org-mode-hook        . embrace-org-mode-hook))
+  :config                             ;nofmt
+  (unless (assq ?n embrace-semantic-units-alist)
+    (setq-default embrace-semantic-units-alist
+                  (cons
+                   '(?n . embrace-avy-semantic-unit)
+                   embrace-semantic-units-alist)))
+
+  (defun embrace-avy-semantic-unit ()
+    "Semantic unit for `embrace' which ask expression with the `avy'."
+    (call-interactively 'avy-mark-word)))
 
 (provide 'my-embrace)
 ;;; my-embrace.el ends here

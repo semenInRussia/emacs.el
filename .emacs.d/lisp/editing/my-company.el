@@ -1,4 +1,4 @@
-;;; my-company.el --- my-company
+;;; my-company.el --- My config for `company'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,33 +23,39 @@
 
 ;;; Commentary:
 
+;; My config for `company'
+
 ;;; Code:
-(use-package company
-    :ensure t
-    :custom
-    (company-idle-delay                 0.3)
-    (company-minimum-prefix-length      2)
-    (company-show-numbers               t)
-    (company-tooltip-limit              15)
-    (company-tooltip-align-annotations  t)
-    (company-tooltip-flip-when-above    t)
-    (company-dabbrev-ignore-case        nil)
-    :config
-    (add-to-list 'company-backends 'company-keywords)
-    (global-company-mode 1))
+(leaf company
+  :ensure t
+  :defvar company-backends
+  :global-minor-mode global-company-mode
+  :config (add-to-list 'company-backends 'company-keywords)
+  :custom ((company-idle-delay                . 0.3)
+           (company-minimum-prefix-length     . 2)
+           (company-show-numbers              . t)
+           (company-tooltip-limit             . 15)
+           (company-tooltip-align-annotations . t)
+           (company-tooltip-flip-when-above   . t)
+           (company-dabbrev-ignore-case       . nil)))
 
-(defvar company-mode/enable-yas t
-  "Enable yasnippet for all backends.")
+(leaf company
+  :after (yasnippet)
+  :config                             ;nofmt
+  (defvar company-mode/enable-yas t
+    "Enable yasnippet for all backends.")
 
-(defun company-mode/backend-with-yas (backend)
-  (if (or (not company-mode/enable-yas)
-          (and (listp backend) (member 'company-yasnippet backend)))
-      backend
-    (append (if (consp backend) backend (list backend))
-            '(:with company-yasnippet))))
+  (defun company-mode/backend-with-yas (backend)
+    (if (or
+         (not company-mode/enable-yas)
+         (and (listp backend) (member 'company-yasnippet backend)))
+        backend
+      (append
+       (if (consp backend) backend (list backend))
+       '(:with company-yasnippet))))
 
-(setq company-backends
-      (mapcar #'company-mode/backend-with-yas company-backends))
+  (setq company-backends
+        (mapcar #'company-mode/backend-with-yas company-backends)))
 
 (provide 'my-company)
 ;;; my-company.el ends here
