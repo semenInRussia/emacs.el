@@ -45,6 +45,7 @@
         my-drag-stuff-right
         my-drag-stuff-right-char
         my-eob-or-mc-align-with-space
+        my-exchange-point-and-mark-or-splice-sexp
         my-forward-char-or-my-drag-stuff-right-char
         my-kill-rectangle-or-delete-char
         my-kill-rectangle-or-kill-line
@@ -66,6 +67,7 @@
         open-line-saving-indent
         org-cdlatex-underscore-caret
         org-cycle
+        org-delete-char
         org-force-self-insert
         org-kill-line
         org-meta-return
@@ -89,6 +91,7 @@
         sp-join-sexp
         sp-kill-hybrid-sexp
         sp-kill-sexp
+        sp-rewrap-sexp
         sp-splice-sexp
         sp-splice-sexp-killing-backward
         sp-split-sexp
@@ -106,6 +109,9 @@
         xah-beginning-of-line-or-block
         xah-clean-whitespace
         xah-copy-all-or-region
+        xah-copy-line-or-region
+        xah-delete-backward-char-or-bracket-text
+        xah-delete-current-text-block
         xah-end-of-line-or-block
         xah-fly-M-x
         xah-fly-command-mode-activate

@@ -1,6 +1,13 @@
 
-;;; Mode settings stored by Calc on Wed Sep 14 23:27:41 2022
-(setq calc-simplify-mode 'units)
+;;; Settings for `calc-sel' stored by semenInRussia on Sat Oct 8 19:48:19 2022
+(setq calc-highlight-selections-with-faces t)
+;;;End of Settings for `calc-sel'
+
+;;; Mode settings stored by Calc on Sun Oct  9 18:12:26 2022
+(setq calc-window-height 14)
+(setq calc-symbolic-mode t)
+(setq calc-infinite-mode t)
+(setq calc-line-breaking nil)
 ;;; End of mode settings
 
 

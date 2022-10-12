@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: defface
+# key: deff
+# --
+(defface ${1:name} '((t (:foreground $2)))
+  "${doc}.")
