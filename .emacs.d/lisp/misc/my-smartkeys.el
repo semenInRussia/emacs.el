@@ -30,17 +30,23 @@
 
 (eval-after-load 'smartparens
   '(progn
-     (define-key-when my-kill-line-or-region
-                      xah-fly-command-map
-                      "x"               ;nofmt
-                      'kill-region
-                      'use-region-p)
+     (defun my-kill-line-or-region ()
+       "Call `kill-region' if region is active, otherwise `sp-kill-whole-line'"
+       (interactive)
+       (if (use-region-p)
+           (kill-region (region-beginning) (region-end))
+         (sp-kill-whole-line)))
 
-     (define-key-when my-exchange-point-and-mark-or-splice-sexp
-                      xah-fly-command-map
-                      "-"
-                      'exchange-point-and-mark
-                      'use-region-p)))
+     (defun my-exchange-point-and-mark-or-splice-sexp ()
+       "Call `exchange-point-and-mark' if active region else `sp-splice-sexp'."
+       (interactive)
+       (if (use-region-p) (exchange-point-and-mark) (sp-splice-sexp)))
+
+     (leaf-keys
+      (xah-fly-command-map
+       :package xah-fly-keys
+       ("-" . my-exchange-point-and-mark-or-splice-sexp)
+       ("x" . my-kill-line-or-region)))))
 
 (provide 'my-smartkeys)
 ;;; my-smartkeys.el ends here
