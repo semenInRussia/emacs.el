@@ -37,9 +37,10 @@
   :type '(repeat symbol)
   :group 'my)
 
-(leaf aggressive-indent
-  :ensure t
-  :hook `(,my-aggresive-indent-hooks . aggressive-indent-mode))
+;; (leaf aggressive-indent
+;;   :ensure t
+;;   :hook `(,my-aggresive-indent-hooks . aggressive-indent-mode)
+;;   :config (aggressive-indent-mode 0))
 
 (provide 'my-aggresive-indent)
 ;;; my-aggresive-indent.el ends here
