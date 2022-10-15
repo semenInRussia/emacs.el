@@ -27,16 +27,14 @@
 (require 'package)
 
 (eval-and-compile
-  (customize-set-variable
-   'package-archives
-   '(("melpa" . "https://melpa.org/packages/")
-     ("org" . "https://orgmode.org/elpa/")
-     ("gnu" . "https://elpa.gnu.org/packages/")))
-  (package-initialize)
+  (straight-use-package 'leaf)
 
-  (unless (package-installed-p 'leaf)
-    (package-refresh-contents)
-    (package-install 'leaf))
+  (setq leaf-alias-keyword-alist
+        (--remove-first
+         (eq (car it) :ensure)
+         leaf-alias-keyword-alist))
+
+  (add-to-list 'leaf-alias-keyword-alist '(:ensure . :straight))
 
   (leaf leaf-keywords :ensure t :config (leaf-keywords-init))
   ;; key binding for `leaf-find' you can find in `my-writing-config'

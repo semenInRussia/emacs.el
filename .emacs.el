@@ -15,6 +15,7 @@
 
 (defcustom my-modules-order
   (list
+   'my-straight
    'my-libs
    'my-lib
    "package-management"
@@ -133,8 +134,6 @@ Return number of modules on which was call F."
 (defun my-load-all-config-modules ()
   "Load each of the my Emacs configuration Elisp files via `require'."
   (interactive)
-  (defvar my-html-local-map (make-sparse-keymap))
-  (defvar my-latex-local-map (make-sparse-keymap))
   (apply 'my-load-modules my-modules-order))
 
 (defun my-reload-all-config-modules ()
@@ -156,6 +155,7 @@ Return number of modules on which was call F."
  '(company-idle-delay 0.3)
  '(company-minimum-prefix-length 2)
  '(company-show-numbers t)
+ '(company-show-quick-access t)
  '(company-tooltip-align-annotations t)
  '(company-tooltip-flip-when-above t)
  '(company-tooltip-limit 15)
@@ -163,11 +163,11 @@ Return number of modules on which was call F."
  '(deft-directory "~/notes/" t)
  '(deft-recursive t t)
  '(deft-use-filename-as-title nil t)
- '(dumb-jump-force-searcher 'rg)
- '(dumb-jump-prefer-searcher 'rg)
+ '(dumb-jump-force-searcher 'rg t)
+ '(dumb-jump-prefer-searcher 'rg t)
  '(eldoc-idle-delay 0.01)
  '(imenu-auto-rescan t)
- '(js-indent-level 2)
+ '(js-indent-level 2 t)
  '(js2-allow-rhino-new-expr-initializer nil t)
  '(js2-auto-indent-p t t)
  '(js2-concat-multiline-strings 'eol t)
@@ -187,6 +187,7 @@ Return number of modules on which was call F."
  '(js2-strict-trailing-comma-warning t t)
  '(lisp-body-indent 2)
  '(lpr-command "PDFToPrinter")
+ '(magit-refresh-status-buffer nil t)
  '(my-mc-cmds-to-run-once
    '(my-mark-all my-bob-or-mc-align my-eob-or-align-with-spaces my-mc-mark-like-this-or-edit-lines my-mc-mark-like-this-or-edit-lines toggle-input-method)
    t)
@@ -205,30 +206,35 @@ Return number of modules on which was call F."
 ")
      ("f" "Film for See" entry
       (file+headline "~/agenda.org" "Films")
-      #'my-films-format-as-org-heading))
-   t)
+      #'my-films-format-as-org-heading)))
  '(org-publish-list-skipped-files nil)
  '(org-publish-project-alist
    '(("Notes" :base-directory "~/notes/" :publishing-directory "~/notes/destination/" :publishing-function org-latex-publish-to-latex :recursive t :author "Семён" :language "ru")))
  '(org-publish-use-timestamps-flag nil)
  '(org-refile-targets '((org-agenda-files :maxlevel . 2)))
  '(org-refile-use-outline-path nil)
+ '(org-startup-folded t)
+ '(org-startup-indented t)
+ '(org-startup-with-inline-images t)
  '(package-archives
    '(("org" . "https://orgmode.org/elpa/")
      ("melpa" . "https://melpa.org/packages/")
      ("gnu" . "https://elpa.gnu.org/packages/")))
  '(package-selected-packages
-   '(run-command-recipes flycheck-ghcmod ghc company-ghci hindent highlight-thing gruber-darker-theme doom-themes skeletor run-command helm-projectile projectile hl-todo git-modes blamer magit git-gutter dired-collapse dired-ranger dired-rainbow dired-open dired-filter deft js2-mode haskell-mode racket-mode suggest emr package-lint flycheck-package paxedit yasnippet smartparens visual-regexp deadgrep helm-swoop multiple-cursors imenu-anywhere format-all flycheck expand-region embrace eldoc dumb-jump rg drag-stuff company comment-dwim-2 avy aggressive-indent aas leaf-keywords org-ml pcache dash f s))
+   '(xclip inspector org-appear org-modern toc-org org-cliplink helm-org-ql org-ql helm-org org-download goggles googles company-auctex company-math latex-extra laas cdlatex magic-latex-buffer math-preview xenops run-command-recipes flycheck-ghcmod ghc company-ghci hindent highlight-thing gruber-darker-theme doom-themes skeletor run-command helm-projectile projectile hl-todo git-modes blamer magit git-gutter dired-collapse dired-ranger dired-rainbow dired-open dired-filter deft js2-mode haskell-mode racket-mode suggest emr package-lint flycheck-package paxedit yasnippet smartparens visual-regexp deadgrep helm-swoop multiple-cursors imenu-anywhere format-all flycheck expand-region embrace eldoc dumb-jump rg drag-stuff company comment-dwim-2 avy aggressive-indent aas leaf-keywords org-ml pcache dash f s))
  '(projectile-completion-system 'helm)
  '(projectile-enable-caching nil)
  '(projectile-project-root-functions
    '(projectile-root-local my-project-root))
  '(projectile-project-search-path '("~/projects/"))
+ '(python-shell-interpreter "python" t)
  '(racket-xp-mode-hook nil t)
- '(run-command-completion-method 'helm)
+ '(run-command-completion-method 'helm t)
  '(skeletor-completing-read-function 'completing-read-default t)
  '(skeletor-init-with-git nil t)
  '(skeletor-project-directory "~/projects" t)
+ '(web-mode-block-padding 0 t)
+ '(web-mode-script-padding 1 t)
  '(yas-snippet-dirs '("~/.emacs.d/snippets"))
  '(yas-wrap-around-region t))
 (custom-set-faces
@@ -238,4 +244,4 @@ Return number of modules on which was call F."
  ;; If there is more than one, they won't work right.
  '(blamer-face
    ((t (:foreground "#7a88cf" :background nil :height 140 :italic t)))
-   nil "Customized with leaf in `blamer' block"))
+   nil "Customized with leaf in `blamer' block at `c:/Users/hrams/AppData/Roaming/.emacs.d/lisp/env/my-git.el'"))

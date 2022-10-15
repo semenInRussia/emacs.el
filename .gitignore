@@ -50,3 +50,4 @@ devdocs/
 *.elc
 /.emacs.d/pomm
 /.emacs.d/.hl-save
+/.emacs.d/straight/
