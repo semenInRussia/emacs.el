@@ -132,7 +132,7 @@
                                                 (lambda (s)
                                                   (s-concat
                                                    "{\\color{white}" s "}"))))
-    :fast-exec ("Preview All Latex Fragments" . 'math-preview-all)
+    :fast-exec ("Preview All Latex Fragments" 'math-preview-all)
     :bind (:my-latex-local-map
            :package tex
            ("v" . my-latex-preview-in-other-window))

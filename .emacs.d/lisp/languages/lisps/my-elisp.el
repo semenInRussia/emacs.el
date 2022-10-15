@@ -32,10 +32,17 @@
                    :parent my-lisp-map)                             ; nofmt
   :hook (emacs-lisp-mode-hook . paxedit-mode)
   :bind (:emacs-lisp-mode-map ("M-RET" . my-elisp-new-field-of-class))
-  :config (leaf eldev
-            :ensure t
-            :require t
-            :config (leaf flycheck-eldev :ensure t)))
+  :config                               ;nofmt
+  (leaf eldev
+    :ensure t
+    :require t
+    :config (leaf flycheck-eldev :ensure t))
+
+  (leaf inspector
+    :ensure t
+    :bind (:my-elisp-local-map
+           :package elisp-mode
+           ("i" . inspector-inspect-last-sexp))))
 
 (leaf ert
   :unless (fboundp 'debugger-make-xrefs)

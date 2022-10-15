@@ -69,6 +69,7 @@
         org-cycle
         org-delete-char
         org-force-self-insert
+        org-id-get-create
         org-kill-line
         org-meta-return
         org-metaright
