@@ -51,3 +51,8 @@ devdocs/
 /.emacs.d/pomm
 /.emacs.d/.hl-save
 /.emacs.d/straight/
+/.emacs.d/.org-id-locations
+/org-roam/
+/.emacs.d/org-roam.db
+/.emacs.d/snippets/org-mode/filetags
+/.emacs.d/lisp/misc/my-org-roam.el

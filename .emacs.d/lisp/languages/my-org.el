@@ -38,7 +38,7 @@
          (org-mode-hook . org-cdlatex-mode))
   :bind (("<f5>" . org-ctrl-c-ctrl-c)
          (:xah-fly-command-map          ;nofmt
-          ("SPC z" . org-capture))
+          ("SPC z z" . org-capture))
          (:my-org-local-map ;; Insert anything
           ("l"   . org-insert-link)
           ("s"   . org-schedule)
@@ -55,6 +55,7 @@
           ([tab] . org-refile)
           ("1"   . my-org-todo)
           (";"   . org-set-tags-command)
+          ("o"   . org-id-get-create)
           ("a"   . org-archive-subtree)
           ("z"   . org-toggle-comment)
 
@@ -91,7 +92,6 @@
           ;; other being in the `org-mode-map' section
 
           ;; Miscellaneous
-          ("j"   . org-latex-preview)
           ("SPC" . org-toggle-checkbox)
           ("RET" . org-open-at-point)
           ("r"   . my-org-schedule-to-today)
@@ -229,6 +229,8 @@ If caption isn't empty string, then insert image with the caption CAPTION."
       (make-directory (f-dirname new-filename) t)
       (url-copy-file url new-filename t)))
 
+  (leaf xenops :ensure t :hook (org-mode-hook . xenops-mode))
+
   (leaf org-autoformat
     :config                             ;nofmt
     (my-use-autoformat-in-mode 'org-mode org-sentence-capitalization)
@@ -280,7 +282,7 @@ If caption isn't empty string, then insert image with the caption CAPTION."
     :custom ((org-use-speed-commands
               .
               (lambda ()
-                (and (not (bobp)) (looking-back "^\**" nil))))
+                (and (bolp) (= (char-after) ?*))))
              (org-speed-commands-default
               .
               '(("k" . org-forward-heading-same-level)
@@ -336,7 +338,8 @@ If caption isn't empty string, then insert image with the caption CAPTION."
       (interactive)
       (end-of-line)
       (search-backward-regexp "^\*" nil t)
-      (xah-fly-insert-mode-activate))
+      (xah-fly-insert-mode-activate)
+      (unless (eq current-input-method nil) (toggle-input-method)))
 
     (defun my-org-goto-parent ()
       "Go to the parent of the `org-mode' heading at the cursor."
@@ -497,6 +500,7 @@ exist after each headings's drawers."
 
   (leaf org-options
     :doc "Commands to set attribute #+OPTIONS of `org-mode'."
+    :after transient
     :leaf-autoload nil
     :bind (:my-org-local-map :package org ("." . my-org-options-transient))
     :init (defvar my-org-options-map
@@ -668,7 +672,18 @@ If not found return nil."
       (goto-char (point-min))
       (when (my-org-goto-option option)
         (delete-region (point-at-bol) (point-at-eol)))
-      (insert "#+" option ": " value "\n"))))
+      (insert "#+" option ": " value "\n")))
+
+  (leaf org-modern
+    :ensure t
+    :global-minor-mode global-org-modern-mode)
+
+  (leaf org-appear
+    :ensure t
+    :hook org-mode-hook
+    :custom ((org-appear-trigger   . 'always)
+             (org-appear-autolinks . t)
+             (org-appear-delay     . 0.4))))
 
 (provide 'my-org)
 ;;; my-org.el ends here

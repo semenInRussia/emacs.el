@@ -2,8 +2,6 @@
 # name: equation
 # key: equ
 # --
-#+BEGIN_LATEX latex
-  \begin{equation}
+\begin{equation}
   $0
-  \end{equation}
-#+END_LATEX
+\end{equation}
