@@ -36,5 +36,10 @@
          ("SPC z o" . org-roam-buffer-toggle)
          ("SPC z j" . org-roam-node-insert)))
 
+(leaf org-roam-ui
+  :ensure t
+  :after org-roam
+  :config (org-roam-ui-follow-mode 0))
+
 (provide 'my-org-roam)
 ;;; my-org-roam.el ends here
