@@ -21,7 +21,8 @@
 
 ;;; Commentary:
 
-;; My configuration of `calc'.
+;; My configuration of `calc'.  For main configuration of the `calc' visit
+;; the file ~/.emacs.d/calc.el created automatically by `calc'
 
 ;;; Code:
 
@@ -38,7 +39,9 @@
          ([remap save-buffer] . calc-edit-finish))
   :config                               ;nofmt
   (--each my-calc-operations
-    (advice-add it :after 'xah-fly-insert-mode-activate)))
+    (advice-add it :after
+                (lambda (&rest _) (xah-fly-insert-mode-activate))
+                '((name . xah-fly-insert-mode-activate)))))
 
 (provide 'my-calc)
 ;;; my-calc.el ends here
