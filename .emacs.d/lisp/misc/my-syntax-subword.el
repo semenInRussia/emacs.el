@@ -28,7 +28,6 @@
 ;;; Code:
 (leaf syntax-subword
   :ensure t
-  :custom (syntax-subword-skip-spaces . t)
   :global-minor-mode global-syntax-subword-mode)
 
 (provide 'my-syntax-subword)
