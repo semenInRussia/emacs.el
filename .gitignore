@@ -55,3 +55,4 @@ devdocs/
 /org-roam/
 /.emacs.d/org-roam.db
 /Emacs.org
+/emacs_backtrace.txt

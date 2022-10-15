@@ -114,7 +114,6 @@
           ("C-S-i" . 'org-shiftcontrolup)
           ("C-S-k" . 'org-shiftcontroldown)
           ("C-S-l" . 'org-shiftcontrolright)))
-  :fast-exec ("Search Org Files via Org Query Language" 'org-ql-search)
   :aas (org-mode
         "exthe" "explore the"
         "misc " "miscellaneous"
@@ -128,7 +127,7 @@
       (xah-fly-insert-mode-activate))
 
     (defun my-org-table-eval-formula-in-field ()
-      "Eval formula with `orgtbl-mode' syntax for the current field of the table."
+      "Eval formula with `orgtbl' syntax for the current field of the table."
       (interactive)
       (org-table-eval-formula '(4)))
 
@@ -280,11 +279,9 @@ If caption isn't empty string, then insert image with the caption CAPTION."
     :hook (dired-mode-hook . org-download-enable))
 
   (leaf org-keys
-    :custom ((org-use-speed-commands
-              .
-              (lambda ()
-                (and (bolp) (= (char-after) ?*))))
-             (org-speed-commands-default
+    :require t
+    :custom ((org-use-speed-commands . t)
+             (org-speed-commands
               .
               '(("k" . org-forward-heading-same-level)
                 ("i" . org-backward-heading-same-level)

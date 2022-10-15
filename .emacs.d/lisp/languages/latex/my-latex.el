@@ -41,7 +41,7 @@
 
 (leaf tex
   :ensure auctex
-  :mode ("\\.tex\\`" . LaTeX-mode)
+  :mode ("\\.tex$" . LaTeX-mode)
   :defun (((er/mark-LaTeX-math er/mark-LaTeX-inside-environment)
            . expand-region)
           (latex-complete-envnames . tex-mode)
@@ -365,7 +365,7 @@
 
   (leaf smartparens-latex
     :after smartparens
-    :bind (:latex-mode-map :package tex ("$" . self-insert-command))
+    :bind (:LaTeX-mode-map :package latex ("$" . self-insert-command))
     :config                             ;nofmt
     (sp-with-modes
         '(tex-mode plain-tex-mode latex-mode LaTeX-mode)
@@ -515,7 +515,10 @@ If the environment is not given, ask for it using completion."
       (add-to-list 'company-backends 'company-math-symbols-latex)
       (add-to-list 'company-backends 'company-latex-commands)))
 
-  (leaf company-auctex :ensure t :config (company-auctex-init)))
+  (leaf company-auctex
+    :ensure t
+    :after auctex
+    :config (company-auctex-init)))
 
 (provide 'my-latex)
 ;;; my-latex.el ends here

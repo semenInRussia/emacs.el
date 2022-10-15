@@ -45,6 +45,7 @@
           (pomm--get-time-remaning . pomm))
   :defvar pomm--state pomm-remaining-time-format
   :custom ((doom-modeline-buffer-file-name-style . 'buffer-name)
+           ( doom-modeline . 'buffer-name)
            (doom-modeline-icon                   . nil)
            (xah-fly-insert-state-p               . nil))
   :config                               ;nofmt

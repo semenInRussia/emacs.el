@@ -26,17 +26,13 @@
 
 (require 'package)
 
-(eval-and-compile
-  (straight-use-package 'leaf)
-  (straight-use-package 'leaf-keywords)
+(straight-use-package 'leaf)
+(straight-use-package 'leaf-keywords)
 
-  (leaf-keywords-init)
+(leaf-keywords-init)
 
-  ;(setq leaf-alias-keyword-alist
-        '((:ensure . :straight)))
-
-  ;; key binding for `leaf-find' you can find in `my-writing-config'
-  )
+(setq leaf-alias-keyword-alist
+      '((:ensure . :straight)))
 
 (defun my-plist-get (plist prop &optional default)
   "Wrapper on `plist-get', difference is that, if first elt isn't keyword work.
