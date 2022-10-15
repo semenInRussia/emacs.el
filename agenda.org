@@ -33,7 +33,7 @@ SCHEDULED: <2022-09-24 Сб>
 SCHEDULED: <2022-09-24 Сб>
 
 *** TODO More useful way to run =run-command-recipes= recipes
-SCHEDULED: <2022-09-24 Сб>
+SCHEDULED: <2022-10-26 Ср>
 
 
 
@@ -61,13 +61,13 @@ SCHEDULED: <2022-09-24 Сб>
 
 *** TODO Post commit hook for Emacs.org (delete DONE =org-mode= heading)
 
-*** TODO Key bind for =org-kill-special=
+*** DONE Key bind for =org-kill-special=
 
 *** TODO Make wrapper for birthday congurlation
 
 *** TODO Insert ;nofmt in elisp keybinding
 *** TODO Byte compile all config after kill =Emacs=
-*** TODO After /s/ revert buffer and change the position in the =dired=
+*** DONE After /s/ revert buffer and change the position in the =dired=
 *** DONE Embrace for =emacs-lisp-mode=
 *** DONE Save Time of the loading config modules
 *** DONE My leaf keywords : simple as may
@@ -93,6 +93,10 @@ SCHEDULED: <2022-09-24 Сб>
 **** TODO More cool readme (provided by =leaf= statisitcs)
 *** TODO Finish commit editing =magit= on /SPC ;/
 ** Targets on Day
+
+
+
+
 
 *** TODO Use =latex-extra-run-all= in the =org-export=
 SCHEDULED: <2022-09-24 Сб>
@@ -184,4 +188,6 @@ SCHEDULED: <2022-09-23 Пт>
 :rating:   86.0
 :countries: (Великобритания Мальта Марокко США)
 :END:
+
+ 
 
