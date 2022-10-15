@@ -30,13 +30,18 @@
   :ensure t
   :custom ((google-translate-default-source-language . "auto")
            (google-translate-default-target-language . "ru"))
-  :fast-exec (("Google Translate" 'google-translate-at-point)
-              ("Query to Google Translate"
-               'google-translate-query-translate-reverse))
+
   :config                               ;nofmt
-  (defun google-translate--search-tkk ()
-    "Search TKK."                       ; a issue from the original GitHub repo
-    (list 430675 2721866130)))
+  (leaf google-translate-default-ui
+    :fast-exec (("Google Translate" 'google-translate-at-point)
+                ("Query to Google Translate"
+                 'google-translate-query-translate-reverse))
+    :defer-config                         ;nofmt
+    (defun google-translate--search-tkk ()
+      ;; a issue from the original
+      ;; GitHub repo
+      "Search TKK."
+      (list 430675 2721866130))))
 
 (provide 'my-google-translate)
 ;;; my-google-translate.el ends here
