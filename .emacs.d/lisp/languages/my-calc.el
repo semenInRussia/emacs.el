@@ -40,7 +40,9 @@
   :config                               ;nofmt
   (--each my-calc-operations
     (advice-add it :after
-                (lambda (&rest _) (xah-fly-insert-mode-activate))
+                (lambda (&rest _)
+                  (message "OK!")
+                  (xah-fly-insert-mode-activate))
                 '((name . xah-fly-insert-mode-activate)))))
 
 (provide 'my-calc)

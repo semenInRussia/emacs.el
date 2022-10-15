@@ -28,8 +28,6 @@
 ;;; Code:
 
 (add-to-list 'load-path "~/projects/fast-exec.el")
-(add-to-list 'load-path "~/projects/porth-mode")
-(add-to-list 'load-path "~/projects/emacs-run-command")
 (add-to-list 'load-path "~/projects/simple-indention.el")
 
 (add-to-list 'load-path (locate-user-emacs-file "site-lisp"))

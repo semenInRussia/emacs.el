@@ -33,7 +33,7 @@
 (defun my-local-major-mode-map-run ()
   "Run `my-local-major-mode-map'."
   (interactive)
-  (set-transient-map my-local-major-mode-map))
+  (set-transient-map (eval my-local-major-mode-map)))
 
 (defcustom my-major-mode-map-prefix "my-"
   "Prefix for the local `major-mode' keymap variable name."
@@ -49,8 +49,7 @@
   (make-hash-table :test 'eql)
   "Hashtable of the `major-mode's and respective keymaps.")
 
-(defun my-define-local-major-mode-map  ;nofmt
-    (keymap-name major-modes &optional parent)
+(defun my-define-local-major-mode-map (keymap-name major-modes &optional parent)
   "Define local keymap for the MAJOR-MODES.
 
 Name of the local keymap will be KEYMAP-NAME + some suffixes and

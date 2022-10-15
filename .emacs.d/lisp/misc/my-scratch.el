@@ -26,7 +26,17 @@
 ;; My config for scratch
 
 ;;; Code:
-(leaf scratch :ensure t :after xah-fly-keys :bind ("C-t" . scratch))
+(defun my-scratch (&optional mode)
+  "Make a scratch buffer for the MODE.
+
+Mode defaults to value of the `major-mode'"
+  (interactive)
+  (or mode (setq mode major-mode))
+  (let ((buf (get-buffer-create (concat "*" (symbol-name mode) "*"))))
+    (with-current-buffer buf (funcall mode))
+    (pop-to-buffer buf '((display-buffer-same-window)))))
+
+(eval-after-load 'xah-fly-keys '(leaf-keys ("C-t" . my-scratch)))
 
 (provide 'my-scratch)
 ;;; my-scratch.el ends here

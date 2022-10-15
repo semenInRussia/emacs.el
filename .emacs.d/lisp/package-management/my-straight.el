@@ -37,5 +37,7 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+(straight-use-package 'org)
+
 (provide 'my-straight)
 ;;; my-straight.el ends here

@@ -27,6 +27,7 @@
 
 ;;; Code:
 (leaf org
+  :ensure t
   :custom ((org-refile-use-outline-path . nil)
            (org-refile-targets . '((org-agenda-files :maxlevel . 2)))
            (org-startup-folded . t)
@@ -374,11 +375,6 @@ If caption isn't empty string, then insert image with the caption CAPTION."
                                          '(("AUTO" "babel" ;nofmt
                                             nil
                                             ("pdflatex")))))))
-
-  (leaf org-ql
-    :ensure t
-    :require t
-    :config (leaf helm-org-ql :ensure t))
 
   (leaf org-cliplink
     :ensure t

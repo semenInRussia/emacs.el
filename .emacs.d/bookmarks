@@ -8,8 +8,8 @@
  (rear-context-string . "line for =drag=\n")
  (position . 2076))
 ("org-capture-last-stored"
- (filename . "~/org-roam/20221013225558-корни_с_чередование.org")
- (front-context-string)
- (rear-context-string . " с Чередованием\n")
- (position . 98))
+ (filename . "~/org-roam/20221014155531-passwords_on_sirius.org")
+ (front-context-string . "\nPasswords for s")
+ (rear-context-string . "words on Sirius\n")
+ (position . 97))
 )

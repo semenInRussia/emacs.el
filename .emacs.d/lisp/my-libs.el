@@ -26,15 +26,15 @@
 ;; Some libraries
 
 ;;; Code:
-(leaf s :ensure t)
+(leaf s :ensure t :require t)
 
-(leaf f :ensure t)
+(leaf f :ensure t :require t)
 
-(leaf dash :ensure t :global-minor-mode global-dash-fontify-mode)
+(leaf dash :ensure t :global-minor-mode global-dash-fontify-mode :require t)
 
-(leaf pcache :ensure t)
+(leaf pcache :ensure t :require t)
 
-(leaf org-ml :ensure t)
+(leaf org-ml :ensure t :require t)
 
 (leaf just :load-path "~/projects/just/")
 

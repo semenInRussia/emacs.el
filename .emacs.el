@@ -1,3 +1,5 @@
+(require 'cl-lib)
+
 (setq initial-buffer-choice "~/Start.org")
 
 (defun my-file-base (file)
@@ -16,9 +18,10 @@
 (defcustom my-modules-order
   (list
    'my-straight
+   'my-leaf
+   "package-management"
    'my-libs
    'my-lib
-   "package-management"
    'my-info
    'my-xah
    'my-fast-exec
@@ -88,7 +91,7 @@ After each call of F, print progress starting from the START."
     (while modules
       (setq module (car modules))
       (setq modules (cdr modules))
-      (incf count)
+      (setq count (1+ count))
       (cond
        ((and
 	 (symbolp module)
@@ -101,9 +104,9 @@ After each call of F, print progress starting from the START."
                  my-load-modules-all)
         (funcall f module))
        ((stringp module)
-        (incf count
-              (1-
-               (my-for-each-module-of-config-dir f module (1- count)))))
+        (setq count
+              (+ count (1-
+               (my-for-each-module-of-config-dir f module (1- count))))))
        ((eq module t)
         (print "AGAIN!")
         (my-for-each-module-of-config-dir f "."))))))

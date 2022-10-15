@@ -54,9 +54,9 @@ In that list openning and closing parens should be added separately."
 (define-minor-mode my-latex-math-spaces-mode
   "Minor mode which automatically insert spaces in the LaTeX math."
   :init-value t
-  (if (not my-latex-math-spaces-mode)
-      (remove-hook 'post-self-insert-hook 'my-latex-math-spaces-do)
-    (add-hook 'post-self-insert-hook 'my-latex-math-spaces-do)))
+  (if my-latex-math-spaces-mode
+      (add-hook 'post-self-insert-hook 'my-latex-math-spaces-do)
+    (remove-hook 'post-self-insert-hook 'my-latex-math-spaces-do)))
 
 (defun my-latex-math-spaces-do ()
   "Do insertion of the spaces for the LaTeX math syntax, if needed."
@@ -69,9 +69,11 @@ In that list openning and closing parens should be added separately."
   (interactive)
   (let ((start (point)))
     (when (my-latex-math-spaces-goto-binary-op-start)
-      (goto-char (+ start (just-spaces-to-1)
-                    ;; traveled distance
-                    ))
+      ;; Make 1 space and change the cursor to binary operation end
+      (goto-char (+ start
+                    ;; traveled distance after changing previous spaces to 1
+                    ;; space
+                    (just-spaces-to-1)))
       (just-spaces-to-1))))
 
 (add-hook 'my-latex-math-spaces-do-hook 'my-latex-math-spaces-for-binary-ops)
@@ -85,8 +87,8 @@ In that list openning and closing parens should be added separately."
   (-when-let*
       ((init-pos (point))
        (paren (my-latex-math-spaces-goto-parens-start))
-       (point-update (just-spaces-to-1)))
-    (goto-char (+ init-pos point-update))
+       (traveled-distance (just-spaces-to-1)))
+    (goto-char (+ init-pos traveled-distance))
     (when (> (length paren) 1) (just-spaces-to-1))))
 
 (add-hook 'my-latex-math-spaces-do-hook 'my-latex-math-spaces-for-binary-ops)

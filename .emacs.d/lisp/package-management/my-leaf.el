@@ -28,15 +28,13 @@
 
 (eval-and-compile
   (straight-use-package 'leaf)
+  (straight-use-package 'leaf-keywords)
 
-  (setq leaf-alias-keyword-alist
-        (--remove-first
-         (eq (car it) :ensure)
-         leaf-alias-keyword-alist))
+  (leaf-keywords-init)
 
-  (add-to-list 'leaf-alias-keyword-alist '(:ensure . :straight))
+  ;(setq leaf-alias-keyword-alist
+        '((:ensure . :straight)))
 
-  (leaf leaf-keywords :ensure t :config (leaf-keywords-init))
   ;; key binding for `leaf-find' you can find in `my-writing-config'
   )
 

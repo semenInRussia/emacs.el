@@ -38,8 +38,8 @@
   :group 'my)
 
 (leaf aggressive-indent
-    :ensure t
-    :hook `(,my-aggresive-indent-hooks . aggressive-indent-mode))
+  :ensure t
+  :hook `(,my-aggresive-indent-hooks . aggressive-indent-mode))
 
 (provide 'my-aggresive-indent)
 ;;; my-aggresive-indent.el ends here

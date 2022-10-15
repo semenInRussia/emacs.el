@@ -48,6 +48,9 @@
    yasnippet
    haskell-mode
    helm-wikipedia)
+  (fast-exec-bind straight
+    (fast-exec-make-some-commands
+     ("Use Package" 'straight-use-package)))
   (fast-exec-reload))
 
 (provide 'my-fast-exec)

@@ -41,7 +41,7 @@
 
 (leaf tex
   :ensure auctex
-  :mode ("\\'.tex\\`" . LaTeX-mode)
+  :mode ("\\.tex\\`" . LaTeX-mode)
   :defun (((er/mark-LaTeX-math er/mark-LaTeX-inside-environment)
            . expand-region)
           (latex-complete-envnames . tex-mode)
@@ -120,9 +120,10 @@
       (delete-region beg end)
       (insert simplified)))
 
-  (leaf xenops :ensure t
+  (leaf xenops
     ;; :hook
     ;; (LaTeX-mode-hook . xenops-mode)
+    :ensure t
     :custom (xenops-math-image-scale-factor . 2))
 
   (leaf math-preview
@@ -152,46 +153,11 @@
 
   (leaf magic-latex-buffer
     :ensure t
-    :hook (LaTeX-mode . magic-latex-buffer))
+    :hook (LaTeX-mode-hook . magic-latex-buffer))
 
   (leaf my-latex-insert
     :load-path* "lisp/languages/latex/"
     :require t)
-
-  (leaf cdlatex
-    :ensure t
-    :hook ((cdlatex-tab-hook . yas-expand)
-           (cdlatex-tab-hook . cdlatex-in-yas-field)
-           (LaTeX-mode-hook  . turn-on-cdlatex))
-    :bind (:cdlatex-mode-map
-           ("<tab>" . cdlatex-tab)
-           (";" . my-latex-dollar)
-           ("(" .  self-insert-command)
-           (")" .  self-insert-command)
-           ("{" .  self-insert-command)
-           ("}" .  self-insert-command)
-           ("[" .  self-insert-command)
-           ("]" .  self-insert-command)
-           ("\"" . self-insert-command)
-           ("\\" . self-insert-command))
-    ;; fields
-    :custom (cdlatex-math-modify-alist
-             .
-             '((?q "\\sqrt" nil t nil nil)
-               (?u "\\breve" "\\uline" t nil nil)))
-    :config                             ;nofmt
-    (defun my-latex-dollar ()
-      "Insert dollars and turn input method into English."
-      (interactive)
-      ;; when current-input-method isn standard
-      (if (not current-input-method)
-          ;; then
-          (insert ";")
-        ;; else
-        (toggle-input-method)
-        (if (use-region-p)
-            (sp-wrap-with-pair "$")
-          (sp-insert-pair "$")))))
 
   (leaf yasnippet
     :bind (:yas-keymap
@@ -252,42 +218,78 @@
           "agl" "\\angle"
           "grd" "^\\circ"))
 
+  (leaf cdlatex
+    :ensure t
+    :hook ((cdlatex-tab-hook . yas-expand)
+           (cdlatex-tab-hook . cdlatex-in-yas-field)
+           (LaTeX-mode-hook  . turn-on-cdlatex))
+    :bind (:cdlatex-mode-map
+           ("<tab>" . cdlatex-tab)
+           (";" . my-latex-dollar)
+           ("(" .  self-insert-command)
+           (")" .  self-insert-command)
+           ("{" .  self-insert-command)
+           ("}" .  self-insert-command)
+           ("[" .  self-insert-command)
+           ("]" .  self-insert-command)
+           ("\"" . self-insert-command)
+           ("\\" . self-insert-command))
+    ;; fields
+    :custom (cdlatex-math-modify-alist
+             .
+             '((?q "\\sqrt" nil t nil nil)
+               (?u "\\breve" "\\uline" t nil nil)))
+    :config                             ;nofmt
+    (defun my-latex-dollar ()
+      "Insert dollars and turn input method into English."
+      (interactive)
+      ;; when current-input-method isn standard
+      (if (not current-input-method)
+          ;; then
+          (insert ";")
+        ;; else
+        (toggle-input-method)
+        (if (use-region-p)
+            (sp-wrap-with-pair "$")
+          (sp-insert-pair "$")))))
+
   (leaf embrace
     :ensure t
     :hook ((LaTeX-mode-hook . embrace-LaTeX-mode-hook)
            (LaTeX-mode-hook . my-embrace-LaTeX-mode-hook))
-    :config (defun my-embrace-LaTeX-mode-hook
-                ()
-              "My additional `embrace-LaTeX-mode-hook'."
-              (interactive)
-              (setq-local embrace-show-help-p nil)
-              (--each
-                  (-concat cdlatex-math-modify-alist-default
-                           cdlatex-math-modify-alist)
-                (my-embrace-add-paren-of-cdlatex-math it))
-              (my-embrace-add-paren-latex-command ?a "answer")
-              (embrace-add-pair-regexp ?\\
-                                       (rx "\\"
-                                           (1+ wordchar)
-                                           (* space)
-                                           (? "[" (*? any) "]" (* space))
-                                           "{")
-                                       "}"
-                                       'my-embrace-with-latex-command
-                                       (embrace-build-help "\\name{" "}"))
-              (embrace-add-pair-regexp ?d
-                                       "\\\\left."
-                                       "\\\\right."
-                                       'my-embrace-with-latex-left-right
-                                       (embrace-build-help
-                                        "\\left(" "\\right)"))
-              (embrace-add-pair-regexp
-               ?e
-               "\\\\begin{\\(.*?\\)}\\(\\[.*?\\]\\)*"
-               "\\\\end{\\(.*?\\)}"
-               'my-embrace-with-latex-env
-               (embrace-build-help "\\begin{name}" "\\end{name}")
-               t))
+    :after cdlatex
+    :config                             ;nofmt
+    (defun my-embrace-LaTeX-mode-hook ()
+      "My additional `embrace-LaTeX-mode-hook'."
+      (interactive)
+      (setq-local embrace-show-help-p nil)
+      (--each
+          (-concat cdlatex-math-modify-alist-default
+                   cdlatex-math-modify-alist)
+        (my-embrace-add-paren-of-cdlatex-math it))
+      (my-embrace-add-paren-latex-command ?a "answer")
+      (embrace-add-pair-regexp ?\\
+                               (rx "\\"
+                                   (1+ wordchar)
+                                   (* space)
+                                   (? "[" (*? any) "]" (* space))
+                                   "{")
+                               "}"
+                               'my-embrace-with-latex-command
+                               (embrace-build-help "\\name{" "}"))
+      (embrace-add-pair-regexp ?d
+                               "\\\\left."
+                               "\\\\right."
+                               'my-embrace-with-latex-left-right
+                               (embrace-build-help
+                                "\\left(" "\\right)"))
+      (embrace-add-pair-regexp
+       ?e
+       "\\\\begin{\\(.*?\\)}\\(\\[.*?\\]\\)*"
+       "\\\\end{\\(.*?\\)}"
+       'my-embrace-with-latex-env
+       (embrace-build-help "\\begin{name}" "\\end{name}")
+       t))
 
     (defun my-embrace-add-paren-of-cdlatex-math (element)
       "Add an ELEMENT of the `cdlatex-math-modify-alist' to the `embrace' parens."
@@ -363,6 +365,7 @@
 
   (leaf smartparens-latex
     :after smartparens
+    :bind (:latex-mode-map :package tex ("$" . self-insert-command))
     :config                             ;nofmt
     (sp-with-modes
         '(tex-mode plain-tex-mode latex-mode LaTeX-mode)

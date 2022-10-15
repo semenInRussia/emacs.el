@@ -30,7 +30,7 @@
 (leaf haskell-mode
   :ensure t
   :major-mode-map (haskell (haskell-mode haskell-interactive-mode))
-  :ensure-system-package (("hoogle" . "cabal install hoogle"))
+  ;; :ensure-system-package (("hoogle" . "cabal install hoogle"))
   :hook ((haskell-mode-hook . haskell-indent-mode)
          (haskell-mode-hook . interactive-haskell-mode))
   :bind (:my-haskell-local-map          ;nofmt
