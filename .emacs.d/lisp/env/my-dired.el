@@ -115,7 +115,7 @@
   (defun my-dired-goto-file (file)
     "Go to line of `dired' buffer describing FILE."
     (goto-char (point-min))
-    (search-forward (f-base to)))
+    (search-forward (f-base file)))
 
   (defun my-rename-file (file)
     "Change name of FILE to new readed from the minibuffer name.
@@ -147,7 +147,10 @@ Return new name of FILE"
   (defun my-dired-new-file (filename)
     "Create file with FILENAME in the directory which opened in the dired buffer."
     (interactive "sName of new file, please: ")
-    (f-touch (f-join (dired-current-directory) filename)))
+    (f-touch (f-join (dired-current-directory) filename))
+    (revert-buffer)
+    (goto-char (point-min))
+    (my-dired-goto-file filename))
 
   (defun my-dired-delete-all-files ()
     "Delete all files from the directory of the `dired' buffer."
