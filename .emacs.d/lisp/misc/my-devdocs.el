@@ -28,10 +28,35 @@
 ;;; Code:
 (leaf devdocs
   :ensure t
-  :hook (python-mode-hook .
-                          (lambda ()
-                            (setq-local devdocs-current-docs
-                                        '("python~3.9")))))
+  :hook ((python-mode-hook . my-devdocs-python-hook)
+         (emacs-lisp-mode-hook . my-devdocs-emacs-lisp-hook)
+         (rust-mode-hook . my-devdocs-rust-hook)
+         (haskell-mode-hook . my-devdocs-haskell-hook))
+  :fast-exec (("Install DevDocs Docset" 'devdocs-install)
+              ("Delete DevDocs Docset" 'devdocs-delete))
+  :bind (:xah-fly-command-map
+         :package xah-fly-keys
+         ("SPC o SPC" . 'devdocs-lookup))
+  :config                               ;nofmt
+  (defun my-devdocs-python-hook ()
+    "Set docsets of `devdocs' for `python-mode'."
+    (setq-local devdocs-current-docs '("python~3.11")))
+
+  (defun my-devdocs-emacs-lisp-hook ()
+    "Set docsets of `devdocs' for `emacs-lisp-mode'."
+    (setq-local devdocs-current-docs '("elisp")))
+
+  (defun my-devdocs-rust-hook ()
+    "Set docsets of `devdocs' for `rust-mode'."
+    (setq-local devdocs-current-docs '("rust")))
+
+  (defun my-devdocs-rust-hook ()
+    "Set docsets of `devdocs'for `rust-mode'."
+    (setq-local devdocs-current-docs '("rust")))
+
+  (defun my-devdocs-haskell-hook ()
+    "Set docsets of `devdocs'for `haskell-mode'."
+    (setq-local devdocs-current-docs '("haskell~9"))))
 
 (provide 'my-devdocs)
 ;;; my-devdocs.el ends here
