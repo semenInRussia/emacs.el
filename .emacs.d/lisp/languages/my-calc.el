@@ -29,7 +29,11 @@
 (require 'dash)
 
 (defvar my-calc-operations
-  '(calcDigit-start calc-convert-units calc-algebraic-entry calc-solve-for)
+  '(calcDigit-start
+    calc-convert-units
+    calc-algebraic-entry
+    calc-solve-for
+    calc-store)
   "List of the function after which will be actived insert mode.")
 
 (leaf calc
