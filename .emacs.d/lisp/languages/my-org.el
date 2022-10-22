@@ -49,7 +49,10 @@
 
           ;; Manipulations with a subtree
           ("c"   . org-copy-subtree)
-          ("x"   . org-cut-subtree)
+          ("x"   . my-org-cut)
+          ;; heading => plain text
+          ;; 8 is * without shift
+          ("8"   . org-toggle-heading)
           ("q"   . my-org-indent-subtree)
           ("6"   . org-mark-subtree)
           ("w"   . my-org-clear-subtree)
@@ -130,6 +133,23 @@
       "Eval formula with `orgtbl' syntax for the current field of the table."
       (interactive)
       (org-table-eval-formula '(4)))
+
+    (defvar my-org-table-cut-map
+      '(keymap
+        (?. . org-cut-special)
+        (?c . org-table-delete-column)
+        (?r . my-kill-line-or-region)))
+
+    (defun my-org-cut ()
+      "Cut any `org' thing.
+
+If in a table ask from the user: either kill column, kill cell or kill row, if
+in a src block cut it, otherwise kill heading"
+      (interactive)
+      (cond
+       ((org-table-p)
+        (set-transient-map my-org-table-cut-map))
+       (t (org-cut-subtree))))
 
     (defun my-org-schedule-to-today ()
       "Scheduale a `org-mode' heading to today."
@@ -231,48 +251,122 @@ If caption isn't empty string, then insert image with the caption CAPTION."
 
   (leaf xenops :ensure t :hook (org-mode-hook . xenops-mode))
 
-  (leaf org-autoformat
+  (leaf my-org-autoformat
     :config                             ;nofmt
-    (my-use-autoformat-in-mode 'org-mode org-sentence-capitalization)
+    (defcustom my-org-list-labels-regexps
+      '("\\+" "-" "[0-9]+\\.")
+      "List of the regexp prefixes indicates a label of a `org-mode' list item.
 
-    (defvar autoformat-org-title-line-start-regexp
-      (rx
-       (or
-        (1+ "*")                        ; Headline
-        (seq (0+ " ")                   ; List Items
-             "-"                        ;    itemized
-             (seq digit ".")            ;    enumerated
-             )
-        (seq "#+"                     ; Attributes which start with #+
-             (or "AUTHOR" "TITLE")
-             ":"
-             (0+ " ")))
-       (1+ " ")))
+Label is thing which just decorates a list, but it's not item content, for
+example in the following list
 
-    (defvar autoformat-org-line-for-capitalization-regexp
+- a
+- b
+- c
+
+Label is \"-\""
+      :group 'my
+      :type '(repeat string))
+
+    (defcustom my-org-keywords
+      '("TODO" "DONE")
+      "List of the `org-mode' keywords sush as TODO or DONE."
+      :group 'my
+      :type '(repeat string))
+
+    (defcustom my-org-list-label-regexp
+      (my-regexp-opt-of-regexp my-org-list-labels-regexps)
+      "Regexp indicates a item of a `org-mode' list.
+
+Label is thing which just decorates a list, but it's not item content, for
+example in the following list
+
+- a
+- b
+- c
+
+Label is \"-\""
+      :group 'my
+      :type '(repeat string))
+
+    (defcustom my-org-list-item-checkbox-regexp
+      "\\[.\\]"
+      "Regexp indicates a `org-mode' checkbox."
+      :group 'my
+      :type 'regexp)
+
+    (defcustom my-org-list-item-prefix-regexp
       (rx line-start
-          (optional
-           (regexp autoformat-org-title-line-start-regexp)
-           (optional (or "TODO" "DONE") (1+ " ")))
-          letter)
-      "Regular expression indicates the necessary of the last word capitalization.")
+          (regexp my-org-list-label-regexp)
+          (? (1+ " ") (regexp my-org-list-item-checkbox-regexp))
+          (0+ " "))
+      "Regexp indicates a list item."
+      :group 'my
+      :type 'regexp)
 
-    (defun autoformat-org-sentence-capitalization ()
+    (my-autoformat-bind-for-major-mode
+     'org-mode
+     'my-org-sentence-capitalization
+     'my-org-list-item-capitalization
+     'my-org-heading-capitalization)
+
+    (defun my-org-sentence-capitalization ()
       "Capitalize first letter of a sentence in the `org-mode'."
       (interactive)
-      (autoformat-sentence-capitalization)
-      (when (and
-             (autoformat-org-at-non-text-line-p)
-             (looking-back autoformat-org-line-for-capitalization-regexp nil))
-        (undo-boundary)
-        (capitalize-word -1)))
+      (when (just-call-on-prev-line*
+             (or
+              (equal (point-at-bol) (point-min))
+              (just-line-is-whitespaces-p)
+              (my-org-heading-p)
+              (my-org-list-item-p)))
+        (autoformat-sentence-capitalization)))
 
-    (defun autoformat-org-at-non-text-line-p ()
-      "Return t, when the cursor being at non-text position for `org-mode'."
-      (or
-       (just-line-regexp-prefix-p autoformat-org-title-line-start-regexp)
-       (just-call-on-prev-line*
-        (just-line-regexp-prefix-p autoformat-org-title-line-start-regexp)))))
+    (defun my-org-heading-p ()
+      "Return t, when the cursor located at a `org-mode' heading text."
+      ;; NOTE: don't handle cases when bold word located at the beginning of the
+      ;; line.  For example:
+      ;;
+      ;; *bold word*
+      ;;
+      ;; this function in the above case return t, but excepted nil
+      (just-line-prefix-p "*"))
+
+    (defun my-org-list-item-capitalization ()
+      "Capitalize first letter of a itemized list item."
+      (interactive)
+      (just-call-on-backward-char*
+       (and
+        (looking-at-p "[[:alpha:]]")
+        (my-org-list-item-p)
+        (looking-back my-org-list-item-prefix-regexp)
+        (upcase-char 1))))
+
+    (defun my-org-list-item-p ()
+      "Return t, when the cursor located at an item of a `org-mode' list."
+      (interactive "d")
+      (just-line-regexp-prefix-p my-org-list-item-prefix-regexp))
+
+    (defun my-org-heading-capitalization ()
+      "Capitalize first letter of a `org-mode' heading.
+
+When `org-mode' heading has any keyword (like to TODO or DONE) first letter
+demotes a first letter after keyword word."
+      (interactive "d")
+      (when (just-call-on-backward-char*
+             (and
+              (my-org-heading-p)
+              (looking-at-p "[[:alpha:]]")
+              (progn
+                (skip-chars-backward " ")
+                (my-org-skip-backward-keyword)
+                (skip-chars-backward " *")
+                (bolp))))
+        (upcase-char -1)))
+
+    (defun my-org-skip-backward-keyword ()
+      "If right at the cursor placed `org-mode' keyword, then skipt it."
+      (when (member (thing-at-point 'symbol) my-org-keywords)
+        (backward-sexp))))
 
   (leaf org-download
     :ensure t
@@ -358,20 +452,41 @@ If caption isn't empty string, then insert image with the caption CAPTION."
            :package org
            ([remap helm-imenu] . helm-org-in-buffer-headings)))
 
+  ;; bound of the keybinding for the `org-export' is already defined in the
+  ;; start of the Heading "Org"
   (leaf ox
-    ;; bound of the keybinding for the `org-export' is already defined in the
-    ;; start of the Heading "Org"
-    :custom ((org-export-coding-system     . 'utf-8)
-             (org-export-with-smart-quotes . t))
-    :config
+    :custom ((org-export-coding-system . 'utf-8)
+             (org-export-with-smart-quotes . t)
+             (org-latex-caption-above . '(table image))
+             (org-latex-packages-alist .
+                                       '(("AUTO" "babel" ;nofmt
+                                          nil
+                                          ("pdflatex")))))
+    :config                             ;nofmt
+    (leaf latex-extra
+      :ensure t
+      :config                           ;nofmt
+      (defun my-org-latex-compile (filename &optional snippet)
+        "My version of the `ox-latex' way to compile a TeX file.
 
-    (leaf ox-latex
-      :custom ((org-latex-listings . 'minted)
-               (org-latex-caption-above . '(table image))
-               (org-latex-packages-alist .
-                                         '(("AUTO" "babel" ;nofmt
-                                            nil
-                                            ("pdflatex")))))))
+Using `latex/compile-commands-until-done'
+
+TEXFILE is the name of the file being compiled.  Processing is
+done through the command specified in `org-latex-pdf-process',
+which see.  Output is redirected to \"*Org PDF LaTeX Output*\"
+buffer.
+
+When optional argument SNIPPET is non-nil, TEXFILE is a temporary
+file used to preview a LaTeX snippet.  In this case, do not
+create a log buffer and do not remove log files.
+
+Return PDF file name or raise an error if it couldn't be
+produced."
+        (find-file filename)
+        ;; if snippet - t, then not clean
+        (latex/compile-commands-until-done (not snippet)))
+
+      (defalias 'org-latex-compile 'my-org-latex-compile)))
 
   (leaf org-cliplink
     :ensure t
@@ -676,7 +791,8 @@ If not found return nil."
     :hook org-mode-hook
     :custom ((org-appear-trigger   . 'always)
              (org-appear-autolinks . t)
-             (org-appear-delay     . 0.4))))
+             (org-appear-delay     . 1))))
 
 (provide 'my-org)
 ;;; my-org.el ends here
+;;; * TODO Capitalize at attributes like #+TITLE and #+AUTHOR

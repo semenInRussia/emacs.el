@@ -67,21 +67,20 @@ See `imenu-generic-expression'"
            :package markdown-mode
            ("t" . markdown-toc-generate-or-refresh-toc)))
 
-  (my-also-use-autoformat-in-mode 'markdown-mode
-                                  markdown-capitalize-heading-line)
-  (my-also-use-autoformat-in-mode 'gfm-mode
-                                  markdown-capitalize-heading-line)
+  (my-autoformat-bind-for-major-mode
+   'markdown-mode
+   'autoformat-markdown-capitalize-heading-line
+   'autoformat-markdown-capitalize-heading-line)
 
   (defun autoformat-markdown-capitalize-heading-line ()
     "Capitalize first letter of a heading line (lines which started with #)."
-    (when (and
-           (just-line-prefix-p "#")
-           (my-markdown-first-letter-of-heading))
-      (undo-boundary)
-      (capitalize-word -1)))
+    (and
+     (just-line-prefix-p "#")
+     (my-markdown-first-letter-of-heading-p)
+     (upcase-char -1)))
 
-  (defun my-markdown-first-letter-of-heading ()
-    "Get t, when backward character is first letter of current markdown heading."
+  (defun my-markdown-first-letter-of-heading-p ()
+    "Return non-nil, when the cursor placed at the `markdown' heading start."
     (save-excursion
       (forward-char -1)
       (skip-chars-backward " #")

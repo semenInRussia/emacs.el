@@ -1,9 +1,9 @@
 
-(Given "^a org-mode buffer$"
-  (lambda ()
-    (switch-to-buffer (get-buffer-create "*org-mode*"))
+(Given "^a \\(.*\\) buffer$"
+  (lambda (mode)
+    (switch-to-buffer (get-buffer-create (concat "*" mode "*")))
     (erase-buffer)
-    (org-mode)))
+    (funcall (intern mode))))
 
 (And "^I activate the insert mode$"
   (lambda () (xah-fly-insert-mode-activate)))

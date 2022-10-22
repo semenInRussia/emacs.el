@@ -26,97 +26,89 @@
 ;; My function for `autoformat'
 
 ;;; Code:
-(defvar my-autoformat-functions nil
-  "Current used autoformat functions.")
+(require 'just)
+(require 'org)
 
-(defcustom my-autoformat-all-functions
-  '(sentence-capitalization)
-  "All my autoformat functions."
+(defgroup my-autoformat nil
+  "Automatically format of source code (add spaces, capitalze and etc)."
+  :group 'editing)
+
+(defvar my-autoformat-local-functions nil
+  "Autoformat functions works locally in the buffer.")
+
+(make-local-variable 'my-autoformat-local-functions)
+
+(defcustom my-autoformat-global-functions
+  nil
+  "Autoformat functions works everywhere."
   :type '(repeat symbol))
-
-(defun my-use-autoformat-function-p (f)
-  "Return t, when must use F as autoformat function."
-  (-contains-p my-autoformat-functions f))
-
-(defmacro my-use-autoformat-in-mode (mode &rest autoformat-functions)
-  "Add hook to MODE, which enable AUTOFORMAT-FUNCTIONS."
-  (let* ((hook
-          (intern (s-append "-hook" (symbol-name (eval mode)))))
-         (fun-name
-          (->>
-           mode
-           (eval)
-           (symbol-name)
-           (s-prepend "my-autoformat-set-functions-for-")
-           (intern)))
-         (funcs
-          (--map
-           (intern (s-prepend "autoformat-" (symbol-name it)))
-           autoformat-functions)))
-    `(progn
-       (defun ,fun-name ()
-         "Add autoformat special functions for mode."
-         (interactive)
-         (setq-local my-autoformat-functions ',funcs))
-       (add-hook ',hook ',fun-name))))
-
-(defmacro my-also-use-autoformat-in-mode (mode &rest autoformat-functions)
-  "Add hook to MODE, which enable AUTOFORMAT-FUNCTIONS plus default functions."
-  `(my-use-autoformat-in-mode ,mode
-                              ,@(-concat autoformat-functions
-                                         my-autoformat-all-functions)))
-
-(defmacro my-use-all-autoformat-in-mode (mode)
-  "Use my all autoformat functions in MODE."
-  `(my-use-autoformat-in-mode ,mode ,@my-autoformat-all-functions))
 
 (defun autoformat-sentence-capitalization ()
   "Auto-capitalize first words of a sentence.
 Either at the beginning of a line, or after a sentence end."
   (interactive)
-  (when (and
-         (my-in-text-p)
-         (looking-back "[а-яa-z]")
-         (save-excursion
-           (forward-char -1)
-           (or
-            (bobp)
-            (looking-back (sentence-end))
-            (and
-             (skip-chars-backward " ")
-             (bolp)
-             (my-previous-line-is-empty))
-            (and
-             (skip-chars-backward " ")
-             (< (skip-chars-backward "*") 0)
-             (bolp)))))
-    (undo-boundary)
-    (capitalize-word -1)))
+  (and
+   (looking-back "[[:alpha:]]")
+   (just-call-on-backward-char*
+    (or
+     (bobp)
+     (looking-back (sentence-end) nil)
+     (and
+      (skip-chars-backward " ")
+      (bolp)
+      (my-previous-line-is-empty))))
+   (upcase-char -1)))
 
 (defun my-previous-line-is-empty ()
   "Move to previous line and return t, when this line is empty.
+
 See `just-line-is-whitespaces-p'"
   (just-call-on-prev-line 'just-line-is-whitespaces-p))
 
-(defun my-in-text-p ()
-  "Return t, when cursor has position on common text."
-  (and
-   (not (org-in-src-block-p))
-   (not (texmathp))))
+(defun my-autoformat-do ()
+  "Funcall each of the local autoformat functions.
 
-(defun my-autoformat ()
-  "Call all autoformat functions."
+See variable `my-autoformat-local-functions'"
   (interactive)
-  (--each my-autoformat-functions (funcall it)))
+  (-each my-autoformat-local-functions 'funcall))
 
-(define-minor-mode my-autoformat-mode
+(define-minor-mode my-autoformat-global-mode
   "Toggle `my-autoformat-mode'."
   :init-value nil
-  (if my-autoformat-mode
-      (add-hook 'post-self-insert-hook #'my-autoformat)
-    (remove-hook 'post-self-insert-hook #'my-autoformat)))
+  (if my-autoformat-global-mode
+      (progn
+        (add-hook 'post-self-insert-hook #'my-autoformat-do)
+        (add-hook 'after-change-major-mode-hook
+                  #'my-autoformat-activate-for-major-mode))
+    (remove-hook 'post-self-insert-hook #'my-autoformat-do)
+    (remove-hook 'after-change-major-mode-hook
+                 #'my-autoformat-activate-for-major-mode)))
 
-(my-autoformat-mode t)
+(defvar my-autoformat-functions-of-major-modes nil
+  "Alist from keys `major-mode' s and values their autoformat functions.")
+
+(defun my-autoformat-activate-for-major-mode (&optional mm)
+  "Change the autoformat local functions depends on major mode (MM).
+
+MM defaults to value of the `major-mode'"
+  (interactive)
+  (or mm (setq mm major-mode))
+  (setq-local my-autoformat-local-functions
+              (alist-get mm
+                         my-autoformat-functions-of-major-modes
+                         '(ignore)
+                         nil
+                         'eq)))
+
+(defun my-autoformat-bind-for-major-mode (mode &rest functions)
+  "Bind autoformat FUNCTIONS for MODE."
+  (->>
+   my-autoformat-functions-of-major-modes
+   (assq-delete-all mode)
+   (cons (cons mode functions))
+   (setq my-autoformat-functions-of-major-modes)))
+
+(my-autoformat-global-mode t)
 
 (provide 'my-autoformat)
 ;;; my-autoformat.el ends here

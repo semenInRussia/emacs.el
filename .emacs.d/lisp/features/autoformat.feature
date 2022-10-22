@@ -80,3 +80,14 @@ Feature: autoformat in the org
     And I type "TODO config of me"
     Then I should see "Config of me"
     
+
+Feature: autoformat in markdown mode
+  there are tests for autoformat-mode in the markdown-mode major-mode
+
+  Scenario: type markdown heading, first letter should be capitalizated
+    Given a markdown-mode buffer
+    When I type "# heading"
+    Then I should see "# Heading"
+    When I press "RET"
+    And I type "## subheading"
+    Then I should see "## Subheading"

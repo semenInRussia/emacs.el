@@ -191,22 +191,13 @@ True dragger mean that its function return non-nil when called interactively."
         (eq major-mode 'org-mode)
         (or
          (my-org-mode-in-heading-start-p)
-         (my-org-mode-at-list-item)
+         (my-org-list-item-p)
          (org-at-table-p))))
 
      (defun my-org-mode-in-heading-start-p ()
        "Return t, when the current position being at a `org-mode' heading."
        (interactive "d")
        (and (not (org-in-src-block-p)) (just-line-prefix-p "*")))
-
-     (defun my-org-mode-at-list-item ()
-       "Return t, when the current position being at an item of a `org-mode' list."
-       (interactive "d")
-       (and
-        (not (org-in-src-block-p))
-        (or
-         (just-line-prefix-p "-" nil t)
-         (just-line-regexp-prefix-p "[0-9]+."))))
 
      (add-right-dragger 'my-drag-org-right)
      (add-left-dragger 'my-drag-org-left)

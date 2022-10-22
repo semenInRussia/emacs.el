@@ -147,7 +147,9 @@ List of racket expressions in which this function should work:
 
 (leaf scribble-mode
   :ensure t
-  :config (my-use-all-autoformat-in-mode 'scribble-mode))
+  :config                               ;nofmt
+  (my-autoformat-bind-for-major-mode 'scribble-mode
+                                     'autoformat-sentence-capitalization))
 
 (provide 'my-racket)
 ;;; my-racket.el ends here
