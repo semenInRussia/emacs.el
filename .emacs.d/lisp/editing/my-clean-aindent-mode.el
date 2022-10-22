@@ -1,4 +1,4 @@
-;;; my-aggresive-indent.el --- My configuration for the `aggressive-indent'
+;;; my-clean-aindent-mode.el --- My configuration for the `clean-aindent-mode'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,24 +23,14 @@
 
 ;;; Commentary:
 
-;; My configuration for the `aggressive-indent'
+;; My configuration for the `clean-aindent-mode'
 
 ;;; Code:
 (require 'leaf)
 
-(defcustom my-aggresive-indent-hooks
-  '(racket-mode-hook
-    css-mode-hook
-    emacs-lisp-mode-hook
-    eshell-mode-hook)
-  "List of hook on which should be enabled `aggressive-indent-mode'."
-  :type '(repeat symbol)
-  :group 'my)
+(leaf clean-aindent-mode
+  :ensure t
+  :hook after-change-major-mode-hook)
 
-;; (leaf aggressive-indent
-;;   :ensure t
-;;   :hook `(,my-aggresive-indent-hooks . aggressive-indent-mode)
-;;   :config (aggressive-indent-mode 0))
-
-(provide 'my-aggresive-indent)
-;;; my-aggresive-indent.el ends here
+(provide 'my-clean-aindent-mode)
+;;; my-clean-aindent-mode.el ends here
