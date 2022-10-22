@@ -85,8 +85,47 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
         ("New Config Module" 'my-new-config-module)))))
 
 (leaf leaf                            ;nofmt
-  :bind (:xah-fly-command-map :package xah-fly-keys
-                              ("SPC SPC j" . leaf-find)))
+  :bind (:xah-fly-command-map         ;nofmt
+         :package xah-fly-keys
+         ("SPC SPC j" . leaf-find)))
+
+(leaf leaf-conver                     ;nofmt
+  :bind (:my-elisp-local-map
+         :package elisp-mode
+         ("l" . 'my-leaf-convert-region)
+         ("v" . 'my-leaf-convert-clipboard))
+  :config                               ;nofmt
+  (defun my-leaf-convert-region (beg end)
+    "Read a sexp beetween BEG and END points convert it to `leaf' and replace."
+    (interactive "r")
+    (let* ((starting-sexp               ;nofmt
+            (read (just-text-in-region)))
+           (leaf-sexp
+            (my-leaf-convert-from-string-to-string starting-sexp)))
+      (delete-region beg end)
+      (insert leaf-sexp)))
+
+  (defun my-leaf-convert-clipboard ()
+    "Read a sexp from the kill ring, convert it to `leaf' format insert it."
+    (interactive)
+    (insert (my-leaf-convert-from-string (current-kill 0))))
+
+  (defun my-leaf-convert-from-string-to-string (s)
+    "Read a elisp source from S and convert it to `leaf' format sexp as string."
+    (->>
+     s
+     (s-prepend "(progn")
+     (s-append ")")
+     (read)
+     (list)
+     (append '(leaf-convert))
+     (eval)
+     (format "%s"))))
+
+(leaf ecukes
+  :ensure t
+  :bind (:my-feature-local-map ("e" . ecukes))
+  :config (leaf espuds :ensure t :require t))
 
 (provide 'my-writing-config)
 ;;; my-writing-config.el ends here
