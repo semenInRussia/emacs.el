@@ -95,6 +95,7 @@ MODE defaults to the current `major-mode'.  See `my-local-major-mode-map-run'"
           'my-change-local-major-mode-map)
 
 (leaf xah-fly-keys
+  :ensure (xah-fly-keys :host github :repo "xahlee/xah-fly-keys")
   :commands xah-fly-insert-mode-activate
   :require t
   :bind (("M-SPC" . xah-fly-command-mode-activate)

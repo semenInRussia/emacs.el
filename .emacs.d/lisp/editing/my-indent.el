@@ -40,7 +40,8 @@
       (funcall indent-line-function))))
 
 (leaf-keys
- ((xah-fly-command-map
+ ((prog-mode-map ("RET" . newline-and-indent))
+  (xah-fly-command-map
    :package xah-fly-keys
    ("RET"   . newline-and-indent)
    ("q"     . my-indent-line-or-region)
