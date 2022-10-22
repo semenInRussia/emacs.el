@@ -75,6 +75,7 @@
         org-metaright
         org-self-insert-command
         org-todo
+        org-toggle-heading
         paxedit-open-round
         rectangle-backward-char
         rectangle-mark-mode
@@ -145,6 +146,7 @@
         my-mark-all
         my-mc-mark-like-this-or-edit-lines
         my-mc-mark-like-this-or-edit-lines
+        my-visit-last-opened-buffer
         swiper-helm
         text-scale-decrease
         toggle-input-method

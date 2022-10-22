@@ -1,4 +1,4 @@
-;;;; Emacs Bookmark Format Version 1 ;;;; -*- coding: utf-8 -*-
+;;;; Emacs Bookmark Format Version 1;;;; -*- coding: utf-8; mode: lisp-data -*-
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
@@ -8,8 +8,8 @@
  (rear-context-string . "line for =drag=\n")
  (position . 2076))
 ("org-capture-last-stored"
- (filename . "~/org-roam/20221014155531-passwords_on_sirius.org")
- (front-context-string . "\nPasswords for s")
- (rear-context-string . "words on Sirius\n")
- (position . 97))
+ (filename . "~/agenda.org")
+ (front-context-string . "\nake =focus= for")
+ (rear-context-string . "ode=\n*** TODO M\n")
+ (position . 2375))
 )
