@@ -52,6 +52,7 @@
             LaTeX-find-matching-end
             LaTeX-mark-section)
            . latex))
+  :custom (TeX-master . nil)
   :hook ((LaTeX-mode-hook . my-latex-find-master-file)
          (LaTeX-mode-hook . my-latex-expansion-mode)
          (LaTeX-mode-hook . visual-fill))
@@ -77,7 +78,7 @@
     (setq-local TeX-master
                 (or
                  (my-latex-lookup-master-file-of (buffer-file-name))
-                 t)))
+                 nil)))
 
   (defun my-latex-lookup-master-file-of (filename)
     "Lookup a auctex master file for the file with FILENAME."
@@ -121,19 +122,18 @@
       (insert simplified)))
 
   (leaf xenops
-    ;; :hook
-    ;; (LaTeX-mode-hook . xenops-mode)
+    :hook (LaTeX-mode-hook . xenops-mode)
     :ensure t
     :custom (xenops-math-image-scale-factor . 2))
 
   (leaf math-preview
     :ensure t
-    :custom (math-preview-preprocess-functions .
-                                               (list
-                                                (lambda (s)
-                                                  (s-concat
-                                                   "{\\color{white}" s "}"))))
     :fast-exec ("Preview All Latex Fragments" 'math-preview-all)
+    :ensure-system-package              ;nofmt
+    `(math-preview .
+                   ,(concat "npm install"
+                            "-g git+"
+                            "https://gitlab.com/matsievskiysv/math-preview"))
     :bind (:my-latex-local-map
            :package tex
            ("v" . my-latex-preview-in-other-window))
@@ -380,12 +380,12 @@
                      :unless '(sp-latex-point-after-backslash sp-in-math-p))))
 
   (leaf my-autoformat
-    :config (eval
-             `(my-use-autoformat-in-mode
-               'LaTeX-mode
-               ,@(append
-                  '(latex-capitalize-special-commands latex-expand-to-list-item)
-                  my-autoformat-all-functions)))
+    :config                             ;nofmt
+    (my-autoformat-bind-for-major-mode
+     'LaTeX-mode
+     'autoformat-latex-capitalize-special-commands
+     'autoformat-latex-expand-to-list-item
+     'autoformat-sentence-capitalization)
 
     (defvar autoformat-latex-capitalize-latex-commands
       '("author" "title" "date" "part" "subsection" "section" "part" "chapter")
