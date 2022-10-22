@@ -61,3 +61,6 @@ devdocs/
 /.authinfo
 .ecukes-failing-scenarios
 /agenda.*
+*.exe
+/sol2.rkt
+/opmls/
