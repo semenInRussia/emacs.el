@@ -28,7 +28,9 @@
 ;;; Code:
 (leaf elisp-mode
   :major-mode-map (elisp
-                   :modes (emacs-lisp-mode inferior-emacs-lisp-mode)
+                   :modes (emacs-lisp-mode ;nofmt
+                           inferior-emacs-lisp-mode
+                           lisp-interaction-mode)
                    :parent my-lisp-map)                             ; nofmt
   :hook (emacs-lisp-mode-hook . paxedit-mode)
   :bind (:emacs-lisp-mode-map ("M-RET" . my-elisp-new-field-of-class))
@@ -64,7 +66,9 @@
          :package xah-fly-keys
          ("SPC /" . emr-show-refactor-menu)))
 
-(leaf elfmt :global-minor-mode elfmt-global-mode)
+(leaf elfmt
+  :ensure (elfmt :host github :repo "riscy/elfmt")
+  :global-minor-mode elfmt-global-mode)
 
 (leaf suggest :ensure t)
 
