@@ -9,13 +9,11 @@
 
 ** Targets on Week
 
-*** TODO Run the main file of the project in =run-command-reicpes= :run_command_recipes:
-
-*** TODO =racket-mmanager=
-
 *** TODO Complete ICT of the =MIPT=
 DEADLINE: <2022-10-06 -20d Чт>
 
+*** TODO Run the main file of the project in =run-command-reicpes= :run_command_recipes:
+*** TODO =racket-mmanager=
 *** TODO explore the =xetex=                                          :latex:
 
 *** TODO add support of the =org-export= to the =run-command-recipes= :run_command_recipes:
@@ -45,32 +43,15 @@ SCHEDULED: <2022-09-24 Сб>
 *** TODO Live evaluating of the =org-mode= table formulas
 SCHEDULED: <2022-09-24 Сб>
 
-*** DONE From the =use-package= to the =leaf=
-SCHEDULED: <2022-09-24 Сб>
-
-*** DONE From the =org-mode= configuration to the pure =elisp= config
-SCHEDULED: <2022-09-24 Сб>
-
-Should be byte-compile clearly
-
-*** DONE Fix the /f/ key binding for the =org-speed-keys=
-SCHEDULED: <2022-09-24 Сб>
-
 *** TODO Fix =sp-kill-whole-line=
 SCHEDULED: <2022-09-24 Сб>
 
 *** TODO Post commit hook for Emacs.org (delete DONE =org-mode= heading)
 
-*** DONE Key bind for =org-kill-special=
-
 *** TODO Make wrapper for birthday congurlation
 
-*** TODO Insert ;nofmt in elisp keybinding
+*** DONE Insert ;nofmt in elisp keybinding
 *** TODO Byte compile all config after kill =Emacs=
-*** DONE After /s/ revert buffer and change the position in the =dired=
-*** DONE Embrace for =emacs-lisp-mode=
-*** DONE Save Time of the loading config modules
-*** DONE My leaf keywords : simple as may
 *** TODO System for the reformat for certain =major-modes= at overwrited /SPC SPC q/ keybinding
 *** TODO New refactor library for the =emacs-lisp=
 - add/change group/type for defcustom
@@ -81,32 +62,27 @@ SCHEDULED: <2022-09-24 Сб>
 - add/delete autoload
 - defcustom=>defvar, defvar=>defcustom
 *** TODO Explore =lsp-mode=
-*** DONE Automatically sorting =org-mode= options
-*** TODO Autload after /:fast-exec/ keyword in =leaf=
+*** DONE Autload after /:fast-exec/ keyword in =leaf=
 *** TODO Explore =ov=
 *** TODO Explore =coq=
-*** TODO New =fast-exec=
-*** TODO Fix =my-projectile=
+*** DONE New =fast-exec=
+*** DONE Fix =my-projectile=
 *** TODO Fix =M-ret= in =Emacs-lisp=
 *** TODO Fix tests
-*** TODO Auto reloading of the =fast-exec=
+*** DONE Auto reloading of the =fast-exec=
 **** TODO More cool readme (provided by =leaf= statisitcs)
 *** TODO Finish commit editing =magit= on /SPC ;/
+*** TODO Auto capitalize at the beginning of the list item in =org-mode=
+*** TODO M
+
+ake =focus= for work
+*** TODO =Telega= fix
+*** TODO Make organize relation beetween computer and phone RSS subscribes
+
 ** Targets on Day
-
-
-
-
 
 *** TODO Use =latex-extra-run-all= in the =org-export=
 SCHEDULED: <2022-09-24 Сб>
-
-*** DONE Command for the =org-mode= options setting
-SCHEDULED: <2022-09-24 Сб>
-
-*** DONE Fix =xah-fly-keys= in =calc=
-SCHEDULED: <2022-09-23 Пт>
-
 
 * Films 
 

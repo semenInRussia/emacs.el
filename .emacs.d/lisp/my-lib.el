@@ -186,8 +186,8 @@ in the region.  Otherwise, read a URL from the minibuffer."
 
 (defun my-url-from-kill-ring ()
   "If the last element of the kill ring is a URL, get it, otherwise get nil."
-  (let ((copied (-first-item kill-ring)))
-    (when (my-url-p copied) copied)))
+  (let ((copied (current-kill 0)))
+    (and (my-url-p copied) copied)))
 
 (defun my-read-string-or-nil ;nofmt
     (prompt &optional initial-input history default-value inherit-input-method)
@@ -225,5 +225,8 @@ Using TESTFN in functions sush as `assoc' or `alist-get'"
    (--remove (assoc (car it) alist2))
    (append alist2)))
 
+(defun my-regexp-opt-of-regexp (regexps)
+  "Return the regexp, which will be match to the one of taked regexps."
+  (concat "\\(?:" (s-join "\\|" regexps) "\\)"))
 (provide 'my-lib)
 ;;; my-lib.el ends here

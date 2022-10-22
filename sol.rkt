@@ -1,5 +1,11 @@
 #lang racket
 
-(provide goals)
+(require math/number-theory)
 
-(define goals +)
+(module+ main
+  (for* ([i (in-naturals)])
+    (when (prime? i)
+      (let ((p (- (expt i 7) 21)))
+        (when (prime? p)
+          (println p)
+          (newline))))))

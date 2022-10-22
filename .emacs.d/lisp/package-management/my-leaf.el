@@ -28,11 +28,11 @@
 
 (straight-use-package 'leaf)
 (straight-use-package 'leaf-keywords)
+(straight-use-package 'leaf-convert)
 
 (leaf-keywords-init)
 
-(setq leaf-alias-keyword-alist
-      '((:ensure . :straight)))
+(setq leaf-alias-keyword-alist '((:ensure . :straight)))
 
 (defun my-plist-get (plist prop &optional default)
   "Wrapper on `plist-get', difference is that, if first elt isn't keyword work.

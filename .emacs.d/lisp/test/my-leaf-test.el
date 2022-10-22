@@ -3,6 +3,7 @@
 ;; Copyright (C) 2022 Semen Khramtsov
 
 ;; Author: Semen Khramtsov <hrams205@gmail.com>
+;; Version: 0.1
 
 ;; This file is not part of GNU Emacs.
 
@@ -94,9 +95,13 @@
   (should-leaf-macroexpand
    (leaf leaf :fast-exec ("Pretty Print Current Buffer" 'pp-buffer))
    (prog1 'leaf
+     (unless (fboundp 'quote) (autoload #'quote "leaf" nil t))
+     (unless (fboundp 'pp-buffer)
+       (autoload #'pp-buffer "leaf" nil t))
      (eval-after-load 'fast-exec
-       '(fast-exec/bind leaf
-                        ("Pretty Print Current Buffer" pp-buffer))))))
+       '(fast-exec-bind leaf
+          (fast-exec-make-some-commands
+           ("Pretty Print Current Buffer" 'pp-buffer)))))))
 
 (ert-deftest my-leaf-check-fast-exec-keyword-some-bindings
     ()
@@ -106,9 +111,11 @@
                   'pp-macroexpand-last-sexp)
                  ("Pretty Print Current Buffer" 'pp-buffer)))
    (prog1 'leaf
+     (unless (fboundp 'quote) (autoload #'quote "leaf" nil t))
      (unless (fboundp 'pp-macroexpand-last-sexp)
-       (autoload 'pp-macroexpand-last-sexp "leaf"))
-     (unless (fboundp 'pp-buffer) (autoload 'pp-buffer "leaf"))
+       (autoload #'pp-macroexpand-last-sexp "leaf" nil t))
+     (unless (fboundp 'pp-buffer)
+       (autoload #'pp-buffer "leaf" nil t))
      (eval-after-load 'fast-exec
        '(fast-exec-bind leaf
           (fast-exec-make-some-commands
@@ -181,25 +188,6 @@
                                         '(markdown-mode)
                                         'nil))
      (leaf-keys (("M-RET" . markdown-insert-list-item))))))
-
-(ert-deftest my-leaf-check-flatten-list
-    ()
-  (should
-   (equal (my-flatten-list '(1 2 3 'dedj)) '(1 2 3 'dedj)))
-  (should
-   (equal
-    (my-flatten-list
-     '(a b c
-         (1 2 3 4 5)
-         (6 ((7) 8 (9)))))
-    '(a b c 1 2 3 4 5 6 7 8 9)))
-  (should
-   (equal
-    (my-flatten-list
-     '(a b c
-         (1 2 3 4 5)
-         (6 ((7) 8 (9 . 10)) . 11) . 12)) ;nofmt
-    '(a b c 1 2 3 4 5 6 7 8 9 10 11 12))))
 
 (provide 'my-leaf-test)
 ;;; my-leaf-test.el ends here

@@ -105,8 +105,10 @@ After each call of F, print progress starting from the START."
         (funcall f module))
        ((stringp module)
         (setq count
-              (+ count (1-
-               (my-for-each-module-of-config-dir f module (1- count))))))
+              (+ count
+                 (1-
+                  (my-for-each-module-of-config-dir f module
+                                                    (1- count))))))
        ((eq module t)
         (print "AGAIN!")
         (my-for-each-module-of-config-dir f "."))))))
@@ -151,7 +153,7 @@ Return number of modules on which was call F."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(avy-background t t)
+ '(avy-background t)
  '(blamer-idle-time 0.3 t)
  '(blamer-min-offset nil t)
  '(company-dabbrev-ignore-case nil)
@@ -162,12 +164,13 @@ Return number of modules on which was call F."
  '(company-tooltip-flip-when-above t)
  '(company-tooltip-limit 15)
  '(deft-default-extension "org" t)
- '(deft-directory "~/notes/" t)
- '(deft-recursive t t)
- '(deft-use-filename-as-title nil t)
+ '(deft-directory "~/notes/")
+ '(deft-recursive t)
+ '(deft-use-filename-as-title nil)
  '(dumb-jump-force-searcher 'rg t)
  '(dumb-jump-prefer-searcher 'rg t)
  '(eldoc-idle-delay 0.01)
+ '(elfeed-feeds '("https://habr.com/ru/rss/all/all/?fl=ru"))
  '(imenu-auto-rescan t)
  '(js-indent-level 2 t)
  '(js2-allow-rhino-new-expr-initializer nil t)
@@ -175,7 +178,8 @@ Return number of modules on which was call F."
  '(js2-concat-multiline-strings 'eol t)
  '(js2-enter-indents-newline nil t)
  '(js2-global-externs
-   '("module" "require" "buster" "sinon" "assert" "refute" "setTimeout" "clearTimeout" "setInterval" "clearInterval" "location" "__dirname" "console" "JSON") t)
+   '("module" "require" "buster" "sinon" "assert" "refute" "setTimeout" "clearTimeout" "setInterval" "clearInterval" "location" "__dirname" "console" "JSON")
+   t)
  '(js2-idle-timer-delay 0.1 t)
  '(js2-include-gears-externs nil t)
  '(js2-include-rhino-externs nil t)
@@ -188,9 +192,10 @@ Return number of modules on which was call F."
  '(js2-strict-trailing-comma-warning t t)
  '(lisp-body-indent 2)
  '(lpr-command "PDFToPrinter")
- '(magit-refresh-status-buffer nil t)
+ '(magit-refresh-status-buffer nil)
  '(my-mc-cmds-to-run-once
-   '(my-mark-all my-bob-or-mc-align my-eob-or-align-with-spaces my-mc-mark-like-this-or-edit-lines my-mc-mark-like-this-or-edit-lines toggle-input-method) t)
+   '(my-mark-all my-bob-or-mc-align my-eob-or-align-with-spaces my-mc-mark-like-this-or-edit-lines my-mc-mark-like-this-or-edit-lines toggle-input-method)
+   t)
  '(org-agenda-files '("~/agenda.org"))
  '(org-capture-templates
    '(("d" "Target on Day" entry
@@ -224,7 +229,8 @@ Return number of modules on which was call F."
    '(xclip inspector org-appear org-modern toc-org org-cliplink helm-org-ql org-ql helm-org org-download goggles googles company-auctex company-math latex-extra laas cdlatex magic-latex-buffer math-preview xenops run-command-recipes flycheck-ghcmod ghc company-ghci hindent highlight-thing gruber-darker-theme doom-themes skeletor run-command helm-projectile projectile hl-todo git-modes blamer magit git-gutter dired-collapse dired-ranger dired-rainbow dired-open dired-filter deft js2-mode haskell-mode racket-mode suggest emr package-lint flycheck-package paxedit yasnippet smartparens visual-regexp deadgrep helm-swoop multiple-cursors imenu-anywhere format-all flycheck expand-region embrace eldoc dumb-jump rg drag-stuff company comment-dwim-2 avy aggressive-indent aas leaf-keywords org-ml pcache dash f s))
  '(projectile-completion-system 'helm)
  '(projectile-enable-caching nil)
- '(projectile-project-root-functions '(projectile-root-local my-project-root))
+ '(projectile-project-root-functions
+   '(projectile-root-local my-project-root))
  '(projectile-project-search-path '("~/projects/"))
  '(python-shell-interpreter "python" t)
  '(racket-xp-mode-hook nil t)
@@ -242,4 +248,6 @@ Return number of modules on which was call F."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(blamer-face ((t (:foreground "#7a88cf" :background nil :height 140 :italic t))) nil "Customized with leaf in `blamer' block at `c:/Users/hrams/AppData/Roaming/.emacs.d/lisp/env/my-git.el'"))
+ '(blamer-face
+   ((t (:foreground "#7a88cf" :background nil :height 140 :italic t)))
+   nil "Customized with leaf in `blamer' block at `c:/Users/hrams/AppData/Roaming/.emacs.d/lisp/env/my-git.el'"))

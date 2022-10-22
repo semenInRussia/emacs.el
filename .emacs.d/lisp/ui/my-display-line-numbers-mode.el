@@ -27,7 +27,8 @@
 
 ;;; Code:
 
-(add-hook 'prog-mode-hook 'display-line-numbers-mode)
+(leaf display-line-numbers-mode
+  :hook (prog-mode-hook . display-line-numbers-mode))
 
 (provide 'my-display-line-numbers-mode)
 ;;; my-display-line-numbers-mode.el ends here

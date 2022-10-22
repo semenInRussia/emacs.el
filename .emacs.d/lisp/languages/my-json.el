@@ -32,9 +32,7 @@
   :config                               ;nofmt
   (leaf json-snatcher
     :ensure t
-    :bind (:my-json-mode-local-map
-           :package json-mode
-           ("c" . jsons-print-path))))
+    :bind (:my-json-local-map :package json-mode ("c" . jsons-print-path))))
 
 (provide 'my-json)
 ;;; my-json.el ends here

@@ -40,6 +40,7 @@
          (:xah-fly-command-map
           :package xah-fly-keys
           ("SPC SPC f" . helm-find-files)
+          ("a"         . helm-M-x)
           ("SPC k r"   . helm-regexp)))
   :global-minor-mode helm-mode
   :fast-exec (("Search via Google" 'helm-google-suggest)

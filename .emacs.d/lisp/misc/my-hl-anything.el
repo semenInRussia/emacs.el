@@ -27,7 +27,6 @@
 
 (leaf hl-anything
   :ensure t
-  :global-minor-mode (hl-highlight-mode)
   :bind (:xah-fly-command-map
          :package xah-fly-keys
          ("SPC d l" . hl-highlight-thingatpt-local)

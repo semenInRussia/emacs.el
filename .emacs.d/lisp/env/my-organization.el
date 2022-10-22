@@ -30,7 +30,6 @@
 (require 'just)
 
 (leaf org-agenda                        ;nofmt
-  :after org
   :custom (org-agenda-files . '("~/agenda.org"))
   :bind (("<f9>"      . org-agenda)
          ("S-<f9>"    . org-agenda-list)
