@@ -272,7 +272,6 @@ would be `find-file-other-window' or `find-file-other-frame'"
 
 (defalias 'projectile-project-files 'my-projectile-project-files)
 (defalias 'projectile-root-local 'my-projectile-root-local)
-(defalias 'project-root 'my-project-root)
 (defalias 'projectile-files-with-string 'my-projectile-files-with-string)
 
 (provide 'my-projectile)
