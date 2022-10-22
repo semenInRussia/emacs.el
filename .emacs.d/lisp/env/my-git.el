@@ -29,11 +29,15 @@
 
 (leaf git-gutter                        ;nofmt
   :ensure t
-  :hook (prog-mode-hook . git-gutter-mode))
+  :hook prog-mode-hook)
 
 (leaf magit                             ;nofmt
   :ensure t
-  :custom (magit-refresh-status-buffer . nil))
+  :custom (magit-refresh-status-buffer . nil)
+  :config                               ;nofmt
+  (leaf forge                           ;nofmt
+    :ensure t
+    :require t))
 
 (leaf blamer
   :ensure t
