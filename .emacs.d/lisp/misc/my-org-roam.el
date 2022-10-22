@@ -27,19 +27,24 @@
 
 (leaf org-roam
   :ensure t
-  :global-minor-mode org-roam-db-autosync-mode
   :init (f-mkdir "~/org-roam")
   :bind (:xah-fly-command-map
          :package xah-fly-keys
-         ("SPC z f" . org-roam-node-find)
-         ("SPC z s" . org-roam-ref-add)
-         ("SPC z o" . org-roam-buffer-toggle)
-         ("SPC z j" . org-roam-node-insert)))
+         ("SPC z f"   . org-roam-node-find)
+         ("SPC z s s" . org-roam-ref-add)
+         ("SPC z s d" . org-roam-ref-remove)
+         ("SPC z a a" . org-roam-alias-add)
+         ("SPC z a d" . org-roam-alias-remove)
+         ("SPC z o"   . org-roam-buffer-toggle)
+         ("SPC z j"   . org-roam-node-insert))
+  :config                               ;nofmt
+  (f-mkdir "~/org-roam")
+  (org-roam-db-autosync-mode t))
 
 (leaf org-roam-ui
   :ensure t
   :after org-roam
-  :config (org-roam-ui-follow-mode 0))
+  :config (org-roam-ui-mode t))
 
 (provide 'my-org-roam)
 ;;; my-org-roam.el ends here
