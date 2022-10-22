@@ -60,3 +60,4 @@ devdocs/
 /.elfeed/
 /.authinfo
 .ecukes-failing-scenarios
+/agenda.*
