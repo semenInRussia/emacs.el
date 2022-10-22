@@ -56,3 +56,7 @@ devdocs/
 /.emacs.d/org-roam.db
 /Emacs.org
 /emacs_backtrace.txt
+/.emacs.d/forge-database.sqlite
+/.elfeed/
+/.authinfo
+.ecukes-failing-scenarios
