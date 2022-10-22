@@ -36,7 +36,9 @@
 
 (leaf org-ml :ensure t :require t)
 
-(leaf just :load-path "~/projects/just/")
+(leaf just                              ;nofmt
+  :ensure (just :host github :repo "semenInRussia/just.el")
+  :require t)
 
 (provide 'my-libs)
 ;;; my-libs.el ends here
