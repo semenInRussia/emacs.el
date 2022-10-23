@@ -50,6 +50,9 @@
                                             :height 140
                                             :italic t)))))
 
+(leaf git-timemachine
+  :ensure (git-timemachine :host gitlab :repo "pidu/git-timemachine"))
+
 (leaf git-modes :ensure t)
 
 (leaf helm-gitignore
