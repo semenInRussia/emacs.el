@@ -83,11 +83,15 @@
     "Go to fields of `defclass' defnition."
     (interactive)
     (my-goto-defclass-beg)
-    (forward-sexp 4)
-    (forward-char -1)
-    (-when-let
-        (sexp (sp-get-enclosing-sexp))
-      (sp-get sexp (goto-char :end-in))))
+    (sp-get
+        (sp-get-enclosing-sexp)
+      (let ((sexp (read (buffer-substring-no-properties :beg :end))))
+        (if (length> sexp 3)
+            (forward-sexp 4)
+          (goto-char :end-in)
+          (newline-and-indent)
+          (insert "()"))
+        (forward-char -1))))
 
   (defun my-elisp-in-defclass-p (&optional pt)
     "Move to PT and return name of function/macros in which stay this sexp."
