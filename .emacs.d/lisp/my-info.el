@@ -38,8 +38,12 @@
 
 (defvar user-name "semenInRussia" "My nickname.")
 
-(when (s-equals-p (format-time-string "%Y-%m-%d") user-birthday)
-  (animate-birthday-present))
+(defun my-maybe-present-my-birthday ()
+  "If today is my birthday, congurlate me with `animate'."
+  (interactive)
+  (when (s-equals-p (format-time-string "%Y-%m-%d") user-birthday)
+    (animate-birthday-present)))
 
+(add-hook 'emacs-startup-hook 'my-maybe-present-my-birthday)
 (provide 'my-info)
 ;;; my-info.el ends here
