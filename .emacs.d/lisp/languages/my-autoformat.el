@@ -43,9 +43,13 @@
   "Autoformat functions works everywhere."
   :type '(repeat symbol))
 
-(defun autoformat-sentence-capitalization ()
+(defun autoformat-sentence-capitalization (&optional ;nofmt
+                                           prev-line-should-not-be-empty)
   "Auto-capitalize first words of a sentence.
-Either at the beginning of a line, or after a sentence end."
+
+Either at the beginning of a line, or after a sentence end, if
+PREV-LINE-SHOULD-NOT-BE-EMPTY is nil (by default), then capitalize only when
+previous line is empty."
   (interactive)
   (and
    (looking-back "[[:alpha:]]")
@@ -56,7 +60,7 @@ Either at the beginning of a line, or after a sentence end."
      (and
       (skip-chars-backward " ")
       (bolp)
-      (my-previous-line-is-empty))))
+      (or prev-line-should-not-be-empty (my-previous-line-is-empty)))))
    (upcase-char -1)))
 
 (defun my-previous-line-is-empty ()

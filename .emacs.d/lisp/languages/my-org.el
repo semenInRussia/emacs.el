@@ -315,10 +315,12 @@ Label is \"-\""
       (interactive)
       (when (just-call-on-prev-line*
              (or
-              (equal (point-at-bol) (point-min))
               (just-line-is-whitespaces-p)
               (my-org-heading-p)
               (my-org-list-item-p)))
+        (autoformat-sentence-capitalization t))
+      (when (just-call-on-prev-line*
+             (equal (point-at-bol) (point-min)))
         (autoformat-sentence-capitalization)))
 
     (defun my-org-heading-p ()

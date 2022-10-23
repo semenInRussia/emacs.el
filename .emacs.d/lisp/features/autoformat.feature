@@ -1,86 +1,84 @@
-
 Feature: autoformat in the org
   there are tests for autoformat-mode in the org-mode major-mode
 
-  Scenario: type text at the beginning of a buffer, first letter should be capitalizated
+  Scenario: type text at the beginning of a buffer
     Given a org-mode buffer
     And I activate the insert mode
-    When I type "george"
+    When I type "any sentence"
+    Then I should see "Any"
     And I activate the command mode
-    Then I should see "George"
-
-  Scenario: type a new sentence, first letter should be capitalizated
+  Scenario: type a new sentence
     Given a org-mode buffer
     And I activate the insert mode
-    When I type "so, I already ready for read.  ready!"
+    When I type "Luke, i your father.  noooo!!!!!"
+    Then I should see "Noooo"
     And I activate the command mode
-    Then I should see "So, I already ready for read.  Ready!"
-
-  Scenario: type a multi-line sentence, first letter of line shouldn't be capitalizated
+  Scenario: type a multi-line sentence
     Given a org-mode buffer
     And I activate the insert mode
-    When I type "for example, this is dog, this explained as the theory of"
+    When I type "Skylller, i think you don't understood who I.  I am not in the danger"
     And I press "RET"
-    And I type "the Newton third (nigerian king), because "
-    And I activate the command mode
+    And I type "i, am the danger, Skyller"
     Then I should see:
       """
-      For example, this is dog, this explained as the theory of the Newton
-      third (nigerian king), because 
+      Skylller, i think you don't understood who I.  I am not in the danger
+      i, am the danger, Skyller
       """
-
-  Scenario: type a org-mode list, first letter of item should be capitalizated
+    And I activate the command mode
+  Scenario: type a org-mode list
     Given a org-mode buffer
     And I activate the insert mode
     And I disable modern-org-mode
-    When I type "Presidents:"
+    When I type "Type of me:"
     And I press "RET"
-    And I type "- bush"
+    And I type "- aggressive worker"
     And I press "M-RET"
-    And I type "obama"
+    And I type "super indolent"
     And I press "M-RET"
-    And I press "tramp"
-    And I press "M-RET"
-    And I press "[x] biden"
+    And I type "[x] stupid"
+    And I type "i, am the danger, Skyller"
+    Then  I should see "Aggressive"
+    And I should see "Super"
+    And I should see "Stupid"
     And I activate the command mode
-    Then I should see:
-      """
-      Presidents:
-      - Bush
-      - Obama
-      - Tramp
-      - [x]Biden
-      """
 
-  Scenario: type a org-mode list with label +,
+  Scenario: type a org-mode list with label +
     Given a org-mode buffer
     And I activate the insert mode
     And I disable modern-org-mode
-    And I type "+ a"
+    When I type "+ a"
     And I press "M-RET"
     And I type "b"
+    Then I should see "A"
+    And I should see "B"
     And I activate the command mode
-    Then I should see:
-      """
-      + A
-      + B
-      """
 
-  Scenario: type org-mode heading, first letter should be capitalizated
+  Scenario: type org-mode heading
     Given a org-mode buffer
     And I activate the insert mode
     And I disable modern-org-mode
-    When I press "M-RET"
-    And I type "main config"
-    Then I should see "* Main config"
+    When I type "* book"
     And I press "RET"
-    And I type "** config of a shit feature"
-    Then I should see "** Config of a shit feature"
-    When I press "M-RET"
-    And I type "TODO config of me"
-    Then I should see "Config of me"
-    
+    And I type "** introduction"
+    And I press "M-RET"
+    And I type "main part"
+    And I press "M-RET"
+    And I type "conclusion"
+    Then I should see "Introduction"
+    And I should see "Main part"
+    And I should see "Conclusion"
+    And I activate the insert mode
 
+
+  Scenario: type a sentence after line with org-mode heading
+    Given a org-mode buffer
+    And I activate the insert mode
+    And I disable modern-org-mode
+    When I type "* Heading"
+    And I press "RET"
+    And I type "first sentence.  second sentence"
+    Then I should see "First"
+    And I should see "Second"
 Feature: autoformat in markdown mode
   there are tests for autoformat-mode in the markdown-mode major-mode
 
