@@ -37,7 +37,7 @@
 (leaf org-ml :ensure t :require t)
 
 (leaf just                              ;nofmt
-  :ensure (just :host github :repo "semenInRussia/just.el")
+  :ensure (just :type git :host github :repo "semenInRussia/just.el")
   :require t)
 
 (provide 'my-libs)

@@ -33,6 +33,7 @@
   :config                               ;nofmt
   (leaf elfeed-org                      ;nofmt
     :ensure t
+    :require t
     :custom ((rmh-elfeed-org-files . '("~/opmls/main.org"))
              (my-elfeed-main-opml  . "~/opmls/main.opml"))
     :config                             ;nofmt
@@ -61,7 +62,16 @@ Special directory configured in `my-elfeed-main-opml' variable"
           (f-touch my-elfeed-main-opml)
           (f-write (buffer-string) 'utf-8 my-elfeed-main-opml))))
 
-    (my-elfeed-org-export)))
+    (my-elfeed-org-export)
+    (elfeed-load-opml my-elfeed-main-opml))
+
+  (leaf elfeed-goodies
+    :ensure t
+    :require t
+    :config (elfeed-goodies/setup))
+
+  (leaf elfeed-tube :ensure t :require t))
+
 
 (provide 'my-elfeed)
 ;;; my-elfeed.el ends here

@@ -39,12 +39,14 @@
          ("SPC z j"   . org-roam-node-insert))
   :config                               ;nofmt
   (f-mkdir "~/org-roam")
-  (org-roam-db-autosync-mode t))
+  (org-roam-db-autosync-mode t)
 
-(leaf org-roam-ui
-  :ensure t
-  :after org-roam
-  :config (org-roam-ui-mode t))
+  (require 'org-roam-export)
+  (require 'org-roam-protocol)
+
+  (leaf org-roam-ui                     ;nofmt
+    :ensure t
+    :config (org-roam-ui-mode t)))
 
 (provide 'my-org-roam)
 ;;; my-org-roam.el ends here

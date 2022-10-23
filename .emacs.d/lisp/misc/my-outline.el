@@ -29,11 +29,10 @@
   :ensure t
   :bind (:xah-fly-command-map
          :package xah-fly-keys
-         ("SPC o o"   . nil)
-         ("SPC o o a" . 'outline-show-all)
-         ("SPC o o o" . 'outline-show-entry)
-         ("SPC o o d" . 'outline-hide-entry)
-         ("SPC o o j" . 'my-outline-cycle))
+         ("SPC o o" . 'outline-show-entry)
+         ("SPC o d" . 'outline-hide-entry)
+         ("SPC o a" . 'outline-show-all)
+         ("SPC o s" . 'my-outline-cycle))
   :config                               ;nofmt
   (defun my-outline-cycle ()
     "My version of the `outline-cycle', different is that repeat at last key."

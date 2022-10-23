@@ -238,7 +238,8 @@
     :custom (cdlatex-math-modify-alist
              .
              '((?q "\\sqrt" nil t nil nil)
-               (?u "\\breve" "\\uline" t nil nil)))
+               (?u "\\breve" "\\uline" t nil nil)
+               (?v "\\vec" nil t nil nil)))
     :config                             ;nofmt
     (defun my-latex-dollar ()
       "Insert dollars and turn input method into English."

@@ -34,6 +34,7 @@
   :bind (("<f9>"      . org-agenda)
          ("S-<f9>"    . org-agenda-list)
          (:xah-fly-command-map
+          :package xah-fly-keys
           ("SPC <f9>" . org-agenda-list)
           ("SPC i p"  . my-open-main-agenda-file)))
   :config                               ;nofmt

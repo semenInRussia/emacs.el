@@ -78,7 +78,8 @@ SCHEDULED: <2022-09-24 Сб>
 ake =focus= for work
 *** TODO =Telega= fix
 *** TODO Make organize relation beetween computer and phone RSS subscribes
-
+*** TODO Explore =git-timemachine=
+*** TODO Fix =org-roam-protocol=
 ** Targets on Day
 
 *** TODO Use =latex-extra-run-all= in the =org-export=
