@@ -18,12 +18,6 @@ DEADLINE: <2022-10-06 -20d Чт>
 
 *** TODO add support of the =org-export= to the =run-command-recipes= :run_command_recipes:
 
-*** TODO Xenops in non \documentclass =LaTeX= documents
-SCHEDULED: <2022-09-24 Сб>
-
-*** TODO New =embrace= with support of the =smartparens=
-SCHEDULED: <2022-09-24 Сб>
-
 *** TODO Impatient modes for all =major-modes=
 SCHEDULED: <2022-09-24 Сб>
 
@@ -32,8 +26,6 @@ SCHEDULED: <2022-09-24 Сб>
 
 *** TODO More useful way to run =run-command-recipes= recipes
 SCHEDULED: <2022-10-26 Ср>
-
-
 
 See on the compile command from the =latex-extra=
 
@@ -46,11 +38,6 @@ SCHEDULED: <2022-09-24 Сб>
 *** TODO Fix =sp-kill-whole-line=
 SCHEDULED: <2022-09-24 Сб>
 
-*** TODO Post commit hook for Emacs.org (delete DONE =org-mode= heading)
-
-*** TODO Make wrapper for birthday congurlation
-
-*** DONE Insert ;nofmt in elisp keybinding
 *** TODO Byte compile all config after kill =Emacs=
 *** TODO System for the reformat for certain =major-modes= at overwrited /SPC SPC q/ keybinding
 *** TODO New refactor library for the =emacs-lisp=
@@ -61,29 +48,12 @@ SCHEDULED: <2022-09-24 Сб>
 - add/delete docstring for defun
 - add/delete autoload
 - defcustom=>defvar, defvar=>defcustom
-*** TODO Explore =lsp-mode=
-*** DONE Autload after /:fast-exec/ keyword in =leaf=
 *** TODO Explore =ov=
 *** TODO Explore =coq=
-*** DONE New =fast-exec=
-*** DONE Fix =my-projectile=
-*** TODO Fix =M-ret= in =Emacs-lisp=
-*** TODO Fix tests
-*** DONE Auto reloading of the =fast-exec=
-**** TODO More cool readme (provided by =leaf= statisitcs)
-*** TODO Finish commit editing =magit= on /SPC ;/
-*** TODO Auto capitalize at the beginning of the list item in =org-mode=
-*** TODO M
-
-ake =focus= for work
-*** TODO =Telega= fix
 *** TODO Make organize relation beetween computer and phone RSS subscribes
 *** TODO Explore =git-timemachine=
 *** TODO Fix =org-roam-protocol=
 ** Targets on Day
-
-*** TODO Use =latex-extra-run-all= in the =org-export=
-SCHEDULED: <2022-09-24 Сб>
 
 * Films 
 
