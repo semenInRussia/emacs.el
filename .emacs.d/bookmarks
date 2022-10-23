@@ -9,7 +9,7 @@
  (position . 2076))
 ("org-capture-last-stored"
  (filename . "~/agenda.org")
- (front-context-string . "\nake =focus= for")
- (rear-context-string . "ode=\n*** TODO M\n")
- (position . 2375))
+ (front-context-string . "*** TODO Fix =or")
+ (rear-context-string . "it-timemachine=\n")
+ (position . 2529))
 )

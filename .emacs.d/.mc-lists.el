@@ -147,6 +147,7 @@
         my-mc-mark-like-this-or-edit-lines
         my-mc-mark-like-this-or-edit-lines
         my-visit-last-opened-buffer
+        orgtbl-self-insert-command
         swiper-helm
         text-scale-decrease
         toggle-input-method

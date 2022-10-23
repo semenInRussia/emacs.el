@@ -50,12 +50,6 @@
                                             :height 140
                                             :italic t)))))
 
-(leaf git-undo
-  :commands git-undo
-  :after fast-exec
-  :init                                 ;nofmt
-  :fast-exec ("Undo via Git" 'git-undo))
-
 (leaf git-modes :ensure t)
 
 (leaf helm-gitignore
