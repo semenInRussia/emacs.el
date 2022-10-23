@@ -38,15 +38,31 @@
 
 (leaf calc
   :hook (calc-start-hook . xah-fly-insert-mode-activate)
-  :bind (:calc-edit-mode-map
-         :package calc-yank
-         ([remap save-buffer] . calc-edit-finish))
+  :bind ((:calc-mode-map                ;nofmt
+          ("v y" . my-calc-mean-yank))
+         (:calc-edit-mode-map
+          :package calc-yank
+          ([remap save-buffer] . calc-edit-finish)))
   :config                               ;nofmt
+  (defun my-calc-mean-yank (vec)
+    "Yank to calculator vector of numbers VEC as string and compute mean.
+
+When call interactively, VEC equal lines of the clipboard as numbers, same
+mechanism use `calc-yank'"
+    (interactive
+     (list
+      (->>
+       (current-kill 0 t)
+       (s-split-words)
+       (-remove-item "•")
+       (s-join "\n"))))
+    (calc-yank-internal 0 vec)
+    (calc-pack (length (s-lines vec)))
+    (calc-vector-mean nil))
+
   (--each my-calc-operations
     (advice-add it :after
-                (lambda (&rest _)
-                  (message "OK!")
-                  (xah-fly-insert-mode-activate))
+                (lambda (&rest _) (xah-fly-insert-mode-activate))
                 '((name . xah-fly-insert-mode-activate)))))
 
 (provide 'my-calc)
