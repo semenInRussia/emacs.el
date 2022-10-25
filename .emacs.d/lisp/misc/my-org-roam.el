@@ -41,11 +41,15 @@
   (f-mkdir "~/org-roam")
   (org-roam-db-autosync-mode t)
 
+  (add-to-list 'Info-directory-list
+               (f-full "~/.emacs.d/straight/repos/org-roam/doc"))
+
   (require 'org-roam-export)
   (require 'org-roam-protocol)
 
   (leaf org-roam-ui                     ;nofmt
     :ensure t
+    :defun org-roam-ui-mode
     :config (org-roam-ui-mode t)))
 
 (provide 'my-org-roam)
