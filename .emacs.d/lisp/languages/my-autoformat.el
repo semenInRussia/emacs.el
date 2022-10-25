@@ -29,6 +29,9 @@
 (require 'just)
 (require 'org)
 
+
+
+
 (defgroup my-autoformat nil
   "Automatically format of source code (add spaces, capitalze and etc)."
   :group 'editing)
@@ -52,7 +55,7 @@ PREV-LINE-SHOULD-NOT-BE-EMPTY is nil (by default), then capitalize only when
 previous line is empty."
   (interactive)
   (and
-   (looking-back "[[:alpha:]]")
+   (looking-back "[[:alpha:]]" nil)
    (just-call-on-backward-char*
     (or
      (bobp)
@@ -76,17 +79,26 @@ See variable `my-autoformat-local-functions'"
   (interactive)
   (-each my-autoformat-local-functions 'funcall))
 
-(define-minor-mode my-autoformat-global-mode
+(define-minor-mode my-autoformat-mode
   "Toggle `my-autoformat-mode'."
   :init-value nil
   (if my-autoformat-global-mode
       (progn
-        (add-hook 'post-self-insert-hook #'my-autoformat-do)
+        (add-hook 'post-self-insert-hook #'my-autoformat-do 0 t)
         (add-hook 'after-change-major-mode-hook
-                  #'my-autoformat-activate-for-major-mode))
-    (remove-hook 'post-self-insert-hook #'my-autoformat-do)
+                  #'my-autoformat-activate-for-major-mode
+                  0 t))
+    (remove-hook 'post-self-insert-hook #'my-autoformat-do t)
     (remove-hook 'after-change-major-mode-hook
-                 #'my-autoformat-activate-for-major-mode)))
+                 #'my-autoformat-activate-for-major-mode t)))
+
+(define-global-minor-mode my-autoformat-global-mode
+  my-autoformat-mode
+  my-autoformat-turn-on-mode)
+
+(defun my-autoformat-turn-on-mode ()
+  "Enable `my-autoformat-mode' locally."
+  (my-autoformat-mode t))
 
 (defvar my-autoformat-functions-of-major-modes nil
   "Alist from keys `major-mode' s and values their autoformat functions.")
@@ -111,6 +123,7 @@ MM defaults to value of the `major-mode'"
    (assq-delete-all mode)
    (cons (cons mode functions))
    (setq my-autoformat-functions-of-major-modes)))
+
 
 (my-autoformat-global-mode t)
 
