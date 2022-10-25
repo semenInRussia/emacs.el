@@ -41,10 +41,11 @@
           :package xah-fly-keys
           ("SPC SPC f" . helm-find-files)
           ("a"         . helm-M-x)
-          ("SPC k r"   . helm-regexp)))
+          ("SPC k r"   . helm-regexp)
+          ("SPC i d" . 'helm-google-suggest)))
   :global-minor-mode helm-mode
-  :fast-exec (("Search via Google" 'helm-google-suggest)
-              ("Get Color" 'helm-colors))
+  :fast-exec (("Get Color" 'helm-colors)
+              ("Search in Goggle" 'helm-google-suggest))
   :config                               ;nofmt
   (leaf helm-ext
     :ensure t
