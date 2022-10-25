@@ -31,13 +31,17 @@
   :ensure t
   :hook prog-mode-hook)
 
+;;; TODO: any thing that I should will implement in the future
+
 (leaf magit                             ;nofmt
   :ensure t
   :custom (magit-refresh-status-buffer . nil)
   :config                               ;nofmt
   (leaf forge                           ;nofmt
     :ensure t
-    :require t))
+    :require t)
+
+  (leaf magit-todos :ensure t :global-minor-mode magit-todos-mode))
 
 (leaf blamer
   :ensure t
