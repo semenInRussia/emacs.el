@@ -147,7 +147,7 @@ If in a table ask from the user: either kill column, kill cell or kill row, if
 in a src block cut it, otherwise kill heading"
       (interactive)
       (cond
-       ((org-table-p)
+       ((org-at-table-p)
         (set-transient-map my-org-table-cut-map))
        (t (org-cut-subtree))))
 
@@ -490,10 +490,6 @@ produced."
 
       (defalias 'org-latex-compile 'my-org-latex-compile)))
 
-  (leaf org-cliplink
-    :ensure t
-    :bind (:my-org-local-map :package org ("i" . org-cliplink)))
-
   (leaf toc-org
     :ensure t
     :hook (org-mode-hook . toc-org-mode)
@@ -559,7 +555,8 @@ Thanks to David Maus!"
              (message "All subtrees checked."))))))
 
     (defun my-org-fix-blank-lines (&optional prefix)
-      "Ensure that Blank lines exist between headings and between headings and their contents.
+      "Ensure that Blank lines exist between headings and their contents.
+
 With prefix, operate on whole buffer. Ensures that blank lines
 exist after each headings's drawers."
       (interactive "P")
