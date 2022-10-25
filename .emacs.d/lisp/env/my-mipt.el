@@ -132,7 +132,7 @@ Object of the `my-mipt-task', will set automatically when find task.")
 If IS-VISIT is t, then also visit the next mipt task"
   (interactive (list t))
   (let ((next-task (my-mipt-current-task)))
-    (incf (my-mipt-task-number next-task))
+    (cl-incf (my-mipt-task-number next-task))
     (when is-visit (my-mipt-task-visit next-task))
     next-task))
 
@@ -142,7 +142,7 @@ If IS-VISIT is t, then also visit the next mipt task"
 If IS-VISIT is t, then also visit the next mipt task."
   (interactive (list t))
   (let ((prev-task (my-mipt-current-task)))
-    (decf (my-mipt-task-number prev-task))
+    (cl-decf (my-mipt-task-number prev-task))
     (when is-visit (my-mipt-task-visit prev-task))
     prev-task))
 

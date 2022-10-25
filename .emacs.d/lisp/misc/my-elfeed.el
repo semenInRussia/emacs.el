@@ -34,6 +34,7 @@
   (leaf elfeed-org                      ;nofmt
     :ensure t
     :require t
+    :defvar (rmh-elfeed-org-files my-elfeed-main-opml)
     :custom ((rmh-elfeed-org-files . '("~/opmls/main.org"))
              (my-elfeed-main-opml  . "~/opmls/main.opml"))
     :config                             ;nofmt
@@ -68,10 +69,10 @@ Special directory configured in `my-elfeed-main-opml' variable"
   (leaf elfeed-goodies
     :ensure t
     :require t
+    :commands elfeed-goodies/setup
     :config (elfeed-goodies/setup))
 
   (leaf elfeed-tube :ensure t :require t))
-
 
 (provide 'my-elfeed)
 ;;; my-elfeed.el ends here

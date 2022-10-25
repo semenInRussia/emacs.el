@@ -33,46 +33,7 @@
          :package xah-fly-keys
          ("SPC t" . rectangle-mark-mode)
          ("SPC v" . yank-rectangle))
-  :after xah-fly-keys
-  :config                             ;nofmt
-  (defun rectangle-mark-mode-p ()
-    "Return t, when `rectangle-mark-mode' is enabled."
-    rectangle-mark-mode)
-
-  (define-key-when
-    my-copy-rectangle-or-copy-line
-    xah-fly-command-map
-    "c"
-    'copy-rectangle-as-kill
-    'rectangle-mark-mode-p)
-
-  (define-key-when
-    my-kill-rectangle-or-delete-char
-    xah-fly-command-map
-    "d"
-    'kill-rectangle
-    'rectangle-mark-mode-p)
-
-  (define-key-when
-    my-kill-rectangle-or-kill-line
-    xah-fly-command-map
-    "x"
-    'kill-rectangle
-    'rectangle-mark-mode-p)
-
-  (define-key-when
-    my-xah-activate-insert-mode-or-replace-rectangle
-    xah-fly-command-map
-    "f"
-    'replace-rectangle
-    'rectangle-mark-mode-p)
-
-  (define-key-when
-    any-exchange-point-and-mark-or-splice-sexp
-    xah-fly-command-map
-    "-"
-    'rectangle-exchange-point-and-mark
-    'rectangle-mark-mode-p))
+  :after xah-fly-keys)
 
 (provide 'my-rectangles)
 ;;; my-rectangles.el ends here

@@ -53,6 +53,7 @@ SCHEDULED: <2022-09-24 Сб>
 *** TODO Make organize relation beetween computer and phone RSS subscribes
 *** DONE Explore =git-timemachine=
 *** TODO Fix =org-roam-protocol=
+*** TODO =pomm= -> =pomidor=
 ** Targets on Day
 
 * Films 

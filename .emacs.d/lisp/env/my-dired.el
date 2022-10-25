@@ -123,8 +123,8 @@
 Return new name of FILE"
     (let* ((new-name-of-file
             (read-string "New name, please: " (f-filename from)))
-           (to (f-join (f-dirname from) new-name-of-file)))
-      (f-move from to)
+           (to (f-join (f-dirname file) new-name-of-file)))
+      (f-move file to)
       to))
 
   (defun my-dired-move ()

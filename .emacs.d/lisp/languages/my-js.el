@@ -1,4 +1,4 @@
-;;; my-js.el --- my-js
+;;; my-js.el --- My configuration for `js'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -22,6 +22,8 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
+
+;; My configuration for `js'
 
 ;;; Code:
 

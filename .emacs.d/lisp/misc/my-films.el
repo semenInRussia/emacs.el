@@ -85,7 +85,7 @@
 (defun my-films--list-candidates ()
   "Helm candidates for `my-films-list'."
   (->>
-   (my-org-mapcar-entries #'my-films--from-org-heading "\+MUST-SEE" 'agenda)
+   (org-map-entries #'my-films--from-org-heading "\+MUST-SEE" 'agenda)
    (--map (cons (helm-kinopoisk--format-film-for-display it) it))))
 
 (defun my-films--from-org-heading ()

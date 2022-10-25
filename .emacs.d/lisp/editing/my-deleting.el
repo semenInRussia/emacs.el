@@ -51,15 +51,14 @@
   :package xah-fly-keys
   ("8"     . select-current-or-next-word)
   ("SPC w" . clear-current-line)
-  ("w"     . delete-and-edit-current-line)))
+  ("g" . my-cancel-selection-or-delete-text-block)))
 
-(eval-after-load 'xah-fly-keys
-  '(define-key-when
-     my-cancel-selection-or-delete-text-block
-     xah-fly-command-map
-     "g"
-     'deactivate-mark
-     'use-region-p))
+(defun my-cancel-selection-or-delete-text-block ()
+  "Either `deactivate-mark' or `xah-delete-current-text-block'."
+  (interactive)
+  (if (use-region-p)
+      (deactivate-mark)
+    (xah-delete-current-text-block)))
 
 (provide 'my-deleting)
 ;;; my-deleting.el ends here

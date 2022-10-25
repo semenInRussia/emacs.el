@@ -60,7 +60,7 @@ See `my-latex-insert-command' for understand of ARGS"
   (-let
       (((required optional)
         (my-latex-optional-and-required-args args)))
-    (case my-latex-insert-at-start-arg-type
+    (cl-case my-latex-insert-at-start-arg-type
       ((optional)
        (my-latex--insert-optional-args optional)
        (my-latex--insert-required-args required))
@@ -82,7 +82,7 @@ See `my-latex-insert-command' for understand of ARGS"
 Optional arguments are elements of ARGS after the `:optional' keyword, required
 are rest"
   (let* ((break-index (-elem-index :optional args)))
-    (case break-index
+    (cl-case break-index
       ((nil)
        (list args nil))
       ((0)
@@ -143,7 +143,7 @@ See `my-latex-insert-command' for understand of use ARGS"
     (while (and (not (string-equal actual "document")) (not found))
       (setq actual (LaTeX-current-environment arg))
       (setq found (string-equal expected actual))
-      (incf arg))
+      (cl-incf arg))
     found))
 
 (defun my-latex-expand-define-function (key fun)

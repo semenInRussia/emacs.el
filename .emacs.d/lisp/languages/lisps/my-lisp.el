@@ -75,9 +75,12 @@
   (defun my-lisp-sexp-whole-line-p ()
     "Return t, when the Lisp sexp at the point being at whole of line."
     (interactive "P")
-    (and
-     (= beg (save-excursion (beginning-of-line-text) (point)))
-     (= end (point-at-eol))))
+    (-let
+        (((beg . end)
+          (paxedit-sexp-region)))
+      (and
+       (= beg (save-excursion (beginning-of-line-text) (point)))
+       (= end (point-at-eol)))))
 
   (defun my-paxedit-transpose-forward ()
     (interactive)

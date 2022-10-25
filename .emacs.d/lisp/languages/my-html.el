@@ -70,12 +70,13 @@
 
   (leaf impatient-mode
     :ensure t
+    :defun impatient-mode
     :bind (:my-html-local-map
            :package web-mode
            ("e" . my-enable-impatient-mode))
     :config                             ;nofmt
     (defun my-enable-impatient-mode ()
-      "Enable `impatient-mode' and open the page of current browser in web browser."
+      "Enable `impatient-mode' open page of the file in the web browser."
       (interactive)
       (impatient-mode +1)
       (->>
