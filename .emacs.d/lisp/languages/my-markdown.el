@@ -67,6 +67,8 @@ See `imenu-generic-expression'"
            :package markdown-mode
            ("t" . markdown-toc-generate-or-refresh-toc)))
 
+  (leaf edit-indirect :ensure t)
+
   (my-autoformat-bind-for-major-mode
    'markdown-mode
    'autoformat-markdown-capitalize-heading-line
