@@ -30,7 +30,8 @@
 
 (leaf deft
   :ensure t
-  :defvar deft-filter-regexp
+  :after org-roam
+  :defvar (deft-filter-regexp org-roam-directory)
   :defun deft-filter-update
   :commands deft
   :bind (:deft-mode-map
