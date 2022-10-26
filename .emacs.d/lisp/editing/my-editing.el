@@ -138,12 +138,12 @@ With prefix arg don't indent."
 (leaf-keys
  (:xah-fly-command-map
   :package xah-fly-keys
-  ("SPC y"     . duplicate-current-line-or-region)
-  ("SPC s"     . open-line-below)
-  ("SPC SPC s" . open-line-above)
-  ("s"         . open-line-saving-indent)
-  ("SPC SPC b" . my-change-case-of-current-line)
-  ("SPC e"     . kill-to-beginning-of-line)))
+  ("SPC y"     . 'duplicate-current-line-or-region)
+  ("SPC s"     . 'open-line-below)
+  ("SPC SPC s" . 'open-line-above)
+  ("s"         . 'open-line-saving-indent)
+  ("SPC SPC b" . 'my-change-case-of-current-line)
+  ("SPC e"     . 'kill-to-beginning-of-line)))
 
 (defun my-change-case-of-current-line ()
   "Change case of current line to next (see `xah-toggle-letter-case')."

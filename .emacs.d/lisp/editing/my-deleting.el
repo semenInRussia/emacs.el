@@ -51,7 +51,8 @@
   :package xah-fly-keys
   ("8"     . select-current-or-next-word)
   ("SPC w" . clear-current-line)
-  ("g" . my-cancel-selection-or-delete-text-block)))
+  ("w"     . delete-and-edit-current-line)
+  ("g"     . my-cancel-selection-or-delete-text-block)))
 
 (defun my-cancel-selection-or-delete-text-block ()
   "Either `deactivate-mark' or `xah-delete-current-text-block'."
