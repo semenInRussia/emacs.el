@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: make-parameter
+# key: mp
+# --
+(make-parameter $0)
