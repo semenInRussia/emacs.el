@@ -155,7 +155,8 @@ Return new name of FILE"
   (defun my-dired-delete-all-files ()
     "Delete all files from the directory of the `dired' buffer."
     (interactive)
-    (--each (f-entries (dired-current-directory)) (f-delete it t))
+    (my-dired-mark-all-files)
+    (dired-do-delete)
     (revert-buffer))
 
   (defun dired-avy ()
