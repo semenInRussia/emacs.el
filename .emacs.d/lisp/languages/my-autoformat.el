@@ -82,15 +82,12 @@ See variable `my-autoformat-local-functions'"
 (define-minor-mode my-autoformat-mode
   "Toggle `my-autoformat-mode'."
   :init-value nil
-  (if my-autoformat-global-mode
+  (if my-autoformat-mode
       (progn
-        (add-hook 'post-self-insert-hook #'my-autoformat-do 0 t)
-        (add-hook 'after-change-major-mode-hook
-                  #'my-autoformat-activate-for-major-mode
-                  0 t))
-    (remove-hook 'post-self-insert-hook #'my-autoformat-do t)
-    (remove-hook 'after-change-major-mode-hook
-                 #'my-autoformat-activate-for-major-mode t)))
+        (my-autoformat-activate-for-major-mode)
+        (add-hook 'post-self-insert-hook #'my-autoformat-do 0 t))
+    (my-autoformat-activate-for-major-mode)
+    (remove-hook 'post-self-insert-hook #'my-autoformat-do t)))
 
 (define-global-minor-mode my-autoformat-global-mode
   my-autoformat-mode
