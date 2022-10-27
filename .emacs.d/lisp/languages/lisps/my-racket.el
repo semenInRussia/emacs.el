@@ -34,15 +34,12 @@
                    :parent my-lisp-map)
   :bind (:racket-mode-map               ;nofmt
          ("M-RET" . my-racket-meta-return))
-  :hook ((racket-mode . racket-xp-mode)
+  :hook ((racket-mode-hook . racket-xp-mode)
          ;; `flycheck' is very slow and `racket-xp-mode' highlight
          ;; errors too, so i disable `flycheck' for the Racket
-         (racket-mode . turn-off-flycheck)
+         (racket-mode-hook . turn-off-flycheck)
          ;; this enable structured editing for the `racket-mode'
-         (racket-mode . paxedit-mode)
-         ;; `racket-xp-mode' has built-in feauture which highlhight a
-         ;; symbol at `point'
-         (racket-mode . my-turn-off-highlight-thing-mode))
+         (racket-mode-hook . paxedit-mode))
   :custom (racket-xp-mode-hook . nil)
   :config                               ;nofmt
   (remove-hook 'racket-mode-hook 'racket-mode) ;fix a bug

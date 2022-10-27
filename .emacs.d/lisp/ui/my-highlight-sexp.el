@@ -25,7 +25,9 @@
 
 ;;; Code:
 
-(leaf highlight-sexp :ensure t :hook emacs-lisp-mode-hook)
+(leaf highlight-sexp
+  :ensure t
+  :hook (racket-mode-hook emacs-lisp-mode-hook))
 
 (provide 'my-highlight-sexp)
 ;;; my-highlight-sexp.el ends here
