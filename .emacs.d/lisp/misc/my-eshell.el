@@ -28,7 +28,12 @@
 (leaf eshell
   :ensure t
   :config                               ;nofmt
-  (leaf esh-autosuggest :ensure t :hook eshell-mode-hook))
+  (leaf esh-autosuggest
+    :ensure t
+    :hook eshell-mode-hook
+    :bind (:esh-autosuggest-active-map
+           ("TAB" . esh-autosuggest-complete-word)
+           ("RET" . company-complete-selection))))
 
 (provide 'my-eshell)
 ;;; my-eshell.el ends here
