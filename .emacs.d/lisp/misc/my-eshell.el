@@ -33,7 +33,18 @@
     :hook eshell-mode-hook
     :bind (:esh-autosuggest-active-map
            ("TAB" . esh-autosuggest-complete-word)
-           ("RET" . company-complete-selection))))
+           ("RET" . company-complete-selection)))
+
+  (defcustom my-eshell-commands-using-minibuffer
+    '(completion-at-point)
+    "List of the `eshell' commands using the minubuffer."
+    :type '(repeat symbol)
+    :group 'my)
+
+  (--each my-eshell-commands-using-minibuffer
+    (advice-add it :after
+                (lambda (&rest _) (xah-fly-insert-mode-activate))
+                '((name . xah-fly-insert-mode-activate)))))
 
 (provide 'my-eshell)
 ;;; my-eshell.el ends here
