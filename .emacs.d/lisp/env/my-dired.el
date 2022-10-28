@@ -77,10 +77,17 @@
          ("~"       . my-dired-jump-to-home)
 
          ;; Key bindings which not change your commands
-         ("a"       . xah-fly-M-x)
+         ("a"       . helm-M-x)
          (","       . xah-next-window-or-frame))
 
   :config                               ;nofmt
+  (defmacro my-dired-save-excursion (&rest body)
+    "Evaluate BODY without change a file/directory at point."
+    (declare (indent 0))
+    `(let ((file (f-full (dired-file-name-at-point))))
+       ,@body
+       (dired-goto-file file)))
+
   (advice-add 'dired-jump
               :after (lambda (&rest _ignore) (xah-fly-insert-mode-activate))
               '((name . "xah-fly-insert-mode-activate")))
@@ -101,28 +108,19 @@
         (dired-get-filename))
        (revert-buffer)))
 
-  (defun my-dired-name-of-file-at-line ()
-    "Get name of file at dired object at current point."
-    (-last-item (s-split " " (just-text-at-line))))
-
   (my-define-dired-command-taking-file my-dired-rename
       (from)
     "Rename file at point from FROM to other name readed from the minibuffer."
     (let ((to (my-rename-file from)))
       (revert-buffer)
-      (my-dired-goto-file to)))
-
-  (defun my-dired-goto-file (file)
-    "Go to line of `dired' buffer describing FILE."
-    (goto-char (point-min))
-    (search-forward (f-base file)))
+      (dired-goto-file to)))
 
   (defun my-rename-file (file)
     "Change name of FILE to new readed from the minibuffer name.
 
 Return new name of FILE"
     (let* ((new-name-of-file
-            (read-string "New name, please: " (f-filename from)))
+            (read-string "New name, please: " (f-filename file)))
            (to (f-join (f-dirname file) new-name-of-file)))
       (f-move file to)
       to))
@@ -149,8 +147,7 @@ Return new name of FILE"
     (interactive "sName of new file, please: ")
     (f-touch (f-join (dired-current-directory) filename))
     (revert-buffer)
-    (goto-char (point-min))
-    (my-dired-goto-file filename))
+    (dired-goto-file (f-full filename)))
 
   (defun my-dired-delete-all-files ()
     "Delete all files from the directory of the `dired' buffer."
@@ -410,9 +407,48 @@ Return new name of FILE"
            ("v" . 'dired-ranger-paste)
            ("c" . 'dired-ranger-copy)))
 
+  (leaf dired-subtree
+    :ensure t
+    :bind (:dired-mode-map
+           :package dired
+           ("TAB" . 'dired-subtree-cycle)
+           ("/"   . 'my-dired-subtree-in-special-buffer))
+    :config                           ;nofmt
+    (defun my-dired-subtree-in-special-buffer ()
+      "Open current `dired-subtree' in the separate `dired' buffer."
+      (interactive)
+      (my-dired-save-excursion
+        (dired-subtree-beginning)
+        (dired-previous-line 1)
+        (dired (dired-x-guess-file-name-at-point)))))
+
   (leaf dired-collapse
     :ensure t
     :hook (dired-mode-hook . dired-collapse-mode))
+
+  (defcustom my-dired-commands-using-minibuffer
+    '(dired-filter-by-file
+      dired-filter-by-extension
+      my-dired-new-file
+      dired-byte-compile
+      dired-do-delete
+      dired-create-directory
+      dired-isearch-filenames)
+    "List of the `dired' commands using the minubuffer."
+    :type '(repeat symbol)
+    :group 'my)
+
+  (defun my-dired-new-directory (directory-name)
+    "My version of `dired-create-directory'.
+
+Main different is that forms like on {1,10} will be expanded to respective
+string"
+    (interactive "s\"Name\" of the directory(ies), please: "))
+
+  (--each my-dired-commands-using-minibuffer
+    (advice-add it :after
+                (lambda (&rest _) (xah-fly-insert-mode-activate))
+                '((name . xah-fly-insert-mode-activate))))
 
   (remove-hook 'dired-mode-hook 'dired-mode))
 
