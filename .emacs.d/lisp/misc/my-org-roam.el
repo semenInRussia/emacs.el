@@ -31,12 +31,15 @@
   :bind (:xah-fly-command-map
          :package xah-fly-keys
          ("SPC z f"   . org-roam-node-find)
+         ("SPC z t t" . org-roam-tag-add)
+         ("SPC z t d" . org-roam-tag-remove)
          ("SPC z s s" . org-roam-ref-add)
          ("SPC z s d" . org-roam-ref-remove)
          ("SPC z a a" . org-roam-alias-add)
          ("SPC z a d" . org-roam-alias-remove)
          ("SPC z o"   . org-roam-buffer-toggle)
          ("SPC z j"   . org-roam-node-insert))
+  :custom (org-roam-mode-sections . '(org-roam-backlinks-section))
   :config                               ;nofmt
   (f-mkdir "~/org-roam")
   (org-roam-db-autosync-mode t)
