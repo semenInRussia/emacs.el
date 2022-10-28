@@ -14,25 +14,19 @@
 *** TODO explore the =xetex=                                          :latex:
 
 *** TODO Impatient modes for all =major-modes=
-SCHEDULED: <2022-09-24 Сб>
 
 *** TODO add support of the =org-export= to the =run-command-recipes= :run_command_recipes:
 *** TODO Fix =my-copy-buffer-content-as-mipt-solution=
-SCHEDULED: <2022-09-24 Сб>
 
 *** TODO More useful way to run =run-command-recipes= recipes
-SCHEDULED: <2022-10-26 Ср>
 
 See on the compile command from the =latex-extra=
 
 *** TODO Keys for the centering =org-mode= table columns
-SCHEDULED: <2022-09-24 Сб>
 
 *** TODO Live evaluating of the =org-mode= table formulas
-SCHEDULED: <2022-09-24 Сб>
 
 *** TODO Fix =sp-kill-whole-line=
-SCHEDULED: <2022-09-24 Сб>
 
 *** TODO System for the reformat for certain =major-modes= at overwrited /SPC SPC q/ keybinding
 *** TODO New refactor library for the =emacs-lisp=
@@ -49,9 +43,14 @@ SCHEDULED: <2022-09-24 Сб>
 *** TODO Fix =org-roam-protocol=
 *** TODO =pomm= -> =pomidor=
 *** TODO Make awesome insertion =pystrings= in =feature-mode=
-** TODO Targets on Day
 
-*** TODO Capitalize even when previous line is :END: in ~org-mode~
+** Targets on Day
+
+*** DONE Capitalize even when previous line is :END: in ~org-mode~
+*** TODO Auto capitalzation after sentence end in heading lines in ~org-mode~
+SCHEDULED: <2022-10-28 Пт>
+*** TODO Nested lists autoformat in ~org-mode~
+SCHEDULED: <2022-10-28 Пт>
 * Films 
 
 ** MUST-SEE Thor: Love and Thunder

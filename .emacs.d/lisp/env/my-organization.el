@@ -68,8 +68,6 @@
       (newline)
       (insert subtree-text)
       (delete-char -1)
-      (beginning-of-line)
-      (org-todo 'todo)
       (org-schedule t (format-time-string "%Y-%m-%d")))))
 
 (defun my-goto-targets-on-day ()
