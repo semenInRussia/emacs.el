@@ -29,8 +29,7 @@
 (require 'just)
 (require 'org)
 
-
-
+(leaf paragraphs :custom (sentence-end . "[.?!]  "))
 
 (defgroup my-autoformat nil
   "Automatically format of source code (add spaces, capitalze and etc)."
@@ -46,25 +45,24 @@
   "Autoformat functions works everywhere."
   :type '(repeat symbol))
 
-(defun autoformat-sentence-capitalization (&optional ;nofmt
-                                           prev-line-should-not-be-empty)
-  "Auto-capitalize first words of a sentence.
+(defun autoformat-sentence-capitalization (&optional prev-line-can-be-text)
+  "Auto-capitalize the first letter of a sentence.
 
 Either at the beginning of a line, or after a sentence end, if
-PREV-LINE-SHOULD-NOT-BE-EMPTY is nil (by default), then capitalize only when
+PREV-LINE-CAN-BE-TEXT is nil (by default), then capitalize only when
 previous line is empty."
   (interactive)
-  (and
-   (looking-back "[[:alpha:]]" nil)
-   (just-call-on-backward-char*
+  (just-call-on-backward-char*
+   (and
+    (looking-at-p "[[:alpha:]]")
+    (or prev-line-can-be-text
+        (just-call-on-prev-line 'just-line-is-whitespaces-p)
+        (bobp))
     (or
+     (just-beginning-of-line-text-p)
      (bobp)
-     (looking-back (sentence-end) nil)
-     (and
-      (skip-chars-backward " ")
-      (bolp)
-      (or prev-line-should-not-be-empty (my-previous-line-is-empty)))))
-   (upcase-char -1)))
+     (looking-back sentence-end nil))
+    (upcase-char 1))))
 
 (defun my-previous-line-is-empty ()
   "Move to previous line and return t, when this line is empty.
