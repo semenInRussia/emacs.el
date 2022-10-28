@@ -23,6 +23,7 @@
 
 ;;; Commentary:
 
+
 ;; My configuration for `org-mode'
 
 ;;; Code:
@@ -186,20 +187,30 @@ in the region."
        (list
         (my-org-read-image-filename)
         (my-org-read-image-caption)))
+      (setq filename (my-org-path-for-image filename))
       (just-ensure-empty-line)
       (when caption                     ;nofmt
         (insert "#+CAPTION: " caption)
         (newline))
       (insert "[[" filename "]]"))
 
+    (defun my-org-path-for-image (path)
+      "Make PATH to an image to path for `org-mode' images specially."
+      (->>
+       path
+       (f-full)
+       (s-chop-prefix (f-full default-directory))
+       (s-prepend "./")))
+
     (defun my-org-read-image-filename ()
       "Read a image filename.
 
 If the region is active, then return text in the region as filename, otherwise
 return filename readed from the minibuffer."
-      (or
-       (just-text-in-region)
-       (read-file-name "Please, choose image to insert: ")))
+      (my-org-path-for-image
+       (or
+        (just-text-in-region)
+        (read-file-name "Please, choose image to insert: "))))
 
     (defun my-org-read-image-caption ()
       "Read a image caption from the minibuffer.
