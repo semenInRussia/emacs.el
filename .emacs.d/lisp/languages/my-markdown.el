@@ -72,7 +72,7 @@ See `imenu-generic-expression'"
   (my-autoformat-bind-for-major-mode
    'markdown-mode
    'autoformat-markdown-capitalize-heading-line
-   'autoformat-markdown-capitalize-heading-line)
+   'autoformat-sentence-capitalization)
 
   (defun autoformat-markdown-capitalize-heading-line ()
     "Capitalize first letter of a heading line (lines which started with #)."
