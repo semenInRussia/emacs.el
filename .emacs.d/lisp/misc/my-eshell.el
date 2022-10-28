@@ -27,13 +27,11 @@
 
 (leaf eshell
   :ensure t
+  :bind (:eshell-mode-map
+         ([remap beginning-of-line] . 'eshell-begin-on-new-line)
+         ([remap beginning-of-line-text] . 'eshell-begin-on-new-line))
   :config                               ;nofmt
-  (leaf esh-autosuggest
-    :ensure t
-    :hook eshell-mode-hook
-    :bind (:esh-autosuggest-active-map
-           ("TAB" . esh-autosuggest-complete-word)
-           ("RET" . company-complete-selection)))
+  (leaf company-shell :ensure t :require t)
 
   (defcustom my-eshell-commands-using-minibuffer
     '(completion-at-point)
