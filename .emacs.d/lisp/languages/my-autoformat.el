@@ -29,11 +29,14 @@
 (require 'just)
 (require 'org)
 
-(leaf paragraphs :custom (sentence-end . "[.?!]  "))
-
 (defgroup my-autoformat nil
   "Automatically format of source code (add spaces, capitalze and etc)."
   :group 'editing)
+
+(defcustom my-autoformat-sentence-end "[.?!]  "
+  "Regexp indicates the end of a sentence for `autoformat'."
+  :group 'my-autoformat
+  :type 'regexp)
 
 (defvar my-autoformat-local-functions nil
   "Autoformat functions works locally in the buffer.")
@@ -43,6 +46,7 @@
 (defcustom my-autoformat-global-functions
   nil
   "Autoformat functions works everywhere."
+  :group 'my-autoformat
   :type '(repeat symbol))
 
 (defun autoformat-sentence-capitalization (&optional prev-line-can-be-text)
@@ -57,11 +61,11 @@ previous line is empty."
     (looking-at-p "[[:alpha:]]")
     (or prev-line-can-be-text
         (just-call-on-prev-line 'just-line-is-whitespaces-p)
-        (bobp))
+        (equal (line-beginning-position) (point-min)))
     (or
      (just-beginning-of-line-text-p)
      (bobp)
-     (looking-back sentence-end nil))
+     (looking-back my-autoformat-sentence-end nil))
     (upcase-char 1))))
 
 (defun my-previous-line-is-empty ()
