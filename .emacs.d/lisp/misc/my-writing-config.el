@@ -105,26 +105,26 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
       (delete-region beg end)
       (insert leaf-sexp)))
 
-  (defun my-leaf-convert-clipboard ()
-    "Read a sexp from the kill ring, convert it to `leaf' format insert it."
-    (interactive)
-    (insert (my-leaf-convert-from-string-to-string (current-kill 0))))
-
-  (defun my-leaf-convert-from-string-to-string (s)
-    "Read a elisp source from S and convert it to `leaf' format sexp as string."
+  (defun my-leaf-convert-from-string-to-string (string)
+    "Convert a Lisp source as STRING to source using `leaf' as string."
     (->>
-     s
+     string
      (s-prepend "(progn")
      (s-append ")")
      (read)
-     (list)
-     (append '(leaf-convert))
+     (cons 'leaf-convert)
      (eval)
-     (format "%s"))))
+     (format "%s")))
+
+  (defun my-leaf-convert-clipboard ()
+    "Read a sexp from the kill ring, convert it to `leaf' format insert it."
+    (interactive)
+    (insert (my-leaf-convert-from-string-to-string (current-kill 0)))))
 
 (leaf ecukes
   :ensure t
   :bind (:my-feature-local-map :package feature-mode ("e" . ecukes))
+  :hook (ecukes-mode-hook . my-feature-mode-hook)
   :config (leaf espuds :ensure t :require t))
 
 (provide 'my-writing-config)

@@ -47,6 +47,7 @@
         my-eob-or-mc-align-with-space
         my-exchange-point-and-mark-or-splice-sexp
         my-forward-char-or-my-drag-stuff-right-char
+        my-kill-line-or-region
         my-kill-rectangle-or-delete-char
         my-kill-rectangle-or-kill-line
         my-latex-dollar
@@ -88,6 +89,7 @@
         sp-backward-kill-sexp
         sp-backward-sexp
         sp-change-enclosing
+        sp-forward-barf-sexp
         sp-forward-sexp
         sp-forward-slurp-sexp
         sp-join-sexp

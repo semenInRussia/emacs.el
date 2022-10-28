@@ -9,18 +9,14 @@
 
 ** Targets on Week
 
-*** TODO Complete ICT of the =MIPT=
-DEADLINE: <2022-10-06 -20d Чт>
-
 *** TODO Run the main file of the project in =run-command-reicpes= :run_command_recipes:
 *** TODO =racket-mmanager=
 *** TODO explore the =xetex=                                          :latex:
 
-*** TODO add support of the =org-export= to the =run-command-recipes= :run_command_recipes:
-
 *** TODO Impatient modes for all =major-modes=
 SCHEDULED: <2022-09-24 Сб>
 
+*** TODO add support of the =org-export= to the =run-command-recipes= :run_command_recipes:
 *** TODO Fix =my-copy-buffer-content-as-mipt-solution=
 SCHEDULED: <2022-09-24 Сб>
 
@@ -38,7 +34,6 @@ SCHEDULED: <2022-09-24 Сб>
 *** TODO Fix =sp-kill-whole-line=
 SCHEDULED: <2022-09-24 Сб>
 
-*** TODO Byte compile all config after kill =Emacs=
 *** TODO System for the reformat for certain =major-modes= at overwrited /SPC SPC q/ keybinding
 *** TODO New refactor library for the =emacs-lisp=
 - add/change group/type for defcustom
@@ -51,11 +46,12 @@ SCHEDULED: <2022-09-24 Сб>
 *** TODO Explore =ov=
 *** TODO Explore =coq=
 *** TODO Make organize relation beetween computer and phone RSS subscribes
-*** DONE Explore =git-timemachine=
 *** TODO Fix =org-roam-protocol=
 *** TODO =pomm= -> =pomidor=
-** Targets on Day
+*** TODO Make awesome insertion =pystrings= in =feature-mode=
+** TODO Targets on Day
 
+*** TODO Capitalize even when previous line is :END: in ~org-mode~
 * Films 
 
 ** MUST-SEE Thor: Love and Thunder
