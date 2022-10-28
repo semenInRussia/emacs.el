@@ -27,14 +27,20 @@
 
 (leaf calendar
   :ensure t
-  :bind (:calendar-mode-map
-         ("l" . 'calendar-forward-day)
-         ("j" . 'calendar-backward-day)
-         ("i" . 'calendar-backward-week)
-         ("k" . 'calendar-forward-week)
-         ("]" . 'calendar-forward-year)
-         ("[" . 'calendar-backward-year)
-         ("=" . 'calendar-count-days-region)))
+  :bind ((:xah-fly-command-map ("SPC i c" . 'calendar))
+         (:calendar-mode-map
+          ("l" . 'calendar-forward-day)
+          ("j" . 'calendar-backward-day)
+          ("i" . 'calendar-backward-week)
+          ("k" . 'calendar-forward-week)
+          ("]" . 'calendar-forward-year)
+          ("[" . 'calendar-backward-year)
+          ("=" . 'calendar-count-days-region)))
+  :config                               ;nofmt
+  (leaf russian-holidays
+    :ensure t
+    :require t
+    :config (setq calendar-holidays russian-holidays)))
 
 (provide 'my-calendar)
 ;;; my-calendar.el ends here
