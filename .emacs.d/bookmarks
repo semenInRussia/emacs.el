@@ -8,8 +8,8 @@
  (rear-context-string . "line for =drag=\n")
  (position . 2076))
 ("org-capture-last-stored"
- (filename . "~/org-roam/20221027235256-friction_force.org")
- (front-context-string . "#+FILETAGS: phys")
- (rear-context-string . " Friction Force\n")
- (position . 92))
+ (filename . "~/org-roam/20221028194047-xargs.org")
+ (front-context-string . "\n#+FILETAGS: pro")
+ (rear-context-string . ":\n#+title: xargs")
+ (position . 82))
 )

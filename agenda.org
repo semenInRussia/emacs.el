@@ -43,11 +43,10 @@ See on the compile command from the =latex-extra=
 *** TODO Fix =org-roam-protocol=
 *** TODO =pomm= -> =pomidor=
 *** TODO Make awesome insertion =pystrings= in =feature-mode=
-
 ** Targets on Day
 
 *** DONE Capitalize even when previous line is :END: in ~org-mode~
-*** TODO Auto capitalzation after sentence end in heading lines in ~org-mode~
+*** DONE Auto capitalzation after sentence end in heading lines in ~org-mode~
 SCHEDULED: <2022-10-28 Пт>
 *** TODO Nested lists autoformat in ~org-mode~
 SCHEDULED: <2022-10-28 Пт>
