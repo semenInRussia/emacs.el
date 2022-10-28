@@ -1,4 +1,4 @@
-;;; espuds.el --- Ecukes step definitions
+;;; espuds-steps.el --- Ecukes step definitions
 
 ;; Copyright (C) 2010-2013 Johan Andersson
 
@@ -505,4 +505,4 @@ be used for major modes."
 
 (provide 'espuds)
 
-;;; espuds.el ends here
+;;; espuds-steps.el ends here

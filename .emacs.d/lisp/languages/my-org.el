@@ -313,15 +313,22 @@ Label is \"-\""
     (defun my-org-sentence-capitalization ()
       "Capitalize first letter of a sentence in the `org-mode'."
       (interactive)
-      (when (just-call-on-prev-line*
-             (or
-              (just-line-is-whitespaces-p)
-              (my-org-heading-p)
-              (my-org-list-item-p)))
+      (cond
+       ((just-call-on-prev-line*
+         (or
+          (just-line-is-whitespaces-p)
+          (my-org-heading-p)
+          (my-org-properties-end-p)
+          (my-org-list-item-p)))
         (autoformat-sentence-capitalization t))
-      (when (just-call-on-prev-line*
-             (equal (point-at-bol) (point-min)))
-        (autoformat-sentence-capitalization)))
+       ((just-call-on-prev-line* (equal (point-at-bol) (point-min)))
+        (autoformat-sentence-capitalization))
+       (t
+        (just-call-on-backward-char*
+         (and
+          (looking-back sentence-end)
+          (looking-at-p "[[:alpha:]]")
+          (upcase-char 1))))))
 
     (defun my-org-heading-p ()
       "Return t, when the cursor located at a `org-mode' heading text."
@@ -345,8 +352,11 @@ Label is \"-\""
 
     (defun my-org-list-item-p ()
       "Return t, when the cursor located at an item of a `org-mode' list."
-      (interactive "d")
       (just-line-regexp-prefix-p my-org-list-item-prefix-regexp))
+
+    (defun my-org-properties-end-p ()
+      "Get t, if the point placed at the end of `org-mode' subtree properties."
+      (string-equal (just-text-at-line nil t) ":END:"))
 
     (defun my-org-heading-capitalization ()
       "Capitalize first letter of a `org-mode' heading.

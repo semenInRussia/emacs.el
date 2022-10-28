@@ -33,5 +33,12 @@
     (insert "- jdejde")
     (should (my-org-list-item-p))))
 
+(ert-deftest my-org-properties-end-p
+    ()
+  (with-temp-buffer
+    (insert "    :END:")
+    (should (my-org-properties-end-p))
+    (newline)
+    (should-not (my-org-properties-end-p))))
 (provide 'my-org-test)
 ;;; my-org-test.el ends here

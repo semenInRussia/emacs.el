@@ -16,3 +16,7 @@
 
 (Given "^I disable modern-org-mode$"
   (lambda () (org-modern-mode 0)))
+
+(And "^I create id for org-mode heading$"
+  (lambda ()
+    (org-set-property "ID" "random-id-which-ussually-constant")))

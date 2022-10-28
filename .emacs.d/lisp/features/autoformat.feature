@@ -36,8 +36,7 @@ Feature: autoformat in the org
     And I type "super indolent"
     And I press "M-RET"
     And I type "[x] stupid"
-    And I type "i, am the danger, Skyller"
-    Then  I should see "Aggressive"
+    Then I should see "Aggressive"
     And I should see "Super"
     And I should see "Stupid"
     And I activate the command mode
@@ -69,7 +68,6 @@ Feature: autoformat in the org
     And I should see "Conclusion"
     And I activate the insert mode
 
-
   Scenario: type a sentence after line with org-mode heading
     Given a org-mode buffer
     And I activate the insert mode
@@ -79,13 +77,28 @@ Feature: autoformat in the org
     And I type "first sentence.  second sentence"
     Then I should see "First"
     And I should see "Second"
+
+  Scenario: type a text after org-mode properties
+    Given a org-mode buffer
+    And I disable modern-org-mode
+    And I activate the insert mode
+    When I type "* Heading"
+    And I press "RET"
+    And I create id for org-mode heading
+    And I type "first sentence.  second sentece"
+    Then I should see "First"
+    And I should see "Second"
+    And I activate the command mode
+
 Feature: autoformat in markdown mode
   there are tests for autoformat-mode in the markdown-mode major-mode
 
   Scenario: type markdown heading, first letter should be capitalizated
     Given a markdown-mode buffer
+    And I activate the insert mode
     When I type "# heading"
     Then I should see "# Heading"
     When I press "RET"
     And I type "## subheading"
     Then I should see "## Subheading"
+    And I activate the command mode
