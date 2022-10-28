@@ -33,7 +33,7 @@
          ("SPC o d" . 'outline-hide-entry)
          ("SPC o a" . 'outline-show-all)
          ("SPC o s" . 'my-outline-cycle)
-         ("SPC o x" . 'my-outline-buffer))
+         ("SPC o x" . 'my-outline-cycle-buffer))
   :config                               ;nofmt
   (defun my-outline-cycle ()
     "My version of the `outline-cycle', different is that repeat at last key."
