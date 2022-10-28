@@ -76,11 +76,13 @@ See `format-time-string' for see what format string"
 
   (defface my-modeline-time-morning-face
     '((t (:foreground "#ff4500" :weight bold)))
-    "Face for view of the time in modeline in the morning.")
+    "Face for view of the time in modeline in the morning."
+    :group 'my)
 
   (defface my-modeline-time-evening-face
     '((t (:foreground "#dcdcdc" :weight bold)))
-    "Face for view of the time in modeline. in the evening")
+    "Face for view of the time in modeline. in the evening"
+    :group 'my)
 
   (doom-modeline-def-segment time
     (let* ((hour (string-to-number (format-time-string "%H"))))
@@ -100,11 +102,13 @@ See `format-time-string' for see what format string"
 
   (defface my-modeline-pomidor-break-face
     '((t :foreground "#ff4500" :underline t :weight bold))
-    "Face will be shown in the mode line on time when `pomm' has break status.")
+    "Face will be shown in the mode line on time when `pomm' has break status."
+    :group 'my)
 
   (defface my-modeline-pomidor-work-face
     '((t :foreground "#7cfc00" :underline t :weight bold))
-    "Face will be shown in the mode line on time when `pomm' has work status.")
+    "Face will be shown in the mode line on time when `pomm' has work status."
+    :group 'my)
 
   (defun my-pomm-face ()
     "Return face for the current status of the current `pomm' state."
