@@ -184,6 +184,16 @@ in the region.  Otherwise, read a URL from the minibuffer."
    (just-text-in-region)
    (read-string "Enter URL for image, please: ")))
 
+(defun my-read-url ()
+  "Read the URL of from the user.
+
+If copied text is a URL, then return.  If region is active, then return a text
+in the region.  Otherwise, read a URL from the minibuffer."
+  (or
+   (my-url-from-kill-ring)
+   (just-text-in-region)
+   (read-string "URL, please: ")))
+
 (defun my-url-from-kill-ring ()
   "If the last element of the kill ring is a URL, get it, otherwise get nil."
   (let ((copied (current-kill 0)))
@@ -215,7 +225,6 @@ Otherwise nil"
    (s-numeric-p s)
    (1+ (string-to-number s))))
 
-
 (defun my-alist-union (alist1 alist2 &optional testfn)
   "Return union of ALIST1 and ALIST2, if has same keys, set to value of ALIST2.
 
@@ -226,7 +235,8 @@ Using TESTFN in functions sush as `assoc' or `alist-get'"
    (append alist2)))
 
 (defun my-regexp-opt-of-regexp (regexps)
-  "Return the regexp, which will be match to the one of taked regexps."
+  "Return the regexp, which will be match to the one of taked REGEXPS."
   (concat "\\(?:" (s-join "\\|" regexps) "\\)"))
+
 (provide 'my-lib)
 ;;; my-lib.el ends here
