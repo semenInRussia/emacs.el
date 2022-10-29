@@ -253,6 +253,28 @@ Number will be automatically initialized, depends on the previous sections."
   (or path (setq path (buffer-file-name)))
   (s-starts-with-p (f-full my-zms-directory) (f-full path)))
 
+(defun my-zms-download-tasks (section url)
+  "Download a pdf at URL file as tasks for a ZMS SECTION.
+
+Save it at filename Tasks.pdf"
+  (interactive (list (my-zms-read-section) (my-read-url)))
+  (url-copy-file url (my-zms-section-tasks-path section) t))
+
+(defun my-zms-download-theory (section url)
+  "Download a pdf at URL file as theory for a ZMS SECTION.
+
+Save it at filename Theory.pdf"
+  (interactive (list (my-zms-read-section) (my-read-url)))
+  (url-copy-file url (my-zms-section-theory-path section) t))
+
+(defun my-zms-section-theory-path (section)
+  "Return path to a pdf theory file for a ZMS SECTION."
+  (f-join (my-zms-section-path section) "Theory.pdf"))
+
+(defun my-zms-section-tasks-path (section)
+  "Return path to a pdf tasks file for a ZMS SECTION."
+  (f-join (my-zms-section-path section) "Tasks.pdf"))
+
 (eval-after-load 'fast-exec
   '(progn
      (fast-exec-bind zms
@@ -261,6 +283,8 @@ Number will be automatically initialized, depends on the previous sections."
         ("Forward ZMS Task Solution" 'my-zms-new-solution-in-current-section)
         ("New ZMS Section"           'my-zms-new-section)
         ("Delete ZMS Section"        'my-zms-delete-section)
+        ("Download ZMS Answers File" 'my-zms-download-tasks)
+        ("Download ZMS Theory File"  'my-zms-download-theory)
         ("Delete ZMS Task Solution"  'my-zms-delete-solution)))))
 
 (eval-after-load 'run-command
