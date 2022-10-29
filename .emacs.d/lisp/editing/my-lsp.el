@@ -25,20 +25,12 @@
 
 ;;; Code:
 
-(defcustom my-lsp-supported-modes
-  '(rust-mode LaTeX-mode)
-  "List of the major modes working with `lsp'."
-  :type '(repeat symbol)
-  :group 'me)
-
 (defun my-lsp-supported-modes-hooks ()
   "Return lust of major modes hooks working with `lsp'."
   (-map 'my-major-mode-to-hook my-lsp-supported-modes))
 
 (leaf lsp-mode
   :ensure t
-  :hook `(,(my-lsp-supported-modes-hooks)
-          . lsp)
   :custom `(;; Performance
             (gc-cons-threshold . 100000000)
             (read-process-output-max . ,(* 1024 1024)) ;; 1mb
