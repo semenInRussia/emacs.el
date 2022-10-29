@@ -382,10 +382,10 @@
                      :trigger "<"
                      :unless '(sp-latex-point-after-backslash sp-in-math-p))))
 
-  (leaf my-autoformat
+  (leaf my-latex-autoformat
     :config                             ;nofmt
     (my-autoformat-bind-for-major-mode
-     'LaTeX-mode
+     'latex-mode
      'autoformat-latex-capitalize-special-commands
      'autoformat-latex-expand-to-list-item
      'autoformat-sentence-capitalization)
