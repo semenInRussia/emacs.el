@@ -337,7 +337,7 @@ Label is \"-\""
        (t
         (just-call-on-backward-char*
          (and
-          (looking-back sentence-end)
+          (looking-back my-autoformat-sentence-end)
           (looking-at-p "[[:alpha:]]")
           (upcase-char 1))))))
 
