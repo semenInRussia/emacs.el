@@ -39,7 +39,7 @@
     "beamer")
   "List of the names for built-in LaTeX documentclasses.")
 
-(leaf tex
+(leaf latex
   :ensure auctex
   :mode ("\\.tex$" . LaTeX-mode)
   :defun (((er/mark-LaTeX-math er/mark-LaTeX-inside-environment)
@@ -66,6 +66,8 @@
          ("\\" . my-latex-equation-to-split)
          ("x"  . my-latex-kill-section))
   :config                               ;nofmt
+  (require 'font-latex)
+
   (defcustom my-latex-master-files-alist
     '(("~/zms/*/solutions/*.tex" . "../Solution.tex"))
     "Associated list, keys are wildcards, values are him master files."
