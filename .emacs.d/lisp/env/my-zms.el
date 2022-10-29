@@ -159,12 +159,11 @@ Number will be automatically initialized, depends on the previous sections."
 (defun my-zms-insert-solution-to-solution.tex (section number)
   "Insert a command viewing solution with NUMBER to Solution.tex of SECTION."
   (find-file (my-zms-section-solution.tex-path section))
-  (with-temp-buffer
-    (insert (f-read (my-zms-section-solution.tex-path section)))
-    (forward-line -1)
-    (end-of-line)
-    (newline)
-    (insert (format my-zms-view-solution-latex number))))
+  (goto-char (point-max))
+  (search-backward "\\end{document}")
+  (newline)
+  (forward-char -1)
+  (insert (format my-zms-view-solution-latex number)))
 
 (defun my-zms-find-solution (section number)
   "Find/visit file of the ZMS SECTION solution with NUMBER file."
