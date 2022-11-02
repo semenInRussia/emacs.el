@@ -25,7 +25,9 @@
 
 ;;; Code:
 
-(leaf sql :ensure t :fast-exec ("Open SQL Lite Connection" 'sql-sql))
+(leaf sql
+  :ensure t
+  :fast-exec ("Open SQL Lite Connection" 'sql-sqlite))
 
 (provide 'my-sql)
 ;;; my-sql.el ends here
