@@ -33,8 +33,7 @@
          :package xah-fly-keys
          ("/"         . embrace-commander)
          ("SPC SPC /" . xah-goto-matching-bracket))
-  :hook ((emacs-lisp-mode-hook . embrace-emacs-lisp-mode-hook)
-         (org-mode-hook        . embrace-org-mode-hook))
+  :hook ((emacs-lisp-mode-hook . embrace-emacs-lisp-mode-hook))
   :config                             ;nofmt
   (unless (assq ?n embrace-semantic-units-alist)
     (setq-default embrace-semantic-units-alist

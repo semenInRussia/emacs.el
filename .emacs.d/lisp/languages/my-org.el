@@ -811,7 +811,16 @@ If not found return nil."
     :hook org-mode-hook
     :custom ((org-appear-trigger   . 'always)
              (org-appear-autolinks . t)
-             (org-appear-delay     . 1))))
+             (org-appear-delay     . 1)))
+
+  (leaf embrace
+    :ensure t
+    :hook (org-mode-hook . my-embrace-org-mode-hook)
+    :config                             ;nofmt
+    (defun my-embrace-org-mode-hook ()
+      "Enable `embrace' specially for `org-mode'."
+      (embrace-org-mode-hook)
+      (setq-local embrace-show-help-p nil))))
 
 (provide 'my-org)
 ;;; my-org.el ends here
