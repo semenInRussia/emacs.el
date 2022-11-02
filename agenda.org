@@ -8,7 +8,6 @@
 * Planes
 
 ** Targets on Week
-
 *** TODO Run the main file of the project in =run-command-reicpes= :run_command_recipes:
 *** TODO =racket-mmanager=
 *** TODO explore the =xetex=                                          :latex:
@@ -30,12 +29,16 @@ See on the compile command from the =latex-extra=
 
 *** TODO System for the reformat for certain =major-modes= at overwrited /SPC SPC q/ keybinding
 *** TODO New refactor library for the =emacs-lisp=
-- add/change group/type for defcustom
-- extract code to defun or lambda argument/let binding/defun/defvar/defcustom and etc.
-- lambda => defun, defun => lambda
-- add/delete interactive binding for defun/lib (depends on args)
-- add/delete docstring for defun
-- add/delete autoload
+- add/change group/type for ~defcustom~
+- extract code to defun or ~lambda~ argument/ ~let~ binding / ~defun~ / ~defvar~ / ~defcustom~ and etc.
+- ~lambda~ => ~defun~, ~defun~ => ~lambda~
+- add/remove interactive binding for ~defun~ / ~lambda~ (depends on args)
+- add/remove docstring for ~defun~
+- add/remove ~autoload~
+- change name of the elisp module
+  + change filename
+  + change ~provide~ statement
+  + change module name in the commentaries
 - defcustom=>defvar, defvar=>defcustom
 *** TODO Explore =ov=
 *** TODO Explore =coq=
@@ -43,14 +46,31 @@ See on the compile command from the =latex-extra=
 *** TODO Fix =org-roam-protocol=
 *** TODO =pomm= -> =pomidor=
 *** TODO Make awesome insertion =pystrings= in =feature-mode=
-** Targets on Day
+*** TODO More smart autocapilazation for lines after llist item in ~org-mode~
 
+In the following case first letter of line should be capitalizated.
+
+#+BEGIN_SRC org
+  - A line item
+  Next line here N is the first letter and it's should be capitalizated
+#+END_SRC
+
+#+BEGIN_SRC org
+  - A line item
+    next line here N is the first letter and it's shouldn't be capitalizated
+#+END_SRC
+*** TODO Explore ~save-place~
+*** TODO Fix and test =my-latex-math-spaces-mode=
+*** TODO Fix the equation => split
+*** TODO Make a notes explorer for ~org-roam~
+** Targets on Day
 *** DONE Capitalize even when previous line is :END: in ~org-mode~
 *** DONE Auto capitalzation after sentence end in heading lines in ~org-mode~
 SCHEDULED: <2022-10-28 Пт>
 *** TODO Nested lists autoformat in ~org-mode~
 SCHEDULED: <2022-10-28 Пт>
-* Films 
+
+* Films
 
 ** MUST-SEE Thor: Love and Thunder
    :PROPERTIES:
@@ -130,6 +150,3 @@ SCHEDULED: <2022-10-28 Пт>
 :rating:   86.0
 :countries: (Великобритания Мальта Марокко США)
 :END:
-
- 
-

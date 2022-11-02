@@ -1,4 +1,4 @@
-;;; my-google-translate.el --- My config `google-translate'
+;;; my-go-translate.el --- My config `go-translate'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,25 +23,23 @@
 
 ;;; Commentary:
 
-;; My config `google-translate'
+;; My config `go-translate'
 
 ;;; Code:
-(leaf google-translate
+(leaf go-translate
   :ensure t
-  :custom ((google-translate-default-source-language . "auto")
-           (google-translate-default-target-language . "ru"))
-
+  :custom (gts-translate-list . '(("en" "ru")))
+  :bind (:xah-fly-command-map
+         :package xah-fly-keys
+         ("SPC i h"     . 'gts-do-translate)
+         ("SPC i SPC h" . 'gts-do-translate))
   :config                               ;nofmt
-  (leaf google-translate-default-ui
-    :fast-exec (("Google Translate" 'google-translate-at-point)
-                ("Query to Google Translate"
-                 'google-translate-query-translate-reverse))
-    :defer-config                         ;nofmt
-    (defun google-translate--search-tkk ()
-      ;; a issue from the original
-      ;; GitHub repo
-      "Search TKK."
-      (list 430675 2721866130))))
+  (setq gts-default-translator
+        (gts-translator :picker
+                        (gts-prompt-picker)
+                        :engines  ;nofmt
+                        (list (gts-google-engine))
+                        :render (gts-buffer-render))))
 
-(provide 'my-google-translate)
-;;; my-google-translate.el ends here
+(provide 'my-go-translate)
+;;; my-go-translate.el ends here
