@@ -43,7 +43,6 @@
 (leaf web-mode
   :ensure t
   :major-mode-map `(html ,my-html-modes)
-  :hook (web-mode-hook . yas-minor-mode-off)
   :custom ((web-mode-script-padding . 1)
            (web-mode-block-padding  . 0))
   :config                               ;nofmt
