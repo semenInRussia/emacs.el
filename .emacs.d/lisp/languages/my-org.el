@@ -820,8 +820,19 @@ If not found return nil."
     (defun my-embrace-org-mode-hook ()
       "Enable `embrace' specially for `org-mode'."
       (embrace-org-mode-hook)
-      (setq-local embrace-show-help-p nil))))
+      (setq-local embrace-show-help-p nil)))
+
+  (leaf org-rainbow-tags
+    :ensure (org-rainbow-tags
+             :host github
+             :repo "KaratasFurkan/org-rainbow-tags")
+    :require t)
+
+  (leaf my-org-db                       ;nofmt
+    :require t
+    :bind (:org-mode-map
+           :package org
+           ([remap imenu-anywhere] . 'my-org-db/body))))
 
 (provide 'my-org)
 ;;; my-org.el ends here
-;;; * TODO Capitalize at attributes like #+TITLE and #+AUTHOR
