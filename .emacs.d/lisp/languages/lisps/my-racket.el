@@ -32,8 +32,10 @@
   :major-mode-map (racket               ;nofmt
                    :modes (racket-mode racket-repl-mode)
                    :parent my-lisp-map)
-  :bind (:racket-mode-map               ;nofmt
-         ("M-RET" . my-racket-meta-return))
+  :bind ((:racket-mode-map               ;nofmt
+          ("M-RET" . 'my-racket-meta-return))
+         (:my-racket-local-map
+          ("i"     . 'racket-add-require-for-identifier)))
   :hook ((racket-mode-hook . racket-xp-mode)
          ;; `flycheck' is very slow and `racket-xp-mode' highlight
          ;; errors too, so i disable `flycheck' for the Racket
