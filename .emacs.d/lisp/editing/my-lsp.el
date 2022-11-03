@@ -25,10 +25,6 @@
 
 ;;; Code:
 
-(defun my-lsp-supported-modes-hooks ()
-  "Return lust of major modes hooks working with `lsp'."
-  (-map 'my-major-mode-to-hook my-lsp-supported-modes))
-
 (leaf lsp-mode
   :ensure t
   :custom `(;; Performance
