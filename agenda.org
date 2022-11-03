@@ -1,6 +1,5 @@
 #+TITLE: Agenda
 #+AUTHOR: semenInRussia
-#+OPTIONS: *:t ':t
 #+TODO: TODO | DONE
 #+TODO: MUST-SEE | SAW
 #+TODO: FAIL | GOAL DONE
@@ -8,13 +7,15 @@
 * Planes
 
 ** Targets on Week
+
 *** TODO Run the main file of the project in =run-command-reicpes= :run_command_recipes:
+
 *** TODO =racket-mmanager=
-*** TODO explore the =xetex=                                          :latex:
 
 *** TODO Impatient modes for all =major-modes=
 
 *** TODO add support of the =org-export= to the =run-command-recipes= :run_command_recipes:
+
 *** TODO Fix =my-copy-buffer-content-as-mipt-solution=
 
 *** TODO More useful way to run =run-command-recipes= recipes
@@ -28,7 +29,9 @@ See on the compile command from the =latex-extra=
 *** TODO Fix =sp-kill-whole-line=
 
 *** TODO System for the reformat for certain =major-modes= at overwrited /SPC SPC q/ keybinding
+
 *** TODO New refactor library for the =emacs-lisp=
+
 - add/change group/type for ~defcustom~
 - extract code to defun or ~lambda~ argument/ ~let~ binding / ~defun~ / ~defvar~ / ~defcustom~ and etc.
 - ~lambda~ => ~defun~, ~defun~ => ~lambda~
@@ -40,12 +43,17 @@ See on the compile command from the =latex-extra=
   + change ~provide~ statement
   + change module name in the commentaries
 - defcustom=>defvar, defvar=>defcustom
-*** TODO Explore =ov=
+
 *** TODO Explore =coq=
+
 *** TODO Make organize relation beetween computer and phone RSS subscribes
+
 *** TODO Fix =org-roam-protocol=
-*** TODO =pomm= -> =pomidor=
+
+*** TODO =pomm= -> =pomidor= or =hammy=
+
 *** TODO Make awesome insertion =pystrings= in =feature-mode=
+
 *** TODO More smart autocapilazation for lines after llist item in ~org-mode~
 
 In the following case first letter of line should be capitalizated.
@@ -59,17 +67,55 @@ In the following case first letter of line should be capitalizated.
   - A line item
     next line here N is the first letter and it's shouldn't be capitalizated
 #+END_SRC
+
 *** TODO Explore ~save-place~
+
 *** TODO Fix and test =my-latex-math-spaces-mode=
-*** TODO Fix the equation => split
-*** TODO Make a notes explorer for ~org-roam~
+
+*** TODO Fix the: equation => split
+
+*** TODO Make a useful notes explorer for ~org-roam~ within ~emacs~
+
+Wanted features
+- Everywhere
+  + Navigate in links/backlinks
+- View buffer for note detail
+  + backlink
+  + internal links
+  + notes tags
+  + notes aliases
+  + notes references
+  + citations
+- View all notes in buffer
+  + Filter by tag
+  + Filter by name
+  + Filter by amount of links
+
+*** TODO Make shell command ~p~: printing some files within one shell command
+
+*** TODO Capitalize at attributes like #+TITLE and #+AUTHOR
+
+*** TODO Support of the ~Makefile~ in ~run-command-recipes~
+
+*** TODO Fix the command-line tool ~pf~
+
+*** TODO Add able to change printer in ~p~ commands
+*** TODO Epxlore =citations=
+*** TODO Add able to ~p~: print fiile at URL
 ** Targets on Day
-*** DONE Capitalize even when previous line is :END: in ~org-mode~
-*** DONE Auto capitalzation after sentence end in heading lines in ~org-mode~
-SCHEDULED: <2022-10-28 Пт>
+
+*** TODO Explore ~org-db~
+SCHEDULED: <2022-11-03 Чт>
+*** TODO Start making =zms= tasks to =math=
+DEADLINE: <2022-11-10 Чт>
 *** TODO Nested lists autoformat in ~org-mode~
 SCHEDULED: <2022-10-28 Пт>
+*** TODO Finish the =Solving a Cubic Equation with Vieta Replacement= Zettelkasten Note
+SCHEDULED: <2022-11-03 Чт>
+*** TODO Olimpium
+  DEADLINE: <2022-11-05 Сб> SCHEDULED: <2022-11-03 Чт>
 
+  Courses located at this link ---- [[https://olimpium.ru/cabinet/courses][olimpium]]
 * Films
 
 ** MUST-SEE Thor: Love and Thunder
@@ -80,6 +126,16 @@ SCHEDULED: <2022-10-28 Пт>
    :id:       1282688
    :rating:   65.0
    :countries: (Австралия США)
+   :END:
+
+** MUST-SEE Doctor Strange in the Multiverse of Madness
+   :PROPERTIES:
+   :name:     Доктор Стрэндж: В мультивселенной безумия
+   :year:     2022
+   :slogan:   Enter a new dimension of Strange.
+   :id:       1219909
+   :rating:   67.0
+   :countries: (США)
    :END:
 
 ** MUST-SEE The Batman
@@ -102,16 +158,6 @@ SCHEDULED: <2022-10-28 Пт>
    :countries: (США)
    :END:
 
-** MUST-SEE Doctor Strange in the Multiverse of Madness
-   :PROPERTIES:
-   :name:     Доктор Стрэндж: В мультивселенной безумия
-   :year:     2022
-   :slogan:   Enter a new dimension of Strange.
-   :id:       1219909
-   :rating:   67.0
-   :countries: (США)
-   :END:
-
 ** MUST-SEE Raiders of the Lost Ark
 :PROPERTIES:
 :name:     Индиана Джонс: В поисках утраченного ковчега
@@ -122,25 +168,6 @@ SCHEDULED: <2022-10-28 Пт>
 :countries: (США)
 :END:
 
-
-
-|           a | name | index |  an | 0     |
-|-------------+------+-------+-----+-------|
-| 4.5 + x / 4 |    2 |     4 |   6 | 6 + x |
-|         4.5 |    9 |     0 |   8 | 6 + x |
-|       205.5 |   90 |   300 | 431 | 6 + x |
-#+TBLFM: $1=vmean($2..$5)::$5=6+x
-
-** MUST-SEE The Matrix Resurrections
-:PROPERTIES:
-:name:     Матрица: Воскрешение
-:year:     2021
-:slogan:   Выбор за тобой
-:id:       1294123
-:rating:   58.0
-:countries: (Австралия США)
-:END:
-
 ** MUST-SEE Gladiator
 :PROPERTIES:
 :name:     Гладиатор
@@ -149,4 +176,13 @@ SCHEDULED: <2022-10-28 Пт>
 :id:       474
 :rating:   86.0
 :countries: (Великобритания Мальта Марокко США)
+:END:
+** MUST-SEE Bad Santa
+:PROPERTIES:
+:name:     Плохой Санта
+:year:     2003
+:slogan:   Get Naughty this Holiday Season
+:id:       1828
+:rating:   74.0
+:countries: (Германия США)
 :END:
