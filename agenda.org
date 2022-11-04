@@ -50,8 +50,6 @@ See on the compile command from the =latex-extra=
 
 *** TODO Fix =org-roam-protocol=
 
-*** TODO =pomm= -> =pomidor= or =hammy=
-
 *** TODO Make awesome insertion =pystrings= in =feature-mode=
 
 *** TODO More smart autocapilazation for lines after llist item in ~org-mode~
@@ -91,31 +89,37 @@ Wanted features
   + Filter by name
   + Filter by amount of links
 
-*** TODO Make shell command ~p~: printing some files within one shell command
-
 *** TODO Capitalize at attributes like #+TITLE and #+AUTHOR
 
 *** TODO Support of the ~Makefile~ in ~run-command-recipes~
 
-*** TODO Fix the command-line tool ~pf~
-
-*** TODO Add able to change printer in ~p~ commands
 *** TODO Epxlore =citations=
-*** TODO Add able to ~p~: print fiile at URL
+
 ** Targets on Day
 
-*** TODO Explore ~org-db~
+*** TODO =pomm= -> =pomidor= or =hammy=
+
+*** DONE Explore ~org-db~
 SCHEDULED: <2022-11-03 Чт>
+
 *** TODO Start making =zms= tasks to =math=
 DEADLINE: <2022-11-10 Чт>
+
 *** TODO Nested lists autoformat in ~org-mode~
 SCHEDULED: <2022-10-28 Пт>
+
 *** TODO Finish the =Solving a Cubic Equation with Vieta Replacement= Zettelkasten Note
 SCHEDULED: <2022-11-03 Чт>
+
 *** TODO Olimpium
   DEADLINE: <2022-11-05 Сб> SCHEDULED: <2022-11-03 Чт>
 
+
   Courses located at this link ---- [[https://olimpium.ru/cabinet/courses][olimpium]]
+
+*** TODO Finish ~pomidor~ modeline
+  SCHEDULED: <2022-11-03 Чт>
+
 * Films
 
 ** MUST-SEE Thor: Love and Thunder
@@ -177,12 +181,13 @@ SCHEDULED: <2022-11-03 Чт>
 :rating:   86.0
 :countries: (Великобритания Мальта Марокко США)
 :END:
-** MUST-SEE Bad Santa
+
+** MUST-SEE Summer of 84
 :PROPERTIES:
-:name:     Плохой Санта
-:year:     2003
-:slogan:   Get Naughty this Holiday Season
-:id:       1828
-:rating:   74.0
-:countries: (Германия США)
+:name:     Лето 84
+:year:     2017
+:slogan:   nil
+:id:       1045081
+:rating:   69.0
+:countries: (Канада)
 :END:

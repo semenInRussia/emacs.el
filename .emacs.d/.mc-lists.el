@@ -47,6 +47,7 @@
         my-eob-or-mc-align-with-space
         my-exchange-point-and-mark-or-splice-sexp
         my-forward-char-or-my-drag-stuff-right-char
+        my-indent-line-or-region
         my-kill-line-or-region
         my-kill-rectangle-or-delete-char
         my-kill-rectangle-or-kill-line
@@ -74,7 +75,9 @@
         org-kill-line
         org-meta-return
         org-metaright
+        org-roam-node-insert
         org-self-insert-command
+        org-shifttab
         org-todo
         org-toggle-heading
         paxedit-open-round
@@ -135,6 +138,7 @@
       '(
         backward-transpose-words
         cdlatex-math-symbol
+        dired-open-file
         dired-ranger-copy
         dired-ranger-move
         eval-buffer

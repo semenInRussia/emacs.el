@@ -8,8 +8,8 @@
  (rear-context-string . "line for =drag=\n")
  (position . 2076))
 ("org-capture-last-stored"
- (filename . "~/org-roam/20221028194047-xargs.org")
- (front-context-string . "\n#+FILETAGS: pro")
- (rear-context-string . ":\n#+title: xargs")
- (position . 82))
+ (filename . "~/agenda.org")
+ (front-context-string . "** MUST-SEE Summ")
+ (rear-context-string . "ания США)\n:END:\n")
+ (position . 4723))
 )
