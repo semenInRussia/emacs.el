@@ -72,3 +72,5 @@ devdocs/
 /inkscape/
 /my-org-db/
 /.emacs.d/speed-type/
+/.emacs.d/lisp/misc/my-pomidor.el
+/.emacs.d/emojis/
