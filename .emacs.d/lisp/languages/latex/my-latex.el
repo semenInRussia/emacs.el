@@ -502,7 +502,7 @@ If the environment is not given, ask for it using completion."
   (leaf latex-extra
     :ensure t
     :hook ((LaTeX-mode-hook . latex-extra-mode)
-           (LaTeX-mode-hook . auto-fill-mode))
+           (LaTeX-mode-hook . visual-line-mode))
     :bind (:my-latex-local-map
            :package tex
            ("e" . latex/compile-commands-until-done)
