@@ -163,6 +163,8 @@ Return number of modules on which was call F."
  '(company-tooltip-align-annotations t)
  '(company-tooltip-flip-when-above t)
  '(company-tooltip-limit 15)
+ '(custom-safe-themes
+   '("f03004fbcff53479b80cd335851a92f1ea9e912b46c41ae6528227349ffe78b0" default))
  '(deft-default-extension "org" t)
  '(deft-directory "~/notes/")
  '(deft-recursive t)
@@ -250,4 +252,7 @@ Return number of modules on which was call F."
  ;; If there is more than one, they won't work right.
  '(blamer-face
    ((t (:foreground "#7a88cf" :background nil :height 140 :italic t)))
-   nil "Customized with leaf in `blamer' block at `c:/Users/hrams/AppData/Roaming/.emacs.d/lisp/env/my-git.el'"))
+   nil "Customized with leaf in `blamer' block")
+ '(focus-unfocused
+   ((t :inherit shadow))
+   nil "Customized with leaf in `focus' block"))

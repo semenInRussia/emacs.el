@@ -29,8 +29,9 @@
 ;; List of my favorite themes:
 ;; - `gruber-darker'
 ;; - `doom-monokai-classic'
+;; - `magnars-black-theme'
 
-(eval-after-load 'doom-themes '(load-theme 'doom-monokai-pro t))
+(eval-after-load 'doom-themes '(load-theme 'doom-1337 t))
 
 (provide 'my-current-theme)
 ;;; my-current-theme.el ends here
