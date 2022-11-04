@@ -1,4 +1,4 @@
-;;; my-pomm.el --- My configuration for `pomm': pomodoro techniques
+;;; my-pomidor.el --- My configuration for `pomidor': pomodoro techniques
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,16 +23,19 @@
 
 ;;; Commentary:
 
-;; My configuration for `pomm': pomodoro techniques
+;; My configuration for `pomidor': pomodoro techniques
 
 ;;; Code:
 
-(leaf pomm                              ;nofmt
+(leaf pomidor
   :ensure t
-  :bind ("<f12>" . pomm)
-  :custom (pomm-ask-before-work . t)
-  :global-minor-mode pomm-mode-line-mode
-  :config (pomm-start))
+  :require t
+  :bind ("<f12>" . pomidor)
+  :custom `((pomidor-break-seconds . ,(* 8 60))
+            (pomidor-seconds       . ,(* 40 60))
+            (pomidor-sound-tack    . nil)
+            (pomidor-sound-tick    . nil))
+  :config (pomidor))
 
-(provide 'my-pomm)
-;;; my-pomm.el ends here
+(provide 'my-pomidor)
+;;; my-pomidor.el ends here

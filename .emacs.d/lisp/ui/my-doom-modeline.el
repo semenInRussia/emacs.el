@@ -41,11 +41,9 @@
            doom-modeline-segment--buffer-info
            doom-modeline-def-modeline
            doom-modeline-set-modeline)
-          (my-drag-p . my-drag)
-          (pomm--get-time-remaning . pomm))
-  :defvar pomm--state pomm-remaining-time-format
+          (my-drag-p . my-drag))
   :custom ((doom-modeline-buffer-file-name-style . 'buffer-name)
-           ( doom-modeline . 'buffer-name)
+           (doom-modeline . 'buffer-name)
            (doom-modeline-icon                   . nil)
            (xah-fly-insert-state-p               . nil))
   :config                               ;nofmt
@@ -92,46 +90,57 @@ See `format-time-string' for see what format string"
        (if (< 4 hour 19)
            'my-modeline-time-morning-face 'my-modeline-time-evening-face))))
 
-  (defun my-pomm-kind ()
-    "Return kind of curent `pomm' state, either long-break, short-break, work."
-    (alist-get 'kind (alist-get 'current pomm--state)))
-
-  (defun my-pomm-status ()
-    "Return status of current `pomm' state, either 'running or 'paused."
-    (alist-get 'status pomm--state))
+  (defun my-pomidor-kind ()
+    "Return kind of curent `pomidor' state, either break, work."
+    (cond
+     ((plist-get (pomidor--current-state) :break)
+      'break)
+     ((plist-get (pomidor--current-state) :started)
+      'work)))
 
   (defface my-modeline-pomidor-break-face
     '((t :foreground "#ff4500" :underline t :weight bold))
-    "Face will be shown in the mode line on time when `pomm' has break status."
+    "Face showing in the mode line at time when `pomidor' has status break."
     :group 'my)
 
   (defface my-modeline-pomidor-work-face
-    '((t :foreground "#7cfc00" :underline t :weight bold))
-    "Face will be shown in the mode line on time when `pomm' has work status."
+    '((t :foreground "#7cfc00" :weight bold))
+    "Face showing in the mode line at time when `pomidor' has work status."
     :group 'my)
 
-  (defun my-pomm-face ()
-    "Return face for the current status of the current `pomm' state."
+  (defun my-pomidor-face ()
+    "Return face for the current status of the current `pomidor' state."
     (cl-case
-        (my-pomm-kind)
-      ((short-break long-break)
+        (my-pomidor-kind)
+      ((break)
        'my-modeline-pomidor-break-face)
       ((work)
        'my-modeline-pomidor-work-face)))
 
-  (doom-modeline-def-segment pomm
+  (defun my-pomidor-remaining-time ()
+    "Return remaining time to the end of the pomidor work or break period.
+
+Format of time is the list form the hours, minutes, seconds and zero?"
+    (pomidor--total-duration (pomidor--current-state)))
+
+  (defcustom my-pomidor-modeline-time-format "%M min"
+    "String defining format of string viewing pomodoro time at the modeline."
+    :group 'my
+    :type 'string)
+
+  (defun my-pomidor-format-remaining-time ()
+    "Format remaining time to the end of the pomidor work or break period."
+    (propertize
+     (format-time-string my-pomidor-modeline-time-format
+                         (my-pomidor-remaining-time))
+     'face
+     (my-pomidor-face)))
+
+  (doom-modeline-def-segment pomidor
     ()
-    "Return format string for `pomm', view remainders minuts for break/work."
-    (unless (not (alist-get 'current pomm--state))
-      (let ((current-status (my-pomm-status))
-            (current-kind (my-pomm-kind))
-            (time-remaining (pomm--get-time-remaning))
-            (face (my-pomm-face)))
-        (format " %s%s "
-                (propertize
-                 (format-seconds pomm-remaining-time-format time-remaining)
-                 'face face)
-                (if (eq current-status 'paused) ":paused" "")))))
+    "Return format string for `pomidor', view remainders minuts for break/work."
+    (when (featurep 'pomidor)
+      (format " %s " (my-pomidor-format-remaining-time))))
 
   (defvar durand-buffer-name-max 20
     "The maximal length of the buffer name in modeline.")
@@ -156,7 +165,7 @@ See `format-time-string' for see what format string"
       drag
       buffer-info-durand
       time
-      pomm
+      pomidor
       word-count
       selection-info)
     '(objed-state
