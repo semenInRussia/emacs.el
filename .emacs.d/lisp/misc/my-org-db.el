@@ -52,7 +52,7 @@
 (require 'cl-lib)
 (require 's)    ; for s-trim
 (require 'org)
-(require 'emacsql-sqlite)
+(leaf emacsql-sqlite :ensure t :require t)
 (leaf hydra :ensure t :require t)
 (leaf ivy :ensure t :require t)
 
