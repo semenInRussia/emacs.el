@@ -91,16 +91,23 @@ See `format-time-string' for see what format string"
            'my-modeline-time-morning-face 'my-modeline-time-evening-face))))
 
   (defun my-pomidor-kind ()
-    "Return kind of curent `pomidor' state, either break, work."
+    "Return kind of curent `pomidor' state, either break, work or overwork."
     (cond
      ((plist-get (pomidor--current-state) :break)
       'break)
+     ((pomidor-overwork-p)
+      'overwork)
      ((plist-get (pomidor--current-state) :started)
       'work)))
 
   (defface my-modeline-pomidor-break-face
     '((t :foreground "#ff4500" :underline t :weight bold))
     "Face showing in the mode line at time when `pomidor' has status break."
+    :group 'my)
+
+  (defface my-modeline-pomidor-overwork-face
+    '((t :foreground "#Ffa500" :underline t :weight bold))
+    "Face showing in the mode line at time when `pomidor' has status overwork."
     :group 'my)
 
   (defface my-modeline-pomidor-work-face
@@ -115,13 +122,22 @@ See `format-time-string' for see what format string"
       ((break)
        'my-modeline-pomidor-break-face)
       ((work)
-       'my-modeline-pomidor-work-face)))
+       'my-modeline-pomidor-work-face)
+      ((overwork)
+       'my-modeline-pomidor-overwork-face)))
 
   (defun my-pomidor-remaining-time ()
     "Return remaining time to the end of the pomidor work or break period.
 
 Format of time is the list form the hours, minutes, seconds and zero?"
-    (pomidor--total-duration (pomidor--current-state)))
+    (cl-case
+        (my-pomidor-kind)
+      ((work)
+       (pomidor--work-duration (pomidor--current-state)))
+      ((overwork)
+       (pomidor--overwork-duration (pomidor--current-state)))
+      ((break)
+       (pomidor--break-duration (pomidor--current-state)))))
 
   (defcustom my-pomidor-modeline-time-format "%M min"
     "String defining format of string viewing pomodoro time at the modeline."
