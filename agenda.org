@@ -94,7 +94,7 @@ Wanted features
 *** TODO Support of the ~Makefile~ in ~run-command-recipes~
 
 *** TODO Epxlore =citations=
-
+*** TODO Make faster ~magic-latex-buffer~
 ** Targets on Day
 
 *** TODO =pomm= -> =pomidor= or =hammy=

@@ -53,9 +53,10 @@
             LaTeX-mark-section)
            . latex))
   :custom (TeX-master . nil)
-  :hook ((LaTeX-mode-hook . my-latex-find-master-file)
-         (LaTeX-mode-hook . my-latex-expansion-mode)
-         (LaTeX-mode-hook . visual-fill))
+  :hook ((LaTeX-mode-hook . 'my-latex-find-master-file)
+         (LaTeX-mode-hook . 'my-latex-expansion-mode)
+         (LaTeX-mode-hook . 'visual-fill)
+         (LaTeX-mode-hook . 'turn-off-flycheck))
   :major-mode-map (latex (LaTeX-mode latex-mode))
   :require calc-lang
   :bind (:my-latex-local-map
@@ -152,10 +153,6 @@
         (LaTeX-mode)
         (insert source)
         (math-preview-region (point-min) (point-max)))))
-
-  (leaf magic-latex-buffer
-    :ensure t
-    :hook (LaTeX-mode-hook . magic-latex-buffer))
 
   (leaf my-latex-insert
     :load-path* "lisp/languages/latex/"
@@ -511,7 +508,7 @@ If the environment is not given, ask for it using completion."
 
   (leaf company-math
     :ensure t
-    :hook (LaTeX-mode . my-company-math-setup)
+    :hook (LaTeX-mode-hook . my-company-math-setup)
     :config                             ;nofmt
     (defun my-company-math-setup ()
       "Setup for `company-math'."
