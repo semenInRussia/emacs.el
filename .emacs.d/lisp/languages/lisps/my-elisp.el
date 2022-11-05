@@ -35,11 +35,6 @@
   :hook (emacs-lisp-mode-hook . paxedit-mode)
   :bind (:emacs-lisp-mode-map ("M-RET" . my-elisp-new-field-of-class))
   :config                               ;nofmt
-  (leaf eldev
-    :ensure t
-    :require t
-    :config (leaf flycheck-eldev :ensure t))
-
   (leaf inspector
     :ensure t
     :bind (:my-elisp-local-map
