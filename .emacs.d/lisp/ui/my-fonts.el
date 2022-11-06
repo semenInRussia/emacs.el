@@ -26,13 +26,15 @@
 ;; My configuration for fonts
 
 ;;; Code:
-(set-face-attribute
- 'default nil
- ;; you can install this font, usin `nerd-fonts' (search in the `github')
- :font "JetBrains Mono SemiBold Nerd Font Complete Windows Compatible"
- :height 250)
 
-(set-frame-font "Consolas" nil t)
+;; you can install this font, usin `nerd-fonts' (search in the `github')
+(defcustom my-fonts-main
+  "JetBrains Mono SemiBold Nerd Font Complete Windows Compatible"
+  "Name of the main font to display all."
+  :group 'my
+  :type 'string)
+
+(set-face-attribute 'default nil :font my-fonts-main :height 250)
 
 (global-hl-line-mode 1)
 
