@@ -53,10 +53,10 @@
             LaTeX-mark-section)
            . latex))
   :custom (TeX-master . nil)
-  :hook ((LaTeX-mode-hook . 'my-latex-find-master-file)
-         (LaTeX-mode-hook . 'my-latex-expansion-mode)
-         (LaTeX-mode-hook . 'visual-fill)
-         (LaTeX-mode-hook . 'turn-off-flycheck))
+  :hook ((LaTeX-mode-hook . my-latex-find-master-file)
+         (LaTeX-mode-hook . my-latex-expansion-mode)
+         (LaTeX-mode-hook . visual-fill)
+         (LaTeX-mode-hook . turn-off-flycheck))
   :major-mode-map (latex (LaTeX-mode latex-mode))
   :require calc-lang
   :bind (:my-latex-local-map
@@ -253,11 +253,10 @@
             (sp-wrap-with-pair "$")
           (sp-insert-pair "$")))))
 
-  (leaf embrace
-    :ensure t
+  (leaf latex-embrace
+    :after (embrace cdlatex)
     :hook ((LaTeX-mode-hook . embrace-LaTeX-mode-hook)
            (LaTeX-mode-hook . my-embrace-LaTeX-mode-hook))
-    :after cdlatex
     :config                             ;nofmt
     (defun my-embrace-LaTeX-mode-hook ()
       "My additional `embrace-LaTeX-mode-hook'."
