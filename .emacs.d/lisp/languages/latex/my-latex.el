@@ -125,7 +125,7 @@
       (insert simplified)))
 
   (leaf xenops
-    :hook (LaTeX-mode-hook . xenops-mode)
+    :hook LaTeX-mode-hook
     :ensure t
     :custom (xenops-math-image-scale-factor . 2))
 
@@ -253,7 +253,7 @@
             (sp-wrap-with-pair "$")
           (sp-insert-pair "$")))))
 
-  (leaf latex-embrace
+  (leaf embrace
     :after (embrace cdlatex)
     :hook ((LaTeX-mode-hook . embrace-LaTeX-mode-hook)
            (LaTeX-mode-hook . my-embrace-LaTeX-mode-hook))
@@ -517,7 +517,9 @@ If the environment is not given, ask for it using completion."
   (leaf company-auctex
     :ensure t
     :after auctex
-    :config (company-auctex-init)))
+    :config (company-auctex-init))
+
+  :mode-hook (auto-fill-mode nil))
 
 (provide 'my-latex)
 ;;; my-latex.el ends here

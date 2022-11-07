@@ -269,8 +269,7 @@ the minibuffer."
 
 If WIDTH is non-nil, then insert WIDTH as the optional argument width to the
 \\includegraphics command."
-  (let* ((filename filename)
-         (image-graphicspath
+  (let* ((image-graphicspath
           (--find
            (s-prefix-p it filename)
            (my-latex-current-graphicspathes)))
@@ -373,44 +372,45 @@ PREAMBLE"
   (my-read-string-or-nil "Preamble, please: "))
 
 (my-latex-expand-define "f" my-latex-insert-figure
-			(&optional placement)
+                        (&optional placement)
   "Insert the LaTeX environment figure into current buffer with PLACEMENT."
   (interactive (list (my-latex-read-placement)))
+  (message "placement is %s" placement)
   (my-latex-insert-env "figure" :optional placement))
 
 (my-latex-expand-define "cp" my-latex-insert-caption ;nofmt
-			(&optional caption-string)
+                        (&optional caption-string)
   "If CAPTION-STRING is non-nil, then insert a caption for with LaTeX syntax."
   (interactive (list (my-latex-read-caption)))
   (when caption-string
     (my-latex-insert-single-line-command "caption" caption-string)))
 
 (my-latex-expand-define "cr" my-latex-insert-center
-			()
+                        ()
   "Insert the LaTeX environment center."
   (interactive)
   (my-latex-insert-env "center"))
 
 (my-latex-expand-define "tr" my-latex-insert-tabular
-			(preamble)
+	                (preamble)
   "Insert the latex environment tabular."
   (interactive (list (my-latex-read-preamble)))
   (my-latex-insert-env "tabular" preamble))
 
 (my-latex-expand-define "ar" my-latex-insert-arabic
-			(counter)
+                        (counter)
   "Insert the latex command arabic."
   (interactive (list (my-latex-read-counter-name)))
   (my-latex-insert-command "arabic" counter))
 
 (my-latex-expand-define "rom" my-latex-insert-roman
-			(counter)
+                        (counter)
   "Insert the latex command roman."
   (interactive (list (my-latex-read-counter-name)))
   (my-latex-insert-command "roman" counter))
 
 (my-latex-expand-define "al" my-latex-insert-alph
-			(counter)
+                        (counter)
   "Insert the latex command alph."
   (interactive (list (my-latex-read-counter-name)))
   (my-latex-insert-command "alph" counter))
@@ -602,10 +602,11 @@ Insert \\includegraphics for image at FILENAME with WIDTH (if it's non-nil).
 
 If CENTERING is non-nil make image centered.  By default, doesn't insert
 CAPTION, but if CAPTION is non-nil, insert."
-  (when centering ;nofmt
+  (when centering                       ;nofmt
     (my-latex-insert-centering))
   (my-latex-insert-includegraphics filename width)
-  (when caption (my-latex-insert-caption caption)))
+  (when caption                         ;nofmt
+    (my-latex-insert-caption caption)))
 
 (defun my-latex-insert-centering ()
   "Insert the LaTeX command \"centering\"."
@@ -618,8 +619,8 @@ CAPTION, but if CAPTION is non-nil, insert."
   (list
    (my-latex-read-image-path-from-graphicspath)
    (my-latex-read-caption)
-   (my-latex-read-width)
    (my-latex-read-placement)
+   (my-latex-read-width)
    (my-latex-read-centering)))
 
 (defun my-latex-read-image-path-from-graphicspath ()
