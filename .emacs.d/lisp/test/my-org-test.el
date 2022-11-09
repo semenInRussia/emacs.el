@@ -31,6 +31,9 @@
     ()
   (with-temp-buffer
     (insert "- jdejde")
+    (should (my-org-list-item-p))
+    (newline)
+    (insert "  + jdeijaewojdi")
     (should (my-org-list-item-p))))
 
 (ert-deftest my-org-properties-end-p

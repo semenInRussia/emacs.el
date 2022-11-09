@@ -72,7 +72,6 @@
          (:org-src-mode-map ([remap save-buffer] . org-edit-src-exit))
 
          (:my-org-local-map
-
           ;; Manipulations with a table
           ("t n" . org-table-create-or-convert-from-region)
           ("="   . org-table-eval-formula)
@@ -94,7 +93,7 @@
 
           ;; Context Commands
           ("'"   . org-edit-special)
-          ;; other being in the `org-mode-map' section
+          ;; other being in the `:org-mode-map' section
 
           ;; Miscellaneous
           ("SPC" . org-toggle-checkbox)
@@ -296,7 +295,8 @@ example in the following list
 - b
 - c
 
-Label is \"-\""
+Label is \"-\", you should consider that spaces before label shouldn't be in the
+regexp"
       :group 'my
       :type '(repeat string))
 
@@ -308,6 +308,7 @@ Label is \"-\""
 
     (defcustom my-org-list-item-prefix-regexp
       (rx line-start
+          (0+ " ")
           (regexp my-org-list-label-regexp)
           (? (1+ " ") (regexp my-org-list-item-checkbox-regexp))
           (0+ " "))

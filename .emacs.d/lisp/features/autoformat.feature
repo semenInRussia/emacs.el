@@ -90,6 +90,19 @@ Feature: autoformat in the org
     And I should see "Second"
     And I activate the command mode
 
+  Scenario: type a text after a list item of a nested list
+    Given a org-mode buffer
+    And I disable modern-org-mode
+    And I activate the insert mode
+    When I type "- Heading"
+    And I press "RET"
+    And I type "+ a"
+    Then I should see "A"
+    And I press "M-RET"
+    And I type "b"
+    And I should see "B"
+    And I activate the command mode
+
 Feature: autoformat in markdown mode
   there are tests for autoformat-mode in the markdown-mode major-mode
 
