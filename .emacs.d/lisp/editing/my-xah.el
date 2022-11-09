@@ -103,11 +103,26 @@ MODE defaults to the current `major-mode'.  See `my-local-major-mode-map-run'"
   :config                               ;nofmt
   (xah-fly-keys-set-layout "qwerty")
   (xah-fly-keys 1)
+  (defun my-format-expression ()
+    "Format the current expression, depends on major modes.
+
+Not each `major-mode' support the formatting, for add formatting to your
+`major-mode' you should use the following Elisp code:
+
+
+(define-key major-mode-map [remap my-format-expression] 'your-function)"
+    (interactive)
+    ;; default implementation
+    (user-error
+     "For major-mode named `%s' format expression function is not found"
+     major-mode))
+
   (leaf-keys
-   (xah-fly-command-map
-    ("SPC l"   . my-local-major-mode-map-run)
-    ("SPC SPC" . nil)
-    ("SPC z"   . nil))))
+   (:xah-fly-command-map
+    ("SPC l"     . my-local-major-mode-map-run)
+    ("SPC SPC"   . nil)
+    ("SPC SPC q" . my-format-expression)
+    ("SPC z"     . nil))))
 
 (provide 'my-xah)
 ;;; my-xah.el ends here
