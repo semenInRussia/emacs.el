@@ -113,9 +113,10 @@ Not each `major-mode' support the formatting, for add formatting to your
 (define-key major-mode-map [remap my-format-expression] 'your-function)"
     (interactive)
     ;; default implementation
-    (user-error
-     "For major-mode named `%s' format expression function is not found"
-     major-mode))
+    (if (use-region-p)
+        (format-all-region (region-beginning) (region-end))
+      (user-error
+       "for this major mode reformat support only with region")))
 
   (leaf-keys
    (:xah-fly-command-map
