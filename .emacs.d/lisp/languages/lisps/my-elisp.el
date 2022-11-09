@@ -63,7 +63,10 @@
 
 (leaf elfmt
   :ensure (elfmt :host github :repo "riscy/elfmt")
-  :global-minor-mode elfmt-global-mode)
+  :global-minor-mode elfmt-global-mode
+  :bind (:emacs-lisp-mode-map
+         :package elisp-mode
+         ([remap my-format-expression] . 'elfmt-sexp)))
 
 (leaf suggest :ensure t)
 
@@ -124,6 +127,7 @@ Only when in class defnition."
   :config                               ;nofmt
   (defun my-embrace-emacs-lisp-mode-hook ()
     "Add some parens for the Emacs-Lisp embrace."
+    (setq-local embrace-show-help-p nil)
     (embrace-add-pair-regexp
      ?f
      "(\\(\\w\\|\\)* "
