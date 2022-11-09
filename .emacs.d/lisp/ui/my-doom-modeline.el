@@ -155,7 +155,9 @@ Format of time is the list form the hours, minutes, seconds and zero?"
   (doom-modeline-def-segment pomidor
     ()
     "Return format string for `pomidor', view remainders minuts for break/work."
-    (when (featurep 'pomidor)
+    (when (and
+           (featurep 'pomidor)
+           (--some (equal (buffer-name it) "*pomidor*") (buffer-list)))
       (format " %s " (my-pomidor-format-remaining-time))))
 
   (defvar durand-buffer-name-max 20
