@@ -107,5 +107,9 @@
       (c . 3)
       (b . 2)))))
 
+(ert-deftest my-lib-check-inc-filename
+    ()
+  (should (equal (my-inc-filename "a/b/1.txt") "a/b/2.txt")))
+
 (provide 'my-lib-test)
 ;;; my-lib-test.el ends here

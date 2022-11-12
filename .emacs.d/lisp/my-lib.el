@@ -223,7 +223,7 @@ Otherwise nil"
   (and                                  ;nofmt
    (stringp s)
    (s-numeric-p s)
-   (1+ (string-to-number s))))
+   (-> s (string-to-number) (1+) (number-to-string))))
 
 (defun my-alist-union (alist1 alist2 &optional testfn)
   "Return union of ALIST1 and ALIST2, if has same keys, set to value of ALIST2.
@@ -237,6 +237,18 @@ Using TESTFN in functions sush as `assoc' or `alist-get'"
 (defun my-regexp-opt-of-regexp (regexps)
   "Return the regexp, which will be match to the one of taked REGEXPS."
   (concat "\\(?:" (s-join "\\|" regexps) "\\)"))
+
+(defun my-inc-filename (path)
+  "Increment filename of PATH and return updated.
+
+For example a/b/1.exe should be a/b/2.exe"
+  (let ((dirname (f-dirname path))
+        (base (f-base path))
+        (ext (f-ext path)))
+    (->                                ;nofmt
+     dirname
+     (f-join (my-incs base))
+     (f-swap-ext ext))))
 
 (provide 'my-lib)
 ;;; my-lib.el ends here
