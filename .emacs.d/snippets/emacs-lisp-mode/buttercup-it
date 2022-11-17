@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: buttercup-it
-# key: it
-# --
-(it "$1"
-    (expect $0))
