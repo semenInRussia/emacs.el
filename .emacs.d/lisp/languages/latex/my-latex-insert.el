@@ -634,20 +634,25 @@ CAPTION, but if CAPTION is non-nil, insert."
 (defun my-latex-read-caption ()
   "Read from the minibuffer a caption for the LaTeX.
 
-  If the user typed nothing, then return nil"
+If the user typed nothing, then return nil"
   (my-read-string-or-nil "Caption, please: "))
 
 (defun my-latex-read-width (&optional for)
   "Read a LaTeX width of FOR from the minibuffer.
 
-  If the user typed nothing, then return nil"
+If the user typed nothing, then return nil.  If user typed character \"t\" in
+the minibuffer, then it will be replaced with \\\\textwidth"
   (setq for (or for "the thing"))
-  (my-read-string-or-nil (format "Width of %s, please: " for)))
+  (->>
+   for
+   (format "Width of %s, please: ")
+   (my-read-string-or-nil)
+   (s-replace "t" "\\textwidth")))
 
 (defun my-latex-read-placement ()
   "Read a LaTeX placement from the minibuffer.
 
-  If the user typed nothing, then return nil"
+If the user typed nothing, then return nil"
   (my-read-string-or-nil "Placement, please (some chars of h t b p ! H): "))
 
 (defun my-latex-read-centering ()

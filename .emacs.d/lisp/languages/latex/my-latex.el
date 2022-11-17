@@ -79,9 +79,9 @@
     "Find auctex master file for the current buffer."
     (interactive)
     (setq-local TeX-master
-                (or
-                 (my-latex-lookup-master-file-of (buffer-file-name))
-                 nil)))
+                (and
+                 (buffer-file-name)
+                 (my-latex-lookup-master-file-of (buffer-file-name)))))
 
   (defun my-latex-lookup-master-file-of (filename)
     "Lookup a auctex master file for the file with FILENAME."
