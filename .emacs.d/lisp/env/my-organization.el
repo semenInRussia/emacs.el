@@ -30,7 +30,9 @@
 (require 'just)
 
 (leaf org-agenda                        ;nofmt
-  :custom (org-agenda-files . '("~/agenda.org"))
+  :custom (org-agenda-files .
+                            '("~/agenda.org"
+                              "~/tasks-archive/task-archive.org"))
   :bind (("<f9>"      . org-agenda)
          ("S-<f9>"    . org-agenda-list)
          (:xah-fly-command-map
