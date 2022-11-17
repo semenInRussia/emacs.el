@@ -37,5 +37,8 @@
     (text-scale-mode 0)
     (visual-fill-column-mode 1)))
 
+(add-hook 'prog-mode-hook
+          (lambda () (interactive) (toggle-truncate-lines 1)))
+
 (provide 'my-lang-utils)
 ;;; my-lang-utils.el ends here
