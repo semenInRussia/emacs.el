@@ -34,7 +34,8 @@
   :custom `((pomidor-break-seconds . ,(* 8 60))
             (pomidor-seconds       . ,(* 40 60))
             (pomidor-sound-tack    . nil)
-            (pomidor-sound-tick    . nil))
+            (pomidor-sound-tick    . nil)
+            (pomidor-confirm-end-break . nil))
   :config (pomidor))
 
 (provide 'my-pomidor)
