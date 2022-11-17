@@ -62,6 +62,7 @@
           (";"   . org-set-tags-command)
           ("o"   . org-id-get-create)
           ("a"   . org-archive-subtree)
+          ("y"   . org-attach)
           ("z"   . org-toggle-comment)
 
           ;; Org Babel
