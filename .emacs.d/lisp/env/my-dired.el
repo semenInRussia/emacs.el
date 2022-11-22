@@ -140,7 +140,8 @@ Return new name of FILE"
     (interactive)
     (let ((parent (f-parent (dired-current-directory))))
       (kill-buffer)
-      (dired parent)))
+      (dired parent)
+      (dired-goto-file parent)))
 
   (defun my-dired-new-file (filename)
     "Create file with FILENAME in the directory which opened in the dired buffer."
