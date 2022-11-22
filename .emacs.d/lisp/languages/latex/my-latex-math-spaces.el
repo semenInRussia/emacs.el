@@ -23,6 +23,9 @@
 
 ;; Auto insertion of the spaces in the LaTeX math environment.
 
+;; - Automatically add spaces around binary operations sush as + or -
+;; - Spaces around of paren if needed
+
 ;;; Code:
 
 (require 'just)
@@ -34,16 +37,16 @@
 
 (defcustom my-latex-math-spaces-binary-ops
   nil
-  "List of the regexps which indicates an binary operator of the LaTeX math.
+  "List of the regexps indicating a binary operator of the LaTeX math.
 
 Binary operator is a LaTeX command which no take arguments and needs to 2
-one left number/expression and one rigth number/expression.  So, \\frac isn't
-binary operator, because it takes arguments"
+arguments: 1 left number/expression and 1 rigth number/expression.  So,
+\\frac isn't binary operator, because it takes arguments only right"
   :type '(repeat regexp))
 
 (defcustom my-latex-math-spaces-parens
   '("(" "\\\\left." "|")
-  "List of the regexps which indicates an paren of the LaTeX math.
+  "List of the regexps indicating a paren of the LaTeX math.
 
 In that list openning and closing parens should be added separately."
   :type '(repeat string))
@@ -55,8 +58,8 @@ In that list openning and closing parens should be added separately."
   "Minor mode which automatically insert spaces in the LaTeX math."
   :init-value t
   (if my-latex-math-spaces-mode
-      (add-hook 'post-self-insert-hook 'my-latex-math-spaces-do)
-    (remove-hook 'post-self-insert-hook 'my-latex-math-spaces-do)))
+      (add-hook 'post-self-insert-hook 'my-latex-math-spaces-do nil t)
+    (remove-hook 'post-self-insert-hook 'my-latex-math-spaces-do t)))
 
 (defun my-latex-math-spaces-do ()
   "Do insertion of the spaces for the LaTeX math syntax, if needed."
@@ -65,11 +68,12 @@ In that list openning and closing parens should be added separately."
     (run-hooks 'my-latex-math-spaces-do-hook)))
 
 (defun my-latex-math-spaces-for-binary-ops ()
-  "Do insertion of the spaces for the last LaTeX binary operation, if needed."
+  "Do insertion of the spaces for the LaTeX binary operation at point, if has."
   (interactive)
   (let ((start (point)))
     (when (my-latex-math-spaces-goto-binary-op-start)
-      ;; Make 1 space and change the cursor to binary operation end
+      ;; Make 1 space at point: before the binary operation
+      ;; and go to the end of binary operation
       (goto-char (+ start
                     ;; traveled distance after changing previous spaces to 1
                     ;; space
@@ -79,7 +83,7 @@ In that list openning and closing parens should be added separately."
 (add-hook 'my-latex-math-spaces-do-hook 'my-latex-math-spaces-for-binary-ops)
 
 (defun my-latex-math-spaces-goto-binary-op-start ()
-  "Go to backward binary operation start when its looking back."
+  "Go to the start of backward binary operation when it is looking back."
   (-any 'my-latex-math-spaces-skip-backward my-latex-math-spaces-binary-ops))
 
 (defun my-latex-math-spaces-for-parens ()
@@ -87,14 +91,16 @@ In that list openning and closing parens should be added separately."
   (-when-let*
       ((init-pos (point))
        (paren (my-latex-math-spaces-goto-parens-start))
+       ;; before paren source make only 1 space
        (traveled-distance (just-spaces-to-1)))
+    ;; go to the paren end
     (goto-char (+ init-pos traveled-distance))
     (when (> (length paren) 1) (just-spaces-to-1))))
 
-(add-hook 'my-latex-math-spaces-do-hook 'my-latex-math-spaces-for-binary-ops)
+(add-hook 'my-latex-math-spaces-do-hook 'my-latex-math-spaces-for-parens)
 
 (defun my-latex-math-spaces-goto-parens-start ()
-  "Go to the start of the LaTeX paren command, if it placed backward of point.
+  "Go to the start of the LaTeX paren command, if it is looking backward.
 
 Return a matched paren or nil if paren isn't found."
   (-any 'my-latex-math-spaces-skip-backward my-latex-math-spaces-parens))
@@ -103,9 +109,12 @@ Return a matched paren or nil if paren isn't found."
   "Do insertion of the spaces for the backward from point char \ , if needed."
   (save-excursion
     (skip-chars-backward " ")
-    (when (= (char-before) ?\\)
-      (forward-char -1)
-      (just-spaces-to-1))))
+    (and
+     (= (char-before) ?\\)
+     ;; if an user twice press \, that insert \\, instead of \ \
+     (not (my-latex-math-spaces-looking-back-string "\\\\"))
+     ;; if an user hit \, it indicates a LaTeX command, so insert space before
+     (progn (forward-char -1) (just-spaces-to-1) (forward-char 1)))))
 
 (add-hook 'my-latex-math-spaces-do-hook 'my-latex-math-spaces-for-backslash)
 
@@ -118,12 +127,22 @@ If IGNORE-SPACES is non-nil, then ignore backward-spaces"
     (goto-char (match-beginning 0))
     (match-string 0)))
 
+(defun my-latex-math-spaces-looking-back-string (string)
+  "Return non-nil, when a given STRING located before the cursor."
+  (save-excursion
+    (->>
+     string
+     (string-to-list)
+     (reverse)
+     (--every
+      (prog1 (= (char-before) it) (forward-char -1))))))
+
 (defun my-latex-math-spaces-skip-forward (regexp)
   "Skip REGEXP looking back, if regexps match return point, else return nil."
   (search-forward-regexp (s-concat "\\=" regexp) nil t))
 
 (defun my-latex-declare-bin-op (&rest ops)
-  "Define LaTeX binary OPS for auto insertion of the spaces in math."
+  "Define a LaTeX binary OPS for auto insertion of the spaces in math."
   (--each ops (add-to-list 'my-latex-math-spaces-binary-ops it)))
 
 (defun my-latex-declare-parens (&rest parens)

@@ -519,6 +519,8 @@ If the environment is not given, ask for it using completion."
     :after auctex
     :config (company-auctex-init))
 
+  (leaf my-latex-math-spaces :hook LaTeX-mode)
+
   :mode-hook (auto-fill-mode nil))
 
 (provide 'my-latex)
