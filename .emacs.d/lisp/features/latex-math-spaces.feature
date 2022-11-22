@@ -34,3 +34,12 @@ Feature: automatically insertion of spaces in a LaTeX math environment
     When I type "a(a+b)"
     Then I should see "a (a + b)"
     And I activate the command mode
+
+  Scenario: type backslash with initial spaces
+    Given a LaTeX-mode buffer
+    And I activate the insert mode
+    And I activate the my-latex-math-spaces-mode
+    And I insert a LaTeX math environment
+    When I type "2      \LaTeX"
+    Then I should see "2 \LaTeX"
+    And I activate the command mode

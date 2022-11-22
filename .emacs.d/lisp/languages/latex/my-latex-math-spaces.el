@@ -114,7 +114,14 @@ Return a matched paren or nil if paren isn't found."
      ;; if an user twice press \, that insert \\, instead of \ \
      (not (my-latex-math-spaces-looking-back-string "\\\\"))
      ;; if an user hit \, it indicates a LaTeX command, so insert space before
-     (progn (forward-char -1) (just-spaces-to-1) (forward-char 1)))))
+     (progn
+       ;; go to before backslash
+       (forward-char -1)
+       ;; reorgonize spaces before backslasy to 1
+       ;; and go to the one symbol before backslash
+       (forward-char (- (just-spaces-to-1)))
+       ;; go to the after backslash
+       (forward-char)))))
 
 (add-hook 'my-latex-math-spaces-do-hook 'my-latex-math-spaces-for-backslash)
 
