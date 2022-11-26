@@ -79,3 +79,5 @@ devdocs/
 /tasks-archive/
 /.emacs.d/places
 /dystroy/
+/jupyter/
+/.anaconda/
