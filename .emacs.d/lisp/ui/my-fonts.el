@@ -29,7 +29,7 @@
 
 ;; you can install this font, usin `nerd-fonts' (search in the `github')
 (defcustom my-fonts-main
-  "JetBrains Mono SemiBold Nerd Font Complete Windows Compatible"
+  "JetBrains Mono"
   "Name of the main font to display all."
   :group 'my
   :type 'string)
