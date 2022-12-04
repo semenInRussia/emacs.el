@@ -663,8 +663,15 @@ exist after each headings's drawers."
                    "Export With Supersripts"
                    my-org-options-with-sub-supersripts)
                   ("*" "Export With Emphasize" my-org-options-with-emphasize)
+                  ("n" "Export with Sections Numbers"
+                   my-org-options-with-emphasize)
                   ]])
     :init                               ;nofmt
+    (defun my-org-options-author (author)
+      "Set #+AUTHOR option for the current `org-mode' option to AUTHOR."
+      (interactive "sAuthor name, please: ")
+      (my-org-set-option "AUTHOR" author))
+
     (defun my-org-options-author (author)
       "Set #+AUTHOR option for the current `org-mode' option to AUTHOR."
       (interactive "sAuthor name, please: ")
@@ -704,6 +711,11 @@ exist after each headings's drawers."
       "If WITH-EMPHASIZE is t, add *:t #+OPTIONS, otherwise *:nil"
       (interactive (list (yes-or-no-p "With emphasize? ")))
       (my-org-set-one-of-options "*" with-emphasize))
+
+    (defun my-org-options-with-emphasize (with-numbers)
+      "If WITH-NUMBERS is t, add num:t #+OPTIONS, otherwise num:nil"
+      (interactive (list (yes-or-no-p "With numbers? ")))
+      (my-org-set-one-of-options "num" with-numbers))
 
     (defun my-org-options-with-special-string (with-special-string)
       "If WITH-SPECIAL-STRING is t, add -:t #+OPTIONS, otherwise -:nil"
