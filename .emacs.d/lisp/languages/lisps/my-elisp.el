@@ -70,6 +70,8 @@
 
 (leaf suggest :ensure t)
 
+(leaf mocker :ensure t :doc "A library for testing `elisp' with mocks")
+
 (leaf elisp-mode-class
   :init                                 ;nofmt
   (defun my-goto-defclass-beg ()
