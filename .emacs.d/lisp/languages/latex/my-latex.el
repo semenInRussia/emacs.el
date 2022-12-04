@@ -57,7 +57,7 @@
          (LaTeX-mode-hook . my-latex-expansion-mode)
          (LaTeX-mode-hook . visual-fill)
          (LaTeX-mode-hook . turn-off-flycheck))
-  :major-mode-map (latex (LaTeX-mode latex-mode))
+  :major-mode-map (latex (latex-mode))
   :require calc-lang
   :bind (:my-latex-local-map
          ("="  . my-calc-simplify-region-copy)
@@ -125,7 +125,7 @@
       (insert simplified)))
 
   (leaf xenops
-    :hook LaTeX-mode-hook
+    :hook latex-mode-hook
     :ensure t
     :custom (xenops-math-image-scale-factor . 2))
 
@@ -221,7 +221,7 @@
     :ensure t
     :hook ((cdlatex-tab-hook . yas-expand)
            (cdlatex-tab-hook . cdlatex-in-yas-field)
-           (LaTeX-mode-hook  . turn-on-cdlatex))
+           (latex-mode-hook  . turn-on-cdlatex))
     :bind (:cdlatex-mode-map
            ("<tab>" . cdlatex-tab)
            (";" . my-latex-dollar)
@@ -255,8 +255,8 @@
 
   (leaf embrace
     :after (embrace cdlatex)
-    :hook ((LaTeX-mode-hook . embrace-LaTeX-mode-hook)
-           (LaTeX-mode-hook . my-embrace-LaTeX-mode-hook))
+    :hook ((latex-mode-hook . embrace-LaTeX-mode-hook)
+           (latex-mode-hook . my-embrace-LaTeX-mode-hook))
     :config                             ;nofmt
     (defun my-embrace-LaTeX-mode-hook ()
       "My additional `embrace-LaTeX-mode-hook'."
@@ -364,7 +364,7 @@
 
   (leaf smartparens-latex
     :after smartparens
-    :bind (:LaTeX-mode-map :package latex ("$" . self-insert-command))
+    :bind (:latex-mode-map :package tex-mode ("$" . self-insert-command))
     :config                             ;nofmt
     (sp-with-modes
         '(tex-mode plain-tex-mode latex-mode LaTeX-mode)
@@ -497,8 +497,8 @@ If the environment is not given, ask for it using completion."
 
   (leaf latex-extra
     :ensure t
-    :hook ((LaTeX-mode-hook . latex-extra-mode)
-           (LaTeX-mode-hook . visual-line-mode))
+    :hook ((latex-mode-hook . latex-extra-mode)
+           (latex-mode-hook . visual-line-mode))
     :bind (:my-latex-local-map
            :package tex
            ("e" . latex/compile-commands-until-done)
@@ -507,7 +507,7 @@ If the environment is not given, ask for it using completion."
 
   (leaf company-math
     :ensure t
-    :hook (LaTeX-mode-hook . my-company-math-setup)
+    :hook (latex-mode-hook . my-company-math-setup)
     :config                             ;nofmt
     (defun my-company-math-setup ()
       "Setup for `company-math'."
@@ -519,7 +519,7 @@ If the environment is not given, ask for it using completion."
     :after auctex
     :config (company-auctex-init))
 
-  (leaf my-latex-math-spaces :hook LaTeX-mode)
+  (leaf my-latex-math-spaces :hook latex-mode)
 
   :mode-hook (auto-fill-mode nil))
 
