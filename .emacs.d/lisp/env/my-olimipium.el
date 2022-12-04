@@ -28,7 +28,9 @@
 (require 'dash)
 
 (defcustom my-olimpium-dir "~/olimpium"
-  "Directory in which should be located solutions of the olimpium tasks.")
+  "Directory in which should be located solutions of the olimpium tasks."
+  :type 'string
+  :group 'my)
 
 (defun my-olimpium-new-solution ()
   "New solution of the olimpium task."
