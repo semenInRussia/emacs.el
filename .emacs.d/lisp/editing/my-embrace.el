@@ -28,12 +28,13 @@
 ;;; Code:
 (leaf embrace
   :ensure t
-  :defvar (embrace-semantic-units-alist)
+  :defvar embrace-semantic-units-alist
+  :setq-default (embrace-show-help-p . nil)
   :bind (:xah-fly-command-map
          :package xah-fly-keys
          ("/"         . embrace-commander)
          ("SPC SPC /" . xah-goto-matching-bracket))
-  :hook ((emacs-lisp-mode-hook . embrace-emacs-lisp-mode-hook))
+  :hook (emacs-lisp-mode-hook . embrace-emacs-lisp-mode-hook)
   :config                             ;nofmt
   (unless (assq ?n embrace-semantic-units-alist)
     (setq-default embrace-semantic-units-alist
