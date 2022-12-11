@@ -158,7 +158,7 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
   (interactive (list (projectile-acquire-root)))
   (remhash (f-full root) my-project-files-hash))
 
-(defun my-projectile-files-with-string (string directory)
+(defun my-projectile-files-with-string (string directory &optional _file-ext)
   "Return a list of all files containing STRING in DIRECTORY."
   (->>
    directory
@@ -315,6 +315,7 @@ Change _SOURCE with FILES of the current project"
             :persistent-help "Preview file"))))
 
 (defalias 'projectile-project-files 'my-projectile-project-files)
+(defalias 'projectile-project-root 'my-project-root)
 (defalias 'projectile-root-local 'my-projectile-root-local)
 (defalias 'projectile-files-with-string 'my-projectile-files-with-string)
 
