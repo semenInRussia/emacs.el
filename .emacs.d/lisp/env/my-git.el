@@ -60,8 +60,7 @@
 (leaf git-modes :ensure t)
 
 (leaf helm-gitignore
-  :after fast-exec
-  :config                               ;nofmt
+  :load-path* "env/"
   :fast-exec ("Generate Gitignore" 'helm-gitignore))
 
 (provide 'my-git)
