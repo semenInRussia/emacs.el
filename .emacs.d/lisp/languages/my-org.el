@@ -511,7 +511,9 @@ produced."
         ;; if snippet - t, then not clean
         (latex/compile-commands-until-done (not snippet)))
 
-      (defalias 'org-latex-compile 'my-org-latex-compile)))
+      (defalias 'org-latex-compile 'my-org-latex-compile))
+
+    (leaf ox-json :ensure t :require t))
 
   (leaf toc-org
     :ensure t
@@ -846,7 +848,13 @@ If not found return nil."
     :require t
     :bind (:org-mode-map
            :package org
-           ([remap imenu-anywhere] . 'my-org-db/body))))
+           ([remap imenu-anywhere] . 'my-org-db/body)))
+
+  (leaf rorg
+    :load-path* "projects/rorg/"
+    :bind (:my-org-local-map
+           :package org
+           ("]" . rorg-forward-slurp-subtree))))
 
 (provide 'my-org)
 ;;; my-org.el ends here
