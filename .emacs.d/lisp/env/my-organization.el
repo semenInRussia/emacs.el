@@ -30,9 +30,10 @@
 (require 'just)
 
 (leaf org-agenda                        ;nofmt
-  :custom (org-agenda-files .
-                            '("~/agenda.org"
-                              "~/tasks-archive/task-archive.org"))
+  :custom ((org-agenda-files .
+                             '("~/agenda.org"
+                               "~/tasks-archive/task-archive.org"))
+           (org-agenda-span . 14))
   :bind (("<f9>"      . org-agenda)
          ("S-<f9>"    . org-agenda-list)
          (:xah-fly-command-map
@@ -58,34 +59,33 @@
 
 (leaf org-agenda
   :after (org fast-exec)
-  :config                               ; nofmt
-  :fast-exec ("Plane New Day" 'my-agenda-plan-new-day))
+  :fast-exec ("Plane New Day" 'my-agenda-plan-new-day)
 
-(defun my-add-org-subtree-to-targets-on-day ()
-  "Add  a `org-mode' subtree at the point to the targets on day."
-  (interactive)
-  (save-excursion
-    (let ((subtree-text (my-delete-and-get-text-of-org-subtree)))
-      (my-goto-targets-on-day)
-      (newline)
-      (insert subtree-text)
-      (delete-char -1)
-      (org-schedule t (format-time-string "%Y-%m-%d")))))
+  (defun my-add-org-subtree-to-targets-on-day ()
+    "Add  a `org-mode' subtree at the point to the targets on day."
+    (interactive)
+    (save-excursion
+      (let ((subtree-text (my-delete-and-get-text-of-org-subtree)))
+        (my-goto-targets-on-day)
+        (newline)
+        (insert subtree-text)
+        (delete-char -1)
+        (org-schedule t (format-time-string "%Y-%m-%d")))))
 
-(defun my-goto-targets-on-day ()
-  "Visit `org-mode' subtree of the targets on day."
-  (my-open-main-agenda-file)
-  (goto-char (point-min))
-  (search-forward "* Targets on Day")
-  (forward-char))
+  (defun my-goto-targets-on-day ()
+    "Visit `org-mode' subtree of the targets on day."
+    (my-open-main-agenda-file)
+    (goto-char (point-min))
+    (search-forward "* Targets on Day")
+    (forward-char))
 
-(defun my-delete-and-get-text-of-org-subtree (&optional pt)
-  "Parse a `org-mode' subtree at the PT, delete it and return text of subtree."
-  (or pt (setq pt (point)))
-  (org-mark-subtree)
-  (prog1
-      (just-text-in-region)
-    (delete-region (region-beginning) (region-end))))
+  (defun my-delete-and-get-text-of-org-subtree (&optional pt)
+    "Parse a `org-mode' subtree at the PT, delete it and return text of subtree."
+    (or pt (setq pt (point)))
+    (org-mark-subtree)
+    (prog1
+        (just-text-in-region)
+      (delete-region (region-beginning) (region-end)))))
 
 (leaf-keys
  (xah-fly-command-map                   ;nofmt
