@@ -41,7 +41,7 @@
 
 (leaf latex
   :ensure auctex
-  :mode ("\\.tex$" . LaTeX-mode)
+  :mode ("\\.tex$" . latex-mode)
   :defun (((er/mark-LaTeX-math er/mark-LaTeX-inside-environment)
            . expand-region)
           (latex-complete-envnames . tex-mode)
@@ -53,10 +53,10 @@
             LaTeX-mark-section)
            . latex))
   :custom (TeX-master . nil)
-  :hook ((LaTeX-mode-hook . my-latex-find-master-file)
-         (LaTeX-mode-hook . my-latex-expansion-mode)
-         (LaTeX-mode-hook . visual-fill)
-         (LaTeX-mode-hook . turn-off-flycheck))
+  :hook ((latex-mode-hook . my-latex-find-master-file)
+         (latex-mode-hook . my-latex-expansion-mode)
+         (latex-mode-hook . visual-fill)
+         (latex-mode-hook . turn-off-flycheck))
   :major-mode-map (latex (latex-mode))
   :require calc-lang
   :bind (:my-latex-local-map
@@ -387,7 +387,15 @@
        'autoformat-sentence-capitalization)
 
       (defvar autoformat-latex-capitalize-latex-commands
-        '("author" "title" "date" "part" "subsection" "section" "part" "chapter")
+        '("author"
+          "title"
+          "date"
+          "part"
+          "subsection"
+          "subsubsection"
+          "section"
+          "part"
+          "chapter")
         "List of regexps which Emacs will automatically capitalize.")
 
       (defvar autoformat-latex-capitalize-regexps
@@ -521,7 +529,7 @@ If the environment is not given, ask for it using completion."
 
   (leaf my-latex-math-spaces :hook latex-mode)
 
-  :mode-hook (auto-fill-mode nil))
+  (add-hook 'latex-mode-hook (lambda () (auto-fill-mode nil))))
 
 (provide 'my-latex)
 ;;; my-latex.el ends here
