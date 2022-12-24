@@ -28,6 +28,7 @@
 ;;; Code:
 (leaf recentf
   :global-minor-mode recentf-mode
+  :custom (recentf-max-saved-items . 200)
   :bind (:xah-fly-command-map
          :package xah-fly-keys
          ("SPC k f" . recentf-open-files))
