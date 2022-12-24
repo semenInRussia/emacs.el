@@ -31,13 +31,66 @@
   :custom (python-shell-interpreter . "python")
   :hook (python-mode-hook . enable-dabbrev-company-backend)
   :mode "\\.py\\'"
-  :config (leaf pydoc :ensure t)
+  :major-mode-map python
+  :bind (:my-python-local-map
+         ("f" . 'py-sort-imports)
+         ("o" . 'my-python-optional-type)
+         ("p" . 'my-python-split-params))
+  :config                               ;nofmt
+
+  (leaf pydoc :ensure t)
 
   (defun enable-dabbrev-company-backend ()
     "Add `company-dabbrev' backend to `company-backends' for local major mode."
     (interactive)
     (setq-local company-backends
-                (cons 'company-dabbrev company-backends))))
+                (cons 'company-dabbrev company-backends)))
 
-(provide 'my-python)
+  (defun my-python-split-multi-imports-in-1-line ()
+    "Find all lines importing more then 1 thing from module and split it."
+    (interactive)
+    (save-excursion
+      (goto-char (point-min))
+      (while (search-forward-regexp
+              "^from +\\(.*?\\) +import +\\(\\(.*?\\), *\\)+" nil t)
+        (let ((line (just-text-at-line))
+              (from (match-string 1)))
+          (delete-region (point-at-bol) (point-at-eol))
+          (--each
+              (->>
+               line
+               (s-split "import")
+               (-last-item)
+               (s-split ",")
+               (-map 's-trim))
+            (insert "from " from " import " it)
+            (newline))))))
+
+  (advice-add 'py-sort-imports
+              :after 'my-python-split-multi-imports-in-1-line)
+
+  (defun my-python-optional-type (beg end)
+    "Turn a python type in the active region into optional.
+
+Active region is region from BEG to END"
+    (interactive "r")
+    (save-excursion
+      (goto-char end)
+      (insert "]")
+      (goto-char beg)
+      (insert "Optional[")))
+
+  (defun my-python-split-params ()
+    "Split params of a python def block into some lines."
+    (interactive)
+    (save-excursion
+      (end-of-line)
+      (search-backward "def")
+      (forward-sexp)
+      (sp-get
+          (sp-get-sexp)
+        (replace-string-in-region "," ",\n" :beg :end))
+      (sp-get (sp-get-sexp) (indent-region-line-by-line :beg :end))))
+
+  (provide 'my-python))
 ;;; my-python.el ends here

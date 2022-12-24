@@ -482,11 +482,14 @@ demotes a first letter after keyword word."
   (leaf ox
     :custom ((org-export-coding-system . 'utf-8)
              (org-export-with-smart-quotes . t)
-             (org-latex-caption-above . '(table image))
+             (org-latex-caption-above . '(table))
+             (org-latex-default-figure-position . "H")
              (org-latex-packages-alist .
-                                       '(("AUTO" "babel" ;nofmt
-                                          nil
-                                          ("pdflatex")))))
+                                       '(("AUTO" "babel" nil
+                                          ("pdflatex" "xelatex"))
+                                         ("" "cmap" nil ("pdflatex"))
+                                         ("" "float" nil
+                                          ("pdflatex" "xelatex")))))
     :config                             ;nofmt
     (leaf latex-extra
       :ensure t
@@ -513,7 +516,9 @@ produced."
 
       (defalias 'org-latex-compile 'my-org-latex-compile))
 
-    (leaf ox-json :ensure t :require t))
+    (leaf ox-json :ensure t :require t)
+
+    (leaf ox-beamer :require t))
 
   (leaf toc-org
     :ensure t
@@ -661,6 +666,7 @@ exist after each headings's drawers."
                    "Export With Preserve-Breaks"
                    my-org-options-with-preserve-breaks)
                   ("S" "Export With String" my-org-options-with-special-string)
+                  ("T" "Export With Table of Contents" my-org-options-with-toc)
                   ("^"
                    "Export With Supersripts"
                    my-org-options-with-sub-supersripts)
@@ -738,6 +744,11 @@ exist after each headings's drawers."
       "If WITH-PRESERVE-SUB-SUPERSRIPTS  is t, add ^:t to #+OPTIONS."
       (interactive (list (yes-or-no-p "With sub supersripts? ")))
       (my-org-set-one-of-options "^" with-sub-supersripts))
+
+    (defun my-org-options-with-toc (with-toc)
+      "If WITH-TOC is non-nil, then add toc:t to #+OPTIONS, otherwise toc:nil."
+      (interactive (list (yes-or-no-p "With table of contents? ")))
+      (my-org-set-one-of-options "toc" with-toc))
 
     (defun my-org-options-with-archived-trees (arch)
       "If ARCH is t, add arch:t to #+OPTIONS, otherwise arch:nil."

@@ -32,6 +32,7 @@
   :require t
   :bind ("<f12>" . pomidor)
   :custom `((pomidor-sound-tack    . nil)
+            (pomidor-seconds       . 1800) ; 30min
             (pomidor-sound-tick    . nil)
             (pomidor-confirm-end-break . nil))
   :config (pomidor))
