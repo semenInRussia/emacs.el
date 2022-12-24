@@ -3,10 +3,13 @@
 (setq calc-highlight-selections-with-faces t)
 ;;;End of Settings for `calc-sel'
 
-;;; Mode settings stored by Calc on Wed Oct 12 23:38:21 2022
-(setq calc-window-height 14)
+;;; Mode settings stored by Calc on Sun Dec 18 23:08:15 2022
+(setq calc-window-height 8)
 (setq calc-symbolic-mode t)
+(setq calc-angle-mode 'hms)
+(setq calc-internal-prec 4)
 (setq calc-infinite-mode t)
+(setq calc-complex-mode 'polar)
 (setq calc-group-digits t)
 (setq calc-line-breaking nil)
 ;;; End of mode settings
