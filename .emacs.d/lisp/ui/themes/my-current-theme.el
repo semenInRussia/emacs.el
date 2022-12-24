@@ -1,4 +1,4 @@
-;;; my-current-theme.el --- my-current-theme
+;;; my-current-theme.el --- Load the current theme
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -29,9 +29,8 @@
 ;; List of my favorite themes:
 ;; - `gruber-darker'
 ;; - `doom-monokai-classic'
-;; - `magnars-black-theme'
 
-(eval-after-load 'doom-themes '(load-theme 'doom-1337 t))
+(eval-after-load 'doom-themes '(load-theme 'doom-acario-dark t))
 
 (provide 'my-current-theme)
 ;;; my-current-theme.el ends here
