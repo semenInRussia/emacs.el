@@ -81,7 +81,6 @@ ROOT"
   (--reduce-from
    (cond
     ((my-matches-with-one-of-p it regexps)
-     (message "Ignore %s" it)
      acc)
     ((f-directory-p it)
      (append acc
