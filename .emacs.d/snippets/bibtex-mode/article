@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: article
+# key: a
+# type: command
+# --
+(bibtex-Article)
