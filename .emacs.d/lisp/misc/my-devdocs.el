@@ -31,6 +31,7 @@
   :hook ((python-mode-hook . my-devdocs-python-hook)
          (emacs-lisp-mode-hook . my-devdocs-emacs-lisp-hook)
          (rust-mode-hook . my-devdocs-rust-hook)
+         (LaTeX-mode-hook . my-devdocs-latex-hook)
          (haskell-mode-hook . my-devdocs-haskell-hook))
   :fast-exec (("Install DevDocs Docset" 'devdocs-install)
               ("Delete DevDocs Docset" 'devdocs-delete))

@@ -53,10 +53,10 @@
             LaTeX-mark-section)
            . latex))
   :custom (TeX-master . nil)
-  :hook ((latex-mode-hook . my-latex-find-master-file)
-         (latex-mode-hook . my-latex-expansion-mode)
-         (latex-mode-hook . visual-fill)
-         (latex-mode-hook . turn-off-flycheck))
+  :hook ((LaTeX-mode-hook . my-latex-find-master-file)
+         (LaTeX-mode-hook . my-latex-expansion-mode)
+         (LaTeX-mode-hook . visual-fill)
+         (LaTeX-mode-hook . turn-off-flycheck))
   :major-mode-map (latex (latex-mode))
   :require calc-lang
   :bind (:my-latex-local-map
@@ -125,7 +125,7 @@
       (insert simplified)))
 
   (leaf xenops
-    :hook latex-mode-hook
+    :hook LaTeX-mode-hook
     :ensure t
     :custom (xenops-math-image-scale-factor . 2))
 
@@ -221,7 +221,7 @@
     :ensure t
     :hook ((cdlatex-tab-hook . yas-expand)
            (cdlatex-tab-hook . cdlatex-in-yas-field)
-           (latex-mode-hook  . turn-on-cdlatex))
+           (LaTeX-mode-hook  . turn-on-cdlatex))
     :bind (:cdlatex-mode-map
            ("<tab>" . cdlatex-tab)
            (";" . my-latex-dollar)
@@ -255,8 +255,8 @@
 
   (leaf embrace
     :after (embrace cdlatex)
-    :hook ((latex-mode-hook . embrace-LaTeX-mode-hook)
-           (latex-mode-hook . my-embrace-LaTeX-mode-hook))
+    :hook ((LaTeX-mode-hook . embrace-LaTeX-mode-hook)
+           (LaTeX-mode-hook . my-embrace-LaTeX-mode-hook))
     :config                             ;nofmt
     (defun my-embrace-LaTeX-mode-hook ()
       "My additional `embrace-LaTeX-mode-hook'."
@@ -505,8 +505,8 @@ If the environment is not given, ask for it using completion."
 
   (leaf latex-extra
     :ensure t
-    :hook ((latex-mode-hook . latex-extra-mode)
-           (latex-mode-hook . visual-line-mode))
+    :hook ((LaTeX-mode-hook . latex-extra-mode)
+           (LaTeX-mode-hook . visual-line-mode))
     :bind (:my-latex-local-map
            :package tex
            ("e" . latex/compile-commands-until-done)
@@ -515,7 +515,7 @@ If the environment is not given, ask for it using completion."
 
   (leaf company-math
     :ensure t
-    :hook (latex-mode-hook . my-company-math-setup)
+    :hook (LaTeX-mode-hook . my-company-math-setup)
     :config                             ;nofmt
     (defun my-company-math-setup ()
       "Setup for `company-math'."
@@ -529,7 +529,7 @@ If the environment is not given, ask for it using completion."
 
   (leaf my-latex-math-spaces :hook latex-mode)
 
-  (add-hook 'latex-mode-hook (lambda () (auto-fill-mode nil))))
+  (add-hook 'LaTeX-mode-hook (lambda () (auto-fill-mode nil))))
 
 (leaf bibtex
   :after bibtex
