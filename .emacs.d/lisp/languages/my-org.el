@@ -484,9 +484,10 @@ demotes a first letter after keyword word."
              (org-export-with-smart-quotes . t)
              (org-latex-caption-above . '(table))
              (org-latex-default-figure-position . "H")
+             (org-latex-image-default-width . "5cm")
              (org-latex-packages-alist .
-                                       '(("AUTO" "babel" nil
-                                          ("pdflatex" "xelatex"))
+                                       '(("AUTO" "babel" nil ("pdflatex"))
+                                         ("AUTO" "polyglossia" t ("xelatex"))
                                          ("" "cmap" nil ("pdflatex"))
                                          ("" "float" nil
                                           ("pdflatex" "xelatex")))))

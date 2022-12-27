@@ -32,6 +32,7 @@
 (leaf org-agenda                        ;nofmt
   :custom ((org-agenda-files .
                              '("~/agenda.org"
+                               "~/agnia.org"
                                "~/tasks-archive/task-archive.org"))
            (org-agenda-span . 14))
   :bind (("<f9>"      . org-agenda)
