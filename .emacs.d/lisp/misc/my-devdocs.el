@@ -42,6 +42,10 @@
     "Set docsets of `devdocs' for `python-mode'."
     (setq-local devdocs-current-docs '("python~3.11")))
 
+  (defun my-devdocs-latex-hook ()
+    "Set docsets of `devdocs' for `latex-mode'."
+    (setq-local devdocs-current-docs '("latex")))
+
   (defun my-devdocs-emacs-lisp-hook ()
     "Set docsets of `devdocs' for `emacs-lisp-mode'."
     (setq-local devdocs-current-docs '("elisp")))
