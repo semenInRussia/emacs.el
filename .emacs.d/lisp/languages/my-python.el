@@ -29,7 +29,6 @@
 (leaf python-mode
   :ensure t
   :custom (python-shell-interpreter . "python")
-  :hook (python-mode-hook . enable-dabbrev-company-backend)
   :mode "\\.py\\'"
   :major-mode-map python
   :bind (:my-python-local-map
@@ -39,12 +38,6 @@
   :config                               ;nofmt
 
   (leaf pydoc :ensure t)
-
-  (defun enable-dabbrev-company-backend ()
-    "Add `company-dabbrev' backend to `company-backends' for local major mode."
-    (interactive)
-    (setq-local company-backends
-                (cons 'company-dabbrev company-backends)))
 
   (defun my-python-split-multi-imports-in-1-line ()
     "Find all lines importing more then 1 thing from module and split it."
@@ -92,5 +85,15 @@ Active region is region from BEG to END"
         (replace-string-in-region "," ",\n" :beg :end))
       (sp-get (sp-get-sexp) (indent-region-line-by-line :beg :end))))
 
-  (provide 'my-python))
+  (leaf company-jedi
+    :ensure t
+    :after company
+    :custom (jedi:complete-on-dot . t)
+    :config                             ;nofmt
+    (defun my-company-jedi-setup ()
+      (setq-local company-backends '(company-jedi)))
+
+    (add-hook 'python-mode-hook 'my-company-jedi-setup)))
+
+(provide 'my-python)
 ;;; my-python.el ends here
