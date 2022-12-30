@@ -863,10 +863,15 @@ If not found return nil."
            ([remap imenu-anywhere] . 'my-org-db/body)))
 
   (leaf rorg
-    :load-path* "projects/rorg/"
+    :load-path "~/projects/rorg/"
     :bind (:my-org-local-map
            :package org
-           ("]" . rorg-forward-slurp-subtree))))
+           ("-" . 'rorg-splice-subtree)
+           ("0" . 'rorg-wrap-region-or-current-heading)
+           ("]" . 'rorg-forward-slurp-subtree)
+           ("}" . 'rorg-backward-barf-subtree)
+           ("{" . 'rorg-backward-slurp-subtree)
+           ("[" . 'rorg-forward-barf-subtree))))
 
 (provide 'my-org)
 ;;; my-org.el ends here
