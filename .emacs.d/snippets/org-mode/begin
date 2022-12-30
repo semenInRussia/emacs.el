@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: begin
-# key: Beg
+# key: beg
 # --
 
 #+BEGIN_${1:Center}

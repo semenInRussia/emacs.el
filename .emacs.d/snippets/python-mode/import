@@ -1,5 +1,5 @@
 # -*- mode: snippet -*-
 # name: import
-# key: im
+# key: imp
 # --
-import $0
+import
