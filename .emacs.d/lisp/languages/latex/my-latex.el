@@ -531,20 +531,5 @@ If the environment is not given, ask for it using completion."
 
   (add-hook 'LaTeX-mode-hook (lambda () (auto-fill-mode nil))))
 
-(leaf bibtex
-  :after bibtex
-  :major-mode-map bibtex
-  :bind ((:bibtex-mode-map
-          ([remap my-format-expression] . 'bibtex-reformat))
-         (:my-bibtex-local-map
-          ("x"   . 'bibtex-kill-entry)
-          ("d"   . 'bibtex-kill-field)
-          ("e"   . 'bibtex-validate)
-          ("RET" . 'bibtex-url)
-          ("v"   . 'bibtex-yank)))
-  :config                               ;nofmt
-  (leaf company-bibtex :ensure t)
-  (leaf bibtex-utils :ensure t))
-
 (provide 'my-latex)
 ;;; my-latex.el ends here
