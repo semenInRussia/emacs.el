@@ -55,7 +55,7 @@ spaces before [, for example
         (make-string
          ;; it's return spaces at the line start
          (skip-chars-forward " ")
-         ? ))))))
+         ? )))))
 
   (defvar my-lyrics-highlights
     `((,my-lyrics-outline-regexp . font-lock-keyword-face))
