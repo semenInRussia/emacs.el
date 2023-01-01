@@ -527,9 +527,7 @@ If the environment is not given, ask for it using completion."
     :after auctex
     :config (company-auctex-init))
 
-  (leaf my-latex-math-spaces :hook latex-mode)
-
-  (add-hook 'LaTeX-mode-hook (lambda () (auto-fill-mode nil))))
+  (leaf my-latex-math-spaces :hook latex-mode))
 
 (provide 'my-latex)
 ;;; my-latex.el ends here

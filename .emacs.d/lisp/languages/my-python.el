@@ -31,11 +31,15 @@
   :custom (python-shell-interpreter . "python")
   :mode "\\.py\\'"
   :major-mode-map python
+  :hook (python-mode-hook . eglot-ensure)
   :bind (:my-python-local-map
          ("f" . 'py-sort-imports)
          ("o" . 'my-python-optional-type)
          ("p" . 'my-python-split-params))
   :config                               ;nofmt
+
+  (add-to-list 'eglot-server-programs
+               '(python-mode "jedi-language-server"))
 
   (leaf pydoc :ensure t)
 
@@ -59,9 +63,6 @@
             (insert "from " from " import " it)
             (newline))))))
 
-  (advice-add 'py-sort-imports
-              :after 'my-python-split-multi-imports-in-1-line)
-
   (defun my-python-optional-type (beg end)
     "Turn a python type in the active region into optional.
 
@@ -83,17 +84,7 @@ Active region is region from BEG to END"
       (sp-get
           (sp-get-sexp)
         (replace-string-in-region "," ",\n" :beg :end))
-      (sp-get (sp-get-sexp) (indent-region-line-by-line :beg :end))))
-
-  (leaf company-jedi
-    :ensure t
-    :after company
-    :custom (jedi:complete-on-dot . t)
-    :config                             ;nofmt
-    (defun my-company-jedi-setup ()
-      (setq-local company-backends '(company-jedi)))
-
-    (add-hook 'python-mode-hook 'my-company-jedi-setup)))
+      (sp-get (sp-get-sexp) (indent-region-line-by-line :beg :end)))))
 
 (provide 'my-python)
 ;;; my-python.el ends here

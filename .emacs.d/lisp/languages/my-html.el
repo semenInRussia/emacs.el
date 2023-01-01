@@ -40,11 +40,10 @@
   "Return list from the maps for each of `my-html-modes'."
   (-map 'my-major-mode-to-map my-html-modes))
 
-(leaf web-mode
+(leaf mhtml-mode
   :ensure t
+  :mode "\\.html$"
   :major-mode-map `(html ,my-html-modes)
-  :custom ((web-mode-script-padding . 1)
-           (web-mode-block-padding  . 0))
   :config                               ;nofmt
   (leaf auto-rename-tag
     :ensure t
@@ -63,15 +62,13 @@
                 ([remap sp-change-enclosing]  . tagedit-kill-attribute))
               (my-html-modes-maps))))
 
-  (leaf company-web
-    :ensure t
-    :push ((company-backends . 'company-web-html)))
+  (leaf emmet-mode :ensure t :hook mhtml-mode-hook)
 
   (leaf impatient-mode
     :ensure t
     :defun impatient-mode
     :bind (:my-html-local-map
-           :package web-mode
+           :package mhtml-mode
            ("e" . my-enable-impatient-mode))
     :config                             ;nofmt
     (defun my-enable-impatient-mode ()

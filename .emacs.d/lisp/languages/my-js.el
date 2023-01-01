@@ -29,42 +29,12 @@
 
 (defun my-enable-flycheck () (flycheck-mode 1))
 
-(leaf js2-mode
+(leaf js
   :ensure t
   :mode "\\.js$"
-  :custom ((js2-allow-rhino-new-expr-initializer . nil)
-           (js2-auto-indent-p . nil)
-           (js2-enter-indents-newline . nil)
-           (js2-global-externs .
-                               '("module"
-                                 "require"
-                                 "buster"
-                                 "sinon"
-                                 "assert"
-                                 "refute"
-                                 "setTimeout"
-                                 "clearTimeout"
-                                 "setInterval"
-                                 "clearInterval"
-                                 "location"
-                                 "__dirname"
-                                 "console"
-                                 "JSON"))
-           (js2-idle-timer-delay . 0.1)
-           (js2-indent-on-enter-key . t)
-           (js2-mirror-mode . nil)
-           (js2-strict-inconsistent-return-warning . nil)
-           (js2-auto-indent-p . t)
-           (js2-include-rhino-externs . nil)
-           (js2-include-gears-externs . nil)
-           (js2-concat-multiline-strings . 'eol)
-           (js2-rebind-eol-bol-keys . nil)
-           (js2-show-parse-errors . nil)
-           (js2-strict-missing-semi-warning . nil)
-           (js2-strict-trailing-comma-warning . t)
-           (js-indent-level . 2))
-  :hook (js2-mode . my-enable-flycheck)
+  :hook (js-mode-hook . eglot-ensure)
   :config                               ;nofmt
+  (add-to-list 'eglot-server-programs '(js-mode "flow"))
   (leaf web-mode :ensure t)
   (leaf js-comint :ensure t))
 

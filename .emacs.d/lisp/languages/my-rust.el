@@ -28,17 +28,8 @@
 ;;; Code:
 (leaf rust-mode
   :ensure t
-  :config                               ;nofmt
-  (leaf racer                           ;nofmt
-    :ensure t
-    :hook ((rust-mode-mode  . racer-mode)
-           ;; (racer-mode-mode . eldoc-mode)
-           ))
-
-  (leaf flycheck-rust
-    :ensure t
-    :require t
-    :config (flycheck-rust-setup)))
+  :hook (rust-mode-hook . eglot)
+  :config (add-to-list 'eglot-server-programs '(rust-mode . "rust-analyzer")))
 
 (provide 'my-rust)
 ;;; my-rust.el ends here

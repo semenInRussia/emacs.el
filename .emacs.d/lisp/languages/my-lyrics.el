@@ -57,6 +57,9 @@ spaces before [, for example
          (skip-chars-forward " ")
          ? )))))
 
+  (defvar my-lyrics-outline-regexp "^ *\\[.*?]"
+    "Regexp indicating outline heading line in `my-lyrics-mode'.")
+
   (defvar my-lyrics-highlights
     `((,my-lyrics-outline-regexp . font-lock-keyword-face))
     "Thing for `my-lyrics-mode' font-lock.")
@@ -70,9 +73,6 @@ Outline headings demote lines which has the following form
 [intro]
 
 instead of intro can be other word")
-
-  (defvar my-lyrics-outline-regexp "^ *\\[.*?]"
-    "Regexp indicating outline heading line in `my-lyrics-mode'.")
 
   (define-derived-mode my-lyrics-mode text-mode "Lyrics"
     "Major mode to edit lyrics for songs (panches)."
