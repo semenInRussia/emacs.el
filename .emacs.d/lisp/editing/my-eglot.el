@@ -36,8 +36,9 @@
   :custom `(;; Performance
             (gc-cons-threshold . 100000000)
             (read-process-output-max . ,(* 1024 1024)) ;; 1mb
+            (eglot-send-changes-idle-time . 1)         ; in seconds
             )
-  :custom-face (eglot-highlight-symbol-face . '((t (:background ))))
+  :custom-face (eglot-highlight-symbol-face . '((t (:inherit lazy-highlight))))
   :hook (eglot-managed-mode-hook . turn-off-flycheck)
   :bind ((:xah-fly-command-map
           :package xah-fly-keys
