@@ -43,10 +43,21 @@
           ("v"   . 'bibtex-yank)))
   :config                               ;nofmt
   (leaf helm-bibtex :ensure t)
-  (leaf company-bibtex
-    :ensure t
-    :config (add-to-list 'company-backends 'company-bibtex))
   (leaf bibtex-utils :ensure t))
+
+(leaf company-bibtex
+  :ensure (company-bibtex :repo "semenInRussia/company-bibtex")
+  :hook (org-mode-hook . company-bibtex-org-mode-hook)
+  :custom (company-bibtex-org-citation-regex . "\\(ebib:\\|cite:@\\)")
+  :config (add-to-list 'company-backends 'company-bibtex)
+  (defun company-bibtex-org-mode-hook ()
+    "Hook for `org-mode' enabling `comapany-bibtex' for current buffer."
+    (interactive "P")
+    (->>
+     company-backends
+     (--remove
+      (and (listp it) (eq (car it) 'company-bbdb)))
+     (setq-local company-backends))))
 
 (leaf latex
   :after tex-mode
