@@ -65,6 +65,9 @@
           ("y"   . org-attach)
           ("z"   . org-toggle-comment)
 
+          ;; Change the Priority of a Subtree
+          ("," . org-priority)
+
           ;; Org Babel
           ("b t" . org-babel-tangle)
           ("b f" . org-babel-tangle-file)
@@ -124,11 +127,11 @@
         "Iau" "I am use")
   :config                               ;nofmt
   (leaf org-editing                     ;nofmt
-    :config                             ;nofmt
-    (defun my-org-clear-subtree ()
-      "Kill subtree at the position, and activate insertion mode."
-      (org-cut-subtree)
-      (xah-fly-insert-mode-activate))
+    :config (defun my-org-clear-subtree
+                ()
+              "Kill subtree at the position, and activate insertion mode."
+              (org-cut-subtree)
+              (xah-fly-insert-mode-activate))
 
     (defun my-org-table-eval-formula-in-field ()
       "Eval formula with `orgtbl' syntax for the current field of the table."
@@ -339,7 +342,7 @@ regexp"
        (t
         (just-call-on-backward-char*
          (and
-          (looking-back my-autoformat-sentence-end)
+          (looking-back my-autoformat-sentence-end nil)
           (looking-at-p "[[:alpha:]]")
           (upcase-char 1))))))
 
@@ -360,7 +363,7 @@ regexp"
        (and
         (looking-at-p "[[:alpha:]]")
         (my-org-list-item-p)
-        (looking-back my-org-list-item-prefix-regexp)
+        (looking-back my-org-list-item-prefix-regexp nil)
         (upcase-char 1))))
 
     (defun my-org-list-item-p ()
