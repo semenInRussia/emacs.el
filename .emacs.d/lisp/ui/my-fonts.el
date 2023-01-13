@@ -36,6 +36,24 @@
 
 (set-face-attribute 'default nil :font my-fonts-main :height 250)
 
+(set-fontset-font t 'unicode
+                  (font-spec :font "all-the-icons")
+                  nil 'append)
+(set-fontset-font t 'unicode
+                  (font-spec :font "file-icons")
+                  nil 'append)
+(set-fontset-font t 'unicode
+                  (font-spec :font "Material Icons")
+                  nil 'append)
+(set-fontset-font t 'unicode
+                  (font-spec :font "FontAwesome")
+                  nil 'append)
+(set-fontset-font t 'unicode
+                  (font-spec :font "Weather Icons")
+                  nil 'append)
+
+(leaf unicode-fonts :ensure t :config (unicode-fonts-setup))
+
 (global-hl-line-mode 1)
 
 (provide 'my-fonts)
