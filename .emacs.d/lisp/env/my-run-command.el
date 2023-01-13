@@ -36,7 +36,7 @@
          ("S-<f5>"  . my-run-last-command))
   :config                               ;nofmt
   (leaf run-command-recipes
-    :ensure t
+    :load-path "~/projects/emacs-run-command-recipes"
     :require t
     :defun run-command-recipes-use-all
     :config (run-command-recipes-use-all))
