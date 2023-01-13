@@ -29,8 +29,12 @@
 ;; List of my favorite themes:
 ;; - `gruber-darker'
 ;; - `doom-monokai-classic'
+;; - `solarized'
 
-(eval-after-load 'doom-themes '(load-theme 'doom-acario-dark t))
+(eval-after-load 'doom-themes '(load-theme 'doom-monokai-machine t))
+
+(custom-set-faces
+ `(region ((t (:background "white" :foreground "black"))))) ;
 
 (provide 'my-current-theme)
 ;;; my-current-theme.el ends here
