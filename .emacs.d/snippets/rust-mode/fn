@@ -2,6 +2,6 @@
 # name: fn
 # key: f
 # --
-fn ${1:main} (${args}) {
+${3:async }fn ${1:main}$5 (${2:args})$4 {
    $0
 }

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: impl
+# key: i
+# --
+impl$2 $1 {
+   $0
+}
