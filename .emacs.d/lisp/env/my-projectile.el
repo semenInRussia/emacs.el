@@ -64,11 +64,10 @@ ROOT"
       (puthash root
                (my-no-cache-project-files root)
                my-project-files-hash))
-    (--when-let
-        (gethash root my-project-files-hash)
+    (let ((files (gethash root my-project-files-hash)))
       (if relatieve-paths
-          (--map (s-chop-prefix root (f-full it)) it)
-        it))))
+          (--map (s-chop-prefix root (f-full it)) files)
+        files))))
 
 (defun my-no-cache-project-files (root)
   "Return filenames list of the project at ROOT, without caching."
@@ -80,6 +79,7 @@ ROOT"
   "Return files list of ROOT each of it don't match with one of REGEXPS."
   (--reduce-from
    (cond
+    ;; don't modify
     ((my-matches-with-one-of-p it regexps)
      acc)
     ((f-directory-p it)
