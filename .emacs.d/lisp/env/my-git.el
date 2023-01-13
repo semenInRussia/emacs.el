@@ -60,7 +60,7 @@
 (leaf git-modes :ensure t)
 
 (leaf helm-gitignore
-  :load-path* "env/"
+  :load-path* "lisp/env/"
   :fast-exec ("Generate Gitignore" 'helm-gitignore))
 
 (provide 'my-git)
