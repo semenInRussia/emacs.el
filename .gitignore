@@ -89,3 +89,5 @@ devdocs/
 /poems/
 /lapce/
 /.emacs.d/annotations
+/.emacs.d/.python-environments/
+/sols/
