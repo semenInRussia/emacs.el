@@ -33,7 +33,12 @@
            (org-refile-targets . '((org-agenda-files :maxlevel . 2)))
            (org-startup-folded . t)
            (org-startup-indented . t)
-           (org-startup-with-inline-images . t))
+           (org-startup-with-inline-images . t)
+           (org-file-apps .
+                          '(("\\.\\'" . default)
+                            ("\\.pdf\\'" . "start %s")
+                            ("\\.png\\'" . "start %s")
+                            ("\\.jpg\\'" . "start %s"))))
   :major-mode-map (org (org-mode))
   :hook ((org-mode-hook . visual-fill)
          (org-mode-hook . aas-activate-for-major-mode)
@@ -867,6 +872,7 @@ If not found return nil."
 
   (leaf rorg
     :load-path "~/projects/rorg/"
+    :require t
     :bind (:my-org-local-map
            :package org
            ("-" . 'rorg-splice-subtree)
