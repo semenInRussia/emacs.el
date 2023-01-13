@@ -30,12 +30,14 @@
 (leaf pomidor
   :ensure t
   :require t
-  :bind ("<f12>" . pomidor)
+  :bind (("<f12>" . pomidor)
+         (:pomidor-mode-map ("Q" . kill-buffer)))
   :custom `((pomidor-sound-tack    . nil)
             (pomidor-seconds       . 1800) ; 30min
             (pomidor-sound-tick    . nil)
             (pomidor-confirm-end-break . nil))
-  :config (pomidor))
+  :config (pomidor)
+  :advice ((:after pomidor xah-fly-insert-mode-activate)))
 
 (provide 'my-pomidor)
 ;;; my-pomidor.el ends here
