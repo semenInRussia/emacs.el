@@ -91,3 +91,4 @@ devdocs/
 /.emacs.d/annotations
 /.emacs.d/.python-environments/
 /sols/
+/tree-sitter/
