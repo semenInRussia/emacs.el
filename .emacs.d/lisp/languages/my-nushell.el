@@ -25,6 +25,9 @@
 
 ;;; Code:
 
+(leaf nushell-mode
+  :ensure (nushell-mode :host github :repo "azzamsa/emacs-nushell"))
+
 (leaf yenushell
   :load-path "~/projects/yenushell/"
   :mode ("\\.nu$" . yenushell-mode))
