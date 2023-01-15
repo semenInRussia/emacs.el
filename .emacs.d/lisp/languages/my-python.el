@@ -36,13 +36,9 @@
          ("f" . 'py-sort-imports)
          ("o" . 'my-python-optional-type)
          ("p" . 'my-python-split-params))
+  :init (add-to-list 'eglot-server-programs
+                     '(python-mode "pyright-langserver" "--stdio"))
   :config                               ;nofmt
-
-  (add-to-list 'eglot-server-programs
-               '(python-mode "jedi-language-server"))
-
-  (leaf pydoc :ensure t)
-
   (defun my-python-split-multi-imports-in-1-line ()
     "Find all lines importing more then 1 thing from module and split it."
     (interactive)
