@@ -32,6 +32,12 @@
   :major-mode-map (racket               ;nofmt
                    :modes (racket-mode racket-repl-mode)
                    :parent my-lisp-map)
+  :defvar (my-racket-meta-return-functions
+           my-racket-meta-return-cond-clauses-expression-names)
+  :defun ((my-racket-meta-return-contracted .
+                                            (my-racket
+                                             my-racket-meta-return-test-case
+                                             my-racket-meta-return-let)))
   :bind ((:racket-mode-map               ;nofmt
           ("M-RET" . 'my-racket-meta-return))
          (:my-racket-local-map
@@ -48,6 +54,7 @@
 
   (defcustom my-racket-meta-return-functions nil
     "List of functions for M-ret in racket.
+
 Each function should return t, if it should be called and should stop next
 calls of functions."
     :type '(repeat function)
