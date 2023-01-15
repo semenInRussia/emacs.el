@@ -28,6 +28,7 @@
 ;;; Code:
 (leaf helm-swoop
   :ensure t
+  :after helm
   :bind ((:xah-fly-command-map
           :package xah-fly-keys
           ("'"       . helm-swoop)
