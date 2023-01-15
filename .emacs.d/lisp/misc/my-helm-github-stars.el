@@ -28,9 +28,10 @@
 ;;; Code:
 (leaf helm-github-stars
   :ensure t
-  :commands helm-github-stars-fetch
+  :after helm
+  :fast-exec ("View Github Stars" 'helm-github-stars-fetch)
   :custom (helm-github-stars-username . "semeninrussia")
-  :fast-exec ("View Github Stars" 'helm-github-stars-fetch))
+  :commands helm-github-stars-fetch)
 
 (provide 'my-helm-github-stars)
 ;;; my-helm-github-stars.el ends here

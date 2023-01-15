@@ -28,7 +28,9 @@
 ;;; Code:
 (leaf run-command
   :ensure t
-  :defun run-command--run
+  :after helm
+  :defun ((run-command--run--set-last-recipe . my-run-command)
+          run-command--run)
   :custom (run-command-completion-method . 'helm)
   :bind (:xah-fly-command-map
          :package xah-fly-keys

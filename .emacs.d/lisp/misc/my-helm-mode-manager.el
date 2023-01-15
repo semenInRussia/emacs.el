@@ -28,7 +28,7 @@
 ;;; Code:
 (leaf helm-mode-manager
   :ensure t
-  :config				; nofmt
+  :after helm
   :fast-exec (("Switch Major Mode" 'helm-switch-major-mode)
               ("Enable Minor Mode" 'helm-enable-minor-mode)
               ("Disable Minor Mode" 'helm-disable-minor-mode)))

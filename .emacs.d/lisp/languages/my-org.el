@@ -481,6 +481,7 @@ demotes a first letter after keyword word."
 
   (leaf helm-org
     :ensure t
+    :after helm
     :bind (:org-mode-map
            :package org
            ([remap helm-imenu] . helm-org-in-buffer-headings)))

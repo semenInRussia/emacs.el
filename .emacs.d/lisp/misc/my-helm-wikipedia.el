@@ -26,7 +26,7 @@
 ;; My config for `helm-wikipedia'
 
 ;;; Code:
-(leaf helm-wikipedia :ensure t)
+(leaf helm-wikipedia :after helm :ensure t)
 
 (provide 'my-helm-wikipedia)
 ;;; my-helm-wikipedia.el ends here

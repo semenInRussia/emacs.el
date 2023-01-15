@@ -42,7 +42,7 @@
           ("RET" . 'bibtex-url)
           ("v"   . 'bibtex-yank)))
   :config                               ;nofmt
-  (leaf helm-bibtex :ensure t)
+  (leaf helm-bibtex :ensure t :after helm)
   (leaf bibtex-utils :ensure t))
 
 (leaf company-bibtex

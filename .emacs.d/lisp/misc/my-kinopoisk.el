@@ -27,8 +27,9 @@
 
 ;;; Code:
 (leaf helm-kinopoisk
-  :require t
-  :load-path "~/projects/emacs-kinopoisk")
+  :after helm
+  :load-path "~/projects/emacs-kinopoisk"
+  :require t)
 
 (provide 'my-kinopoisk)
 ;;; my-kinopoisk.el ends here

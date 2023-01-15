@@ -183,6 +183,7 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
   :config                               ;nofmt
   (leaf helm-projectile
     :ensure t
+    :after helm
     :defvar (helm-projectile-file-actions helm-pattern)
     :defun ((helm-ff-prefix-filename  . helm-files)
             (with-helm-current-buffer . helm-lib)

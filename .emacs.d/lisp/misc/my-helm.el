@@ -28,7 +28,7 @@
 ;;; Code:
 (leaf helm
   :ensure t
-  :defvar helm-completion-style
+  :after doom-modeline
   :custom ((helm-M-x-fuzzy-match   . t)
            (helm-buffers-fuzzy-matching    . t)
            (helm-recentf-fuzzy-match       . t)
@@ -46,6 +46,7 @@
   :global-minor-mode helm-mode
   :fast-exec (("Get Color" 'helm-colors)
               ("Search in Goggle" 'helm-google-suggest))
+  :defvar helm-completion-style
   :config                               ;nofmt
   (leaf helm-ext
     :ensure t
