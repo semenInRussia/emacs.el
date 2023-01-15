@@ -52,7 +52,11 @@
                   (font-spec :font "Weather Icons")
                   nil 'append)
 
-(leaf unicode-fonts :ensure t :config (unicode-fonts-setup))
+(leaf unicode-fonts
+  :ensure t
+  :config (unicode-fonts-setup)
+  (setq unicode-fonts--instructions
+        (-remove-item '... unicode-fonts--instructions)))
 
 (global-hl-line-mode 1)
 
