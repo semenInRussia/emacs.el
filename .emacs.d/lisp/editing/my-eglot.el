@@ -39,14 +39,18 @@
             (eglot-send-changes-idle-time . 1)         ; in seconds
             )
   :custom-face (eglot-highlight-symbol-face . '((t (:inherit lazy-highlight))))
+  ;; `eglot' use `flymake' instead of `flycheck', so i disable `flycheck'
   :hook (eglot-managed-mode-hook . turn-off-flycheck)
   :bind ((:xah-fly-command-map
           :package xah-fly-keys
           ("SPC SPC 7"   . 'eglot-rename)
           ("SPC SPC RET" . 'eglot-code-actions)
-          ("SPC SPC i" . 'eglot-code-action-organize-imports))
+          ("SPC SPC i"   . 'eglot-code-action-organize-imports))
          (:eglot-mode-map
           ([remap my-format-expression] . 'eglot-format)))
+  :fast-exec (("Start a LSP Server for Current Buffer" 'eglot)
+              ("Reconnect the LSP Server" 'eglot-reconnect)
+              ("Disable the LSP Server" 'eglot-shutdown))
   :config                               ;nofmt
   (leaf flymake
     :require t
