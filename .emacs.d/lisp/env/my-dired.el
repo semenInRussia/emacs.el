@@ -41,7 +41,6 @@
            dired-jump
            dired-get-file-for-visit)
           (helm-open-file-with-default-tool . helm-utils))
-  :custom (lpr-command . "PDFToPrinter") ; Command for printing file
   :bind (:dired-mode-map
          ("SPC"     . nil)                ; make command at space empty prefix
 
@@ -81,6 +80,8 @@
          (","       . xah-next-window-or-frame))
 
   :config                               ;nofmt
+  (leaf async :config (dired-async-mode 1))
+
   (defmacro my-dired-save-excursion (&rest body)
     "Evaluate BODY without change a file/directory at point."
     (declare (indent 0))
@@ -189,6 +190,8 @@ Return new name of FILE"
            ("l"   . 'dired-open-file)
            ("RET" . 'dired-open-file))
     :push ((dired-open-functions . 'my-dired-open-function-pdf))
+    :defvar dired-open-functions
+    :defun (my-dired . (my-pdf-file my-try-open-pdf-file))
     :config                             ;nofmt
     (defun my-dired-open-function-pdf ()
       "Open function for `dired-open-functions'."
@@ -450,6 +453,9 @@ string"
     (advice-add it :after
                 (lambda (&rest _) (xah-fly-insert-mode-activate))
                 '((name . xah-fly-insert-mode-activate))))
+
+  ;; Command for printing file
+  (with-eval-after-load 'lpr (setq lpr-command "PDFToPrinter"))
 
   (remove-hook 'dired-mode-hook 'dired-mode))
 
