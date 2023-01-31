@@ -26,8 +26,13 @@
 ;; My configuration for `run-command'
 
 ;;; Code:
+
 (leaf run-command
-  :ensure t
+  :ensure (run-command
+           :type git
+           :host github
+           :repo "bard/emacs-run-command"
+           :branch "develop")
   :after helm
   :defun ((run-command--run--set-last-recipe . my-run-command)
           run-command--run)
