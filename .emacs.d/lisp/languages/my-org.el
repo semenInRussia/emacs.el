@@ -72,14 +72,12 @@
 
           ;; Change the Priority of a Subtree
           ("," . org-priority)
-
           ;; Org Babel
           ("b t" . org-babel-tangle)
           ("b f" . org-babel-tangle-file)
           ("b e" . org-babel-execute)
           ("b e" . org-edit-special))
          (:org-src-mode-map ([remap save-buffer] . org-edit-src-exit))
-
          (:my-org-local-map
           ;; Manipulations with a table
           ("t n" . org-table-create-or-convert-from-region)
@@ -858,12 +856,6 @@ If not found return nil."
       "Enable `embrace' specially for `org-mode'."
       (embrace-org-mode-hook)
       (setq-local embrace-show-help-p nil)))
-
-  (leaf org-rainbow-tags
-    :ensure (org-rainbow-tags
-             :host github
-             :repo "KaratasFurkan/org-rainbow-tags")
-    :require t)
 
   (leaf my-org-db                       ;nofmt
     :require t
