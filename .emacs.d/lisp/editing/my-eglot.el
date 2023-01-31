@@ -33,6 +33,7 @@
 
 (leaf eglot
   :ensure t
+  :disabled t
   :custom `(;; Performance
             (gc-cons-threshold . 100000000)
             (read-process-output-max . ,(* 1024 1024)) ;; 1mb
