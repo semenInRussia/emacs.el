@@ -30,11 +30,16 @@
 ;; - `gruber-darker'
 ;; - `doom-monokai-classic'
 ;; - `solarized'
+;; - `flatland-theme'
 
-(eval-after-load 'doom-themes '(load-theme 'doom-monokai-machine t))
+(require 'flatland-theme-autoloads)
+
+(with-eval-after-load 'flatland-theme-autoloads
+  (load-theme 'flatland t))
 
 (custom-set-faces
- `(region ((t (:background "white" :foreground "black"))))) ;
+ `(region
+   ((t (:background "white" :foreground "black" :inherit t)))))
 
 (provide 'my-current-theme)
 ;;; my-current-theme.el ends here

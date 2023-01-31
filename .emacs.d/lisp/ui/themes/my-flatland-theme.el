@@ -1,12 +1,10 @@
-;;; my-doom-themes.el --- My file loading `doom-themes'
+;;; my-flatland-theme.el --- My configuration of `flatland-theme' -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022 Semen Khramtsov
+;; Copyright (C) 2022 semenInRussia
 
-;; Author: Semen Khramtsov <hrams205@gmail.com>
+;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
-
-;; This file is not part of GNU Emacs.
+;; Homepage: https://github.com/semeninrussia/emacs.el
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -19,14 +17,15 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
-;; My file loading `doom-themes'
+;; My configuration of `flatland-theme'.
 
 ;;; Code:
-(leaf doom-themes :ensure t)
 
-(provide 'my-doom-themes)
-;;; my-doom-themes.el ends here
+(leaf flatland-theme :ensure t)
+
+(provide 'my-flatland-theme)
+;;; my-flatland-theme.el ends here
