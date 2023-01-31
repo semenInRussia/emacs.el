@@ -33,7 +33,7 @@
   ;; :ensure-system-package (("hoogle" . "cabal install hoogle"))
   :hook ((haskell-mode-hook . haskell-indent-mode)
          (haskell-mode-hook . interactive-haskell-mode)
-         (haskell-mode-hook . eglot-ensure))
+         (haskell-mode-hook . lsp-bridge-mode))
   :bind (:my-haskell-local-map          ;nofmt
          ("e" . haskell-compile)
          ("i" . haskell-add-import)

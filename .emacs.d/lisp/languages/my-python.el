@@ -28,16 +28,15 @@
 ;;; Code:
 (leaf python-mode
   :ensure t
-  :custom (python-shell-interpreter . "python")
   :mode "\\.py\\'"
+  :custom (python-shell-interpreter . "python")
+  :hook (python-mode-hook . lsp-bridge-mode)
   :major-mode-map python
-  :hook (python-mode-hook . eglot-ensure)
   :bind (:my-python-local-map
-         ("f" . 'py-sort-imports)
-         ("o" . 'my-python-optional-type)
-         ("p" . 'my-python-split-params))
-  :init (add-to-list 'eglot-server-programs
-                     '(python-mode "pyright-langserver" "--stdio"))
+         :package org
+         ("f" . py-sort-imports)
+         ("o" . my-python-optional-type)
+         ("p" . my-python-split-params))
   :config                               ;nofmt
   (defun my-python-split-multi-imports-in-1-line ()
     "Find all lines importing more then 1 thing from module and split it."

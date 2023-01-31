@@ -31,10 +31,11 @@
 
 (leaf js
   :ensure t
+  :after lsp-bridge
   :mode "\\.js$"
-  :hook (js-mode-hook . eglot-ensure)
   :config                               ;nofmt
-  (add-to-list 'eglot-server-programs '(js-mode "flow"))
+  (add-to-list 'lsp-bridge-single-lang-server-mode-list
+               '(js-mode . "typescript"))
   (leaf web-mode :ensure t)
   (leaf js-comint :ensure t))
 

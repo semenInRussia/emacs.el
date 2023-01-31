@@ -28,25 +28,29 @@
 ;;; Code:
 (leaf rust-mode
   :ensure t
-  :hook (rust-mode-hook . eglot-ensure)
+  :hook ((rust-mode-hook . my-rust-whitespace-mode)
+         (rust-mode-hook . lsp-bridge-mode))
   :major-mode-map rust
   :bind (:my-rust-local-map
          ("p" . 'my-rust-toggle-pub)
          ("t" . 'my-rust-visit-Cargo.toml)
          ("m" . 'rust-toggle-mutability))
-  :config (add-to-list 'eglot-server-programs
-                       '(rust-mode "rustup" "run" "stable" "rust-analyzer"))
-
+  :config                               ;nofmt
   (defcustom my-rust-maybe-pub-words
     '(fn mod struct enum type)
     "List of the symbols indicating words which can be public in Rust."
     :type '(repeat symbol)
     :group 'my)
 
-  (defun my-rust-visit-Cargo.toml ()
-    "Visit Cargo.toml file of current rust crate."
+  (defun my-rust-toggle-pub ()
+    "Toggle public/private scope of the current rust function/imple/struct."
     (interactive)
-    (find-file (my-rust-find-Cargo.toml-in-directory)))
+    (let* ((node (ignore-errors (tsc-root-node tree-sitter-tree)))
+           (patterns )
+           (query
+            (tsc-make-query tree-sitter-language '[(function_item)]))
+           (nodes-to-fold (tsc-query-matches query node #'ignore)))
+      (goto-char (car (aref nodes-to-fold 0)))))
 
   (defun my-rust-find-Cargo.toml-in-directory (&optional dir)
     "Find closest Cargo.toml in the DIR and return path to it."
@@ -57,6 +61,11 @@
           cargo.toml
         (my-rust-find-Cargo.toml-in-directory (f-parent dir)))))
 
+  (defun my-rust-visit-Cargo.toml ()
+    "Visit Cargo.toml file of current rust crate."
+    (interactive)
+    (find-file (my-rust-find-Cargo.toml-in-directory)))
+
   (leaf embrace
     :after embrace
     :hook (rust-mode-hook . my-rust-embrace-hook)
@@ -66,7 +75,13 @@
               (embrace-add-pair ?v "Vec<" ">")
               (embrace-add-pair ?b "Box<" ">")
               (embrace-add-pair ?o "Option<" ">")
-              (embrace-add-pair ?r "Result<" ">"))))
+              (embrace-add-pair ?r "Result<" ">")))
+
+  (defun my-rust-whitespace-mode ()
+    "Change the `whitespace-mode' for `rust-mode'."
+    (interactive)
+    (setq-local whitespace-line-column 100)
+    whitespace-line-column))
 
 (provide 'my-rust)
 ;;; my-rust.el ends here
