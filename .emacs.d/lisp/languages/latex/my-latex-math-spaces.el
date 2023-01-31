@@ -51,12 +51,13 @@ arguments: 1 left number/expression and 1 rigth number/expression.  So,
 In that list openning and closing parens should be added separately."
   :type '(repeat string))
 
+;;;###autoload
 (defvar my-latex-math-spaces-do-hook nil
   "Hooks which will be run when called `my-latex-math-spaces-do'.")
 
 (define-minor-mode my-latex-math-spaces-mode
   "Minor mode which automatically insert spaces in the LaTeX math."
-  :init-value t
+  :init-value nil
   (if my-latex-math-spaces-mode
       (add-hook 'post-self-insert-hook 'my-latex-math-spaces-do nil t)
     (remove-hook 'post-self-insert-hook 'my-latex-math-spaces-do t)))

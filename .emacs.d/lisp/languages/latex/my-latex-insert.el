@@ -197,8 +197,12 @@ COMMAND is pair from the key which will be activate that command, and function
 which will be do insertion."
   (insert (symbol-name (cdr command))))
 
+;;;###autoload
 (define-minor-mode my-latex-expansion-mode
-  "Which expands certain text fragments to LaTeX objects."
+  "Minor mode which complete text snippets for LaTeX after press dot.
+
+List of the \"snippets\" you can learn using
+function `my-latex-insert-commands-help'"
   :init-value nil
   (if my-latex-expansion-mode
       (progn (aas-mode +1) (aas-activate-keymap 'latex-mode))
@@ -235,7 +239,7 @@ the minibuffer."
     (my-latex-goto-graphicspath)
     (forward-char -1)
     (sp-get
-	(sp-get-enclosing-sexp)
+        (sp-get-enclosing-sexp)
       (delete-region :beg-in :end-in)
       (--each paths (insert "{" it "}")))))
 
@@ -245,7 +249,7 @@ the minibuffer."
     (my-latex-goto-graphicspath)
     (forward-char -1)
     (sp-get
-	(sp-get-enclosing-sexp)
+        (sp-get-enclosing-sexp)
       (->>
        (buffer-substring-no-properties :beg-in :end-in)
        (s-match-strings-all "{\\(.*\\)}")
@@ -326,7 +330,7 @@ downloaded file"
      (s-match "\\\\usepackage\\(\\[.*\\]\\)?{\\(.*\\)}" it)))))
 
 (my-latex-expand-define "wt" my-latex-insert-wrap-table ;nofmt
-			(preamble ;nofmt
+                        (preamble ;nofmt
                          wrapfig-pos
                          width
                          &optional
@@ -346,7 +350,7 @@ PLACEMENT"
   (my-latex--insert-inner-of-table preamble centering-p))
 
 (my-latex-expand-define "t" my-latex-insert-table ;nofmt
-			(preamble &optional placement centering-p)
+                        (preamble &optional placement centering-p)
   "Insert the LaTeX environment table to the current buffer with PREAMBLE.
 
 If CENTERING-P is non-nil make table centered.  Pass to the environment
@@ -392,7 +396,7 @@ PREAMBLE"
   (my-latex-insert-env "center"))
 
 (my-latex-expand-define "tr" my-latex-insert-tabular
-	                (preamble)
+                        (preamble)
   "Insert the latex environment tabular."
   (interactive (list (my-latex-read-preamble)))
   (my-latex-insert-env "tabular" preamble))

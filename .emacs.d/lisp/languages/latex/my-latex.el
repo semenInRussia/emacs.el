@@ -56,9 +56,9 @@
   :hook ((LaTeX-mode-hook . my-latex-find-master-file)
          (LaTeX-mode-hook . my-latex-expansion-mode)
          (LaTeX-mode-hook . visual-fill)
-         (LaTeX-mode-hook . turn-off-flycheck))
+         (LaTeX-mode-hook . turn-off-flycheck)
+         (LaTeX-mode-hook . my-latex-disable-auto-fill))
   :major-mode-map (latex (latex-mode))
-  :require calc-lang
   :bind (:my-latex-local-map
          ("="  . my-calc-simplify-region-copy)
          ("f"  . my-calc-simplify-region-change)
@@ -67,6 +67,7 @@
          ("\\" . my-latex-equation-to-split)
          ("x"  . my-latex-kill-section))
   :config                               ;nofmt
+  (require 'calc-lang)
   (require 'font-latex)
 
   (defcustom my-latex-master-files-alist
@@ -156,7 +157,7 @@
 
   (leaf my-latex-insert
     :load-path* "lisp/languages/latex/"
-    :require t)
+    :hook (LaTeX-mode-hook . my-latex-expansion-mode))
 
   (leaf yasnippet
     :bind (:yas-keymap
@@ -527,7 +528,12 @@ If the environment is not given, ask for it using completion."
     :after auctex
     :config (company-auctex-init))
 
-  (leaf my-latex-math-spaces :hook latex-mode))
+  (leaf my-latex-math-spaces :hook latex-mode)
+
+  (defun my-latex-disable-auto-fill ()
+    "Disable `auto-fill-mode'."
+    (interactive)
+    (auto-fill-mode 0)))
 
 (provide 'my-latex)
 ;;; my-latex.el ends here
