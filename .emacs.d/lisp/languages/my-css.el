@@ -28,6 +28,7 @@
 ;;; Code:
 
 (leaf css-mode
+  :config                               ;nofmt
   (leaf css-eldoc
     :ensure t
     :hook (((css-mode-hook web-mode-hook)
@@ -36,6 +37,7 @@
   (leaf helm-color
     :commands (my-css-pick-color)
     :ensure helm
+    :defun (helm-colors-get-rgb)
     :bind (:css-mode-map :package css-mode ("#" . 'my-css-pick-color))
     :config                             ;nofmt
     (defun my-css-pick-color ()
