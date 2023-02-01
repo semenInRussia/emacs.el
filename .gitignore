@@ -92,3 +92,7 @@ devdocs/
 /.emacs.d/.python-environments/
 /sols/
 /tree-sitter/
+/.minecraft/
+/.tlauncher/
+/Mozilla/
+/discord/
