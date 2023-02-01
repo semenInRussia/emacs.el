@@ -32,10 +32,10 @@
 ;; - `solarized'
 ;; - `flatland-theme'
 
-(require 'flatland-theme-autoloads)
+(require 'monokai-theme-autoloads)
 
-(with-eval-after-load 'flatland-theme-autoloads
-  (load-theme 'flatland t))
+(with-eval-after-load 'monokai-theme-autoloads
+  (load-theme 'monokai t))
 
 (custom-set-faces
  `(region
