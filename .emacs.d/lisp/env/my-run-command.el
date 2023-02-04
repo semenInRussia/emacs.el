@@ -36,7 +36,8 @@
   :after helm
   :defun ((run-command--run--set-last-recipe . my-run-command)
           run-command--run)
-  :custom (run-command-completion-method . 'helm)
+  :custom ((run-command-completion-method . 'helm)
+           (run-command-default-runner . #'run-command-runner-compile))
   :bind (:xah-fly-command-map
          :package xah-fly-keys
          ("SPC , c" . run-command)
