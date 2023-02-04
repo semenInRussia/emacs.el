@@ -44,8 +44,8 @@
           (my-drag-p . my-drag))
   :custom ((doom-modeline-buffer-file-name-style . 'buffer-name)
            (doom-modeline . 'buffer-name)
-           (doom-modeline-icon                   . nil)
-           (xah-fly-insert-state-p               . nil))
+           (doom-modeline-icon . t)
+           (xah-fly-insert-state-p . nil))
   :config                               ;nofmt
   (doom-modeline-def-segment drag
     (when (my-drag-p)
