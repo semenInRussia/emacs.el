@@ -94,6 +94,7 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
          :package elisp-mode
          ("l" . my-leaf-convert-region)
          ("v" . my-leaf-convert-clipboard))
+  :defun (my-writing-config . (my-leaf-convert-from-string-to-string))
   :config                               ;nofmt
   (defun my-leaf-convert-region (beg end)
     "Read a sexp beetween BEG and END points convert it to `leaf' and replace."

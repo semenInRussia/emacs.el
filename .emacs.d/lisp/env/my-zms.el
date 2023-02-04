@@ -249,8 +249,11 @@ Number will be automatically initialized, depends on the previous sections."
     (my-zms-section-dirname-to-section))))
 
 (defun my-zms-path-p (&optional path)
+  "Return non-nil when PATH is the part os the ZMS tasks."
   (or path (setq path (buffer-file-name)))
-  (s-starts-with-p (f-full my-zms-directory) (f-full path)))
+  (and
+   path
+   (s-starts-with-p (f-full my-zms-directory) (f-full path))))
 
 (defun my-zms-download-tasks (section url)
   "Download a pdf at URL file as tasks for a ZMS SECTION.
