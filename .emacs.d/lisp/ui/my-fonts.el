@@ -54,11 +54,17 @@
 
 (leaf unicode-fonts
   :ensure t
-  :config (unicode-fonts-setup)
-  (setq unicode-fonts--instructions
-        (-remove-item '... unicode-fonts--instructions)))
+  :require t
+  :config (setq unicode-fonts--instructions
+                (-remove-item '... unicode-fonts--instructions))
+  (unicode-fonts-setup))
 
 (global-hl-line-mode 1)
+
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-language-environment 'utf-8)
+(set-selection-coding-system 'utf-8)
 
 (provide 'my-fonts)
 ;;; my-fonts.el ends here
