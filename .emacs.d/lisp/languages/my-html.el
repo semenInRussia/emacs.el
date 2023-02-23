@@ -44,6 +44,7 @@
   :ensure t
   :mode "\\.html$"
   :major-mode-map `(html ,my-html-modes)
+  :hook (mhtml-mode-hook . lsp-bridge-mode)
   :config                               ;nofmt
   (leaf auto-rename-tag
     :ensure t
@@ -75,10 +76,7 @@
       "Enable `impatient-mode' open page of the file in the web browser."
       (interactive)
       (impatient-mode +1)
-      (->>
-       (buffer-name)
-       (s-prepend "http://localhost:8080/imp/live/")
-       (browse-url)))))
+      (imp-visit-buffer))))
 
 (provide 'my-html)
 ;;; my-html.el ends here

@@ -26,9 +26,9 @@
 ;;; Code:
 
 
+(leaf posframe :ensure t)
+
 (leaf lsp-bridge
-  :require t
-  :after posframe
   :init (add-to-list 'load-path "~/.emacs.d/lisp/site-lisp/lsp-bridge")
   :hook ((lsp-bridge-mode-hook . (lambda () (company-mode 0)))
          (lsp-bridge-mode-hook . turn-off-flycheck))

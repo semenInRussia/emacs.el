@@ -39,6 +39,8 @@
 (leaf calc
   :hook (calc-start-hook . xah-fly-insert-mode-activate)
   :bind ((:calc-mode-map                ;nofmt
+          :package calc
+          ("v" . nil)
           ("v y" . my-calc-mean-yank))
          (:calc-edit-mode-map
           :package calc-yank

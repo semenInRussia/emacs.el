@@ -1,4 +1,4 @@
-;;; my-topspace.el --- My configuration of `topspace' -*- lexical-binding: t; -*-
+;;; my-company-wordfreq.el --- My configuration of `company-wordfreq' -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022 semenInRussia
 
@@ -21,16 +21,11 @@
 
 ;;; Commentary:
 
-;; My configuration of `topspace'.  It's automatically center current line when
-;; you reach the end of the visible buffer
+;; My configuration of `company-wordfreq'.
 
 ;;; Code:
 
-(leaf topspace
-  :ensure t
-  :global-minor-mode global-topspace-mode
-  ;; it fixes an error
-  :custom (topspace-center-position . (lambda () 0.4)))
+(leaf company-wordfreq)
 
-(provide 'my-topspace)
-;;; my-topspace.el ends here
+(provide 'my-company-wordfreq)
+;;; my-company-wordfreq.el ends here

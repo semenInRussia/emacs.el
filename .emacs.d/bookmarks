@@ -4,12 +4,12 @@
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
 (("org-refile-last-stored"
  (filename . "~/agenda.org")
- (front-context-string . "*** TODO Make =L")
- (rear-context-string . "line for =drag=\n")
- (position . 2076))
+ (front-context-string . "*** TODO Support")
+ (rear-context-string . " ~fig:~ *test*\n\n")
+ (position . 3803))
 ("org-capture-last-stored"
  (filename . "~/agenda.org")
- (front-context-string . "** MUST-SEE Summ")
- (rear-context-string . "ания США)\n:END:\n")
- (position . 4723))
+ (front-context-string . "** MUST-SEE I do")
+ (rear-context-string . " США ЮАР)\n:END:\n")
+ (position . 8385))
 )

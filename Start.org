@@ -1,24 +1,25 @@
-
-
-           _____ _ / ____| | |
-           | |    __    ___     ___     __| |
-           | | |  _ |  / _ \   / _ \   / _` |
-           | | __| |  |  (_)| |(_)  | |(_|  |
-              \_____|  \___/   \___/  \_____|
-
-           | |                      | |    | |
-          | |         _   _    ___  | | __ | |
-          | |       | | | |   / __| | |/ / | |
-          | |  ____  | |_| | | (__  |   <  |_|
-          |________| |_____| \____| |__|\| |_|
-
+#         _______   ______     ______    _______      __
+#        /  _____| /  __  \   /  __  \  |       \    |  |
+#       |  |  __  |  |  |  | |  |  |  | |  .--.  |   |  |
+#       |  | |_ | |  |  |  | |  |  |  | |  |  |  |   |  |
+#       |  |__| | |  `--'  | |  `--'  | |  '--'  |   |  |
+#        \______|  \______/   \______/  |_______/    |  |
+#                                                    |  |
+#                                                    |  |
+#                                                    |  |
+#        __       __    __    ______  __  ___        |  |
+#       |  |     |  |  |  |  /      ||  |/  /        |  |
+#       |  |     |  |  |  | |  ,----'|  '  /         |  |
+#       |  |     |  |  |  | |  |     |    <          |  |
+#       |  `----.|  `--'  | |  `----.|  .  \         |__|
+#       |_______| \______/   \______||__|\__\        (__)
 
 
 - [[elisp:(helm-projectile-switch-project)][Open Project]]
-- [[elisp:org-todo-list][See TODOs]]
+- [[elisp:org-agenda-list][See Agenda]]
 - [[elisp:(dired "~/projects")][Open Directory of Projects]]
 - [[elisp:(call-interactively 'helm-find-files)][Open File]]
-- [[file+emacs:(xah-new-empty-buffer)][New Filename]]
+- [[elisp:(xah-new-empty-buffer)][New Filename]]
 - [[elisp:(let* ((link-on-github (read-string "Enter Link on Github: ")) (repository-name (-last-item (-last-item (s-match-strings-all "/\\(.*\\).git$" link-on-github)))) (project-name (read-string "Enter project's name: " repository-name)) (project-repo-path (f-join "~/projects/" repository-name)) (project-path (f-join "~/projects/" project-name))) (cd "~/projects/") (shell-command (s-concat "git clone " link-on-github)) (rename-file project-repo-path project-path) (projectile-add-known-project project-path) (projectile-switch-project-by-name project-name))][Project from GitHub]]
-- [[elisp:(call-interactively 'my-mipt-solution-search)][Search MIPT's Solution]]
+- [[elisp:(call-interactively 'my-mipt-find-task)][Search MIPT's Solution]]
 - [[elisp:(call-interactively 'skeletor-create-project)][New Project by Template]]

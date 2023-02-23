@@ -1,4 +1,4 @@
-;;; my-js.el --- My configuration for `js'
+;;; my-js.el --- My configuration for JavaScript and TypeScript
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -19,11 +19,11 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 ;;; Commentary:
 
-;; My configuration for `js'
+;; My configuration for JavaScript and TypeScript
 
 ;;; Code:
 
@@ -31,13 +31,24 @@
 
 (leaf js
   :ensure t
-  :after lsp-bridge
+  :defvar lsp-bridge-single-lang-server-mode-list
+  :hook (js-mode-hook . lsp-bridge-mode)
   :mode "\\.js$"
   :config                               ;nofmt
+  (require 'lsp-bridge)
   (add-to-list 'lsp-bridge-single-lang-server-mode-list
                '(js-mode . "typescript"))
   (leaf web-mode :ensure t)
   (leaf js-comint :ensure t))
+
+(leaf typescript-mode
+  :ensure t
+  :hook (typescript-mode-hook . lsp-bridge-mode)
+  :custom (typescript-indent-level . 2)
+  :config                               ;nofmt
+  (require 'lsp-bridge)
+  (add-to-list 'lsp-bridge-single-lang-server-mode-list
+               '(typescript-mode . "typescript")))
 
 (provide 'my-js)
 ;;; my-js.el ends here

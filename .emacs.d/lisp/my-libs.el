@@ -32,9 +32,9 @@
 
 (leaf dash :ensure t :global-minor-mode global-dash-fontify-mode :require t)
 
-(leaf pcache :ensure t :require t)
+(leaf pcache :ensure t)
 
-(leaf org-ml :ensure t :require t)
+(leaf org-ml :ensure t)
 
 (leaf just                              ;nofmt
   :ensure (just :host github :repo "semenInRussia/just.el")

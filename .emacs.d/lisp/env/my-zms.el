@@ -86,15 +86,14 @@ section"
 
 (defun my-zms-section-save (section)
   "Save the ZMS SECTION into the file system."
-  (my-use-skeleton my-zms-section-template-directory
-                   (my-zms-section-path section)
-                   `(("_section-number"
-                      .
-                      ,(number-to-string
-                        (my-zms-section-num section)))
-                     ("_section-name_"
-                      .
-                      ,(my-zms-section-name section)))))
+  (let ((path (my-zms-section-path section))
+        (name (my-zms-section-name section))
+        (num (number-to-string (my-zms-section-num section))))
+    (projectile-add-known-project path)
+    (my-use-skeleton my-zms-section-template-directory
+                     path
+                     `(("_section-number" . ,num)
+                       ("_section-name_" . ,name)))))
 
 (defun my-zms-section-path (section)
   "Return path to the directory of the ZMS section SECTION."

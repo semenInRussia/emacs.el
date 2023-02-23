@@ -11,6 +11,7 @@
         TeX-insert-sub-or-superscript
         any-exchange-point-and-mark-or-splice-sexp
         avy-yank-word
+        backward-char
         backward-sexp
         cdlatex-dollar
         cdlatex-math-modify
@@ -18,21 +19,28 @@
         cdlatex-sub-superscript
         cdlatex-tab
         delete-and-edit-current-line
+        delete-backward-char
         delete-current-text-block-or-cancel-selection
         delete-only-1-char
         dired-find-file
+        embrace-commander
+        eval-defun
         eval-last-sexp
+        forward-char
         forward-sexp
         forward-slurp-sexp
+        goto-last-change
         helm-confirm-and-exit-minibuffer
         indent-line-or-region
         insert-spaces-before-or-to-beginning-of-each-line
+        join-line
         kill-to-beginning-of-line
         kill-visual-line
         kmacro-call-macro-or-apply-to-lines
         kmacro-start-or-end-macro
         mark-inner-or-expand-region
         markdown-outdent-or-delete
+        mc/mark-previous-like-this-word
         my-activate-insert-mode-or-edit-lines
         my-backward-char-or-my-drag-stuff-left-char
         my-backward-word-or-drag-stuff-left
@@ -60,11 +68,13 @@
         my-next-line-or-my-drag-stuff-down
         my-previous-line-or-drag-stuff-up
         my-previous-line-or-my-drag-stuff-up
+        my-python-optional-type
         my-syntax-subword-backward-or-my-drag-stuff-left
         my-syntax-subword-forward-or-my-drag-stuff-right
         my-toggle-change-case-of-line-or-word-or-selection
         my-univeral-multiple-cursors-function
         my-xah-activate-insert-mode-or-replace-rectangle
+        next-line
         open-line-below
         open-line-saving-indent
         org-cdlatex-underscore-caret
@@ -79,8 +89,15 @@
         org-self-insert-command
         org-shifttab
         org-todo
+        org-toggle-checkbox
         org-toggle-heading
+        orgtbl-hijacker-command-100
+        orgtbl-hijacker-command-109
         paxedit-open-round
+        previous-line
+        projectile-replace
+        py-electric-colon
+        quoted-insert
         rectangle-backward-char
         rectangle-mark-mode
         rectangle-next-line
@@ -89,6 +106,8 @@
         ryo:130cc23a4daeb4a5e1d91040266d3b00:mc/edit-lines
         ryo:37943079fa1140633b807dda2635fc75:my-buffer-list-or-edit-lines
         select-current-or-next-word
+        self-insert-command
+        set-mark-command
         sp-backward-kill-sexp
         sp-backward-sexp
         sp-change-enclosing
@@ -143,8 +162,12 @@
         dired-ranger-move
         eval-buffer
         eval-print-last-sexp
+        fast-exec-exec
+        helm-M-x
+        hungry-delete-backward
         iedit-switch-to-mc-mode
         indent-for-tab-command
+        markdown-insert-list-item
         mouse-set-region
         my-bob-or-mc-align
         my-buffer-list-or-edit-lines
@@ -153,6 +176,7 @@
         my-mc-mark-like-this-or-edit-lines
         my-mc-mark-like-this-or-edit-lines
         my-visit-last-opened-buffer
+        org-comment-dwim
         orgtbl-self-insert-command
         swiper-helm
         text-scale-decrease

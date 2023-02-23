@@ -1,6 +1,6 @@
 ;;; my-flycheck.el --- My configuration of the `flycheck'
 
-;; Copyright (C) 2022 Semen Khramtsov
+;; Copyright (C) 2022, 2023 Semen Khramtsov
 
 ;; Author: Semen Khramtsov <hrams205@gmail.com>
 ;; Version: 0.1
@@ -29,6 +29,8 @@
 
 (leaf flycheck                          ;nofmt
   :ensure t
+  :bind (("C-4" . 'flycheck-next-error)
+         ("C-3" . 'flycheck-previous-error))
   :defun flycheck-mode
   :global-minor-mode global-flycheck-mode
   :config                             ;nofmt

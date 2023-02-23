@@ -1,4 +1,4 @@
-;;; my-topspace.el --- My configuration of `topspace' -*- lexical-binding: t; -*-
+;;; my-all-the-icons.el --- My configuration of `all-the-icons' -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022 semenInRussia
 
@@ -21,16 +21,15 @@
 
 ;;; Commentary:
 
-;; My configuration of `topspace'.  It's automatically center current line when
-;; you reach the end of the visible buffer
+;; My configuration of `all-the-icons'.
 
 ;;; Code:
 
-(leaf topspace
+(leaf all-the-icons
   :ensure t
-  :global-minor-mode global-topspace-mode
-  ;; it fixes an error
-  :custom (topspace-center-position . (lambda () 0.4)))
+  :require t
+  :when (display-graphic-p)
+  :custom (all-the-icons-fonts-subdirectory . "c:/users/hrams/Fonts"))
 
-(provide 'my-topspace)
-;;; my-topspace.el ends here
+(provide 'my-all-the-icons)
+;;; my-all-the-icons.el ends here

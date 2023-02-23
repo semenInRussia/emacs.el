@@ -33,7 +33,6 @@
                            lisp-interaction-mode)
                    :parent my-lisp-map)                             ; nofmt
   :hook (emacs-lisp-mode-hook . paxedit-mode)
-  :bind (:emacs-lisp-mode-map ("M-RET" . my-elisp-new-field-of-class))
   :config                               ;nofmt
   (leaf inspector
     :ensure t
@@ -73,6 +72,10 @@
 (leaf mocker :ensure t :doc "A library for testing `elisp' with mocks")
 
 (leaf elisp-mode-class
+  :after elisp-mode
+  :bind (:emacs-lisp-mode-map
+         :package elisp-mode
+         ("M-RET" . my-elisp-new-field-of-class))
   :init                                 ;nofmt
   (defun my-goto-defclass-beg ()
     "Goto backward defclass."

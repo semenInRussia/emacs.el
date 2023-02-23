@@ -26,6 +26,8 @@
 ;; My configuration for rust
 
 ;;; Code:
+(autoload 'my-rust-find-Cargo.toml-in-directory "my-rust.el")
+
 (leaf rust-mode
   :ensure t
   :hook ((rust-mode-hook . my-rust-whitespace-mode)

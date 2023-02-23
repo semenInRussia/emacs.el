@@ -35,6 +35,8 @@
 (toggle-truncate-lines t)
 (add-hook 'prog-mode-hook 'whitespace-mode)
 (setq default-input-method "russian-computer")
+(setq default-file-name-coding-system 'utf-8)
+(setq default-keyboard-coding-system 'utf-8)
 (setq buffer-file-coding-system 'utf-8)
 
 (defun my-new-fake-pptx-file ()

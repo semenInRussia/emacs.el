@@ -46,7 +46,8 @@
   :bind (("<f5>" . org-ctrl-c-ctrl-c)
          (:xah-fly-command-map          ;nofmt
           ("SPC z z" . org-capture))
-         (:my-org-local-map ;; Insert anything
+         (:my-org-local-map             ;nofmt
+          ;; Insert anything
           ("l"   . org-insert-link)
           ("s"   . org-schedule)
           ("d"   . org-deadline)
@@ -77,7 +78,8 @@
           ("b f" . org-babel-tangle-file)
           ("b e" . org-babel-execute)
           ("b e" . org-edit-special))
-         (:org-src-mode-map ([remap save-buffer] . org-edit-src-exit))
+         (:org-src-mode-map             ;nofmt
+          ([remap save-buffer] . org-edit-src-exit))
          (:my-org-local-map
           ;; Manipulations with a table
           ("t n" . org-table-create-or-convert-from-region)
@@ -124,147 +126,21 @@
           ("C-S-i" . 'org-shiftcontrolup)
           ("C-S-k" . 'org-shiftcontroldown)
           ("C-S-l" . 'org-shiftcontrolright)))
+  ;; the following code should add some auto activating snippets, for example,
+  ;; if I type "exthe", then it should be extended to the "Explore the"
+  ;; see `aas-mode'
   :aas (org-mode
         "exthe" "explore the"
+        "Exthe" "Explore the"
         "misc " "miscellaneous"
-        "Iau" "I am use")
+        "Misc " "Miscellaneous"
+        "iau" "I am use")
   :config                               ;nofmt
-  (leaf org-editing                     ;nofmt
-    :config (defun my-org-clear-subtree
-                ()
-              "Kill subtree at the position, and activate insertion mode."
-              (org-cut-subtree)
-              (xah-fly-insert-mode-activate))
-
-    (defun my-org-table-eval-formula-in-field ()
-      "Eval formula with `orgtbl' syntax for the current field of the table."
-      (interactive)
-      (org-table-eval-formula '(4)))
-
-    (defvar my-org-table-cut-map
-      '(keymap
-        (?. . org-cut-special)
-        (?c . org-table-delete-column)
-        (?r . my-kill-line-or-region)))
-
-    (defun my-org-cut ()
-      "Cut any `org' thing.
-
-If in a table ask from the user: either kill column, kill cell or kill row, if
-in a src block cut it, otherwise kill heading"
-      (interactive)
-      (cond
-       ((org-at-table-p)
-        (set-transient-map my-org-table-cut-map))
-       (t (org-cut-subtree))))
-
-    (defun my-org-schedule-to-today ()
-      "Scheduale a `org-mode' heading to today."
-      (interactive)
-      (org-schedule t (format-time-string "%Y-%m-%d")))
-
-    (defun my-org-indent-subtree ()
-      "Indent current the `org-mode' subtree at current position."
-      (interactive)
-      (save-excursion
-        (org-mark-subtree)
-        (indent-region (region-beginning) (region-end))))
-
-    (defun my-org-todo ()
-      "My version of the `org-todo'.
-
-Different with the original functions is that this function can be repeated by
-pressing of the previous last pressed char.  So if functions is bound to
-\"SPC l 1\", that after pressing that user can press \"1\" and this command will
-be repeated"
-      (interactive)
-      (call-interactively #'org-todo)
-      (one-shot-keybinding "1" 'my-org-todo))
-
-    (defun my-org-insert-image (filename &optional caption)
-      "Insert a image with FILENAME.
-
-By default, caption for the image don't inserts, but if CAPTION is a
-string, then define caption of the image to the CAPTION.
-
-In the interactive, If the region is active, the FILENAME will be text
-in the region."
-      (interactive
-       (list
-        (my-org-read-image-filename)
-        (my-org-read-image-caption)))
-      (setq filename (my-org-path-for-image filename))
-      (just-ensure-empty-line)
-      (when caption                     ;nofmt
-        (insert "#+CAPTION: " caption)
-        (newline))
-      (insert "[[" filename "]]"))
-
-    (defun my-org-path-for-image (path)
-      "Make PATH to an image to path for `org-mode' images specially."
-      (->>
-       path
-       (f-full)
-       (s-chop-prefix (f-full default-directory))
-       (s-prepend "./")))
-
-    (defun my-org-read-image-filename ()
-      "Read a image filename.
-
-If the region is active, then return text in the region as filename, otherwise
-return filename readed from the minibuffer."
-      (my-org-path-for-image
-       (or
-        (just-text-in-region)
-        (read-file-name "Please, choose image to insert: "))))
-
-    (defun my-org-read-image-caption ()
-      "Read a image caption from the minibuffer.
-
-If the user insert any caption, return its, otherwise return nil."
-      (let ((caption (read-string "Caption for the image, please: ")))
-        (unless (s-blank-p caption) caption)))
-
-    (defcustom my-org-default-images-dir "./images/"
-      "Default directory for images of a `org-mode' document."
-      :type 'string
-      :group 'my)
-
-    (defun my-org-insert-img-at-url     ;nofmt
-        (url &optional new-file-name images-dir caption)
-      "Insert org image at URL, download it into IMAGES-DIR with name NEW-FILE-NAME.
-
-If the region is active return it, otherwise read URL from the minibuffer.
-If caption isn't empty string, then insert image with the caption CAPTION."
-      (interactive (my--get-arguments-for-org-insert-img-at-url))
-      (or images-dir (setq images-dir my-org-default-images-dir))
-      (let ((new-filename (f-join images-dir new-file-name)))
-        (my-download url new-filename)
-        (my-org-insert-image new-filename caption)))
-
-    (defun my--get-arguments-for-org-insert-img-at-url ()
-      "Get arguments from the user for `my-org-insert-img-at-url'."
-      (let* ((url (my-read-image-url))
-             (new-file-name
-              (my-org-read-new-image-at-url-file-name url))
-             (images-dir (my-org-read-images-dir))
-             (caption (my-org-read-image-caption)))
-        (list url new-file-name images-dir caption)))
-
-    (defun my-org-read-images-dir ()
-      "Read directory path for downloading of the image."
-      (read-directory-name "Image will download into directory:"
-                           my-org-default-images-dir))
-
-    (defun my-org-read-new-image-at-url-file-name (url)
-      "Read from the minibuffer new file name for the image at URL."
-      (read-string "Image will be downloaded with name: "
-                   (my-uri-of-url url)))
-
-    (defun my-download (url new-filename)
-      "Download file at URL as file with NEW-FILENAME."
-      (make-directory (f-dirname new-filename) t)
-      (url-copy-file url new-filename t)))
+  (leaf my-org-editing
+    :commands (my-org-todo
+               my-org-indent-subtree my-org-clear-subtree ;nofmt
+               my-org-cut my-org-schedule-to-today
+               my-org-insert-image))
 
   (leaf xenops :ensure t :hook (org-mode-hook . xenops-mode))
 
@@ -484,8 +360,7 @@ demotes a first letter after keyword word."
            :package org
            ([remap helm-imenu] . helm-org-in-buffer-headings)))
 
-  ;; bound of the keybinding for the `org-export' is already defined in the
-  ;; start of the Heading "Org"
+  ;; I am bind the command `org-export' with \"SPC l e\" in the root `leaf'
   (leaf ox
     :custom ((org-export-coding-system . 'utf-8)
              (org-export-with-smart-quotes . t)
@@ -765,22 +640,22 @@ exist after each headings's drawers."
 
     (defun my-org-options-with-author (author)
       "If AUTHOR is t, add author:t to #+OPTIONS, otherwise author:nil."
-      (interactive (list (yes-or-no-p "Export with author: ")))
+      (interactive (list (yes-or-no-p "Export with author? ")))
       (my-org-set-one-of-options "author" author))
 
     (defun my-org-options-with-clocks (clocks)
       "If CLOCKS is t, add c:t to #+OPTIONS, otherwise c:nil."
-      (interactive (list (yes-or-no-p "Export with clocks: ")))
+      (interactive (list (yes-or-no-p "Export with clocks? ")))
       (my-org-set-one-of-options "c" clocks))
 
     (defun my-org-options-with-drawers (drawers)
       "If DRAWERS is t, add d:t to #+OPTIONS, otherwise d:nil."
-      (interactive (list (yes-or-no-p "Export with drawers: ")))
+      (interactive (list (yes-or-no-p "Export with drawers? ")))
       (my-org-set-one-of-options "d" drawers))
 
     (defun my-org-options-with-email (email)
       "If DRAWERS is t, add email:t to #+OPTIONS, otherwise email:nil."
-      (interactive (list (yes-or-no-p "Export with email: ")))
+      (interactive (list (yes-or-no-p "Export with email? ")))
       (my-org-set-one-of-options "email" email))
 
     (defun my-org-set-one-of-options (opt val)
@@ -841,13 +716,6 @@ If not found return nil."
     :ensure t
     :global-minor-mode global-org-modern-mode)
 
-  (leaf org-appear
-    :ensure t
-    :hook org-mode-hook
-    :custom ((org-appear-trigger   . 'always)
-             (org-appear-autolinks . t)
-             (org-appear-delay     . 1)))
-
   (leaf embrace
     :ensure t
     :hook (org-mode-hook . my-embrace-org-mode-hook)
@@ -858,22 +726,21 @@ If not found return nil."
       (setq-local embrace-show-help-p nil)))
 
   (leaf my-org-db                       ;nofmt
-    :require t
+    :commands my-org-db/body
     :bind (:org-mode-map
            :package org
            ([remap imenu-anywhere] . 'my-org-db/body)))
 
   (leaf rorg
     :load-path "~/projects/rorg/"
-    :require t
     :bind (:my-org-local-map
            :package org
-           ("-" . 'rorg-splice-subtree)
-           ("0" . 'rorg-wrap-region-or-current-heading)
-           ("]" . 'rorg-forward-slurp-subtree)
-           ("}" . 'rorg-backward-barf-subtree)
-           ("{" . 'rorg-backward-slurp-subtree)
-           ("[" . 'rorg-forward-barf-subtree))))
+           ("-" . rorg-splice-subtree)
+           ("0" . rorg-wrap-region-or-current-heading)
+           ("]" . rorg-forward-slurp-subtree)
+           ("}" . rorg-backward-barf-subtree)
+           ("{" . rorg-backward-slurp-subtree)
+           ("[" . rorg-forward-barf-subtree))))
 
 (provide 'my-org)
 ;;; my-org.el ends here

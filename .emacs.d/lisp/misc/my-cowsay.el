@@ -29,7 +29,7 @@
 (leaf cowsay
   :ensure t
   :custom (cowsay-directories . '("~/.emacs.d/cows"))
-  :config (cowsay-load-cows)
+  :defer-config (cowsay-load-cows)
   :fast-exec (("Cow Say String..."  'cowsay-string)
               ("Cow Say Region..."  'cowsay-region)
               ("Cow Say and Insert" 'cowsay-replace-region)

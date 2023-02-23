@@ -22,6 +22,8 @@
    "package-management"
    'my-libs
    'my-lib
+   'my-all-the-icons
+   'my-doom-modeline
    'my-info
    'my-xah
    'my-fast-exec
@@ -63,12 +65,12 @@ symbol indicates load only one module or t, indicates load other"
 (defun my-require-or-debug (module)
   "Require MODULE, if has any errors, then debug that."
   (unless (featurep module)
-    (if (ignore-errors (require module nil t))
-        (let ((start-time (current-time)))
-          (message "`%s' module took %dms"
+    (let ((start-time (current-time)))
+      (if (ignore-errors (require module nil t))
+          (message "`%s' module took %dsec"
                    module
-                   (* 1000 (float-time (time-since start-time)))))
-      (lwarn 'my :error "Error in module `%s'\n" module))))
+                   (float-time (time-since start-time)))
+        (lwarn 'my :error "Error in module `%s'\n" module)))))
 
 (defun my-unload-modules (&rest modules)
   "UnLoad each of MODULES.
@@ -148,6 +150,26 @@ Return number of modules on which was call F."
 
 (my-load-all-config-modules)
 
+(defgroup my nil "Group for all my config files." :group 'tools)
+
+(defun my-bench ()
+  "Show bench analysis."
+  (interactive)
+  (require 'dash)
+  (require 's)
+  (require 'inspector)
+  (switch-to-buffer "*Messages*")
+  (->>
+   (buffer-substring-no-properties (point-min) (point-max))
+   (s-lines)
+   (--keep
+    (-when-let
+        ((_ module duration)
+         (s-match "‘\\(.*?\\)’ module took \\(.*?\\)sec" it))             ;nofmt
+      (cons module (string-to-number duration))))
+   (--sort (> (cdr it) (cdr other)))
+   (inspector-inspect)))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -164,17 +186,17 @@ Return number of modules on which was call F."
  '(company-tooltip-flip-when-above t)
  '(company-tooltip-limit 15)
  '(custom-safe-themes
-   '("f03004fbcff53479b80cd335851a92f1ea9e912b46c41ae6528227349ffe78b0" default))
+   '("416e9537eccd2888c108a6ea5d1a2fff6a3e32bf3ddc33731bc303b7fecde67f" "70937c8612012bf9582da21de4e8ae89d0cd13f8eb90ceedb0a638dbc6aa92b7" "be8b0984e738655bf130e6b0d23dcdb70253bd2a85247fa37bd7e4252bf96c97" "79de6f796909e0ae1e528262adc205eacd4ea44852a2a737694df8dadd23ec89" "f03004fbcff53479b80cd335851a92f1ea9e912b46c41ae6528227349ffe78b0" default))
  '(deft-default-extension "org" t)
- '(deft-directory "~/notes/")
+ '(deft-directory "~/notes/" t)
  '(deft-recursive t)
- '(deft-use-filename-as-title nil)
+ '(deft-use-filename-as-title nil t)
  '(dumb-jump-force-searcher 'rg t)
  '(dumb-jump-prefer-searcher 'rg t)
  '(eldoc-idle-delay 0.01)
  '(elfeed-feeds '("https://habr.com/ru/rss/all/all/?fl=ru"))
  '(imenu-auto-rescan t)
- '(js-indent-level 2 t)
+ '(js-indent-level 2)
  '(js2-allow-rhino-new-expr-initializer nil t)
  '(js2-auto-indent-p t t)
  '(js2-concat-multiline-strings 'eol t)
@@ -198,7 +220,8 @@ Return number of modules on which was call F."
  '(my-mc-cmds-to-run-once
    '(my-mark-all my-bob-or-mc-align my-eob-or-align-with-spaces my-mc-mark-like-this-or-edit-lines my-mc-mark-like-this-or-edit-lines toggle-input-method)
    t)
- '(org-agenda-files '("~/agenda.org"))
+ '(org-agenda-files
+   '("~/tasks-archive/task-archive.org" "c:/Users/hrams/AppData/Roaming/agenda.org"))
  '(org-capture-templates
    '(("d" "Target on Day" entry
       (file+headline "~/agenda.org" "Targets on Day")
@@ -213,13 +236,16 @@ Return number of modules on which was call F."
 ")
      ("f" "Film for See" entry
       (file+headline "~/agenda.org" "Films")
-      #'my-films-format-as-org-heading)))
+      #'my-films-format-as-org-heading))
+   t)
  '(org-publish-list-skipped-files nil)
  '(org-publish-project-alist
    '(("Notes" :base-directory "~/notes/" :publishing-directory "~/notes/destination/" :publishing-function org-latex-publish-to-latex :recursive t :author "Семён" :language "ru")))
  '(org-publish-use-timestamps-flag nil)
  '(org-refile-targets '((org-agenda-files :maxlevel . 2)))
  '(org-refile-use-outline-path nil)
+ '(org-safe-remote-resources
+   '("\\`https://fniessen\\.github\\.io/org-html-themes/org/theme-bigblow\\.setup\\'"))
  '(org-startup-folded t)
  '(org-startup-indented t)
  '(org-startup-with-inline-images t)
@@ -234,13 +260,15 @@ Return number of modules on which was call F."
  '(projectile-project-root-functions
    '(projectile-root-local my-project-root))
  '(projectile-project-search-path '("~/projects/"))
- '(python-shell-interpreter "python" t)
+ '(python-shell-interpreter "python")
  '(racket-xp-mode-hook nil t)
  '(run-command-completion-method 'helm t)
  '(skeletor-completing-read-function 'completing-read-default t)
  '(skeletor-init-with-git nil t)
  '(skeletor-project-directory "~/projects" t)
- '(warning-suppress-types '((my)))
+ '(warning-suppress-types
+   '(((unlock-file))
+     (my)))
  '(web-mode-block-padding 0 t)
  '(web-mode-script-padding 1 t)
  '(yas-snippet-dirs '("~/.emacs.d/snippets"))
@@ -255,4 +283,6 @@ Return number of modules on which was call F."
    nil "Customized with leaf in `blamer' block")
  '(focus-unfocused
    ((t :inherit shadow))
-   nil "Customized with leaf in `focus' block"))
+   nil "Customized with leaf in `focus' block")
+ '(region
+   ((t (:background "white" :foreground "black" :inherit t)))))
