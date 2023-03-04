@@ -29,8 +29,9 @@
 
 (leaf flycheck                          ;nofmt
   :ensure t
-  :bind (("C-4" . 'flycheck-next-error)
-         ("C-3" . 'flycheck-previous-error))
+  :bind (:flycheck-mode-map
+         ([remap next-error] . 'flycheck-next-error)
+         ([remap previous-error] . 'flycheck-previous-error))
   :defun flycheck-mode
   :global-minor-mode global-flycheck-mode
   :config                             ;nofmt
