@@ -50,6 +50,7 @@
          (:lsp-bridge-mode-map
           ([remap xref-find-definitions] . 'lsp-bridge-find-def)
           ([remap helm-imenu-anywhere] . 'lsp-bridge-workspace-list-symbols)
+          ([remap my-format-expression] . 'lsp-bridge-code-format)
           ([remap next-error] . 'lsp-bridge-diagnostic-jump-next)
           ([remap previous-error] . 'lsp-bridge-diagnostic-jump-prev)))
   :fast-exec (("Start a LSP Server for Current Buffer" 'lsp-bridge-mode)
