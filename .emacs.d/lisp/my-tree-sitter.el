@@ -1,6 +1,6 @@
 ;;; my-tree-sitter.el --- My configuration of `tree-sitter' -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022 semenInRussia
+;; Copyright (C) 2022, 2023 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
@@ -27,13 +27,14 @@
 
 (leaf tree-sitter-langs
   :ensure t
-  :config (defvar tree-sitter-mode-map (make-sparse-keymap))
-  (with-no-warnings
-    (add-minor-mode
-     'tree-sitter-mode '" tree-sitter" tree-sitter-mode-map nil nil))
   :global-minor-mode global-tree-sitter-mode
   :hook (tree-sitter-after-on-hook . tree-sitter-hl-mode)
-  :fast-exec ("Do Tree Sitter Query for Buffer" 'tree-sitter-query-builder))
+  :fast-exec ("Do Tree Sitter Query for Buffer" 'tree-sitter-query-builder)
+  :config                               ;nofmt
+  (defvar tree-sitter-mode-map (make-sparse-keymap))
+  (with-no-warnings
+    (add-minor-mode
+     'tree-sitter-mode '" tree-sitter" tree-sitter-mode-map nil nil)))
 
 (leaf ts-fold
   :ensure (ts-fold :type git :host github :repo "emacs-tree-sitter/ts-fold")
@@ -56,11 +57,6 @@
   :bind (:tree-sitter-mode-map
          :package tree-sitter
          ([remap helm-imenu] . 'helm-tree-sitter)))
-
-(leaf tree-sitter-occur
-  :ensure (tree-sitter-occur :type git
-                             :host github
-                             :repo "ymarco/tree-sitter-occur"))
 
 (provide 'my-tree-sitter)
 ;;; my-tree-sitter.el ends here
