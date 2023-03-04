@@ -31,6 +31,7 @@
   :mode "\\.py\\'"
   :custom (python-shell-interpreter . "python")
   :hook (python-mode-hook . lsp-bridge-mode)
+  :custom (lsp-bridge-python-lsp-server . 'pylsp)
   :major-mode-map python
   :bind (:my-python-local-map
          :package org
