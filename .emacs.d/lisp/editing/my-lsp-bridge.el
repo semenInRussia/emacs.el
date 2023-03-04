@@ -40,6 +40,7 @@
            (lsp-bridge-signature-show-function
             . 'eldoc-box--eldoc-message-function)
            (lsp-bridge-python-lsp-server . 'pyright)
+           (lsp-bridge-diagnostic-display-errors-delay . 0.9)
            (lsp-bridge-tex-lsp-server . 'texlab))
   :bind ((:xah-fly-command-map
           :package xah-fly-keys
