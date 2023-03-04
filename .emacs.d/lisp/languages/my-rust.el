@@ -39,7 +39,7 @@
          ("m" . 'rust-toggle-mutability))
   :config                               ;nofmt
   (defcustom my-rust-maybe-pub-words
-    '(fn mod struct enum type)
+    '(async fn mod struct enum type trait)
     "List of the symbols indicating words which can be public in Rust."
     :type '(repeat symbol)
     :group 'my)
@@ -47,12 +47,26 @@
   (defun my-rust-toggle-pub ()
     "Toggle public/private scope of the current rust function/imple/struct."
     (interactive)
-    (let* ((node (ignore-errors (tsc-root-node tree-sitter-tree)))
-           (patterns )
-           (query
-            (tsc-make-query tree-sitter-language '[(function_item)]))
-           (nodes-to-fold (tsc-query-matches query node #'ignore)))
-      (goto-char (car (aref nodes-to-fold 0)))))
+    (let ((line-start (point-at-bol)))
+      (save-excursion
+        (end-of-line)
+        (or
+         ;; try search a keyword in the current line
+         (--first
+          (search-backward-regexp
+           (s-concat (symbol-name it) " ")
+           line-start t)
+          my-rust-maybe-pub-words)
+         ;; otherwise try search a keyword in the current buffer
+         (--first
+          (search-backward-regexp
+           (s-concat (symbol-name it) " ")
+           nil t)
+          my-rust-maybe-pub-words))
+        (if (looking-back "pub *" nil)
+            (just-delete-word -1)
+          (insert "pub ")))
+      (repeat-at-last-keystroke)))
 
   (defun my-rust-find-Cargo.toml-in-directory (&optional dir)
     "Find closest Cargo.toml in the DIR and return path to it."
