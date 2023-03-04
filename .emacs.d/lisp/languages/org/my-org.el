@@ -424,18 +424,6 @@ produced."
     :hook (org-mode-hook . toc-org-mode)
     :custom (toc-org-max-depth . 4))
 
-  (leaf org-tidy                        ; nofmt
-    :bind (:my-org-local-map :package org ("k" . 'my-org-tidy))
-    :init                               ;nofmt
-    (defun my-org-remove-empty-property-drawers ()
-      "Remove all empty property drawers in current file."
-      (interactive)
-      (save-excursion
-        (goto-char (point-min))
-        (while (re-search-forward ":PROPERTIES:" nil t)
-          (save-excursion
-            (org-remove-empty-drawer-at (match-beginning 0))))))
-
     (defun my-org-remove-redundant-tags ()
       "Remove redundant tags of headlines in current buffer.
 
@@ -740,12 +728,6 @@ If not found return nil."
       "Enable `embrace' specially for `org-mode'."
       (embrace-org-mode-hook)
       (setq-local embrace-show-help-p nil)))
-
-  (leaf my-org-db                       ;nofmt
-    :commands my-org-db/body
-    :bind (:org-mode-map
-           :package org
-           ([remap imenu-anywhere] . 'my-org-db/body)))
 
   (leaf rorg
     :load-path "~/projects/rorg/"
