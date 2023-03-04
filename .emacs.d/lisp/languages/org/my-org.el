@@ -29,6 +29,22 @@
 ;;; Code:
 (leaf org
   :ensure t
+  :defvar (my-org-set-option
+           my-org-set-one-of-options
+           my-org-set-options
+           my-org-get-options
+           my-org-get-option-value
+           my-org-goto-option
+           transient-define-prefix
+           my-org-options-transient
+           my-org)
+  :defun (transient-define-prefix
+          my-org-goto-option
+          my-org-get-option-value
+          my-org-get-options
+          my-org-set-options
+          my-org-set-one-of-options
+          my-org-set-option)
   :custom ((org-refile-use-outline-path . nil)
            (org-refile-targets . '((org-agenda-files :maxlevel . 2)))
            (org-startup-folded . t)
