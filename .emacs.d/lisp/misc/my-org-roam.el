@@ -44,6 +44,10 @@
   (f-mkdir "~/org-roam")
   (org-roam-db-autosync-mode t)
 
+  (add-hook
+   'org-roam-buffer-postrender-functions
+   'org-toggle-link-display)
+
   (add-to-list 'Info-directory-list
                (f-full "~/.emacs.d/straight/repos/org-roam/doc"))
 
