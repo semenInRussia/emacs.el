@@ -44,7 +44,7 @@
 (defun select-current-or-next-word ()
   "If word was selected, then move to next word, otherwise select word."
   (interactive)
-  (if (use-region-p) (forward-word) (xah-extend-selection)))
+  (if (use-region-p) (forward-word) (puni-mark-sexp-at-point)))
 
 (leaf-keys
  (xah-fly-command-map
