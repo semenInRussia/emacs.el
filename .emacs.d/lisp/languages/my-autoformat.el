@@ -1,6 +1,6 @@
 ;;; my-autoformat.el --- My function for `autoformat'
 
-;; Copyright (C) 2022 Semen Khramtsov
+;; Copyright (C) 2022-2023 Semen Khramtsov
 
 ;; Author: Semen Khramtsov <hrams205@gmail.com>
 ;; Version: 0.1
@@ -27,6 +27,7 @@
 
 ;;; Code:
 (require 'just)
+(require 'dash)
 (require 'org)
 
 (defgroup my-autoformat nil
@@ -34,22 +35,27 @@
   :group 'editing)
 
 (defcustom my-autoformat-sentence-end "[.?!]  "
-  "Regexp indicates the end of a sentence for `autoformat'."
+  "Regexp that indicates the end of a sentence for `autoformat'."
   :group 'my-autoformat
   :type 'regexp)
 
 (defvar my-autoformat-local-functions nil
-  "Autoformat functions works locally in the buffer.")
+  "Autoformat functions that will be called to format a code.
+
+This variable is local to each buffer, so every buffer can has own special
+formatting functions.")
 
 (make-local-variable 'my-autoformat-local-functions)
 
 (defcustom my-autoformat-global-functions
   nil
-  "Autoformat functions works everywhere."
-  :group 'my-autoformat
-  :type '(repeat symbol))
+  "Autoformat functions that working everywhere.
 
-(defun autoformat-sentence-capitalization (&optional prev-line-can-be-text)
+This be like on `my-autoformat-local-functions', but works globally"
+  :group 'my-autoformat
+  :type '(repeat function))
+
+(defun my-autoformat-sentence-capitalization (&optional prev-line-can-be-text)
   "Auto-capitalize the first letter of a sentence.
 
 Either at the beginning of a line, or after a sentence end, if
@@ -69,29 +75,39 @@ previous line is empty."
     (upcase-char 1))))
 
 (defun my-previous-line-is-empty ()
-  "Move to previous line and return t, when this line is empty.
+  "Return non-nil value, if the previous line is empty.
 
-See `just-line-is-whitespaces-p'"
+See `just-line-is-whitespaces-p' to understand what \"empty\" is mean"
   (just-call-on-prev-line 'just-line-is-whitespaces-p))
 
 (defun my-autoformat-do ()
-  "Funcall each of the local autoformat functions.
+  "Funcall each of autoformat functions.
 
-See variable `my-autoformat-local-functions'"
+See variable `my-autoformat-local-functions' to know about autoformat
+functions working locally in the buffer and `my-autoformat-global-functions'
+to know about autoformat functions working everywhere"
   (interactive)
-  (-each my-autoformat-local-functions 'funcall))
+  (-each my-autoformat-local-functions 'funcall)
+  (-each my-autoformat-global-functions 'funcall))
 
 (define-minor-mode my-autoformat-mode
-  "Toggle `my-autoformat-mode'."
+  "Toggle `my-autoformat-mode'.
+
+If the ARG is non-nil, then enable the mode, otherwise disable it.
+
+In this mode each keyboard press calls functions to format a code.  These
+functions can be defined either locally (see `my-autoformat-local-functions')
+or everywhere (see `my-autoformat-global-functions')."
   :init-value nil
   (if my-autoformat-mode
       (progn
         (my-autoformat-activate-for-major-mode)
-        (add-hook 'post-self-insert-hook #'my-autoformat-do 0 t))
+        (add-hook 'post-self-insert-hook #'my-autoformat-do nil t))
     (my-autoformat-activate-for-major-mode)
     (remove-hook 'post-self-insert-hook #'my-autoformat-do t)))
 
-(define-global-minor-mode my-autoformat-global-mode
+(define-globalized-minor-mode
+  my-autoformat-global-mode
   my-autoformat-mode
   my-autoformat-turn-on-mode)
 
@@ -116,7 +132,7 @@ MM defaults to value of the `major-mode'"
                          'eq)))
 
 (defun my-autoformat-bind-for-major-mode (mode &rest functions)
-  "Bind autoformat FUNCTIONS for MODE."
+  "Bind autoformat FUNCTIONS as local to major-mode MODE."
   (->>
    my-autoformat-functions-of-major-modes
    (assq-delete-all mode)

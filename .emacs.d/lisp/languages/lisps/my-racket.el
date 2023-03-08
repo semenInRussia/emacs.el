@@ -155,7 +155,7 @@ List of racket expressions in which this function should work:
   :ensure t
   :config                               ;nofmt
   (my-autoformat-bind-for-major-mode 'scribble-mode
-                                     'autoformat-sentence-capitalization))
+                                     'my-autoformat-sentence-capitalization))
 
 (provide 'my-racket)
 ;;; my-racket.el ends here
