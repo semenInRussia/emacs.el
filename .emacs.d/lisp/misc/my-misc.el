@@ -51,5 +51,16 @@
        (fast-exec-make-some-commands
         ("New Fake PPTX File" 'my-new-fake-pptx-file)))))
 
+;; Startup time
+(defun my-display-startup-time ()
+  (message
+   "Emacs loaded in %s with %d garbage collections."
+   (format
+    "%.2f seconds"
+    (float-time (time-subtract after-init-time before-init-time)))
+   gcs-done))
+
+(add-hook 'emacs-startup-hook #'my-display-startup-time)
+
 (provide 'my-misc)
 ;;; my-misc.el ends here

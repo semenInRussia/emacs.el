@@ -72,7 +72,8 @@ Outline headings demote lines which has the following form
 
 [intro]
 
-instead of intro can be other word")
+instead of intro can be other word"
+    :group 'my)
 
   (define-derived-mode my-lyrics-mode text-mode "Lyrics"
     "Major mode to edit lyrics for songs (panches)."

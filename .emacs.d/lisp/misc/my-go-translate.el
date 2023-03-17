@@ -29,17 +29,18 @@
 (leaf go-translate
   :ensure t
   :custom (gts-translate-list . '(("en" "ru")))
+  :defvar gts-default-translator
+  :defun (gts-buffer-render gts-translator gts-prompt-picker gts-google-engine)
   :bind (:xah-fly-command-map
          :package xah-fly-keys
          ("SPC i h"     . 'gts-do-translate)
          ("SPC i SPC h" . 'gts-do-translate))
-  :config                               ;nofmt
-  (setq gts-default-translator
-        (gts-translator :picker
-                        (gts-prompt-picker)
-                        :engines  ;nofmt
-                        (list (gts-google-engine))
-                        :render (gts-buffer-render))))
+  :config (setq gts-default-translator
+                (gts-translator :picker
+                                (gts-prompt-picker)
+                                :engines  ;nofmt
+                                (list (gts-google-engine))
+                                :render (gts-buffer-render))))
 
 (provide 'my-go-translate)
 ;;; my-go-translate.el ends here

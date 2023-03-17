@@ -54,7 +54,7 @@
    (find-file)))
 
 (with-eval-after-load 'fast-exec
-  (fast-exec-bind olimpium
+  (fast-exec-bind 'olimpium
     (fast-exec-make-some-commands
      ("New Olimpium Task" 'my-olimpium-new-solution))))
 

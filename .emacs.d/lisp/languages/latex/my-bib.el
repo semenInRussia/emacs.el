@@ -28,7 +28,7 @@
 (leaf bibtex
   :major-mode-map ((bibtex-mode)
                    bibtex)
-  :custom ((bibtex-align-at-equal-sign . t)
+  :custom ((bibtex-align-at-equal-sign  . t)
            (bibtex-user-optional-fields .
                                         '(("file" "Link to document file."
                                            ":")))

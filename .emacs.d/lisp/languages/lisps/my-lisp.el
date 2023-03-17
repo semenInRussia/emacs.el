@@ -46,14 +46,14 @@
           ("q" . 'paxedit-compress)
           ("k" . 'paxedit-delete-whitespace)
           ("y" . 'my-paxedit-duplicate)))
-  :config (defun my-paxedit-comment
-              ()
-            "Comment the Lisp expression at the cursor."
-            (interactive)
-            (-let
-                (((beg . end)
-                  (paxedit-sexp-region)))
-              (comment-region beg end)))
+  :config                               ;nofmt
+  (defun my-paxedit-comment ()
+    "Comment the Lisp expression at the cursor."
+    (interactive)
+    (-let
+        (((beg . end)
+          (paxedit-sexp-region)))
+      (comment-region beg end)))
 
   (defun my-paxedit-change ()
     "Kill the Lisp expression at the cursor and activate insert mode."

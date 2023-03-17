@@ -23,31 +23,16 @@
 
 ;;; Commentary:
 
-
 ;; My configuration for `org-mode'
 
 ;;; Code:
 (leaf org
   :ensure t
-  :defvar (my-org-set-option
-           my-org-set-one-of-options
-           my-org-set-options
-           my-org-get-options
-           my-org-get-option-value
-           my-org-goto-option
-           transient-define-prefix
-           my-org-options-transient
-           my-org)
-  :defun (transient-define-prefix
-          my-org-goto-option
-          my-org-get-option-value
-          my-org-get-options
-          my-org-set-options
-          my-org-set-one-of-options
-          my-org-set-option)
+  :defun ((transient-define-prefix . transient))
   :custom ((org-refile-use-outline-path . nil)
-           (org-refile-targets . '((org-agenda-files :maxlevel . 2)))
-           (org-startup-folded . t)
+           (org-fold-core-style  . 'overlays)
+           (org-refile-targets   . '((org-agenda-files :maxlevel . 2)))
+           (org-startup-folded   . t)
            (org-startup-indented . t)
            (org-startup-with-inline-images . t)
            (org-file-apps .
@@ -153,12 +138,17 @@
         "iau" "I am use")
   :config                               ;nofmt
   (leaf my-org-editing
-    :commands (my-org-todo
-               my-org-indent-subtree my-org-clear-subtree ;nofmt
-               my-org-cut my-org-schedule-to-today
-               my-org-insert-image))
+    :commands (my-org-clear-subtree
+               my-org-clear-subtree
+               my-org-cut
+               my-org-indent-subtree
+               my-org-indent-subtree
+               my-org-insert-image
+               my-org-schedule-to-today
+               my-org-todo
+               my-org-todo))
 
-  (leaf xenops :ensure t :hook (org-mode-hook . xenops-mode))
+  (leaf xenops :ensure t :hook org-mode-hook)
 
   (leaf my-org-autoformat
     :config                             ;nofmt
@@ -389,7 +379,7 @@ demotes a first letter after keyword word."
                                          ("" "cmap" nil ("pdflatex"))
                                          ("" "float" nil
                                           ("pdflatex" "xelatex")))))
-    :config                             ;nofmt
+    :defer-config                       ;nofmt
     (leaf latex-extra
       :ensure t
       :config                           ;nofmt
@@ -419,323 +409,33 @@ produced."
 
     (leaf ox-beamer :require t))
 
-  (leaf toc-org
+  (leaf my-org-do-tidy
+    :bind (:my-org-local-map :package org ("k" . my-org-tidy)))
+
+  (leaf my-org-options
+    :bind (:my-org-local-map :package org ("." . my-org-options-transient)))
+
+  (leaf org-modern :ensure t :global-minor-mode global-org-modern-mode)
+
+  (leaf embrace
     :ensure t
-    :hook (org-mode-hook . toc-org-mode)
-    :custom (toc-org-max-depth . 4))
+    :hook (org-mode-hook . my-embrace-org-mode-hook)
+    :config                             ;nofmt
+    (defun my-embrace-org-mode-hook ()
+      "Enable `embrace' specially for `org-mode'."
+      (embrace-org-mode-hook)
+      (setq-local embrace-show-help-p nil)))
 
-  (defun my-org-remove-redundant-tags ()
-    "Remove redundant tags of headlines in current buffer.
-
-A tag is considered redundant if it is local to a headline and
-inherited by a parent headline.
-
-Thanks to David Maus!"
-    (interactive)
-    (when (eq major-mode 'org-mode)
-      (save-excursion
-        (org-map-entries
-         (lambda ()
-           (let ((alltags
-                  (split-string
-                   (or (org-entry-get (point) "ALLTAGS") "")
-                   ":"))
-                 local inherited tag)
-             (dolist (tag alltags)
-               (if (get-text-property 0 'inherited tag)
-                   (push tag inherited)
-                 (push tag local)))
-             (dolist (tag local)
-               (if (member tag inherited) (org-toggle-tag tag 'off)))))
-         t nil))))
-
-  (defun my-org-check-misformatted-subtree ()
-    "Check misformatted entries in the current buffer."
-    (interactive)
-    (outline-show-all)
-    (org-map-entries
-     (lambda ()
-       (when (and
-              (move-beginning-of-line 2)
-              (not (looking-at org-heading-regexp)))
-         (if (or
-              (and
-               (org-get-scheduled-time (point))
-               (not (looking-at (concat "^.*" org-scheduled-regexp))))
-              (and
-               (org-get-deadline-time (point))
-               (not (looking-at (concat "^.*" org-deadline-regexp)))))
-             (when (y-or-n-p "Fix this subtree? ")
-               (message "Call the function again when you're done fixing this subtree.")
-               (recursive-edit))
-           (message "All subtrees checked."))))))
-
-  (defun my-org-fix-blank-lines (&optional prefix)
-    "Ensure that Blank lines exist between headings and their contents.
-
-With prefix, operate on whole buffer. Ensures that blank lines
-exist after each headings's drawers."
-    (interactive "P")
-    (org-map-entries
-     (lambda ()
-       (org-with-wide-buffer
-        ;; `org-map-entries' narrows the buffer, which prevents us from seeing
-        ;; newlines before the current heading, so we do this part widened.
-        (while (not (looking-back "\n\n" nil))
-          ;; Insert blank lines before heading.
-          (insert "\n")))
-       (let ((end (org-entry-end-position)))
-         ;; Insert blank lines before entry content
-         (forward-line)
-         (while (and
-                 (org-at-planning-p)
-                 (< (point) (point-max)))
-           ;; Skip planning lines
-           (forward-line))
-         (while (re-search-forward org-drawer-regexp end t)
-           ;; Skip drawers. You might think that `org-at-drawer-p' would suffice, but
-           ;; for some reason it doesn't work correctly when operating on hidden text.
-           ;; This works, taken from `org-agenda-get-some-entry-text'.
-           (re-search-forward "^[ \t]*:END:.*\n?" end t)
-           (goto-char (match-end 0)))
-         (unless (or
-                  (= (point) (point-max))
-                  (org-at-heading-p)
-                  (looking-at-p "\n"))
-           (insert "\n"))))
-     t
-     (if prefix nil 'tree)))
-
-  (defun my-org-align-all-tables ()
-    (interactive)
-    (org-table-map-tables 'org-table-align 'quietly))
-
-  (defun my-org-tidy ()
-    "Use each of rules tidy org."
-    (interactive)
-    ;; Clean up metadata
-    (my-org-remove-redundant-tags)
-    (my-org-remove-empty-property-drawers)
-    (my-org-check-misformatted-subtree)
-    ;; Repair other elements of org-mode
-    (my-org-fix-blank-lines t)
-    (my-org-align-all-tables)))
-
-(leaf org-options
-  :doc "Commands to set attribute #+OPTIONS of `org-mode'."
-  :after transient
-  :leaf-autoload nil
-  :bind (:my-org-local-map :package org ("." . my-org-options-transient))
-  :init (defvar my-org-options-map
-          (make-sparse-keymap)
-          "Map for setting `org-mode' options.")
-  :transient (my-org-options-transient
-              ()
-              "Transient for setting of the `org-mode' options."
-              [["Set Info"
-                ("a" "Set Author" my-org-options-author)
-                ("c" "Set Creator" my-org-options-creator)
-                ("e" "Set Email" my-org-options-email)
-                ("l" "Set Language" my-org-options-language)
-                ("t" "Set Title" my-org-options-title)
-                ]
-               ["Export With..."
-                ("'" "Export With Smart Quotes" my-org-options-smart-quotes)
-                ("A" "Export With Author" my-org-options-with-author)
-                ("DEL"
-                 "Export With Archived Trees"
-                 my-org-options-with-archived-trees)
-                ("C" "Export With Clock" my-org-options-with-clocks)
-                ("D" "Export With Drawers" my-org-options-with-drawers)
-                ("E" "Export With Email" my-org-options-with-email)
-                ("RET"
-                 "Export With Preserve-Breaks"
-                 my-org-options-with-preserve-breaks)
-                ("S" "Export With String" my-org-options-with-special-string)
-                ("T" "Export With Table of Contents" my-org-options-with-toc)
-                ("^"
-                 "Export With Supersripts"
-                 my-org-options-with-sub-supersripts)
-                ("*" "Export With Emphasize" my-org-options-with-emphasize)
-                ("n" "Export with Sections Numbers"
-                 my-org-options-with-emphasize)
-                ]])
-  :init                               ;nofmt
-  (defun my-org-options-author (author)
-    "Set #+AUTHOR option for the current `org-mode' option to AUTHOR."
-    (interactive "sAuthor name, please: ")
-    (my-org-set-option "AUTHOR" author))
-
-  (defun my-org-options-author (author)
-    "Set #+AUTHOR option for the current `org-mode' option to AUTHOR."
-    (interactive "sAuthor name, please: ")
-    (my-org-set-option "AUTHOR" author))
-
-  (defun my-org-options-creator (creator)
-    "Commands to set attribute #+CREATOR of `org-mode'."
-    (interactive "sCreator, please: ")
-    (my-org-set-option "CREATOR" creator))
-
-  (defun my-org-options-date (date)
-    "Commands to set attribute #+DATE of `org-mode'."
-    (interactive "sDate, please: ")
-    (my-org-set-option "DATE" date))
-
-  (defun my-org-options-email (email)
-    "Commands to set attribute #+EMAIL of `org-mode'."
-    (interactive "sEMail, please: ")
-    (my-org-set-option "EMAIL" email))
-
-  (defun my-org-options-language (language)
-    "Commands to set attribute #+LANGUAGE of `org-mode'."
-    (interactive (list (read-string "Language, please: " "ru")))
-    (my-org-set-option "LANGUAGE" language))
-
-  (defun my-org-options-title (title)
-    "Commands to set attribute #+TITLE of `org-mode'."
-    (interactive (list (read-string "Title, please: ")))
-    (my-org-set-option "TITLE" title))
-
-  (defun my-org-options-smart-quotes (smart-quotes)
-    "If SMART-QUOTES is t, add ':t #+OPTIONS, otherwise ':nil"
-    (interactive (list (yes-or-no-p "With smart quotes? ")))
-    (my-org-set-one-of-options "'" smart-quotes))
-
-  (defun my-org-options-with-emphasize (with-emphasize)
-    "If WITH-EMPHASIZE is t, add *:t #+OPTIONS, otherwise *:nil"
-    (interactive (list (yes-or-no-p "With emphasize? ")))
-    (my-org-set-one-of-options "*" with-emphasize))
-
-  (defun my-org-options-with-emphasize (with-numbers)
-    "If WITH-NUMBERS is t, add num:t #+OPTIONS, otherwise num:nil"
-    (interactive (list (yes-or-no-p "With numbers? ")))
-    (my-org-set-one-of-options "num" with-numbers))
-
-  (defun my-org-options-with-special-string (with-special-string)
-    "If WITH-SPECIAL-STRING is t, add -:t #+OPTIONS, otherwise -:nil"
-    (interactive (list (yes-or-no-p "With special string? ")))
-    (my-org-set-one-of-options "-" with-special-string))
-
-  (defun my-org-options-with-special-string (with-timestamps)
-    "If WITH-TIMESTAMPS is t, add ::t #+OPTIONS, otherwise ::nil"
-    (interactive (list (yes-or-no-p "With timestamps? ")))
-    (my-org-set-one-of-options "<" with-timestamps))
-
-  (defun my-org-options-with-preserve-breaks (with-preserve-breaks)
-    "If WITH-PRESERVE-BREAKS is t, add \\n:t #+OPTIONS, otherwise \\n:nil"
-    (interactive (list (yes-or-no-p "With preserve breaks? ")))
-    (my-org-set-one-of-options "\\n" with-preserve-breaks))
-
-  (defun my-org-options-with-sub-supersripts (with-sub-supersripts)
-    "If WITH-PRESERVE-SUB-SUPERSRIPTS  is t, add ^:t to #+OPTIONS."
-    (interactive (list (yes-or-no-p "With sub supersripts? ")))
-    (my-org-set-one-of-options "^" with-sub-supersripts))
-
-  (defun my-org-options-with-toc (with-toc)
-    "If WITH-TOC is non-nil, then add toc:t to #+OPTIONS, otherwise toc:nil."
-    (interactive (list (yes-or-no-p "With table of contents? ")))
-    (my-org-set-one-of-options "toc" with-toc))
-
-  (defun my-org-options-with-archived-trees (arch)
-    "If ARCH is t, add arch:t to #+OPTIONS, otherwise arch:nil."
-    (interactive (list (yes-or-no-p "With archived trees? ")))
-    (my-org-set-one-of-options "arch" arch))
-
-  (defun my-org-options-with-author (author)
-    "If AUTHOR is t, add author:t to #+OPTIONS, otherwise author:nil."
-    (interactive (list (yes-or-no-p "Export with author? ")))
-    (my-org-set-one-of-options "author" author))
-
-  (defun my-org-options-with-clocks (clocks)
-    "If CLOCKS is t, add c:t to #+OPTIONS, otherwise c:nil."
-    (interactive (list (yes-or-no-p "Export with clocks? ")))
-    (my-org-set-one-of-options "c" clocks))
-
-  (defun my-org-options-with-drawers (drawers)
-    "If DRAWERS is t, add d:t to #+OPTIONS, otherwise d:nil."
-    (interactive (list (yes-or-no-p "Export with drawers? ")))
-    (my-org-set-one-of-options "d" drawers))
-
-  (defun my-org-options-with-email (email)
-    "If DRAWERS is t, add email:t to #+OPTIONS, otherwise email:nil."
-    (interactive (list (yes-or-no-p "Export with email? ")))
-    (my-org-set-one-of-options "email" email))
-
-  (defun my-org-set-one-of-options (opt val)
-    "Set one of options named OPT in form #+TITLE to VAL."
-    (my-org-set-options (list (cons opt val))))
-
-  (defun my-org-set-options (alist)
-    "Set #+OPTIONS to values and keys from ALIST.
-
-For example: '((\"'\" . nil) (\"*\" . t)), set #+OPTIONS to
-':nil *:t"
-    (let ((options (my-org-get-options)))
-      (->>
-       (my-alist-union options alist 'string-equal)
-       (--map (format "%s:%s" (car it) (cdr it)))
-       (s-join " ")
-       (my-org-set-option "OPTIONS"))))
-
-  (defun my-org-get-options ()
-    "Get value of #+OPTIONS as an alist.
-
-For example with #+OPTIONS: ':nil *:t, return is '((\"'\" . nil) (\"*\" . t))"
-    (let ((options-string (my-org-get-option-value "OPTIONS")))
-      (-some->> options-string
-        (s-split " ")
-        (--map (s-split ":" it))
-        (--map (cons (car it) (-second-item it))))))
-
-  (defun my-org-get-option-value (option-name)
-    "Get one of options #+OPTIONS."
-    (save-excursion
-      (when (my-org-goto-option option-name)
-        (->>
-         (just-text-at-line)
-         (s-chop-prefix (s-concat "#+" option-name ":"))
-         (s-trim)))))
-
-  (defun my-org-goto-option (option)
-    "Search `org-mode' OPTION with form as #+TITLE in `org-mode' buffer.
-
-If not found return nil."
-    (goto-char (point-min))
-    (let ((init-pos (point))
-          (search-result
-           (search-forward (s-concat "#+" option) nil t)))
-      (unless search-result (goto-char init-pos))
-      search-result))
-
-  (defun my-org-set-option (option value)
-    "Set an option called OPTION sush as #+TITLE to VALUE."
-    (interactive "sName of the option: \nsValue, please: ")
-    (goto-char (point-min))
-    (when (my-org-goto-option option)
-      (delete-region (point-at-bol) (point-at-eol)))
-    (insert "#+" option ": " value "\n")))
-
-(leaf org-modern :ensure t :global-minor-mode global-org-modern-mode)
-
-(leaf embrace
-  :ensure t
-  :hook (org-mode-hook . my-embrace-org-mode-hook)
-  :config                             ;nofmt
-  (defun my-embrace-org-mode-hook ()
-    "Enable `embrace' specially for `org-mode'."
-    (embrace-org-mode-hook)
-    (setq-local embrace-show-help-p nil)))
-
-(leaf rorg
-  :load-path "~/projects/rorg/"
-  :bind (:my-org-local-map
-         :package org
-         ("-" . rorg-splice-subtree)
-         ("0" . rorg-wrap-region-or-current-heading)
-         ("]" . rorg-forward-slurp-subtree)
-         ("}" . rorg-backward-barf-subtree)
-         ("{" . rorg-backward-slurp-subtree)
-         ("[" . rorg-forward-barf-subtree)))
+  (leaf rorg
+    :load-path "~/projects/rorg/"
+    :bind (:my-org-local-map
+           :package org
+           ("-" . rorg-splice-subtree)
+           ("0" . rorg-wrap-region-or-current-heading)
+           ("]" . rorg-forward-slurp-subtree)
+           ("}" . rorg-backward-barf-subtree)
+           ("{" . rorg-backward-slurp-subtree)
+           ("[" . rorg-forward-barf-subtree))))
 
 (provide 'my-org)
 ;;; my-org.el ends here

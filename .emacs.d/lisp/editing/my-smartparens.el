@@ -29,7 +29,7 @@
 
 (require 'my-lib)
 
-(leaf puni :ensure t :require t)
+(leaf puni :ensure t)
 
 (leaf smartparens
   :ensure t

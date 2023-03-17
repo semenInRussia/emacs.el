@@ -43,10 +43,10 @@
          (:my-racket-local-map
           ("i"     . 'racket-add-require-for-identifier)))
   :hook ((racket-mode-hook . racket-xp-mode)
-         ;; `flycheck' is very slow and `racket-xp-mode' highlight
-         ;; errors too, so i disable `flycheck' for the Racket
+         ;; `flycheck' is very slow plus `racket-xp-mode' highlight
+         ;; errors too, so i disable `flycheck' for Racket
          (racket-mode-hook . turn-off-flycheck)
-         ;; this enable structured editing for the `racket-mode'
+         ;; enable structured editing for the `racket-mode'
          (racket-mode-hook . paxedit-mode))
   :custom (racket-xp-mode-hook . nil)
   :config                               ;nofmt

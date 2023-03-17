@@ -26,9 +26,7 @@
 ;; My configuration of the `auto-activating-snippets'
 
 ;;; Code:
-(leaf aas                        ;nofmt
-  :ensure t
-  :global-minor-mode aas-global-mode)
+(leaf aas :ensure t :global-minor-mode aas-global-mode)
 
 (provide 'my-aas)
 ;;; my-aas.el ends here

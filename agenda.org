@@ -9,41 +9,36 @@
 
 ** Habits
 
+*** TODO Append anything to the knowledge base ~zettelkasten~
+SCHEDULED: <2023-03-14 Вт .+1d>
+:PROPERTIES:
+:STYLE: habit
+:LAST_REPEAT: [2023-03-13 Пн 20:17]
+:END:
+
+- State "DONE"       from "TODO"       [2023-03-13 Пн 20:17]
+- State "DONE"       from "TODO"       [2023-03-07 Вт 15:28]
+- State "DONE"       from "TODO"       [2023-03-06 Пн 20:02]
+- State "DONE"       from "TODO"       [2023-03-05 Вс 15:06]
+*** TODO "Clean head"
+SCHEDULED: <2023-03-03 Пт .+1d>
+:PROPERTIES:
+:STYLE: HABIT
+:END:
+
 ** Events
-
-*** AFTER Strikeball
-SCHEDULED: <2023-02-26 Вс>
-
-Suggest visit the channel in the [[https://t.me/semenInRussia][telegram]]
 
 *** AFTER Physics OGE
 SCHEDULED: <2023-05-26 Пт>
 
-*** AFTER 23 february: holiday!
-SCHEDULED: <2023-02-23 Чт>
-
 ** Targets on Week
 
 *** TODO [#C] Run a main file of the project in ~run-command-reicpes~ :run_command_recipes:
-*** TODO [#B] Fix =my-copy-buffer-content-as-mipt-solution=
 
-*** TODO [#B] ~pdflatex~ support in the ~nu~                        :nushell:
+*** DONE Buy the glasses for [[[[*Strikeball]]][Strikeball]]
 
-*** TODO [#C] Impatient modes for all =major-modes=
-
-*** TODO [#C] add support of the =org-export= to the =run-command-recipes= :run_command_recipes:
-
-*** TODO More useful way to run =run-command-recipes= recipes
-
-See on the compile command from the =latex-extra=
-
-*** TODO [#C] Live evaluating of the =org-mode= table formulas
-
-*** TODO [#C] New refactor library for the =emacs-lisp=
-
-- add/change group/type for ~defcustom~
-- extract code to defun or ~lambda~ argument/ ~let~ binding / ~defun~ / ~defvar~ / ~defcustom~ and etc.
-- ~lambda~ => ~defun~, ~defun~ => ~lambda~
+*** TODO Make a reformer for lisp
+DEADLINE: <2023-03-12 Вс> ~defun~, ~defun~ => ~lambda~
 - add/remove interactive binding for ~defun~ / ~lambda~ (depends on args)
 - add/remove docstring for ~defun~
 - add/remove ~autoload~
@@ -100,17 +95,10 @@ Use ~TeX-master~
 
 Easy way to save image and insert into an ~org~ or ~latex~ buffer
 
-*** TODO [#C] Refactor tool for ~latex~
-
-- Rotation with $$, \(\) or \[\] form
-- Equation env to split env
-- Promote section (to subsection, subsection, paragraph, subparagraph)
-- Transpose sections, list items
-
 *** TODO [#A] ~autoformat~ for ~markdown~
 
 *** TODO [#C] Fix my project named ~stupid-site~
-*** TODO [#A] ZMS: olympiad
+*** TODO [#A] ZMS: linear equation
 DEADLINE: <2022-12-20 Вт>
 *** TODO [#C] Make system of school homeworks
 
@@ -142,12 +130,20 @@ Ref should have prefix ~fig:~ *test*
 *** TODO Write frontend for org-roam-fetcher using ~yew~    :orgroamexplorer:
 *** TODO Explore old, but popular ~WordPress~
 
+
+****
+
 ** Targets on Day
 
-*** TODO Buy 10 notebooks
-SCHEDULED: <2023-02-20 Пн>
+*** TODO [#C] Refactor tool for ~latex~
+SCHEDULED: <2023-03-03 Пт>
 
-* Books
+- Rotation with $$, \(\) or \[\] form
+- Equation env to split env
+- Promote section (to subsection, subsection, paragraph, subparagraph)
+- Transpose sections, list items
+
+* Books to Read
 
 ** MUST-READ S. N. U. F. F.
 Author: Pelevin
@@ -155,21 +151,53 @@ Author: Pelevin
 ** MUST-READ Empire "V"
 Author: Pelevin
 
-** MUST-READ "Тёмные Аллеи"
-Author: Bunin
-
 ** MUST-READ Рэнт: биография Бастера Кейси
 Author: Chuck Palannik
 
 * Films
-
-** MUST-SEE The Sopranos
+** MUST-SEE Tár
 :PROPERTIES:
-:name:     Сопрано
-:year:     1999
-:slogan:   Tony's not like other fathers. Tony is a mob boss
-:id:       79848
-:rating:   88.0
+:name:     Тар
+:year:     2022
+:slogan:   nil
+:id:       4511218
+:rating:   74.0
+:countries: (США)
+:END:
+** MUST-SEE Top Gun: Maverick
+:PROPERTIES:
+:name:     Топ Ган: Мэверик
+:year:     2022
+:slogan:   Feel the need... The need for speed.
+:id:       572032
+:rating:   78.0
+:countries: (США)
+:END:
+** MUST-SEE Triangle of Sadness
+:PROPERTIES:
+:name:     Треугольник печали
+:year:     2022
+:slogan:   nil
+:id:       1348487
+:rating:   73.0
+:countries: (Великобритания Германия Греция Дания Мексика США Турция Франция Швейцария Швеция)
+:END:
+** MUST-SEE Avatar: The Way of Water
+:PROPERTIES:
+:name:     Аватар: Путь воды
+:year:     2022
+:slogan:   nil
+:id:       505898
+:rating:   79.0
+:countries: (США)
+:END:
+** MUST-SEE Blonde
+:PROPERTIES:
+:name:     Блондинка
+:year:     2022
+:slogan:   Watched by all, seen by none
+:id:       525530
+:rating:   61.0
 :countries: (США)
 :END:
 ** MUST-SEE Raiders of the Lost Ark
@@ -189,16 +217,6 @@ Author: Chuck Palannik
    :slogan:   Unmask The Truth
    :id:       590286
    :rating:   79.0
-   :countries: (США)
-   :END:
-
-** MUST-SEE Doctor Strange in the Multiverse of Madness
-   :PROPERTIES:
-   :name:     Доктор Стрэндж: В мультивселенной безумия
-   :year:     2022
-   :slogan:   Enter a new dimension of Strange.
-   :id:       1219909
-   :rating:   67.0
    :countries: (США)
    :END:
 
@@ -365,4 +383,31 @@ Author: Chuck Palannik
 :id:       978956
 :rating:   68.0
 :countries: (США)
+:END:
+** MUST-SEE Birdman or (The Unexpected Virtue of Ignorance)
+:PROPERTIES:
+:name:     Бёрдмэн
+:year:     2014
+:slogan:   You're Anything But Invisible
+:id:       722827
+:rating:   76.0
+:countries: (США)
+:END:
+** MUST-SEE Mind Game
+:PROPERTIES:
+:name:     Игра разума
+:year:     2004
+:slogan:   nil
+:id:       119318
+:rating:   76.0
+:countries: (Япония)
+:END:
+** MUST-SEE 1917
+:PROPERTIES:
+:name:     1917
+:year:     2019
+:slogan:   Время — наш главный враг
+:id:       1171976
+:rating:   79.0
+:countries: (Великобритания Индия Испания США)
 :END:

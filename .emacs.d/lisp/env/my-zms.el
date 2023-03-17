@@ -278,7 +278,7 @@ Save it at filename Theory.pdf"
 
 (eval-after-load 'fast-exec
   '(progn
-     (fast-exec-bind zms
+     (fast-exec-bind 'zms
        (fast-exec-make-some-commands
         ("New ZMS Task Solution"     'my-zms-new-solution)
         ("Forward ZMS Task Solution" 'my-zms-new-solution-in-current-section)

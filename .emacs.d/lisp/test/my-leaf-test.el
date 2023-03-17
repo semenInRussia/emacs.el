@@ -99,7 +99,7 @@
      (unless (fboundp 'pp-buffer)
        (autoload #'pp-buffer "leaf" nil t))
      (eval-after-load 'fast-exec
-       '(fast-exec-bind leaf
+       '(fast-exec-bind 'leaf
           (fast-exec-make-some-commands
            ("Pretty Print Current Buffer" 'pp-buffer)))))))
 
@@ -117,7 +117,7 @@
      (unless (fboundp 'pp-buffer)
        (autoload #'pp-buffer "leaf" nil t))
      (eval-after-load 'fast-exec
-       '(fast-exec-bind leaf
+       '(fast-exec-bind 'leaf
           (fast-exec-make-some-commands
            ("Pretty Macro Expand Last Expression" 'pp-macroexpand-last-sexp)
            ("Pretty Print Current Buffer" 'pp-buffer)))))))

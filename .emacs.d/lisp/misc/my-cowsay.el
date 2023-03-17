@@ -28,23 +28,25 @@
 ;;; Code:
 (leaf cowsay
   :ensure t
+  :defun cowsay--get-default-cow
+  :defvar cowsay-cows
   :custom (cowsay-directories . '("~/.emacs.d/cows"))
   :defer-config (cowsay-load-cows)
   :fast-exec (("Cow Say String..."  'cowsay-string)
               ("Cow Say Region..."  'cowsay-region)
               ("Cow Say and Insert" 'cowsay-replace-region)
               ("Load Cows"  'cowsay-load-cows))
-  :config ; nofmt
-  (defun cowsay--prompt-for-cow (&rest _ignored)
-    "Read any cow name from the minibuffer."
-    (let ((default (cowsay--get-default-cow)))
-      (completing-read
-       "Cow: "
-       cowsay-cows
-       nil t
-       default
-       'cowsay-cow-history
-       default))))
+  :config (defun cowsay--prompt-for-cow
+              (&rest _ignored)
+            "Read any cow name from the minibuffer."
+            (let ((default (cowsay--get-default-cow)))
+              (completing-read
+               "Cow: "
+               cowsay-cows
+               nil t
+               default
+               'cowsay-cow-history
+               default))))
 
 (provide 'my-cowsay)
 ;;; my-cowsay.el ends here

@@ -1,13 +1,46 @@
 (require 'cl-lib)
 
-(setq initial-buffer-choice "~/Start.org")
+(add-to-list 'load-path
+             (locate-user-emacs-file "lisp/local-projects"))
 
-(defun my-file-base (file)
-  "Return base of the FILE: just name of file without extension."
-  (car
-   (split-string (car (last (split-string file "/"))) "\\.")))
 
 (add-to-list 'load-path "~/.emacs.d/lisp")
+
+(require 'my-autoload)
+(setq initial-buffer-choice "~/Start.org")
+
+(defvar my-modules-order
+  (list
+   "packagement/my-straight.el"
+   "packagement/my-leaf.el"
+   "package-management"
+   "my-libs.el"
+   "my-lib.el"
+   "ui/my-all-the-icons.el"
+   "ui/my-doom-modeline.el"
+   "editing/my-xah.el"
+   "editing"
+   "languages/lisps/my-lisp.el"
+   "languages/my-autoformat.el"
+   "languages"
+   "env"
+   "ui")
+  "Names of the directories and files that define an order to load.")
+
+(defvar my-modules-files-ignore-regexps
+  '("/local-projects/" "/test/" "/features/" ".*-step\\.el" "/site-lisp/")
+  "List of the regexps that indicates that a file to load shouldn't be loaded.")
+
+(defun my-file-igored-as-module-p (filename)
+  "Return non-nil if a module at FILENAME can't be a configuration module."
+  (cl-some
+   (lambda (regexp) (string-match-p regexp filename))
+   my-modules-files-ignore-regexps))
+
+(setq my-modules-files
+      (cl-remove-if
+       #'my-file-igored-as-module-p
+       (directory-files-recursively "~/.emacs.d/lisp" ".el$" nil)))
 
 (let ((dirs (directory-files-recursively "~/.emacs.d/lisp" ".*" t)))
   (while dirs
@@ -15,139 +48,68 @@
       (add-to-list 'load-path (car dirs)))
     (setq dirs (cdr dirs))))
 
-(defcustom my-modules-order
-  (list
-   'my-straight
-   'my-leaf
-   "package-management"
-   'my-libs
-   'my-lib
-   'my-all-the-icons
-   'my-doom-modeline
-   'my-info
-   'my-xah
-   'my-fast-exec
-   'my-smartparens
-   "editing"
-   'my-aas
-   'my-lisp
-   'my-autoformat
-   "languages"
-   "env"
-   "ui"
-   t)
-  "List of the modules which will be load with the special function.
-
-The special function is `my-for-each-config-module'.")
-
-(defvar my-modules-files
-  (directory-files-recursively "~/.emacs.d/lisp" ".el$" nil
-                               (lambda (x)
-                                 (not (string-suffix-p "test" x)))))
-
 (defvar my-load-modules-all (length my-modules-files))
 
-(defun my-reload-modules (&rest modules)
-  "Unload and then load each of MODULES.
-
-Each of MODULES is either string (indicates loading each of directory),
-symbol indicates load only one module or t, indicates load other"
-  (apply 'my-unload-modules modules modules)
-  (apply 'my-load-modules modules))
-
-(defun my-load-modules (&rest modules)
-  "Load each of MODULES.
-
-Each of MODULES is either string (indicates loading each of directory),
-symbol indicates load only one module or t, indicates load other"
-  (my-for-each-config-module 'my-require-or-debug modules))
+(defun my-require-or-debug-file (filename)
+  "Require the module in FILENAME, if catch errors, debug it."
+  (my-require-or-debug (intern (file-name-base filename))))
 
 (defun my-require-or-debug (module)
   "Require MODULE, if has any errors, then debug that."
   (unless (featurep module)
     (let ((start-time (current-time)))
-      (if (ignore-errors (require module nil t))
-          (message "`%s' module took %dsec"
-                   module
-                   (float-time (time-since start-time)))
-        (lwarn 'my :error "Error in module `%s'\n" module)))))
+      (ignore-errors (require module nil t))
+      (message "`%s' module took %ssec"
+               module
+               (float-time (time-since start-time))))))
 
-(defun my-unload-modules (&rest modules)
-  "UnLoad each of MODULES.
+(defvar my-config-modules-prefix "~/.emacs.d/lisp/")
 
-Each of MODULES is either string (indicates loading each of directory),
-symbol indicates load only one module or t, indicates load other"
-  (my-for-each-config-module
-   (lambda (module) (unload-feature module t))
-   modules))
+(defmacro my-extend (var lst)
+  "Extend a variable called VAR with type list with LST.
+The same to
+\(setq var (append var lst))"
+  `(setq ,var (append ,var ,lst)))
 
-(defun my-for-each-config-module (f modules &optional start)
-  "Call F for each of the my Emacs configuration MODULES.
+(defmacro my-remove-from (var elt)
+  "Remove an ELT from the list at VAR.
+The same to
+\(setq var (remove elt var))"
+  `(setq ,var (remove ,elt ,var)))
 
-Each of MODULES is either string (indicates loading each of directory),
-symbol indicates load only one module or t, indicates load other.
-
-After each call of F, print progress starting from the START."
-  (let ((count (or start 0))
-        module)
-    (while modules
-      (setq module (car modules))
-      (setq modules (cdr modules))
-      (setq count (1+ count))
-      (cond
-       ((and
-	 (symbolp module)
-	 (not (eq module t))
-	 (not (eq module '##)))
-        (message "Call `%s' with %s (%s/%s)"
-                 f
-                 module
-                 count
-                 my-load-modules-all)
-        (funcall f module))
-       ((stringp module)
-        (setq count
-              (+ count
-                 (1-
-                  (my-for-each-module-of-config-dir f module
-                                                    (1- count))))))
-       ((eq module t)
-        (print "AGAIN!")
-        (my-for-each-module-of-config-dir f "."))))))
-
-(defun my-for-each-module-of-config-dir (f dir &optional start)
-  "Call F for each Emacs Lisp file of the the configuration subdir DIR.
-
-After each call of F, print progress starts with START.
-
-Return number of modules on which was call F."
-  (let ((modules
-         (mapcar
-          (lambda (file) (intern (my-file-base file)))
-          (directory-files-recursively
-           (concat "~/.emacs.d/lisp/" dir)
-           "\\.el$"))))
-    (my-for-each-config-module f modules start)
-    (length modules)))
-
-(defun my-load-modules-of-dir (dir)
-  "Load each Emacs Lisp file of the DIR."
-  (apply
-   'my-load-modules
-   (mapcar
-    (lambda (file) (intern (my-file-base file)))
-    (directory-files-recursively dir ".el$"))))
+(defmacro my-mapc (lst elt &rest body)
+  "Evaluate a BODY with variable called ELT setted to element of a LST."
+  `(cl-do
+       ((lst (cdr ,lst) (cdr lst))
+        (,elt
+         (car ,lst)
+         (car lst)))
+       ((null ,elt))
+     ,@body))
 
 (defun my-load-all-config-modules ()
-  "Load each of the my Emacs configuration Elisp files via `require'."
-  (interactive)
-  (apply 'my-load-modules my-modules-order))
+  "Load all configuration modules."
+  (cl-do*
+      ((order nil)
+       (sketch-order (cdr my-modules-order) (cdr sketch-order))
+       (it
+        (concat my-config-modules-prefix (car sketch-order))
+        (and
+         sketch-order
+         (concat my-config-modules-prefix (car sketch-order)))))
+      ((null it))
+    (if (file-directory-p it)
+        (my-mapc my-modules-files file
+                 (and
+                  (string-prefix-p it file)
+                  (not (string-equal it file))
+                  (my-remove-from my-modules-files it)
+                  (my-require-or-debug-file file)))
+      (my-require-or-debug-file it)
+      (my-remove-from my-modules-files it)))
+  (my-mapc my-modules-files file (my-require-or-debug-file file)))
 
-(defun my-reload-all-config-modules ()
-  "Unload and load after each module of the my Emacs configuration."
-  (interactive)
-  (apply 'my-reload-modules my-modules-order))
-
+(my-load-all-config-modules)
 (my-load-all-config-modules)
 
 (defgroup my nil "Group for all my config files." :group 'tools)
@@ -169,6 +131,17 @@ Return number of modules on which was call F."
       (cons module (string-to-number duration))))
    (--sort (> (cdr it) (cdr other)))
    (inspector-inspect)))
+
+(defun my-do-autoload-for-local-projects-files ()
+  "If the opened file is a \"local projects\", make the directory autoloads."
+  (interactive)
+  (when (string-prefix-p
+         (f-full "~/.emacs.d/lisp/local-projects/")
+         (f-full (buffer-file-name)))
+    (make-directory-autoloads "~/.emacs.d/lisp/local-projects/"
+                              "~/.emacs.d/lisp/local-projects/my-autoload.el")))
+
+(add-hook 'after-save-hook 'my-do-autoload-for-local-projects-files)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

@@ -33,12 +33,11 @@
                            lisp-interaction-mode)
                    :parent my-lisp-map)                             ; nofmt
   :hook (emacs-lisp-mode-hook . paxedit-mode)
-  :config                               ;nofmt
-  (leaf inspector
-    :ensure t
-    :bind (:my-elisp-local-map
-           :package elisp-mode
-           ("i" . inspector-inspect-last-sexp))))
+  :config (leaf inspector
+            :ensure t
+            :bind (:my-elisp-local-map
+                   :package elisp-mode
+                   ("i" . inspector-inspect-last-sexp))))
 
 (leaf ert
   :unless (fboundp 'debugger-make-xrefs)
@@ -49,10 +48,9 @@
 (leaf package-lint
   :ensure t
   :after flycheck
-  :config                                 ;nofmt
-  (leaf flycheck-package                  ;nofmt
-    :ensure t
-    :config (flycheck-package-setup)))
+  :config (leaf flycheck-package        ;nofmt
+            :ensure t
+            :config (flycheck-package-setup)))
 
 (leaf emr
   :ensure t
@@ -71,61 +69,10 @@
 
 (leaf mocker :ensure t :doc "A library for testing `elisp' with mocks")
 
-(leaf elisp-mode-class
-  :after elisp-mode
+(leaf my-elisp-class-fields
   :bind (:emacs-lisp-mode-map
          :package elisp-mode
-         ("M-RET" . my-elisp-new-field-of-class))
-  :init                                 ;nofmt
-  (defun my-goto-defclass-beg ()
-    "Goto backward defclass."
-    (search-backward-regexp "(\\W*defclass" nil t)
-    (skip-chars-forward "("))
-
-  (defun my-goto-fields-defclass-defnition ()
-    "Go to fields of `defclass' defnition."
-    (interactive)
-    (my-goto-defclass-beg)
-    (sp-get
-        (sp-get-enclosing-sexp)
-      (let ((sexp (read (buffer-substring-no-properties :beg :end))))
-        (if (length> sexp 3)
-            (forward-sexp 4)
-          (goto-char :end-in)
-          (newline-and-indent)
-          (insert "()"))
-        (forward-char -1))))
-
-  (defun my-elisp-in-defclass-p (&optional pt)
-    "Move to PT and return name of function/macros in which stay this sexp."
-    (setq pt (or pt (point)))
-    (save-excursion
-      (goto-char pt)
-      (when (my-goto-defclass-beg)
-        (-when-let
-            (sexp (sp-get-enclosing-sexp))
-          (sp-get sexp (< :beg pt :end))))))
-
-  (defun my-elisp-defclass-name ()
-    "Return name of `defclass' defnition."
-    (interactive)
-    (save-excursion
-      (my-goto-defclass-beg)
-      (forward-sexp 1)
-      (forward-char 1)
-      (sexp-at-point)))
-
-  (defun my-elisp-new-field-of-class ()
-    "Insert new field of Lisp class.
-Only when in class defnition."
-    (interactive)
-    (when (my-elisp-in-defclass-p)
-      (my-goto-fields-defclass-defnition)
-      (unless (just-line-is-whitespaces-p) (newline-and-indent))
-      (yas-expand-snippet
-       (format
-        "(${1:name} :initarg :$1 :accessor %s-$1)"
-        (my-elisp-defclass-name))))))
+         ("M-RET" . my-elisp-new-field-of-class)))
 
 (leaf embrace
   :hook (emacs-lisp-mode-hook . my-embrace-emacs-lisp-mode-hook)

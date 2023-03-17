@@ -28,7 +28,6 @@
 ;;; Code:
 (require 'just)
 (require 'dash)
-(require 'org)
 
 (defgroup my-autoformat nil
   "Automatically format of source code (add spaces, capitalze and etc)."

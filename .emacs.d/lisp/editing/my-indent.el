@@ -29,6 +29,7 @@
 
 (require 'leaf)
 
+;; disable tabs
 (setq-default indent-tabs-mode nil)
 
 (defun my-indent-line-or-region ()

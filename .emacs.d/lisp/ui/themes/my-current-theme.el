@@ -32,9 +32,8 @@
 ;; - `solarized'
 ;; - `flatland-theme'
 
-(require 'monokai-theme-autoloads)
-
-(with-eval-after-load 'monokai-theme-autoloads
+(with-eval-after-load 'my-monokai
+  (require 'monokai-theme-autoloads)
   (load-theme 'monokai t))
 
 (custom-set-faces

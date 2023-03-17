@@ -28,12 +28,14 @@
 ;;; Code:
 (leaf fast-exec
   :load-path "~/projects/fast-exec.el/"
-  :require fast-exec-initial-keymaps
   :defun fast-exec-use
   :bind (:xah-fly-command-map           ;nofmt
          :package xah-fly-keys
          ("=" . fast-exec-exec))
-  :config                               ;nofmt
+  :config
+
+  (require 'fast-exec-initial-keymaps)
+
   (fast-exec-use
    deadgrep
    devdocs
@@ -48,7 +50,7 @@
    yasnippet
    haskell-mode
    helm-wikipedia)
-  (fast-exec-bind straight
+  (fast-exec-bind 'straight
     (fast-exec-make-some-commands
      ("Use Package" 'straight-use-package)))
   (fast-exec-reload))

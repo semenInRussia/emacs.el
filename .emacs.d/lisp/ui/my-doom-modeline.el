@@ -175,8 +175,6 @@ Format of time is the list form the hours, minutes, seconds and zero?"
 
   (setq flycheck-mode-line nil)
 
-  (defvar my-modeline-ignored-modes '(company-mode))
-  (display-time-mode t)
   (doom-modeline-def-modeline 'main
     '(bar
       my-matches

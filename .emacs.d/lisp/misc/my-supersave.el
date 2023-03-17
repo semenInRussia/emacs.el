@@ -29,7 +29,6 @@
 (leaf super-save
   :ensure t
   :global-minor-mode super-save-mode
-  :custom (super-save-exclude . '("Emacs\\.org"))
   :config (add-to-list 'super-save-triggers 'dired-jump))
 
 (provide 'my-supersave)

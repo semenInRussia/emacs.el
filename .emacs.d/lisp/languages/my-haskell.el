@@ -35,10 +35,10 @@
          (haskell-mode-hook . interactive-haskell-mode)
          (haskell-mode-hook . lsp-bridge-mode))
   :bind (:my-haskell-local-map          ;nofmt
-         ("e" . haskell-compile)
-         ("i" . haskell-add-import)
-         ("g" . haskell-process-load)
-         ("p" . haskell-process-do-type)))
+         ("e" . 'haskell-compile)
+         ("i" . 'haskell-add-import)
+         ("g" . 'haskell-process-load)
+         ("p" . 'haskell-process-do-type)))
 
 (provide 'my-haskell)
 ;;; my-haskell.el ends here

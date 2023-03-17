@@ -60,8 +60,7 @@
          (LaTeX-mode-hook . my-latex-disable-auto-fill))
   :major-mode-map (latex (latex-mode))
   :bind (:my-latex-local-map
-         ("="  . my-calc-simplify-region-copy)
-         ("f"  . my-calc-simplify-region-change)
+         ("f"  . 'calc-embedded)
          ("1"  . latex-split-block)
          ("6"  . my-latex-mark-inside-environment-or-math)
          ("\\" . my-latex-equation-to-split)
@@ -82,7 +81,9 @@
     (setq-local TeX-master
                 (and
                  (buffer-file-name)
-                 (my-latex-lookup-master-file-of (buffer-file-name)))))
+                 (or
+                  (my-latex-lookup-master-file-of (buffer-file-name))
+                  (TeX-master-file-ask)))))
 
   (defun my-latex-lookup-master-file-of (filename)
     "Lookup a auctex master file for the file with FILENAME."
@@ -100,60 +101,10 @@
      (wildcard-to-regexp)
      (string-match-p filename)))
 
-  (defun my-calc-simplify (expr)
-    "Simplify EXPR via `calc' and return this."
-    (calc-latex-language t)
-    (calc-alg-entry expr)
-    (with-temp-buffer
-      (calc-copy-to-buffer 1)
-      (delete-char -1)
-      (buffer-string)))
-
-  (defun my-calc-simplify-region-copy (beg end)
-    "Take from BEG to END, simplify this via `calc' and copy as kill."
-    (interactive "r")
-    (let ((expr (my-calc-simplify (buffer-substring beg end))))
-      (kill-new expr)
-      (message "coppied: %s" (current-kill 0))))
-
-  (defun my-calc-simplify-region-change (beg end)
-    "Get from BEG to END change this via `calc' and yank instead of region."
-    (interactive "r")
-    (let* ((expr (buffer-substring beg end))
-           (simplified (my-calc-simplify expr)))
-      (goto-char beg)
-      (delete-region beg end)
-      (insert simplified)))
-
   (leaf xenops
     :hook LaTeX-mode-hook
     :ensure t
     :custom (xenops-math-image-scale-factor . 2))
-
-  (leaf math-preview
-    :ensure t
-    :fast-exec ("Preview All Latex Fragments" 'math-preview-all)
-    :ensure-system-package              ;nofmt
-    `(math-preview .
-                   ,(concat "npm install"
-                            "-g git+"
-                            "https://gitlab.com/matsievskiysv/math-preview"))
-    :bind (:my-latex-local-map
-           :package tex
-           ("v" . my-latex-preview-in-other-window))
-    :config                             ;nofmt
-    (defun my-latex-preview-in-other-window ()
-      "Preview fragment of LaTeX source at point in seperated window."
-      (interactive)
-      (let ((source
-             (save-mark-and-excursion
-               (xah-select-block)
-               (buffer-substring (region-beginning) (region-end)))))
-        (switch-to-buffer-other-window "*my-latex-preview*")
-        (delete-region (point-min) (point-max))
-        (LaTeX-mode)
-        (insert source)
-        (math-preview-region (point-min) (point-max)))))
 
   (leaf my-latex-insert
     :load-path* "lisp/languages/latex/"
@@ -201,7 +152,7 @@
 
   (leaf laas
     :ensure t
-    :hook (LaTeX-mode-hook . laas-mode)
+    :hook LaTeX-mode-hook
     :aas (laas-mode
           :cond #'texmathp
           ;; Some Physics Units
@@ -365,7 +316,6 @@
 
   (leaf smartparens-latex
     :after smartparens
-    :bind (:latex-mode-map :package tex-mode ("$" . self-insert-command))
     :config                             ;nofmt
     (sp-with-modes
         '(tex-mode plain-tex-mode latex-mode LaTeX-mode)
@@ -377,106 +327,106 @@
       (sp-local-pair " \"<"
                      "\">"
                      :trigger "<"
-                     :unless '(sp-latex-point-after-backslash sp-in-math-p)))
+                     :unless '(sp-latex-point-after-backslash sp-in-math-p))))
 
-    (leaf my-latex-autoformat
-      :config                             ;nofmt
-      (my-autoformat-bind-for-major-mode
-       'latex-mode
-       'autoformat-latex-capitalize-special-commands
-       'autoformat-latex-expand-to-list-item
-       'autoformat-sentence-capitalization)
+  (leaf my-latex-autoformat
+    :config                             ;nofmt
+    (my-autoformat-bind-for-major-mode
+     'latex-mode
+     'autoformat-latex-capitalize-special-commands
+     'autoformat-latex-expand-to-list-item
+     'my-autoformat-sentence-capitalization)
 
-      (defvar autoformat-latex-capitalize-latex-commands
-        '("author"
-          "title"
-          "date"
-          "part"
-          "subsection"
-          "subsubsection"
-          "section"
-          "part"
-          "chapter")
-        "List of regexps which Emacs will automatically capitalize.")
+    (defvar autoformat-latex-capitalize-latex-commands
+      '("author"
+        "title"
+        "date"
+        "part"
+        "subsection"
+        "subsubsection"
+        "section"
+        "part"
+        "chapter")
+      "List of regexps which Emacs will automatically capitalize.")
 
-      (defvar autoformat-latex-capitalize-regexps
-        (--map
-         (s-concat "\\\\" it "\\W*{.")
-         autoformat-latex-capitalize-latex-commands)
-        "List of regexps which Emacs will automatically capitalize.")
+    (defvar autoformat-latex-capitalize-regexps
+      (--map
+       (s-concat "\\\\" it "\\W*{.")
+       autoformat-latex-capitalize-latex-commands)
+      "List of regexps which Emacs will automatically capitalize.")
 
-      (add-to-list 'autoformat-latex-capitalize-regexps "\\\\item\\W+.")
+    (add-to-list 'autoformat-latex-capitalize-regexps "\\\\item\\W+.")
 
-      (defun autoformat-latex-capitalize-special-commands ()
-        "Capitalize last symbol, when its match on special regexp."
-        (interactive)
-        (when (-any #'looking-back autoformat-latex-capitalize-regexps)
-          (undo-boundary)
-          (capitalize-word -1)))
+    (defun autoformat-latex-capitalize-special-commands ()
+      "Capitalize last symbol, when its match on special regexp."
+      (interactive)
+      (when (-any #'looking-back autoformat-latex-capitalize-regexps)
+        (undo-boundary)
+        (capitalize-word -1)))
 
-      (defun autoformat-latex-expand-to-list-item ()
-        "Try expand fragments sush as 1. or - to LaTeX list items."
-        (cond
-         ((autoformat-latex-expand-to-enumerate-list-item-p)
-          (autoformat-latex-expand-to-enumerate-list-item))
-         ((autoformat-latex-expand-to-itemized-list-item-p)
-          (autoformat-latex-expand-to-itemized-list-item))))
+    (defun autoformat-latex-expand-to-list-item ()
+      "Try expand fragments sush as 1. or - to LaTeX list items."
+      (cond
+       ((autoformat-latex-expand-to-enumerate-list-item-p)
+        (autoformat-latex-expand-to-enumerate-list-item))
+       ((autoformat-latex-expand-to-itemized-list-item-p)
+        (autoformat-latex-expand-to-itemized-list-item))))
 
-      (defcustom autoformat-latex-enumerate-list-items-triggers
-        '("[0-9]*\\. ")
-        "List of regepxs which should be expanded to LaTeX enumerate list item.
-
-Will be expanded only on matching in empty line and not in math"
-        :type '(repeat string)
-        :group 'my)
-
-      (defcustom autoformat-latex-itemized-list-items-triggers
-        '("- " "\\* ")
-        "List of regepxs which should be expanded to LaTeX itemized list item.
+    (defcustom autoformat-latex-enumerate-list-items-triggers
+      '("[0-9]*\\. ")
+      "List of regepxs which should be expanded to LaTeX enumerate list item.
 
 Will be expanded only on matching in empty line and not in math"
-        :type '(repeat string)
-        :group 'my)
+      :type '(repeat string)
+      :group 'my)
 
-      (defun autoformat-latex-expand-to-enumerate-list-item-p ()
-        "Get t, when autoformat should expand text to the enumerate LaTeX list."
-        (my-one-of-regexps-looking-back-on-bol
-         autoformat-latex-enumerate-list-items-triggers))
+    (defcustom autoformat-latex-itemized-list-items-triggers
+      '("- " "\\* ")
+      "List of regepxs which should be expanded to LaTeX itemized list item.
 
-      (defun autoformat-latex-expand-to-itemized-list-item-p ()
-        "Get t, when autoformat should expand text to the itemized LaTeX list."
-        (my-one-of-regexps-looking-back-on-bol
-         autoformat-latex-itemized-list-items-triggers))
+Will be expanded only on matching in empty line and not in math"
+      :type '(repeat string)
+      :group 'my)
 
-      (defun my-one-of-regexps-looking-back-on-bol (regexps)
-        "Get t, when one of REGEXPS matchs with text from current point to bol."
-        (->> regexps (--map (concat "^ *" it)) (-some 'looking-back)))
+    (defun autoformat-latex-expand-to-enumerate-list-item-p ()
+      "Get t, when autoformat should expand text to the enumerate LaTeX list."
+      (my-one-of-regexps-looking-back-on-bol
+       autoformat-latex-enumerate-list-items-triggers))
 
-      (defun autoformat-latex-expand-to-enumerate-list-item ()
-        "Expand, for example, 1. to the LaTeX enumerate list item."
-        (clear-current-line)
-        (if (string-equal (LaTeX-current-environment) "enumerate")
-            (LaTeX-insert-item)
-          (LaTeX-env-item "enumerate")))
+    (defun autoformat-latex-expand-to-itemized-list-item-p ()
+      "Get t, when autoformat should expand text to the itemized LaTeX list."
+      (my-one-of-regexps-looking-back-on-bol
+       autoformat-latex-itemized-list-items-triggers))
 
-      (defun autoformat-latex-expand-to-itemized-list-item ()
-        "Expand, for example, 1. to the LaTeX itemized list item."
-        (clear-current-line)
-        (if (string-equal (LaTeX-current-environment) "itemize")
-            (LaTeX-insert-item)
-          (LaTeX-env-item "itemize")))
+    (defun my-one-of-regexps-looking-back-on-bol (regexps)
+      "Get t, when one of REGEXPS matchs with text from current point to bol."
+      (->> regexps (--map (concat "^ *" it)) (-some 'looking-back)))
 
-      (defun my-latex-env-beg-and-end ()
-        "Return as cons beginning and end of current LaTeX environment."
-        (save-excursion
-          (LaTeX-find-matching-begin)
-          (end-of-line)
-          (forward-char)
-          (push-mark nil nil t)
-          (LaTeX-find-matching-end)
-          (beginning-of-line)
-          (forward-char -1)
-          (cons (region-beginning) (region-end)))))
+    (defun autoformat-latex-expand-to-enumerate-list-item ()
+      "Expand, for example, 1. to the LaTeX enumerate list item."
+      (clear-current-line)
+      (if (string-equal (LaTeX-current-environment) "enumerate")
+          (LaTeX-insert-item)
+        (LaTeX-env-item "enumerate")))
+
+    (defun autoformat-latex-expand-to-itemized-list-item ()
+      "Expand, for example, 1. to the LaTeX itemized list item."
+      (clear-current-line)
+      (if (string-equal (LaTeX-current-environment) "itemize")
+          (LaTeX-insert-item)
+        (LaTeX-env-item "itemize")))
+
+    (defun my-latex-env-beg-and-end ()
+      "Return as cons beginning and end of current LaTeX environment."
+      (save-excursion
+        (LaTeX-find-matching-begin)
+        (end-of-line)
+        (forward-char)
+        (push-mark nil nil t)
+        (LaTeX-find-matching-end)
+        (beginning-of-line)
+        (forward-char -1)
+        (cons (region-beginning) (region-end))))
 
     (defun my-latex-env-beg ()
       "Return point at beginning of current LaTeX environment."
@@ -493,7 +443,7 @@ Will be expanded only on matching in empty line and not in math"
     (defun my-latex-wrap-environment (beg end environment)
       "Wrap the region from BEG to END into ENVIRONMENT.
 
-If the environment is not given, ask for it using completion."
+  If the environment is not given, ask for it using completion."
       (just-mark-region beg end)
       (cdlatex-wrap-environment environment)
       (indent-region (region-beginning) (region-end)))
@@ -502,17 +452,17 @@ If the environment is not given, ask for it using completion."
       "Kill a LaTeX section."
       (interactive)
       (LaTeX-mark-section)
-      (kill-region (region-beginning) (region-end))))
+      (kill-region (region-beginning) (region-end)))
 
-  (leaf latex-extra
-    :ensure t
-    :hook ((LaTeX-mode-hook . latex-extra-mode)
-           (LaTeX-mode-hook . visual-line-mode))
-    :bind (:my-latex-local-map
-           :package tex
-           ("e" . latex/compile-commands-until-done)
-           ("l" . latex/next-section-same-level)
-           ("j" . latex/previous-section-same-level)))
+    (leaf latex-extra
+      :ensure t
+      :hook ((LaTeX-mode-hook . latex-extra-mode)
+             (LaTeX-mode-hook . visual-line-mode))
+      :bind (:my-latex-local-map
+             :package tex
+             ("e" . latex/compile-commands-until-done)
+             ("l" . latex/next-section-same-level)
+             ("j" . latex/previous-section-same-level))))
 
   (leaf company-math
     :ensure t

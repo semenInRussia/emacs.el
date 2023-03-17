@@ -1,4 +1,4 @@
-;;; my-films.el --- My config for management of the films
+;;; my-films.el --- My config for films to watch management
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,16 +23,14 @@
 
 ;;; Commentary:
 
-;; My config for management of the films
+;; My config for films to watch management
 
 ;;; Code:
-(defun my-films-format-as-org-heading ()
-  "Format an `kinopoisk-film' readed from the minibuffer as an org entry."
-  (with-temp-buffer
-    (org-mode)
-    (my-films-add (my-films--search-new))
-    (s-concat (buffer-string) "%?")))
+(require 'kinopoisk)
+(require 's)
+(require 'org)
 
+;;;###autoload
 (defun my-films-add (film)
   "Add FILM to current org file, this file is db of films."
   (interactive (list (my-films--search-new)))
@@ -46,6 +44,13 @@
    (id        . (kinopoisk-film-id film))
    (rating    . (kinopoisk-film-rating film))
    (countries . (kinopoisk-film-countries film))))
+
+(defun my-films-format-as-org-heading ()
+  "Format an `kinopoisk-film' readed from the minibuffer as an org entry."
+  (with-temp-buffer
+    (org-mode)
+    (my-films-add (my-films--search-new))
+    (s-concat (buffer-string) "%?")))
 
 (defmacro my-org-set-props (&rest key-and-val)
   "Set properties of org heading with keys from KEY-AND-VAL and values from it."

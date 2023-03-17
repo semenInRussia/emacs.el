@@ -5,8 +5,6 @@
 #       |  |__| | |  `--'  | |  `--'  | |  '--'  |   |  |
 #        \______|  \______/   \______/  |_______/    |  |
 #                                                    |  |
-#                                                    |  |
-#                                                    |  |
 #        __       __    __    ______  __  ___        |  |
 #       |  |     |  |  |  |  /      ||  |/  /        |  |
 #       |  |     |  |  |  | |  ,----'|  '  /         |  |
@@ -16,10 +14,7 @@
 
 
 - [[elisp:(helm-projectile-switch-project)][Open Project]]
+- [[elisp:helm-multi-files][See Recent Files]]
 - [[elisp:org-agenda-list][See Agenda]]
 - [[elisp:(dired "~/projects")][Open Directory of Projects]]
-- [[elisp:(call-interactively 'helm-find-files)][Open File]]
-- [[elisp:(xah-new-empty-buffer)][New Filename]]
-- [[elisp:(let* ((link-on-github (read-string "Enter Link on Github: ")) (repository-name (-last-item (-last-item (s-match-strings-all "/\\(.*\\).git$" link-on-github)))) (project-name (read-string "Enter project's name: " repository-name)) (project-repo-path (f-join "~/projects/" repository-name)) (project-path (f-join "~/projects/" project-name))) (cd "~/projects/") (shell-command (s-concat "git clone " link-on-github)) (rename-file project-repo-path project-path) (projectile-add-known-project project-path) (projectile-switch-project-by-name project-name))][Project from GitHub]]
-- [[elisp:(call-interactively 'my-mipt-find-task)][Search MIPT's Solution]]
-- [[elisp:(call-interactively 'skeletor-create-project)][New Project by Template]]
+- [[elisp:(let* ((link-on-github (read-string "Enter Link on Github: ")) (repository-name (-last-item (-last-item (s-match-strings-all "/\\(.*\\).git$" link-on-github)))) (project-name (read-string "Enter project's name: " repository-name)) (project-repo-path (f-join "~/projects/" repository-name)) (project-path (f-join "~/projects/" project-name))) (cd "~/projects/") (shell-command (s-concat "git clone " link-on-github)) (rename-file project-repo-path project-path) (projectile-add-known-project project-path) (projectile-switch-project-by-name project-name))][Clone a Project from GitHub]]

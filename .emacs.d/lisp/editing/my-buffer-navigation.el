@@ -31,36 +31,35 @@
 (require 'dash)
 (require 's)
 
-(leaf ace-window :ensure t
+(leaf ace-window
+  :ensure t
   :bind (:xah-fly-command-map :package xah-fly-keys ("," . ace-window)))
 
-(leaf buffer-navigation
-  :init                                 ;nofmt
-  (defun my-visit-last-opened-buffer ()
-    "Visit buffer which was opened recently."
-    (interactive)
-    (switch-to-buffer (my-last-opened-buffer)))
+(defun my-visit-last-opened-buffer ()
+  "Visit buffer which was opened recently."
+  (interactive)
+  (switch-to-buffer (my-last-opened-buffer)))
 
-  (defun my-last-opened-buffer ()
-    "Get buffer which was visited most recently."
-    (--find
-     (not (my--visit-last-opened-buffer-ignore-p it))
-     (cdr (buffer-list))))
+(defun my-last-opened-buffer ()
+  "Get buffer which was visited most recently."
+  (--find
+   (not (my--visit-last-opened-buffer-ignore-p it))
+   (cdr (buffer-list))))
 
-  (defun my--visit-last-opened-buffer-ignore-p (buffer)
-    "Take object of BUFFER and return nil when don't need visit its."
-    (->> buffer (buffer-name) (s-trim) (s-prefix-p "*Minibuf")))
+(defun my--visit-last-opened-buffer-ignore-p (buffer)
+  "Take object of BUFFER and return nil when don't need visit its."
+  (->> buffer (buffer-name) (s-trim) (s-prefix-p "*Minibuf")))
 
-  (defun my-kill-current-buffer ()
-    "Kill current opened buffer."
-    (interactive)
-    (kill-buffer (current-buffer)))
+(defun my-kill-current-buffer ()
+  "Kill current opened buffer."
+  (interactive)
+  (kill-buffer (current-buffer)))
 
-  (leaf-keys
-   (xah-fly-command-map
-    :package xah-fly-keys
-    ("SPC 0" . my-visit-last-opened-buffer)
-    ("SPC u" . my-kill-current-buffer))))
+(leaf-keys
+ (xah-fly-command-map
+  :package xah-fly-keys
+  ("SPC 0" . 'my-visit-last-opened-buffer)
+  ("SPC u" . 'my-kill-current-buffer)))
 
 (provide 'my-buffer-navigation)
 ;;; my-buffer-navigation.el ends here

@@ -54,22 +54,11 @@
 
          ;; Open file
          ("o"       . dired-find-file-other-window)
-         ("j"       . my-dired-goto-parent-dir)
          ;; some other open files I define in the section "Dired Hacks: Open"
-
-         ;; Manipulation with file(s)
-         ;; copy/move/paste also defines in the section "Dired Hacks: Ranger"
-         ("SPC g"   . my-dired-delete)
-         ("SPC x"   . my-dired-delete-all-files)
-         ("SPC y"   . my-dired-duplicate)
-         ("f"       . my-dired-rename)
-         ("SPC TAB" . my-dired-move)
-         ("s"       . my-dired-new-file)
 
          ;; Mark files
          ("t"       . dired-mark)
          ("SPC u"   . dired-unmark-all-marks)
-         ("SPC a"   . my-dired-mark-all-files)
 
          ;; Misc.
          ("y"       . dired-undo)
@@ -82,100 +71,20 @@
   :config                               ;nofmt
   (leaf async :config (dired-async-mode 1))
 
-  (defmacro my-dired-save-excursion (&rest body)
-    "Evaluate BODY without change a file/directory at point."
-    (declare (indent 0))
-    `(let ((file (f-full (dired-file-name-at-point))))
-       ,@body
-       (dired-goto-file file)))
-
-  (advice-add 'dired-jump
-              :after (lambda (&rest _ignore) (xah-fly-insert-mode-activate))
-              '((name . "xah-fly-insert-mode-activate")))
-
-  (defun my-dired-mark-all-files ()
-    "Mark all file in `dired'."
-    (interactive)
-    (save-excursion (goto-char (point-min)) (dired-mark 1)))
-
-  (defmacro my-define-dired-command-taking-file (name args docstring &rest body)
-    "Define the command from function which take a 1 argument: filename."
-    (declare (indent 2))
-    `(defun ,name ()
-       (interactive)
-       ,docstring
-       (funcall
-        (lambda ,args ,@body)
-        (dired-get-filename))
-       (revert-buffer)))
-
-  (my-define-dired-command-taking-file my-dired-rename
-      (from)
-    "Rename file at point from FROM to other name readed from the minibuffer."
-    (let ((to (my-rename-file from)))
-      (revert-buffer)
-      (dired-goto-file to)))
-
-  (defun my-rename-file (file)
-    "Change name of FILE to new readed from the minibuffer name.
-
-Return new name of FILE"
-    (let* ((new-name-of-file
-            (read-string "New name, please: " (f-filename file)))
-           (to (f-join (f-dirname file) new-name-of-file)))
-      (f-move file to)
-      to))
-
-  (defun my-dired-move ()
-    "Move file of current directory of `dired' at the point."
-    (interactive)
-    (dired-do-rename))
-
-  (my-define-dired-command-taking-file my-dired-delete
-      (file)
-    "Delete file at dired object at current position of the cursor."
-    (f-delete file t))
-
-  (defun my-dired-goto-parent-dir ()
-    "Navigate to parent directory of current dired directory."
-    (interactive)
-    (let ((parent (f-parent (dired-current-directory))))
-      (kill-buffer)
-      (dired parent)
-      (dired-goto-file parent)))
-
-  (defun my-dired-new-file (filename)
-    "Create file with FILENAME in the directory which opened in the dired buffer."
-    (interactive "sName of new file, please: ")
-    (f-touch (f-join (dired-current-directory) filename))
-    (revert-buffer)
-    (dired-goto-file (f-full filename)))
-
-  (defun my-dired-delete-all-files ()
-    "Delete all files from the directory of the `dired' buffer."
-    (interactive)
-    (my-dired-mark-all-files)
-    (dired-do-delete)
-    (revert-buffer))
-
-  (defun dired-avy ()
-    "Version of `avy' for the `dired'."
-    (interactive)
-    (avy-goto-line))
-
-  (my-define-dired-command-taking-file my-dired-duplicate
-      (filename)
-    "Make copy of the file with FILENAME in the same directory."
-    (f-touch
-     (f-join
-      (dired-current-directory)
-      (read-string "Name of the filename, please: "
-                   (f-filename filename)))))
-
-  (defun my-dired-jump-to-home ()
-    "Open a `dired' buffer of the home directory."
-    (interactive)
-    (dired-jump nil "~/"))
+  (leaf my-dired-commands
+    :bind (:dired-mode-map
+           :package dired
+           ;; Mark anything
+           ("SPC a"   . my-dired-mark-all-files)
+           ;; Manipulation with file(s)
+           ;; copy/move/paste also defines in the section "Dired Hacks: Ranger"
+           ("SPC g"   . my-dired-delete)
+           ("SPC x"   . my-dired-delete-all-files)
+           ("SPC y"   . my-dired-duplicate)
+           ("f"       . my-dired-rename)
+           ("SPC TAB" . my-dired-move)
+           ("s"       . my-dired-new-file)
+           ("j"       . my-dired-goto-parent-dir)))
 
   (leaf dired-filter
     :ensure t
@@ -442,12 +351,9 @@ Return new name of FILE"
     :type '(repeat symbol)
     :group 'my)
 
-  (defun my-dired-new-directory (directory-name)
-    "My version of `dired-create-directory'.
-
-Main different is that forms like on {1,10} will be expanded to respective
-string"
-    (interactive "s\"Name\" of the directory(ies), please: "))
+  (advice-add 'dired-jump
+              :after (lambda (&rest _ignore) (xah-fly-insert-mode-activate))
+              '((name . "xah-fly-insert-mode-activate")))
 
   (--each my-dired-commands-using-minibuffer
     (advice-add it :after

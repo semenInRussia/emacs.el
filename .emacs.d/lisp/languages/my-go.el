@@ -29,8 +29,7 @@
 (leaf go-mode
   :ensure t
   :major-mode-map go
-  :bind (:my-go-local-map ("i" . go-import-add))
-  :config (leaf go-eldoc :ensure t :hook (go-mode-hook . go-eldoc-setup)))
+  :bind (:my-go-local-map ("i" . go-import-add)))
 
 (provide 'my-go)
 ;;; my-go.el ends here

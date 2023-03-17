@@ -1,4 +1,4 @@
-;;; my-pandoc.el --- My config for the tool pandoc
+;;; my-pandoc.el --- My config for the the pandoc
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -45,7 +45,7 @@
 
 (eval-after-load 'fast-exec
   '(progn
-     (fast-exec-bind pandoc
+     (fast-exec-bind 'pandoc
        (fast-exec-make-some-commands
         ("Convert Tex Files and Move to Documents Dir"
          'my-pandoc-tex-to-documents-dir)))))

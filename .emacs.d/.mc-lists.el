@@ -93,9 +93,15 @@
         org-toggle-heading
         orgtbl-hijacker-command-100
         orgtbl-hijacker-command-109
+        paxedit-open-bracket
         paxedit-open-round
         previous-line
         projectile-replace
+        puni-backward-kill-word
+        puni-backward-sexp
+        puni-forward-kill-word
+        puni-forward-sexp
+        puni-kill-line
         py-electric-colon
         quoted-insert
         rectangle-backward-char

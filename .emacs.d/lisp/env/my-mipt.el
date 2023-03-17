@@ -358,7 +358,7 @@ ID and a course name."
 
 (eval-after-load 'fast-exec
   '(progn
-     (fast-exec-bind mipt
+     (fast-exec-bind 'mipt
        (fast-exec-make-some-commands
         ("Next MIPT Task" 'my-mipt-next-task)
         ("Previous MIPT Task" 'my-mipt-prev-task)

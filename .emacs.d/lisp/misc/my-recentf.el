@@ -28,11 +28,7 @@
 ;;; Code:
 (leaf recentf
   :global-minor-mode recentf-mode
-  :custom (recentf-max-saved-items . 20000)
-  :bind (:xah-fly-command-map
-         :package xah-fly-keys
-         ("SPC k f" . recentf-open-files))
-  :hook (recentf-dialog-mode-hook . xah-fly-insert-mode-activate))
+  :custom (recentf-max-saved-items . 10000))
 
 (provide 'my-recentf)
 ;;; my-recentf.el ends here

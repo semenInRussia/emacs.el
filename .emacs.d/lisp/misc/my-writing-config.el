@@ -80,7 +80,7 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
 
 (eval-after-load 'fast-exec
   '(progn
-     (fast-exec-bind writing-config
+     (fast-exec-bind 'writing-config
        (fast-exec-make-some-commands
         ("New Config Module" 'my-new-config-module)))))
 
@@ -90,6 +90,7 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
          ("SPC SPC j" . leaf-find)))
 
 (leaf leaf-convert                     ;nofmt
+  :ensure t
   :bind (:my-elisp-local-map
          :package elisp-mode
          ("l" . my-leaf-convert-region)

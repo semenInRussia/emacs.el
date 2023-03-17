@@ -27,17 +27,16 @@
 
 ;;; Code:
 
+
 (leaf eldoc                             ;elfmt
   :ensure t
   :custom (eldoc-idle-delay . 0.01)
-  :config                               ;nofmt
-  (leaf eldoc-box                         ;elfmt
-    :ensure t
-    :init                                 ;nofmt
-    (define-global-minor-mode global-eldoc-box-hover-mode
-      eldoc-box-hover-mode
-      (lambda () (eldoc-box-hover-mode 1)))
-    :global-minor-mode global-eldoc-box-hover-mode))
+  :config (leaf eldoc-box
+            :ensure t
+            :init (define-global-minor-mode global-eldoc-box-hover-mode
+                    eldoc-box-hover-mode
+                    (lambda () (eldoc-box-hover-mode 1)))
+            :global-minor-mode global-eldoc-box-hover-mode))
 
 (provide 'my-eldoc)
 ;;; my-eldoc.el ends here

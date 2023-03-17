@@ -47,13 +47,13 @@ See `imenu-generic-expression'"
   :ensure t
   :major-mode-map markdown
   :bind (:my-markdown-local-map
-         ("<SPC>" . markdown-toggle-gfm-checkbox)
-         ("b"     . markdown-insert-bold)
-         ("i"     . markdown-insert-italic)
-         ("l"     . markdown-insert-link)
-         ("p"     . markdown-live-preview-mode)
-         ("'"     . markdown-edit-code-block)
-         ("<RET>" . markdown-follow-thing-at-point))
+         ("<SPC>" . 'markdown-toggle-gfm-checkbox)
+         ("b"     . 'markdown-insert-bold)
+         ("i"     . 'markdown-insert-italic)
+         ("l"     . 'markdown-insert-link)
+         ("p"     . 'markdown-live-preview-mode)
+         ("'"     . 'markdown-edit-code-block)
+         ("<RET>" . 'markdown-follow-thing-at-point))
   :hook ((markdown-mode-hook . visual-fill)
          (markdown-mode-hook .
                              (lambda ()

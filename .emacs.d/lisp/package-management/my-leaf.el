@@ -1,6 +1,6 @@
 ;;; my-leaf.el --- My config for `leaf' -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022 semenInRussia
+;; Copyright (C) 2022-2023 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
@@ -24,20 +24,16 @@
 
 ;;; Code:
 
-(require 'package)
-
 (straight-use-package 'leaf)
 (straight-use-package 'leaf-keywords)
-(straight-use-package 'leaf-convert)
-
-(leaf-keywords-init)
+(require 'leaf-keywords)
 
 (setq leaf-alias-keyword-alist '((:ensure . :straight)))
 
 (defun my-plist-get (plist prop &optional default)
-  "Wrapper on `plist-get', difference is that, if first elt isn't keyword work.
+  "Wrapper to `plist-get', but it's work if first el isn't keyword.
 
-Also take 3rd optional argument DEFAULT, which will be return if PROP is not
+Also accept 3rd optional argument DEFAULT, which will be return if PROP is not
 found in PLIST."
   (unless (keywordp (car plist))
     (setq plist (cdr plist)))
@@ -92,7 +88,7 @@ found in PLIST."
                   (unless (eq (-second-item it) 'quote)
                     (leaf-register-autoload (-second-item it) leaf--name)))
                 `((eval-after-load 'fast-exec
-                    '(fast-exec-bind ,name
+                    '(fast-exec-bind ',name
                        (fast-exec-make-some-commands ,@bindings)))
                   ,@leaf--body))))
 
@@ -112,9 +108,9 @@ found in PLIST."
             ,@leaf--body))))
 
 (defun my-flatten-list (lst)
-  "LST of the list of the list ... to list of the atom elements.
+  "LST of the lists of the lists ... to list of the atom elements.
 
-This is the version of `flatten-list', which isn't change ' to quote symbol."
+This is a version of `flatten-list', but it isn't change ' to 'quote."
   (delete 'quote (flatten-list lst)))
 
 (defun my-leaf-keywords-init ()

@@ -1,4 +1,4 @@
-;;; my-scratch.el --- My config for scratch
+;;; my-open-junk-file.el --- My config to `open-junk-file'
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,10 +23,10 @@
 
 ;;; Commentary:
 
-;; My config for scratch
+;; My config for open-junk-file
 
 ;;; Code:
 (leaf open-junk-file :ensure t :bind ("C-t" . 'open-junk-file))
 
-(provide 'my-scratch)
-;;; my-scratch.el ends here
+(provide 'my-open-junk-file)
+;;; my-open-junk-file.el ends here

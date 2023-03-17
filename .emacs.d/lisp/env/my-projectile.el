@@ -1,6 +1,6 @@
 ;;; my-projectile.el --- My configration of `projectile'
 
-;; Copyright (C) 2022 Semen Khramtsov
+;; Copyright (C) 2022-2023 Semen Khramtsov
 
 ;; Author: Semen Khramtsov <hrams205@gmail.com>
 ;; Version: 0.1
@@ -31,139 +31,6 @@
 (require 'f)
 (require 's)
 
-(defvar my-project-files-hash (make-hash-table :test 'equal))
-
-(defcustom my-project-gitignore-default-patterns
-  '(".git/" "*.exe")
-  "Patterns in .gitignore sytax style which should be ignore by default."
-  :type '(repeat string)
-  :group 'my)
-
-(defun my-project-root (&optional dir)
-  "Root of the project at DIR."
-  (or dir (setq dir default-directory))
-  (->>
-   projectile-known-projects
-   (--filter (s-starts-with? (f-full it) (f-full dir)))
-   (--max-by (> (f-depth it) (f-depth other)))))
-
-(defun my-projectile-root-local (dir)
-  "A simple wrapper around `projectile-project-root'.
-
-Return value at `projectile-project-root' when DIR is nil, otherwise return nil"
-  (unless dir projectile-project-root))
-
-(defun my-projectile-project-files (root &optional relatieve-paths)
-  "Return filenames list of the project at ROOT, with caching.
-
-If RELATIEVE-PATHS is non-nil, instead of the returns path relatieve to the
-ROOT"
-  (let ((root (f-full root))
-        files)
-    (unless (gethash root my-project-files-hash)
-      (puthash root
-               (my-no-cache-project-files root)
-               my-project-files-hash))
-    (let ((files (gethash root my-project-files-hash)))
-      (if relatieve-paths
-          (--map (s-chop-prefix root (f-full it)) files)
-        files))))
-
-(defun my-no-cache-project-files (root)
-  "Return filenames list of the project at ROOT, without caching."
-  (my-files-of-root-not-match-with-regexps
-   root
-   (my-project-gitignore-regexps root)))
-
-(defun my-files-of-root-not-match-with-regexps (root regexps)
-  "Return files list of ROOT each of it don't match with one of REGEXPS."
-  (--reduce-from
-   (cond
-    ;; don't modify
-    ((my-matches-with-one-of-p it regexps)
-     acc)
-    ((f-directory-p it)
-     (append acc
-             (my-files-of-root-not-match-with-regexps it regexps)))
-    (t (cons it acc)))
-   nil
-   (f-entries root)))
-
-(defun my-matches-with-one-of-p (str regexps)
-  "Return t, when one of REGEXPS has match with STR."
-  (--some (s-matches-p it str) regexps))
-
-(defun my-project-gitignore-regexps (root)
-  "Return list of regexp from .gitignore file of project at ROOT."
-  (--map
-   (my-regexp-from-gitignore-pattern it root)
-   (my-project-gitignore-patterns root)))
-
-(defun my-project-gitignore-patterns (root)
-  "Get patterns list with syntax of .gitignore files for the project at ROOT."
-  (append
-   (my-project-specific-gitignore-patterns root)
-   my-project-gitignore-default-patterns))
-
-(defun my-project-specific-gitignore-patterns (root)
-  "Parse .gitignore file of project at ROOT into list of ignored patterns."
-  (--when-let
-      (my-project-gitignore root)
-    (->>
-     it
-     (f-read)
-     (s-lines)
-     (--remove
-      (or (string-equal "" it) (my-gitignore-comment-line-p it))))))
-
-(defun my-project-gitignore (root)
-  "Return path to .gitignore file of the project at ROOT.
-
-If the project not contains .gitignore file, then return nil"
-  (let ((path (f-join root ".gitignore")))
-    (when (f-exists-p path) path)))
-
-(defun my-regexp-from-gitignore-pattern (regexp gitignore-root)
-  "From REGEXP of .gitignore file to real Elisp regular expression.
-
-GITIGNORE-ROOT directory is directory which contains .gitginore file."
-  ;; TODO Don't ignore files in project, which has same name with ignored
-  ;; directory
-  (let ((gitignore-root (f-full gitignore-root)))
-    (-->
-     regexp
-     (my-gitignore-rx-to-el it)
-     (s-chop-suffix "/" it)
-     (s-prepend
-      (if (s-prefix-p "/" it)
-          (s-chop-suffix "/" gitignore-root)
-        ".*/")
-      it))))
-
-(defun my-gitignore-rx-to-el (regexp)
-  "Transform REGEXP with regexp syntax as in .gitignore file to Elisp regexp."
-  (->>
-   regexp
-   (s-replace "*" "[^/]*")
-   (s-replace "\\" "")
-   (s-replace "." "\\.")))
-
-(defun my-gitignore-comment-line-p (line)
-  "Return non-nil, when LINE of .gitignore file source is commented."
-  (s-prefix-p "#" (s-trim line)))
-
-(defun projectile-project-files-clear-cache (root)
-  "Function `projectile-project-files' is cached, clear this cache for ROOT."
-  (interactive (list (projectile-acquire-root)))
-  (remhash (f-full root) my-project-files-hash))
-
-(defun my-projectile-files-with-string (string directory &optional _file-ext)
-  "Return a list of all files containing STRING in DIRECTORY."
-  (->>
-   directory
-   (projectile-project-files)
-   (--filter (s-contains-p string (f-read it)))))
-
 (leaf projectile
   :ensure t
   :defun (projectile-acquire-root
@@ -173,12 +40,14 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
           projectile-project-files
           projectile-maybe-invalidate-cache)
   :defvar (projectile-known-projects projectile-project-root)
-  :custom ((projectile-project-search-path . '("~/projects/"))
+  :custom ((projectile-switch-project-action . 'helm-projectile-find-file)
+           (projectile-project-search-path . '("~/projects/"))
            (projectile-completion-system . 'helm)
            (projectile-project-root-functions .
                                               '(projectile-root-local
                                                 my-project-root))
-           (projectile-enable-caching . nil))
+           ((projectile-enable-caching . nil)
+            (projectile-auto-discover . nil)))
   :global-minor-mode projectile-mode
   :config                               ;nofmt
   (leaf helm-projectile

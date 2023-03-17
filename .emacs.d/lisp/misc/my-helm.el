@@ -29,7 +29,7 @@
 (leaf helm
   :ensure t
   :after doom-modeline
-  :custom ((helm-M-x-fuzzy-match   . t)
+  :custom ((helm-M-x-fuzzy-match           . t)
            (helm-buffers-fuzzy-matching    . t)
            (helm-recentf-fuzzy-match       . t)
            (helm-imenu-fuzzy-match         . t)
@@ -51,9 +51,8 @@
   (leaf helm-ext
     :ensure t
     :require t
-    :config                             ;nofmt
-    (helm-ext-ff-enable-skipping-dots t)
-    (helm-ext-ff-enable-auto-path-expansion t)))
+    :custom ((helm-ext-ff-enable-skipping-dots       . t)
+             (helm-ext-ff-enable-auto-path-expansion . t))))
 
 (provide 'my-helm)
 ;;; my-helm.el ends here

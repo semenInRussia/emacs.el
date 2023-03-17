@@ -28,6 +28,7 @@
 (leaf org-roam
   :ensure t
   :init (f-mkdir "~/org-roam")
+  :commands org-roam-ui-mode
   :bind (:xah-fly-command-map
          :package xah-fly-keys
          ("SPC z f"   . org-roam-node-find)
@@ -43,10 +44,6 @@
   :config                               ;nofmt
   (f-mkdir "~/org-roam")
   (org-roam-db-autosync-mode t)
-
-  (add-hook
-   'org-roam-buffer-postrender-functions
-   'org-toggle-link-display)
 
   (add-to-list 'Info-directory-list
                (f-full "~/.emacs.d/straight/repos/org-roam/doc"))

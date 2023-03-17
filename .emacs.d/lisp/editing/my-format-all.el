@@ -27,8 +27,7 @@
 
 ;;; Code:
 
-(leaf format-all                        ;nofmt
-  :ensure t)
+(leaf format-all :ensure t)
 
 (provide 'my-format-all)
 ;;; my-format-all.el ends here

@@ -29,7 +29,7 @@
 
 (leaf multiple-cursors
   :ensure t
-  :defvar (multiple-cursors-mode)
+  :defvar multiple-cursors-mode
   :custom (my-mc-cmds-to-run-once .
                                   '(my-mark-all
                                     my-bob-or-mc-align
@@ -49,7 +49,9 @@
          ("SPC a"     . my-mark-all))
   :config                             ;nofmt
   (defun my-buffer-list-or-edit-lines ()
-    "Do `helm-buffer-list' or `mc/edit-lines'."
+    "Do either `helm-multi-files' or `mc/edit-lines' depends on context.
+
+If the region is active, then "
     (interactive)
     (if (use-region-p)
         (call-interactively #'mc/edit-lines)

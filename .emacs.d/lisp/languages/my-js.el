@@ -38,7 +38,6 @@
   (require 'lsp-bridge)
   (add-to-list 'lsp-bridge-single-lang-server-mode-list
                '(js-mode . "typescript"))
-  (leaf web-mode :ensure t)
   (leaf js-comint :ensure t))
 
 (leaf typescript-mode
