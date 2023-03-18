@@ -3,16 +3,14 @@
 ;;; Code:
 
 
-;;;### (autoloads nil "flycheck_my-films" "flycheck_my-films.el"
+;;;### (autoloads nil "flycheck_my-elisp-embrace" "flycheck_my-elisp-embrace.el"
 ;;;;;;  (0 0 0 0))
-;;; Generated autoloads from flycheck_my-films.el
+;;; Generated autoloads from flycheck_my-elisp-embrace.el
 
-(autoload 'my-films-add "flycheck_my-films" "\
-Add FILM to current org file, this file is db of films.
+(autoload 'my-embrace-emacs-lisp-mode-hook "flycheck_my-elisp-embrace" "\
+Add some parens for the Emacs-Lisp embrace." nil nil)
 
-\(fn FILM)" t nil)
-
-(register-definition-prefixes "flycheck_my-films" '("my-"))
+(register-definition-prefixes "flycheck_my-elisp-embrace" '("my-embrace-emacs-lisp-with-"))
 
 ;;;***
 
@@ -59,6 +57,17 @@ Insert new field of Lisp class.
 Only when in class defnition." t nil)
 
 (register-definition-prefixes "my-elisp-class-fields" '("my-"))
+
+;;;***
+
+;;;### (autoloads nil "my-elisp-embrace" "my-elisp-embrace.el" (0
+;;;;;;  0 0 0))
+;;; Generated autoloads from my-elisp-embrace.el
+
+(autoload 'my-embrace-emacs-lisp-mode-hook "my-elisp-embrace" "\
+Add some parens for the Emacs-Lisp embrace." nil nil)
+
+(register-definition-prefixes "my-elisp-embrace" '("my-embrace-emacs-lisp-with-"))
 
 ;;;***
 

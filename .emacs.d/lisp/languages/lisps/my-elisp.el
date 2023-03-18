@@ -33,11 +33,17 @@
                            lisp-interaction-mode)
                    :parent my-lisp-map)                             ; nofmt
   :hook (emacs-lisp-mode-hook . paxedit-mode)
-  :config (leaf inspector
-            :ensure t
-            :bind (:my-elisp-local-map
-                   :package elisp-mode
-                   ("i" . inspector-inspect-last-sexp))))
+  :config                               ;nofmt
+  (leaf inspector
+    :ensure t
+    :bind (:my-elisp-local-map
+           :package elisp-mode
+           ("i" . inspector-inspect-last-sexp)))
+
+  (leaf my-elisp-class-fields
+    :bind (:emacs-lisp-mode-map
+           :package elisp-mode
+           ("M-RET" . my-elisp-new-field-of-class))))
 
 (leaf ert
   :unless (fboundp 'debugger-make-xrefs)
@@ -69,87 +75,8 @@
 
 (leaf mocker :ensure t :doc "A library for testing `elisp' with mocks")
 
-(leaf my-elisp-class-fields
-  :bind (:emacs-lisp-mode-map
-         :package elisp-mode
-         ("M-RET" . my-elisp-new-field-of-class)))
-
-(leaf embrace
-  :hook (emacs-lisp-mode-hook . my-embrace-emacs-lisp-mode-hook)
-  :config                               ;nofmt
-  (defun my-embrace-emacs-lisp-mode-hook ()
-    "Add some parens for the Emacs-Lisp embrace."
-    (setq-local embrace-show-help-p nil)
-    (embrace-add-pair-regexp
-     ?f
-     "(\\(\\w\\|\\)* "
-     ")"
-     'my-embrace-emacs-lisp-with-function-call
-     (embrace-build-help "(name " ")"))
-    (embrace-add-pair-regexp
-     ?d
-     "(defun \\(\\w\\|-\\)+ (.*)
-  \\( *\".*?\"\\)?
-  \\((interactive \".*?\")\\)?"
-     ")"
-     'my-embrace-emacs-lisp-with-defun
-     (embrace-build-help "(defun " ")"))
-    (embrace-add-pair-regexp
-     ?c
-     "(defcustom \\(\\w\\|-\\)*[\n ]"
-     "\".*?\"[\n ]*\\(:\\(type\\|group\\) .*?)\\)*"
-     'my-embrace-emacs-lisp-with-defcustom
-     (embrace-build-help "(defcustom " ")")))
-
-  (defun my-embrace-emacs-lisp-with-function-call ()
-    "Return open and close pairs for the Elisp function call."
-    (cons
-     (s-concat "(" (read-string "Name of the function: ") " ")
-     ")"))
-
-  (defun my-embrace-emacs-lisp-with-defun ()
-    "Return open and close pairs for the Elisp defun paren."
-    (cons
-     (s-concat
-      "(defun "
-      (read-string "Name of the function, please: ")
-      " "
-      "("
-      (read-string "Args, please: ")
-      ")"
-      "\n"
-      "\""
-      (read-string "Docstring, please: ")
-      "\""
-      "\n"
-      (--if-let
-          (my-read-string-or-nil "Ineractive preamble please: ")
-          (s-concat "\"" it "\"")
-        ""))
-     ")"))
-
-  (defun my-embrace-emacs-lisp-with-defcustom ()
-    "Return open and close pairs for the Elisp defcustom paren."
-    (cons
-     (s-concat
-      "(defcustom "
-      (read-string "Name of the variable, please: ")
-      "\n")
-     (s-concat
-      "\n"
-      "\""
-      (read-string "Docstring, please: ")
-      "\""
-      "\n"
-      (--if-let
-          (my-read-string-or-nil "Group: ")
-          (s-concat ":group '" it "\n")
-        "")
-      (--if-let
-          (my-read-string-or-nil "Type: ")
-          (s-concat ":type '" it)
-        "")
-      ")"))))
+(leaf my-elisp-embrace
+  :hook (emacs-lisp-mode-hook . my-embrace-emacs-lisp-mode-hook))
 
 (provide 'my-elisp)
 ;;; my-elisp.el ends here
