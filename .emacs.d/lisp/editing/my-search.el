@@ -26,32 +26,29 @@
 ;; My configuration of the search
 
 ;;; Code:
-(leaf helm-swoop
+(leaf ctrlf
   :ensure t
-  :after helm
-  :bind ((:xah-fly-command-map
+  :bind (("C-s" . ctrlf-forward-default)
+         (:xah-fly-command-map
           :package xah-fly-keys
-          ("'"       . helm-swoop)
-          ("SPC k '" . helm-multi-swoop-current-mode))
-         (:helm-swoop-map              ;nofmt
-          ("M-j"     . helm-swoop-edit))
-         (:helm-swoop-edit-map         ;nofmt
-          ([remap save-buffer] . helm-swoop--edit-complete))))
-
-(leaf deadgrep
-  :ensure t
-  :bind (:xah-fly-command-map :package xah-fly-keys ("SPC '" . deadgrep)))
-
-(leaf projectile
-  :bind (:xah-fly-command-map
-         :package xah-fly-keys
-         ("SPC SPC r" . projectile-replace)))
+          ("'" . ctrlf-forward-default))))
 
 (leaf visual-regexp
   :ensure t
   :bind (:xah-fly-command-map
          :package xah-fly-keys
          ("SPC r" . vr/query-replace)))
+
+(leaf deadgrep
+  :ensure t
+  :custom (deadgrep-project-root-function . #'projectile-acquire-root)
+  :bind (:xah-fly-command-map :package xah-fly-keys
+                              ("SPC SPC '" . deadgrep)))
+
+(leaf helm-projectile
+  :bind (:xah-fly-command-map
+         :package xah-fly-keys
+         ("SPC SPC r" . projectile-replace)))
 
 (provide 'my-search)
 ;;; my-search.el ends here
