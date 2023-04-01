@@ -480,6 +480,13 @@ Will be expanded only on matching in empty line and not in math"
 
   (leaf my-latex-math-spaces :hook latex-mode)
 
+  (leaf latex-r
+    :load-path "~/projects/latex-r"
+    :bind (:my-latex-local-map
+           :package latex
+           ("l" . 'latex-r-cycle-math-parens)
+           ("k" . 'latex-r-split-environment)))
+
   (defun my-latex-disable-auto-fill ()
     "Disable `auto-fill-mode'."
     (interactive)
