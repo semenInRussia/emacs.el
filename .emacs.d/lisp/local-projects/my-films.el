@@ -45,6 +45,7 @@
    (rating    . (kinopoisk-film-rating film))
    (countries . (kinopoisk-film-countries film))))
 
+;;;###autoload
 (defun my-films-format-as-org-heading ()
   "Format an `kinopoisk-film' readed from the minibuffer as an org entry."
   (with-temp-buffer

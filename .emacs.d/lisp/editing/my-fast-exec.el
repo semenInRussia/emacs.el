@@ -50,10 +50,16 @@
    yasnippet
    haskell-mode
    helm-wikipedia)
-  (fast-exec-bind 'straight
-    (fast-exec-make-some-commands
-     ("Use Package" 'straight-use-package)))
-  (fast-exec-reload))
+  (leaf straight :fast-exec ("Use Package" 'straight-use-package))
+  (leaf my-mipt
+    :fast-exec (("Next MIPT Task" 'my-mipt-next-task)
+                ("Previous MIPT Task" 'my-mipt-prev-task)
+                ("Open Last MIPT Task" 'my-mipt-visit-last-task)
+                ("Find MIPT Task" 'my-mipt-task-visit)
+                ("Open MIPT Task in Web Browser" 'my-mipt-task-browse-course-url))
+    :bind (:my-latex-local-map
+           :package tex
+           ("c" . my-copy-buffer-content-as-mipt-solution))))
 
 (provide 'my-fast-exec)
 ;;; my-fast-exec.el ends here

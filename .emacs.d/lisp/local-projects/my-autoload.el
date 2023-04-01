@@ -3,17 +3,6 @@
 ;;; Code:
 
 
-;;;### (autoloads nil "flycheck_my-elisp-embrace" "flycheck_my-elisp-embrace.el"
-;;;;;;  (0 0 0 0))
-;;; Generated autoloads from flycheck_my-elisp-embrace.el
-
-(autoload 'my-embrace-emacs-lisp-mode-hook "flycheck_my-elisp-embrace" "\
-Add some parens for the Emacs-Lisp embrace." nil nil)
-
-(register-definition-prefixes "flycheck_my-elisp-embrace" '("my-embrace-emacs-lisp-with-"))
-
-;;;***
-
 ;;;### (autoloads nil "my-dired-commands" "my-dired-commands.el"
 ;;;;;;  (0 0 0 0))
 ;;; Generated autoloads from my-dired-commands.el
@@ -67,7 +56,8 @@ Only when in class defnition." t nil)
 (autoload 'my-embrace-emacs-lisp-mode-hook "my-elisp-embrace" "\
 Add some parens for the Emacs-Lisp embrace." nil nil)
 
-(register-definition-prefixes "my-elisp-embrace" '("my-embrace-emacs-lisp-with-"))
+(register-definition-prefixes "my-elisp-embrace"
+                              '("my-embrace-emacs-lisp-with-"))
 
 ;;;***
 
@@ -78,6 +68,9 @@ Add some parens for the Emacs-Lisp embrace." nil nil)
 Add FILM to current org file, this file is db of films.
 
 \(fn FILM)" t nil)
+
+(autoload 'my-films-format-as-org-heading "my-films" "\
+Format an `kinopoisk-film' readed from the minibuffer as an org entry." nil nil)
 
 (register-definition-prefixes "my-films" '("my-"))
 
@@ -92,6 +85,13 @@ Helm to generate .gitignore using gitignore.io." t nil)
 
 (register-definition-prefixes "my-helm-gitignore"
                               '("helm-gitignore--"))
+
+;;;***
+
+;;;### (autoloads nil "my-mipt" "my-mipt.el" (0 0 0 0))
+;;; Generated autoloads from my-mipt.el
+
+(register-definition-prefixes "my-mipt" '("my-"))
 
 ;;;***
 

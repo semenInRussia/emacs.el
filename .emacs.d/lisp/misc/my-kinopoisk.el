@@ -29,7 +29,7 @@
 (leaf helm-kinopoisk
   :after helm
   :load-path "~/projects/emacs-kinopoisk"
-  :commands (helm-kinopoisk-search-films helm-kinopoisk-see-films-top))
+  :commands helm-kinopoisk-search-films helm-kinopoisk-see-films-top)
 
 (provide 'my-kinopoisk)
 ;;; my-kinopoisk.el ends here
