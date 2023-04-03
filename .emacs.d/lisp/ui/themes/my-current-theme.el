@@ -32,6 +32,10 @@
 ;; - `solarized'
 ;; - `flatland-theme'
 
+(setq font-lock-maximum-decoration t
+      color-theme-is-global t
+      truncate-partial-width-windows nil)
+
 (with-eval-after-load 'my-monokai
   (require 'monokai-theme-autoloads)
   (load-theme 'monokai t))

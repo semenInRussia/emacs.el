@@ -26,9 +26,11 @@
 ;; My configuration of the `fast-exec'
 
 ;;; Code:
+
 (leaf fast-exec
   :load-path "~/projects/fast-exec.el/"
   :defun fast-exec-use
+  :hook (fast-exec-hint-buffer-mode-hook . visual-fill)
   :bind (:xah-fly-command-map           ;nofmt
          :package xah-fly-keys
          ("=" . fast-exec-exec))

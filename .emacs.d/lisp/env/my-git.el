@@ -1,4 +1,4 @@
-;;; my-git.el --- My config of `git'
+;;; my-git.el --- My config for the Git: the most popular version control
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -19,20 +19,17 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 ;;; Commentary:
 
-;; My config of `git'
+;; My config for the Git: the most popular version control.
 
 ;;; Code:
 
-(leaf git-gutter                        ;nofmt
+(leaf magit
   :ensure t
-  :hook prog-mode-hook)
-
-(leaf magit                             ;nofmt
-  :ensure t
+  :hook (magit-mode-hook . visual-fill)
   :custom (magit-refresh-status-buffer . nil))
 
 (leaf git-timemachine
@@ -43,6 +40,17 @@
 (leaf my-helm-gitignore
   :after helm
   :fast-exec ("Generate Gitignore" 'helm-gitignore))
+
+(leaf github-clone
+  :ensure t
+  :custom (github-clone-directory . "~/projects")
+  :fast-exec ("Clone a GitHub Project" 'github-clone))
+
+(leaf line-reminder
+  :ensure t
+  :hook prog-mode-hook
+  :custom ((line-reminder-bitmap . 'left-fringe)
+           (line-reminder-show-option . 'indicators)))
 
 (provide 'my-git)
 ;;; my-git.el ends here

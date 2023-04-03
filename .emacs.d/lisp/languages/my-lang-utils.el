@@ -28,14 +28,15 @@
 
 (leaf visual-fill-column
   :ensure t
-  :config                               ;nofmt
-  (defun visual-fill (&optional width)
-    (interactive)
-    (or width (setq width 70))
-    (setq-default visual-fill-column-width width
-                  visual-fill-column-center-text t)
-    (text-scale-mode 0)
-    (visual-fill-column-mode 1)))
+  :hook (prog-mode-hook . visual-fill))
+
+(defun visual-fill (&optional width)
+  (interactive)
+  (or width (setq width 70))
+  (setq-default visual-fill-column-width width
+                visual-fill-column-center-text t)
+  (text-scale-mode 0)
+  (visual-fill-column-mode 1))
 
 (add-hook 'prog-mode-hook
           (lambda () (interactive) (toggle-truncate-lines 1)))
