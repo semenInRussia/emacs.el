@@ -244,11 +244,38 @@ Using TESTFN in functions sush as `assoc' or `alist-get'"
 For example a/b/1.exe should be a/b/2.exe"
   (let ((dirname (f-dirname path))
         (base (f-base path))
-        (ext (f-ext path)))
+        (ext (f- path)))
     (->                                ;nofmt
      dirname
      (f-join (my-incs base))
      (f-swap-ext ext))))
+
+(defmacro time-it (form &optional iters)
+  "Return the average time to evaluate FORM ITERS time.
+
+ITERATIONS defaults to 1"
+  (or iters (setq iters 1))
+  `(let ((started (current-time)))
+     (--dotimes ,iters ,form)
+     (/ (float-time (time-since started)) ,iters)))
+
+(defmacro which-faster (iters &rest things)
+  "Print name of the most fast things from given THINGS.
+
+Also print average time to one iteration of each thing's call (do ITERS
+calls for each thing)
+
+Each thing is binding of name of thing (just a symbol without quote) and form
+which should be evaluated"
+  `(let ((times
+          (list
+           ,@(--map
+              `(cons ',(car it) (time-it ,(cadr it) ,iters))
+              things))))
+     (--each
+         (--sort (< (cdr it) (cdr other)) times)
+       (message "Thing `%s' took `%s's" (car it) (cdr it)))
+     (--sort (< (cdr it) (cdr other)) times)))
 
 (provide 'my-lib)
 ;;; my-lib.el ends here

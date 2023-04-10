@@ -32,7 +32,6 @@
 (leaf org-agenda                        ;nofmt
   :custom ((org-agenda-files .
                              '("~/agenda.org"
-                               "~/agnia.org"
                                "~/tasks-archive/task-archive.org"))
            (org-agenda-span . 14))
   :bind (("<f9>"      . org-agenda)
@@ -58,12 +57,22 @@
     (interactive)
     (find-file "~/agenda.org")))
 
-(leaf org-agenda
-  :after (org fast-exec)
-  :fast-exec ("Plane New Day" 'my-agenda-plan-new-day)
+(leaf org-gcal
+  :ensure t
+  :custom ((plstore-cache-passphrase-for-symmetric-encryption . t)
+           (org-gcal-client-id .
+                               "146209799006-1fgq6iblk629hc21e68v5988lnpfvnl1.apps.googleusercontent.com")
+           (org-gcal-client-secret . "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")
+           (org-gcal-fetch-file-alist
+            .
+            '(("hrams205@gmail.com" . "~/major.org")))))
 
+(leaf org-agenda
+  :after org
+  :fast-exec ("Plane New Day" 'my-agenda-plan-new-day)
+  :config                               ;nofmt
   (defun my-add-org-subtree-to-targets-on-day ()
-    "Add  a `org-mode' subtree at the point to the targets on day."
+    "Add an `org-mode' subtree at the point to the targets on day."
     (interactive)
     (save-excursion
       (let ((subtree-text (my-delete-and-get-text-of-org-subtree)))

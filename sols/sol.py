@@ -29,6 +29,8 @@ def main():
     for track in top_tracks["tracks"]:
         print(f"- {track['name']}")
 
+d = print(0)  + "" + dejdeij     + "djeide"
+
 
 if __name__ == "__main__":
     main()

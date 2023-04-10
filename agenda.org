@@ -10,16 +10,18 @@
 ** Habits
 
 *** TODO Append anything to the knowledge base ~zettelkasten~
-SCHEDULED: <2023-03-14 Вт .+1d>
+SCHEDULED: <2023-03-30 Чт .+1d>
 :PROPERTIES:
 :STYLE: habit
-:LAST_REPEAT: [2023-03-13 Пн 20:17]
+:LAST_REPEAT: [2023-03-29 Ср 19:51]
 :END:
 
+- State "DONE"       from "TODO"       [2023-03-29 Ср 19:51]
 - State "DONE"       from "TODO"       [2023-03-13 Пн 20:17]
 - State "DONE"       from "TODO"       [2023-03-07 Вт 15:28]
 - State "DONE"       from "TODO"       [2023-03-06 Пн 20:02]
 - State "DONE"       from "TODO"       [2023-03-05 Вс 15:06]
+
 *** TODO "Clean head"
 SCHEDULED: <2023-03-03 Пт .+1d>
 :PROPERTIES:
@@ -31,14 +33,26 @@ SCHEDULED: <2023-03-03 Пт .+1d>
 *** AFTER Physics OGE
 SCHEDULED: <2023-05-26 Пт>
 
+*** BEFORE SHUBA
+SCHEDULED: <2023-03-22 Ср 15:20>
+
 ** Targets on Week
+
+*** TODO [#C] Refactor tool for ~LaTeX~
+SCHEDULED: <2023-03-03 Пт>
+
+
+- [X] Rotation with $$, \(\) or \[\] form
+- [ ] Split an ~equation~ environment
+- [ ] Promote section (to subsection, subsection, paragraph, subparagraph)
+- [ ] Transpose sections, list items
+- [ ] Split one file into some files using \include and \input
 
 *** TODO [#C] Run a main file of the project in ~run-command-reicpes~ :run_command_recipes:
 
-*** DONE Buy the glasses for [[[[*Strikeball]]][Strikeball]]
-
 *** TODO Make a reformer for lisp
-DEADLINE: <2023-03-12 Вс> ~defun~, ~defun~ => ~lambda~
+
+- ~defun~, ~defun~ => ~lambda~
 - add/remove interactive binding for ~defun~ / ~lambda~ (depends on args)
 - add/remove docstring for ~defun~
 - add/remove ~autoload~
@@ -48,25 +62,7 @@ DEADLINE: <2023-03-12 Вс> ~defun~, ~defun~ => ~lambda~
   + change module name in the commentaries
 - defcustom=>defvar, defvar=>defcustom
 
-*** TODO [#C] Explore ~coq~
-
 *** TODO [#C] Fix ~org-roam-protocol~
-
-*** TODO More smart autocapilazation for lines after llist item in ~org-mode~
-
-In the following case first letter of line should be capitalizated.
-
-#+BEGIN_SRC org
-  - A line item
-  Next line here N is the first letter and it's should be capitalizated
-#+END_SRC
-
-#+BEGIN_SRC org
-  - A line item
-    next line here N is the first letter and it's shouldn't be capitalizated
-#+END_SRC
-
-*** TODO Fix the: equation => split
 
 *** TODO [#C] Make a useful notes explorer for ~org-roam~ within ~emacs~
 
@@ -89,7 +85,7 @@ Wanted features
 
 *** TODO [#C] Read main file when change ~graphicx~ pathes in ~my-latex-insert-image~
 
-Use ~TeX-master~
+ Use ~TeX-master~
 
 *** TODO [#C] Able to insert to Org/LaTeX plots from the ~calc~ + ~gnuplot~
 
@@ -97,9 +93,9 @@ Easy way to save image and insert into an ~org~ or ~latex~ buffer
 
 *** TODO [#A] ~autoformat~ for ~markdown~
 
-*** TODO [#C] Fix my project named ~stupid-site~
 *** TODO [#A] ZMS: linear equation
 DEADLINE: <2022-12-20 Вт>
+
 *** TODO [#C] Make system of school homeworks
 
 Needed features
@@ -112,9 +108,13 @@ Needed features
 - Mark as done
 
 *** TODO Check Documentation of ~run-command-recipes~
+
 *** TODO In python, when define method add self automatically
+
 *** TODO [#C] Lyrics for music managers of ~FreeSpotify_Back~
+
 *** TODO Capitalize at attributes like #+TITLE and #+AUTHOR
+
 *** TODO Make awesome insertion =pystrings= in =feature-mode=
 
 *** TODO Add to ~my-latex-insert~ able for insert label
@@ -122,40 +122,41 @@ Needed features
 Ref should have prefix ~fig:~ *test*
 
 *** TODO Support of the ~Makefile~ in ~run-command-recipes~
-*** TODO ~projectile~ into ~deadgrep~
-*** TODO Write ~emacs~ package for [[https://github.com/sitandr/quickpoeterGUI][quickpoeter]]
-*** TODO Tests for current features                       :orgroamexplorer:
+
 *** TODO Define trait for blog fetchers                     :orgroamexplorer:
+
 *** TODO Explore ~WebAssembly~                              :orgroamexplorer:
+
 *** TODO Write frontend for org-roam-fetcher using ~yew~    :orgroamexplorer:
+
 *** TODO Explore old, but popular ~WordPress~
 
 
 ****
 
+*** TODO Fix film management
+
+*** TODO Do support of the run ~espuds~ with ~eask~ onto ~run-command-recipes~
+
 ** Targets on Day
-
-*** TODO [#C] Refactor tool for ~latex~
-SCHEDULED: <2023-03-03 Пт>
-
-- Rotation with $$, \(\) or \[\] form
-- Equation env to split env
-- Promote section (to subsection, subsection, paragraph, subparagraph)
-- Transpose sections, list items
 
 * Books to Read
 
 ** MUST-READ S. N. U. F. F.
+
 Author: Pelevin
 
 ** MUST-READ Empire "V"
+
 Author: Pelevin
 
 ** MUST-READ Рэнт: биография Бастера Кейси
+
 Author: Chuck Palannik
 
 * Films
-** MUST-SEE Tár
+
+** SAW Tár
 :PROPERTIES:
 :name:     Тар
 :year:     2022
@@ -164,6 +165,7 @@ Author: Chuck Palannik
 :rating:   74.0
 :countries: (США)
 :END:
+
 ** MUST-SEE Top Gun: Maverick
 :PROPERTIES:
 :name:     Топ Ган: Мэверик
@@ -173,6 +175,7 @@ Author: Chuck Palannik
 :rating:   78.0
 :countries: (США)
 :END:
+
 ** MUST-SEE Triangle of Sadness
 :PROPERTIES:
 :name:     Треугольник печали
@@ -182,6 +185,7 @@ Author: Chuck Palannik
 :rating:   73.0
 :countries: (Великобритания Германия Греция Дания Мексика США Турция Франция Швейцария Швеция)
 :END:
+
 ** MUST-SEE Avatar: The Way of Water
 :PROPERTIES:
 :name:     Аватар: Путь воды
@@ -191,6 +195,7 @@ Author: Chuck Palannik
 :rating:   79.0
 :countries: (США)
 :END:
+
 ** MUST-SEE Blonde
 :PROPERTIES:
 :name:     Блондинка
@@ -200,6 +205,7 @@ Author: Chuck Palannik
 :rating:   61.0
 :countries: (США)
 :END:
+
 ** MUST-SEE Raiders of the Lost Ark
 :PROPERTIES:
 :name:     Индиана Джонс: В поисках утраченного ковчега
@@ -240,7 +246,7 @@ Author: Chuck Palannik
 :countries: (Великобритания Мальта Марокко США)
 :END:
 
-** MUST-SEE Summer of 84
+** SAW Summer of 84
 :PROPERTIES:
 :name:     Лето 84
 :year:     2017
@@ -249,6 +255,7 @@ Author: Chuck Palannik
 :rating:   69.0
 :countries: (Канада)
 :END:
+
 ** MUST-SEE Her
 :PROPERTIES:
 :name:     Она
@@ -258,6 +265,7 @@ Author: Chuck Palannik
 :rating:   76.0
 :countries: (США)
 :END:
+
 ** MUST-SEE Vice
 :PROPERTIES:
 :name:     Власть
@@ -267,6 +275,7 @@ Author: Chuck Palannik
 :rating:   71.0
 :countries: (США)
 :END:
+
 ** MUST-SEE The Big Short
 :PROPERTIES:
 :name:     Игра на понижение
@@ -276,6 +285,7 @@ Author: Chuck Palannik
 :rating:   74.0
 :countries: (США)
 :END:
+
 ** MUST-SEE Goodfellas
 :PROPERTIES:
 :name:     Славные парни
@@ -285,6 +295,7 @@ Author: Chuck Palannik
 :rating:   81.0
 :countries: (США)
 :END:
+
 ** MUST-SEE The Departed
 :PROPERTIES:
 :name:     Отступники
@@ -294,6 +305,7 @@ Author: Chuck Palannik
 :rating:   85.0
 :countries: (Гонконг США)
 :END:
+
 ** MUST-SEE Raging Bull
 :PROPERTIES:
 :name:     Бешеный бык
@@ -303,6 +315,7 @@ Author: Chuck Palannik
 :rating:   78.0
 :countries: (США)
 :END:
+
 ** MUST-SEE The Fighter
 :PROPERTIES:
 :name:     Боец
@@ -312,6 +325,7 @@ Author: Chuck Palannik
 :rating:   78.0
 :countries: (США)
 :END:
+
 ** MUST-SEE The Terminator
 :PROPERTIES:
 :name:     Терминатор
@@ -321,6 +335,7 @@ Author: Chuck Palannik
 :rating:   80.0
 :countries: (Великобритания США)
 :END:
+
 ** MUST-SEE Aliens
 :PROPERTIES:
 :name:     Чужие
@@ -330,6 +345,7 @@ Author: Chuck Palannik
 :rating:   81.0
 :countries: (Великобритания США)
 :END:
+
 ** MUST-SEE The Irishman
 :PROPERTIES:
 :name:     Ирландец
@@ -339,6 +355,7 @@ Author: Chuck Palannik
 :rating:   74.0
 :countries: (США)
 :END:
+
 ** MUST-SEE Jaws
 :PROPERTIES:
 :name:     Челюсти
@@ -348,6 +365,7 @@ Author: Chuck Palannik
 :rating:   73.0
 :countries: (США)
 :END:
+
 ** MUST-SEE Jurassic Park
 :PROPERTIES:
 :name:     Парк Юрского периода
@@ -357,6 +375,7 @@ Author: Chuck Palannik
 :rating:   78.0
 :countries: (США)
 :END:
+
 ** MUST-SEE Minority Report
 :PROPERTIES:
 :name:     Особое мнение
@@ -366,6 +385,7 @@ Author: Chuck Palannik
 :rating:   77.0
 :countries: (США)
 :END:
+
 ** MUST-SEE District 9
 :PROPERTIES:
 :name:     Район №9
@@ -375,6 +395,7 @@ Author: Chuck Palannik
 :rating:   78.0
 :countries: (Канада Новая Зеландия США ЮАР)
 :END:
+
 ** MUST-SEE I don't feel at home in this world anymore.
 :PROPERTIES:
 :name:     В этом мире я больше не чувствую себя как дома.
@@ -384,6 +405,7 @@ Author: Chuck Palannik
 :rating:   68.0
 :countries: (США)
 :END:
+
 ** MUST-SEE Birdman or (The Unexpected Virtue of Ignorance)
 :PROPERTIES:
 :name:     Бёрдмэн
@@ -393,6 +415,7 @@ Author: Chuck Palannik
 :rating:   76.0
 :countries: (США)
 :END:
+
 ** MUST-SEE Mind Game
 :PROPERTIES:
 :name:     Игра разума
@@ -402,6 +425,7 @@ Author: Chuck Palannik
 :rating:   76.0
 :countries: (Япония)
 :END:
+
 ** MUST-SEE 1917
 :PROPERTIES:
 :name:     1917
@@ -410,4 +434,40 @@ Author: Chuck Palannik
 :id:       1171976
 :rating:   79.0
 :countries: (Великобритания Индия Испания США)
+:END:
+** SAW The Social Network
+:PROPERTIES:
+:name:     Социальная сеть
+:year:     2010
+:slogan:   Нельзя завести 500 миллионов друзей, не нажив ни одного врага
+:id:       427198
+:rating:   77.0
+:countries: (США)
+:END:
+** MUST-SEE Split
+:PROPERTIES:
+:name:     Сплит
+:year:     2017
+:slogan:   Внутри Кевина живут 23 личности. Вскоре еще одна явит себя миру.
+:id:       930534
+:rating:   70.0
+:countries: (США Япония)
+:END:
+** MUST-SEE Silicon Valley
+:PROPERTIES:
+:name:     Силиконовая долина
+:year:     2014
+:slogan:   Когда масштаб имеет значение?
+:id:       723959
+:rating:   84.0
+:countries: (США)
+:END:
+** MUST-SEE Bronson
+:PROPERTIES:
+:name:     Бронсон
+:year:     2008
+:slogan:   The Man. The Myth. The Celebrity.
+:id:       438272
+:rating:   70.0
+:countries: (Великобритания Дания)
 :END:

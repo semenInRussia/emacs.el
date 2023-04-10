@@ -49,7 +49,7 @@
 (leaf line-reminder
   :ensure t
   :hook prog-mode-hook
-  :custom ((line-reminder-bitmap . 'left-fringe)
+  :custom ((line-reminder-bitmap . 'filled-rectangle)
            (line-reminder-show-option . 'indicators)))
 
 (provide 'my-git)

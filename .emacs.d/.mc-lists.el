@@ -13,6 +13,9 @@
         avy-yank-word
         backward-char
         backward-sexp
+        c-electric-brace
+        c-electric-lt-gt
+        c-electric-paren
         cdlatex-dollar
         cdlatex-math-modify
         cdlatex-pbb
@@ -75,6 +78,7 @@
         my-univeral-multiple-cursors-function
         my-xah-activate-insert-mode-or-replace-rectangle
         next-line
+        open-line-above
         open-line-below
         open-line-saving-indent
         org-cdlatex-underscore-caret
@@ -97,17 +101,20 @@
         paxedit-open-round
         previous-line
         projectile-replace
+        puni-backward-kill-line
         puni-backward-kill-word
         puni-backward-sexp
         puni-forward-kill-word
         puni-forward-sexp
         puni-kill-line
+        puni-slurp-forward
         py-electric-colon
         quoted-insert
         rectangle-backward-char
         rectangle-mark-mode
         rectangle-next-line
         repeat
+        rust-toggle-mutability
         ryo-modal-mode
         ryo:130cc23a4daeb4a5e1d91040266d3b00:mc/edit-lines
         ryo:37943079fa1140633b807dda2635fc75:my-buffer-list-or-edit-lines

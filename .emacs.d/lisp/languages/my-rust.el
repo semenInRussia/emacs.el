@@ -85,19 +85,33 @@
   (leaf embrace
     :after embrace
     :hook (rust-mode-hook . my-rust-embrace-hook)
-    :config (defun my-rust-embrace-hook
-                ()
-              "Add parens to `embrace' parens for `rust-mode'."
-              (embrace-add-pair ?v "Vec<" ">")
-              (embrace-add-pair ?b "Box<" ">")
-              (embrace-add-pair ?o "Option<" ">")
-              (embrace-add-pair ?r "Result<" ">")))
+    :config                             ;nofmt
 
-  (defun my-rust-whitespace-mode ()
-    "Change the `whitespace-mode' for `rust-mode'."
-    (interactive)
-    (setq-local whitespace-line-column 100)
-    whitespace-line-column))
+    (defun my-rust-embrace-hook ()
+      "Add parens to `embrace' parens for `rust-mode'."
+      (interactive)
+      (embrace-add-pair ?v "Vec<" ">")
+      (embrace-add-pair ?b "Box<" ">")
+      (embrace-add-pair ?o "Option<" ">")
+      (embrace-add-pair ?r "Result<" ">")
+      (embrace-add-pair-regexp ?p
+                               "print\\(ln\\)?!(\".*?\"," ")"
+                               (lambda ()
+                                 (interactive)
+                                 (cons
+                                  (concat
+                                   "println!("
+                                   (read-string
+                                    "Template to format string: "
+                                    "\"{}\"")
+                                   ", ")
+                                  ");"))))
+
+    (defun my-rust-whitespace-mode ()
+      "Change the `whitespace-mode' for `rust-mode'."
+      (interactive)
+      (setq-local whitespace-line-column 100)
+      whitespace-line-column)))
 
 (provide 'my-rust)
 ;;; my-rust.el ends here

@@ -8,8 +8,8 @@
  (rear-context-string . " ~fig:~ *test*\n\n")
  (position . 3803))
 ("org-capture-last-stored"
- (filename . "~/org-roam/20230312145734-series_pilot.org")
- (front-context-string . "#+filetags: :ser")
- (rear-context-string . "e: Series Pilot\n")
- (position . 90))
+ (filename . "~/agenda.org")
+ (front-context-string . "** MUST-SEE Bron")
+ (rear-context-string . "es: (США)\n:END:\n")
+ (position . 9589))
 )

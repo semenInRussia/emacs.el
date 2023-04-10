@@ -55,6 +55,7 @@
 (leaf unicode-fonts
   :ensure t
   :require t
+  :init (defvar ... nil)
   :config (setq unicode-fonts--instructions
                 (-remove-item '... unicode-fonts--instructions))
   (unicode-fonts-setup))
