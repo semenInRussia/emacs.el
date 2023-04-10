@@ -31,7 +31,8 @@
   :mode "\\.py\\'"
   :custom (python-shell-interpreter . "python")
   :hook (python-mode-hook . lsp-bridge-mode)
-  :custom (lsp-bridge-python-lsp-server . 'pylsp)
+  :custom ((lsp-bridge-python-lsp-server . nil)
+           (lsp-bridge-python-multi-lsp-server . "pyright_ruff"))
   :major-mode-map python
   :bind (:my-python-local-map
          :package org
@@ -64,11 +65,7 @@
 
 Active region is region from BEG to END"
     (interactive "r")
-    (save-excursion
-      (goto-char end)
-      (insert "]")
-      (goto-char beg)
-      (insert "Optional[")))
+    (save-excursion (goto-char end) (insert " | None")))
 
   (defun my-python-split-params ()
     "Split params of a python def block into some lines."
