@@ -482,6 +482,7 @@ Will be expanded only on matching in empty line and not in math"
 
   (leaf latex-r
     :load-path "~/projects/latex-r"
+    :commands (latex-r-cycle-math-parens latex-r-split-environment)
     :bind (:my-latex-local-map
            :package latex
            ("l" . 'latex-r-cycle-math-parens)
