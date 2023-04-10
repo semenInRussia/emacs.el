@@ -41,6 +41,7 @@
            (lsp-bridge-tex-lsp-server . 'texlab)
            ;; misc
            (lsp-bridge-diagnostic-display-errors-delay . 0.9)
+           (lsp-bridge-code-action-preview-delay . 20)
            (lsp-bridge-signature-show-function
             . 'eldoc-box--eldoc-message-function))
   :bind ((:xah-fly-command-map
