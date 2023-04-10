@@ -426,6 +426,9 @@ produced."
       (embrace-org-mode-hook)
       (setq-local embrace-show-help-p nil)))
 
+  (leaf org-table-sticky-header :ensure t :hook org-mode-hook)
+  (leaf org-autolist :ensure t :hook org-mode-hook)
+
   (leaf rorg
     :load-path "~/projects/rorg/"
     :bind (:my-org-local-map

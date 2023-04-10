@@ -84,50 +84,19 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
        (fast-exec-make-some-commands
         ("New Config Module" 'my-new-config-module)))))
 
-(leaf leaf                            ;nofmt
-  :bind (:xah-fly-command-map         ;nofmt
-         :package xah-fly-keys
-         ("SPC SPC j" . leaf-find)))
-
-(leaf leaf-convert                     ;nofmt
-  :ensure t
-  :bind (:my-elisp-local-map
-         :package elisp-mode
-         ("l" . my-leaf-convert-region)
-         ("v" . my-leaf-convert-clipboard))
-  :defun (my-writing-config . (my-leaf-convert-from-string-to-string))
-  :config                               ;nofmt
-  (defun my-leaf-convert-region (beg end)
-    "Read a sexp beetween BEG and END points convert it to `leaf' and replace."
-    (interactive "r")
-    (let* ((starting-sexp               ;nofmt
-            (just-text-in-region))
-           (leaf-sexp
-            (my-leaf-convert-from-string-to-string starting-sexp)))
-      (delete-region beg end)
-      (insert leaf-sexp)))
-
-  (defun my-leaf-convert-from-string-to-string (string)
-    "Convert a Lisp source as STRING to source using `leaf' as string."
-    (->>
-     string
-     (s-prepend "(progn")
-     (s-append ")")
-     (read)
-     (cons 'leaf-convert)
-     (eval)
-     (format "%s")))
-
-  (defun my-leaf-convert-clipboard ()
-    "Read a sexp from the kill ring, convert it to `leaf' format insert it."
-    (interactive)
-    (insert (my-leaf-convert-from-string-to-string (current-kill 0)))))
-
 (leaf ecukes
   :ensure t
   :bind (:my-feature-local-map :package feature-mode ("e" . ecukes))
   :hook (ecukes-mode-hook . my-feature-mode-hook)
   :config (leaf espuds :ensure t :require t))
+
+(leaf leaf
+  :bind (:xah-fly-command-map
+         :package xah-fly-keys
+         ("SPC SPC j" . 'leaf-find)))
+
+;;; this is an Emacs Start Up Profiler
+(leaf esup :ensure t)
 
 (provide 'my-writing-config)
 ;;; my-writing-config.el ends here
