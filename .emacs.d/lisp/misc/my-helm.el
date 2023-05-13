@@ -51,8 +51,9 @@
   (leaf helm-ext
     :ensure t
     :require t
-    :custom ((helm-ext-ff-enable-skipping-dots       . t)
-             (helm-ext-ff-enable-auto-path-expansion . t))))
+    :config                             ;nofmt
+    (helm-ext-ff-enable-skipping-dots t)
+    (helm-ext-ff-enable-auto-path-expansion t)))
 
 (provide 'my-helm)
 ;;; my-helm.el ends here
