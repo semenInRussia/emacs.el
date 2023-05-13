@@ -1,5 +1,6 @@
 #+TITLE: Agenda
 #+AUTHOR: semenInRussia
+
 #+TODO: TODO | DONE
 #+TODO: AFTER | BEFORE
 #+TODO: MUST-SEE | SAW
@@ -10,12 +11,14 @@
 ** Habits
 
 *** TODO Append anything to the knowledge base ~zettelkasten~
-SCHEDULED: <2023-03-30 Чт .+1d>
+SCHEDULED: <2023-05-03 Ср .+1d>
 :PROPERTIES:
 :STYLE: habit
-:LAST_REPEAT: [2023-03-29 Ср 19:51]
+:LAST_REPEAT: [2023-05-02 Вт 00:57]
 :END:
 
+- State "DONE" from "TODO" [2023-05-02 Вт 00:57] today i add some
+  thoughts about some AI tools (see [[id:bb800757-3145-4d44-80ef-42dd7fb09c52][The Infinite Drums Machine]])
 - State "DONE"       from "TODO"       [2023-03-29 Ср 19:51]
 - State "DONE"       from "TODO"       [2023-03-13 Пн 20:17]
 - State "DONE"       from "TODO"       [2023-03-07 Вт 15:28]
@@ -28,15 +31,30 @@ SCHEDULED: <2023-03-03 Пт .+1d>
 :STYLE: HABIT
 :END:
 
-** Events
-
-*** AFTER Physics OGE
-SCHEDULED: <2023-05-26 Пт>
-
-*** BEFORE SHUBA
-SCHEDULED: <2023-03-22 Ср 15:20>
-
 ** Targets on Week
+
+*** DONE See to some (maybe) useless emacs packages in my configuration
+
+- [X] my-latex-math-spaces
+- [X] latex-extra
+- [X] org-keys
+- [X] syntax-subword
+- [X] outline
+- [X] hl-anything
+- [X] helm-ext
+- [X] command-log-mode
+- [X] aggressive-fill-paragraph
+- [X] ace-jump-helm-line
+- [X] nano-agenda
+- [X] color-identifiers-mode
+- [X] org-gcal
+- [X] hl-todo
+- [X] github-clone
+- [X] dwim-shell-command
+- [X] puni
+- [X] rect
+- [X] goto-last-change
+
 
 *** TODO [#C] Refactor tool for ~LaTeX~
 SCHEDULED: <2023-03-03 Пт>
@@ -47,8 +65,6 @@ SCHEDULED: <2023-03-03 Пт>
 - [ ] Promote section (to subsection, subsection, paragraph, subparagraph)
 - [ ] Transpose sections, list items
 - [ ] Split one file into some files using \include and \input
-
-*** TODO [#C] Run a main file of the project in ~run-command-reicpes~ :run_command_recipes:
 
 *** TODO Make a reformer for lisp
 
@@ -62,27 +78,6 @@ SCHEDULED: <2023-03-03 Пт>
   + change module name in the commentaries
 - defcustom=>defvar, defvar=>defcustom
 
-*** TODO [#C] Fix ~org-roam-protocol~
-
-*** TODO [#C] Make a useful notes explorer for ~org-roam~ within ~emacs~
-
-Wanted features
-- Everywhere
-  + Navigate in links/backlinks
-- View buffer for note detail
-  + backlink
-  + internal links
-  + notes tags
-  + notes aliases
-  + notes references
-  + citations
-- View all notes in buffer
-  + Filter by tag
-  + Filter by name
-  + Filter by amount of links
-
-*** TODO [#C] Make faster ~magic-latex-buffer~
-
 *** TODO [#C] Read main file when change ~graphicx~ pathes in ~my-latex-insert-image~
 
  Use ~TeX-master~
@@ -91,10 +86,7 @@ Wanted features
 
 Easy way to save image and insert into an ~org~ or ~latex~ buffer
 
-*** TODO [#A] ~autoformat~ for ~markdown~
-
-*** TODO [#A] ZMS: linear equation
-DEADLINE: <2022-12-20 Вт>
+*** DONE [#A] ~autoformat~ for ~markdown~
 
 *** TODO [#C] Make system of school homeworks
 
@@ -109,7 +101,7 @@ Needed features
 
 *** TODO Check Documentation of ~run-command-recipes~
 
-*** TODO In python, when define method add self automatically
+*** TODO In python, when define method add =self= automatically
 
 *** TODO [#C] Lyrics for music managers of ~FreeSpotify_Back~
 
@@ -117,7 +109,7 @@ Needed features
 
 *** TODO Make awesome insertion =pystrings= in =feature-mode=
 
-*** TODO Add to ~my-latex-insert~ able for insert label
+*** TODO Add to ~my-latex-insert~ able to insert a label
 
 Ref should have prefix ~fig:~ *test*
 
@@ -129,17 +121,52 @@ Ref should have prefix ~fig:~ *test*
 
 *** TODO Write frontend for org-roam-fetcher using ~yew~    :orgroamexplorer:
 
-*** TODO Explore old, but popular ~WordPress~
-
-
-****
-
 *** TODO Fix film management
 
 *** TODO Do support of the run ~espuds~ with ~eask~ onto ~run-command-recipes~
-
+*** TODO Update the autoload file asynchronous
+*** TODO Limit ~elfmt~ (a little)
+*** TODO Change way to detect ERT tests in a project for ~run-command-recipes~
 ** Targets on Day
 
+*** DONE Make the full video
+SCHEDULED: <2023-04-26 Ср>
+
+*** TODO Do every day some things from Physics OGE
+SCHEDULED: <2023-05-03 Ср .+1d>
+:PROPERTIES:
+:LAST_REPEAT: [2023-05-02 Вт 20:32]
+:END:
+- State "DONE"       from "TODO"       [2023-05-02 Вт 20:32]
+*** TODO Solve a hard ICT task
+SCHEDULED: <2023-05-04 Чт .+2d>
+:PROPERTIES:
+:STYLE: habit
+:LAST_REPEAT: [2023-05-02 Вт 20:18]
+:END:
+- State "DONE"       from "TODO"       [2023-05-02 Вт 20:18]
+- State "DONE" from "TODO" [2023-05-01 Пн 22:37] i solve the task in
+  C++!! I was should write a program that find 4 sized things that
+  results in the sum a given target
+- State "DONE" from "TODO" [2023-04-30 Вс 23:17] ye I did 3 tasks on
+  leet code and understant that I'm LOX
+*** DONE Make minimal emacs
+SCHEDULED: <2023-05-02 Вт>
+
+Visit [[file+emacs:~/small-init.el][small-init.el]] to continue develop
+
+It should has an easy way to run and only necessary editor features to
+normal programming (without [[id:1b4eb549-84ab-42cf-9d34-fdb82c00deb4][LSP]] and todo's notes taking, only
+flycheck, minimal completion, minimal compiling and other small
+features).  The main goal is a fast start up and fast emacs rendering
+with a huge FPS without stupid lags
+
+*** DONE Extend the Zettelkasten with info about last physics topics
+SCHEDULED:<2023-04-28 Пт>
+*** TODO Make function ~all_ip_adresses~
+  SCHEDULED: <2023-05-08 Пн>
+
+  c:/Users/hrams/AppData/Roaming/sols/gists/all_ip_adresses.cpp
 * Books to Read
 
 ** MUST-READ S. N. U. F. F.
@@ -453,7 +480,7 @@ Author: Chuck Palannik
 :rating:   70.0
 :countries: (США Япония)
 :END:
-** MUST-SEE Silicon Valley
+** SAW Silicon Valley
 :PROPERTIES:
 :name:     Силиконовая долина
 :year:     2014

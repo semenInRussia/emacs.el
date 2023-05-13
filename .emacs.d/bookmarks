@@ -9,7 +9,7 @@
  (position . 3803))
 ("org-capture-last-stored"
  (filename . "~/agenda.org")
- (front-context-string . "** MUST-SEE Bron")
- (rear-context-string . "es: (США)\n:END:\n")
- (position . 9589))
+ (front-context-string . "*** TODO Make fu")
+ (rear-context-string . "<2023-04-28 Пт>\n")
+ (position . 4871))
 )

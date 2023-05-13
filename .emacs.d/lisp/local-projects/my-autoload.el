@@ -3,6 +3,20 @@
 ;;; Code:
 
 
+;;;### (autoloads nil "agnifize" "agnifize.el" (0 0 0 0))
+;;; Generated autoloads from agnifize.el
+
+(autoload 'agnifize-dwim "agnifize" "\
+Agnifize that you mean.
+
+By default agnifize the current buffer.  If a region is selected and active
+then agnifize source code between its bounds.  If do in a `dired' buffer, then
+try agnifize marked files." t nil)
+
+(register-definition-prefixes "agnifize" '("agn"))
+
+;;;***
+
 ;;;### (autoloads nil "my-dired-commands" "my-dired-commands.el"
 ;;;;;;  (0 0 0 0))
 ;;; Generated autoloads from my-dired-commands.el
@@ -106,18 +120,14 @@ Use each of rules tidy org." t nil)
 
 ;;;***
 
-;;;### (autoloads nil "my-org-editing" "my-org-editing.el" (25610
-;;;;;;  5732 0 0))
+;;;### (autoloads nil "my-org-editing" "my-org-editing.el" (0 0 0
+;;;;;;  0))
 ;;; Generated autoloads from my-org-editing.el
 
 (autoload 'my-org-clear-subtree "my-org-editing" "\
 Kill subtree at the position, and activate insertion mode." nil nil)
 
-(defvar my-org-table-cut-map
-  '(keymap
-    (46 . org-cut-special)
-    (99 . org-table-delete-column)
-    (114 . my-kill-line-or-region)))
+(defvar my-org-table-cut-map '(keymap (46 . org-cut-special) (99 . org-table-delete-column) (114 . my-kill-line-or-region)))
 
 (autoload 'my-org-cut "my-org-editing" "\
 Cut any `org' thing.
@@ -190,6 +200,10 @@ Return a list of all files containing STRING in DIRECTORY.
 \(fn STRING DIRECTORY &optional FILE-EXT)" nil nil)
 
 (register-definition-prefixes "my-project" '("my-"))
+
+;;;***
+
+;;;### (autoloads nil nil ("agnifize-test.el") (0 0 0 0))
 
 ;;;***
 

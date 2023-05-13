@@ -14,8 +14,7 @@
 (And "^I print the buffer content$"
   (lambda () (message "---\n%s\n---" (buffer-string))))
 
-(Given "^I disable modern-org-mode$"
-  (lambda () (org-modern-mode 0)))
+(Given "^I disable modern-org-mode$")
 
 (And "^I create id for org-mode heading$"
   (lambda ()

@@ -9,13 +9,18 @@
         TeX-insert-backslash
         TeX-insert-quote
         TeX-insert-sub-or-superscript
+        ace-window
         any-exchange-point-and-mark-or-splice-sexp
         avy-yank-word
         backward-char
         backward-sexp
         c-electric-brace
+        c-electric-colon
         c-electric-lt-gt
         c-electric-paren
+        c-electric-semi&comma
+        c-electric-slash
+        c-electric-star
         cdlatex-dollar
         cdlatex-math-modify
         cdlatex-pbb
@@ -130,6 +135,7 @@
         sp-join-sexp
         sp-kill-hybrid-sexp
         sp-kill-sexp
+        sp-kill-whole-line
         sp-rewrap-sexp
         sp-splice-sexp
         sp-splice-sexp-killing-backward
@@ -145,6 +151,7 @@
         syntax-subword-transpose
         toggle-input-method
         transpose-sexps
+        vr/query-replace
         xah-beginning-of-line-or-block
         xah-clean-whitespace
         xah-copy-all-or-region
@@ -163,6 +170,7 @@
         xah-toggle-letter-case
         xah-toggle-previous-letter-case
         xref-find-definitions
+        yank-rectangle
         yas-expand
         ))
 
