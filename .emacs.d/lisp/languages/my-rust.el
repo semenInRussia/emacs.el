@@ -91,6 +91,7 @@
       "Add parens to `embrace' parens for `rust-mode'."
       (interactive)
       (embrace-add-pair ?v "Vec<" ">")
+      (embrace-add-pair ?d "dbg!(" ")")
       (embrace-add-pair ?b "Box<" ">")
       (embrace-add-pair ?o "Option<" ">")
       (embrace-add-pair ?r "Result<" ">")
