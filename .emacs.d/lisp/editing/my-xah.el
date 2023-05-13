@@ -99,7 +99,11 @@ MODE defaults to the current `major-mode'.  See `my-local-major-mode-map-run'"
   :commands xah-fly-insert-mode-activate
   :require t
   :bind (("M-SPC" . xah-fly-command-mode-activate)
-         (:xah-fly-command-map ("SPC l" . my-local-major-mode-map) ("'" . nil)))
+         (:xah-fly-command-map
+          ("SPC l" . my-local-major-mode-map)
+          ("'" . nil)
+          ("4" . 'next-error)
+          ("C-4" . 'split-window-below)))
   :config                               ;nofmt
   (xah-fly-keys-set-layout "qwerty")
   (xah-fly-keys 1)
