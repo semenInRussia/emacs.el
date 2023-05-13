@@ -1,0 +1,17 @@
+{
+  "completion": ["pyright"],
+  "completion_item_resolve": ["pyright"],
+  "diagnostics": ["ruff", "pyright"],
+  "code_action": ["ruff"],
+  "execute_command": ["pyright", "ruff"],
+  "find_define": "pyright",
+  "find_type_define": "pyright",
+  "find_implementation": "pyright",
+  "find_references": "pyright",
+  "formatting": "ruff",
+  "hover": "pyright",
+  "signature_help": "pyright",
+  "prepare_rename": "pyright",
+  "rename": "pyright",
+  "document_symbol": "pyright"
+}

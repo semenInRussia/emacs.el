@@ -1,0 +1,9 @@
+{
+  "name": "rome",
+  "languageId": "TypeScript",
+  "command": [
+    "rome",
+    "lsp-proxy"
+  ],
+  "settings": {  }
+}

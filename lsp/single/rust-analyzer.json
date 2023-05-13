@@ -1,0 +1,39 @@
+{
+  "name": "rust-analyzer",
+  "languageId": "rust",
+  "command": ["rust-analyzer"],
+  "settings": {},
+  "initializationOptions": {
+    "enableExperimental": false,
+    "diagnostics": {
+      "enable": true
+    },
+    "cargo": {
+      "features": "all",
+      "noDefaultFeatures": false,
+      "runBuildScripts": true,
+      "loadOutDirsFromCheck": true,
+      "useRustcWrapperForBuildScripts": true,
+      "autoreload": true,
+      "buildScripts": {
+        "enable": true
+      }
+    },
+    "completion": {
+      "addCallParenthesis": true,
+      "addCallArgumentSnippets": true,
+      "postfix": {
+        "enable": false
+      },
+      "autoimport": {
+        "enable": true
+      }
+    },
+    "procMacro": {
+      "enable": true
+    },
+    "lens": {
+      "enable": false
+    }
+  }
+}

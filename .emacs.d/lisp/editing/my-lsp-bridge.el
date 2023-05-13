@@ -30,17 +30,21 @@
 
 (leaf lsp-bridge
   :load-path* "lisp/site-lisp/lsp-bridge"
-  :hook ((lsp-bridge-mode-hook . (lambda () (company-mode 0)))
+  :hook ((lsp-bridge-user-multiserver-dir . "~/lsp/multi")
+         (lsp-bridge-user-langserver-dir . "~/lsp/single/")
+         (lsp-bridge-mode-hook . (lambda () (company-mode 0)))
          (lsp-bridge-mode-hook . turn-off-flycheck))
   :custom (;; features
            (lsp-bridge-enable-hover-diagnostic . t)
            (acm-enable-tabnine . nil)
            (acm-enable-quick-access . t)
            ;; choose LSP servers
-           (lsp-bridge-python-lsp-server . 'pylsp)
            (lsp-bridge-tex-lsp-server . 'texlab)
+           (lsp-bridge-multi-lang-server-extension-list . nil)
            ;; misc
            (lsp-bridge-diagnostic-display-errors-delay . 0.9)
+           ;; use helm instead of popup for autofixes
+           (lsp-bridge-code-action-enable-popup-menu . nil)
            (lsp-bridge-code-action-preview-delay . 20)
            (lsp-bridge-signature-show-function
             . 'eldoc-box--eldoc-message-function))
@@ -51,6 +55,7 @@
           ("SPC SPC RET" . 'lsp-bridge-code-action)
           ("SPC , ,"     . 'lsp-bridge-find-references))
          (:lsp-bridge-mode-map
+          ([remap xref-pop-marker-stack] . 'lsp-bridge-pop)
           ([remap xref-find-definitions] . 'lsp-bridge-find-def)
           ([remap helm-imenu-anywhere] . 'lsp-bridge-workspace-list-symbols)
           ([remap my-format-expression] . 'lsp-bridge-code-format)
@@ -61,8 +66,7 @@
           ("M-n" . 'lsp-bridge-call-hierarchy-next)
           ("M-p" . 'lsp-bridge-call-hierarchy-prev)))
   :fast-exec (("Start a LSP Server for Current Buffer" 'lsp-bridge-mode)
-              ("Reconnect the LSP Server" 'lsp-bridge-restart-process))
-  :advice ((:after lsp-bridge-code-action xah-fly-insert-mode-activate)))
+              ("Reconnect the LSP Server" 'lsp-bridge-restart-process)))
 
 (provide 'my-lsp-bridge)
 ;;; my-lsp-bridge.el ends here
