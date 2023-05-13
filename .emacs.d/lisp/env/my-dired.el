@@ -62,6 +62,7 @@
 
          ;; Misc.
          ("y"       . dired-undo)
+         ("A"       . agnifize-dwim)
          ("~"       . my-dired-jump-to-home)
 
          ;; Key bindings which not change your commands
@@ -69,7 +70,8 @@
          (","       . xah-next-window-or-frame))
 
   :config                               ;nofmt
-  (leaf async :config (dired-async-mode 1))
+  (leaf async                           ;nofmt
+    :config (dired-async-mode 1))
 
   (leaf my-dired-commands
     :bind (:dired-mode-map
