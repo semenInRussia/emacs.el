@@ -61,16 +61,28 @@ ROOT"
       (puthash root
                (my-project-files-no-cache root)
                my-project-files-hash))
-    (let ((files (gethash root my-project-files-hash)))
-      (if relatieve-paths
-          (--map (s-chop-prefix root (f-full it)) files)
-        files))))
+    (setq files (gethash root my-project-files-hash))
+    (if relatieve-paths
+        (--map (s-chop-prefix root (f-full it)) files)
+      files)))
 
 (defun my-project-files-no-cache (root)
   "Return filenames list of the project at ROOT, without caching."
-  (my-files-of-root-not-match-with-regexps
-   root
-   (my-project-gitignore-regexps root)))
+  (if (f-exists-p (f-join root ".git"))
+      (let ((default-directory root))
+        (->>
+         (shell-command-to-string "git ls-files")
+         (s-trim)
+         (s-lines)))
+    (my-files-of-root-not-match-with-regexps
+     root
+     (my-project-gitignore-regexps root))))
+
+;;;###autoload
+(defun projectile-project-files-clear-cache (root)
+  "Function `projectile-project-files' is cached, clear this cache for ROOT."
+  (interactive (list (projectile-acquire-root)))
+  (remhash (f-full root) my-project-files-hash))
 
 (defun my-files-of-root-not-match-with-regexps (root regexps)
   "Return files list of ROOT each of it don't match with one of REGEXPS."
@@ -148,11 +160,82 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
   "Return non-nil, if a LINE of .gitignore file is commented."
   (s-prefix-p "#" (s-trim line)))
 
-;;;###autoload
-(defun projectile-project-files-clear-cache (root)
-  "Function `projectile-project-files' is cached, clear this cache for ROOT."
-  (interactive (list (projectile-acquire-root)))
-  (remhash (f-full root) my-project-files-hash))
+
+(defun my-files-of-root-not-match-with-regexps (root regexps)
+  "Return files list of ROOT each of it don't match with one of REGEXPS."
+  (--reduce-from
+   (cond
+    ((my-matches-with-one-of-p (f-full it) regexps)
+     acc)
+    ((f-directory-p it)
+     (append acc
+             (my-files-of-root-not-match-with-regexps it regexps)))
+    (t (cons it acc)))
+   nil
+   (f-entries root)))
+
+(defun my-matches-with-one-of-p (str regexps)
+  "Return non-nil, when one of REGEXPS has match with STR."
+  (--find (s-matches-p it str) regexps))
+
+(defun my-project-gitignore-regexps (root)
+  "Return list of regexp from .gitignore file of project at ROOT."
+  (--map
+   (my-regexp-from-gitignore-pattern it root)
+   (my-project-gitignore-patterns root)))
+
+(defun my-project-gitignore-patterns (root)
+  "Get patterns list with syntax of .gitignore files for the project at ROOT."
+  (append
+   (my-project-specific-gitignore-patterns root)
+   my-project-gitignore-default-patterns))
+
+(defun my-project-specific-gitignore-patterns (root)
+  "Parse .gitignore file of project at ROOT into list of ignored patterns."
+  (--when-let
+      (my-project-gitignore root)
+    (->>
+     it
+     (f-read)
+     (s-lines)
+     (--remove
+      (or (string-equal "" it) (my-gitignore-comment-line-p it))))))
+
+(defun my-project-gitignore (root)
+  "Return path to .gitignore file of the project at ROOT.
+
+If the project not contains .gitignore file, then return nil"
+  (let ((path (f-join root ".gitignore")))
+    (when (f-exists-p path) path)))
+
+(defun my-regexp-from-gitignore-pattern (regexp gitignore-root)
+  "From REGEXP of .gitignore file to real Elisp regular expression.
+
+Notice that a gitignore pattern like \"target/\" converted from this function
+won't be matched with paths like \"target/debug\" only strict \"target\"
+
+GITIGNORE-ROOT directory is directory which contains .gitginore file."
+  ;; TODO Don't ignore files in project, which has same name with ignored
+  ;; directory
+  (let ((gitignore-root (f-full gitignore-root)))
+    (-->
+     regexp
+     (my-gitignore-rx-to-el it)
+     (if (s-starts-with-p "/" it)
+         (f-join gitignore-root (s-chop-prefix "/" it))
+       (concat ".*/" it)))))
+
+(defun my-gitignore-rx-to-el (regexp)
+  "Transform REGEXP with regexp syntax as in .gitignore file to Elisp regexp."
+  (->>
+   regexp
+   (s-replace "*" "[^/]*")
+   (s-replace "\\" "")
+   (s-replace "." "\\.")))
+
+(defun my-gitignore-comment-line-p (line)
+  "Return non-nil, if a LINE of .gitignore file is commented."
+  (s-prefix-p "#" (s-trim line)))
 
 ;;;###autoload
 (defun my-projectile-files-with-string (string directory &optional _file-ext)
