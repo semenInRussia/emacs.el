@@ -166,5 +166,14 @@ If caption isn't empty string, then insert image with the caption CAPTION."
   (make-directory (f-dirname new-filename) t)
   (url-copy-file url new-filename t))
 
+(defun my-org-toggle-checkbox ()
+  "My version of `org-toggle-checkbox'.
+
+The difference is that after this function you can hit the last hitted
+keystroke and it calls function again."
+  (interactive)
+  (org-toggle-checkbox)
+  (one-shot-keybinding " " this-command))
+
 (provide 'my-org-editing)
 ;;; my-org-editing.el ends here
