@@ -52,11 +52,5 @@
             (ts-fold-toggle)
             (repeat-at-last-keystroke)))
 
-(leaf helm-tree-sitter
-  :ensure t
-  :bind (:tree-sitter-mode-map
-         :package tree-sitter
-         ([remap helm-imenu] . 'helm-tree-sitter)))
-
 (provide 'my-tree-sitter)
 ;;; my-tree-sitter.el ends here
