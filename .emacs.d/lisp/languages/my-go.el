@@ -29,6 +29,7 @@
 (leaf go-mode
   :ensure t
   :major-mode-map go
+  :hook (go-mode-hook . lsp-bridge-mode)
   :bind (:my-go-local-map ("i" . go-import-add)))
 
 (provide 'my-go)

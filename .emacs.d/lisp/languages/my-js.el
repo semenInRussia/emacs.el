@@ -36,8 +36,9 @@
   :mode "\\.js$"
   :config                               ;nofmt
   (require 'lsp-bridge)
-  (add-to-list 'lsp-bridge-single-lang-server-mode-list
-               '(js-mode . "typescript"))
+  (add-to-list 'lsp-bridge-multi-lang-server-mode-list
+               '((typescript-mode js-mode)
+                 . "typescript_rome"))
   (leaf js-comint :ensure t))
 
 (leaf typescript-mode
@@ -46,8 +47,9 @@
   :custom (typescript-indent-level . 2)
   :config                               ;nofmt
   (require 'lsp-bridge)
-  (add-to-list 'lsp-bridge-single-lang-server-mode-list
-               '(typescript-mode . "typescript")))
+  (add-to-list 'lsp-bridge-multi-lang-server-mode-list
+               '((typescript-mode js-mode)
+                 . "typescript_rome")))
 
 (provide 'my-js)
 ;;; my-js.el ends here
