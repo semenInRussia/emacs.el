@@ -30,7 +30,8 @@
   :ensure t
   :mode "\\.py\\'"
   :custom (python-shell-interpreter . "python")
-  :hook (python-mode-hook . lsp-bridge-mode)
+  :hook ((python-mode-hook . my-python-fix-whitespaces-mode)
+         (python-mode-hook . lsp-bridge-mode))
   :custom ((lsp-bridge-python-lsp-server . nil)
            (lsp-bridge-python-multi-lsp-server . "pyright_ruff"))
   :major-mode-map python
@@ -65,7 +66,16 @@
 
 Active region is region from BEG to END"
     (interactive "r")
-    (save-excursion (goto-char end) (insert " | None")))
+    (let ((init-pos (point)))
+      (goto-char end)
+      (insert "]")
+      (goto-char beg)
+      (insert "Optional[")))
+
+  (defun my-python-fix-whitespaces-mode ()
+    "Fix `whitespace-mode' for `python-mode'."
+    (interactive)
+    (setq-local whitespace-line-column 88))
 
   (defun my-python-split-params ()
     "Split params of a python def block into some lines."
