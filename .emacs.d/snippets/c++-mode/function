@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: func
+# key: f
+# --
+${1:int} ${2:name}(${3:args}) {
+    $0
+    return 0;
+}
