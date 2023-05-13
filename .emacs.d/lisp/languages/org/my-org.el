@@ -415,8 +415,6 @@ produced."
   (leaf my-org-options
     :bind (:my-org-local-map :package org ("." . my-org-options-transient)))
 
-  (leaf org-modern :ensure t :global-minor-mode global-org-modern-mode)
-
   (leaf embrace
     :ensure t
     :hook (org-mode-hook . my-embrace-org-mode-hook)

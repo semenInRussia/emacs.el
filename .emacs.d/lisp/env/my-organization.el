@@ -57,15 +57,15 @@
     (interactive)
     (find-file "~/agenda.org")))
 
-(leaf org-gcal
-  :ensure t
-  :custom ((plstore-cache-passphrase-for-symmetric-encryption . t)
-           (org-gcal-client-id .
-                               "146209799006-1fgq6iblk629hc21e68v5988lnpfvnl1.apps.googleusercontent.com")
-           (org-gcal-client-secret . "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")
-           (org-gcal-fetch-file-alist
-            .
-            '(("hrams205@gmail.com" . "~/major.org")))))
+;; (leaf org-gcal
+;;   :ensure t
+;;   :custom ((plstore-cache-passphrase-for-symmetric-encryption . t)
+;;            (org-gcal-client-id .
+;;                                "146209799006-1fgq6iblk629hc21e68v5988lnpfvnl1.apps.googleusercontent.com")
+;;            (org-gcal-client-secret . "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")
+;;            (org-gcal-fetch-file-alist
+;;             .
+;;             '(("hrams205@gmail.com" . "~/major.org")))))
 
 (leaf org-agenda
   :after org

@@ -29,8 +29,6 @@
 
 (require 'my-lib)
 
-(leaf puni :ensure t)
-
 (leaf smartparens
   :ensure t
   :global-minor-mode smartparens-global-mode
@@ -49,28 +47,28 @@
           ("DEL"       . delete-only-1-char)
           ("SPC 8"     . sp-kill-sexp)
           ("SPC k e"   . sp-backward-kill-sexp)
-          ("SPC SPC g" . 'puni-kill-line)
-          ("SPC SPC e" . 'puni-backward-kill-line)
+          ("SPC SPC g" . sp-kill-hybrid-sexp)
+          ("SPC SPC e" . sp-backward-kill-line)
           ("SPC -"     . sp-rewrap-sexp)
-          ("-"         . 'puni-splice)
-          ("SPC 9"     . 'puni-squeeze)
+          ("-"         . sp-splice)
+          ("SPC 9"     . sp-change-enclosing)
 
           ;; Change wrap placement
-          ("]"         . 'puni-slurp-forward)
-          ("["         . 'puni-barf-forward)
-          ("SPC ["     . 'puni-slurp-backward)
-          ("SPC ]"     . 'puni-barf-backward)
-          ("SPC ="     . 'puni-raise)
+          ("]"         . 'sp-slurp-hybrid-sexp)
+          ("["         . 'sp-forward-barf-sexp)
+          ("SPC ["     . 'sp-backward-slurp-sexp)
+          ("SPC ]"     . 'sp-backward-barf-sexp)
+          ("SPC ="     . 'sp-raise-sexp)
 
           ;; Navigation
-          ("m"         . 'puni-backward-sexp)
-          ("."         . 'puni-forward-sexp)
+          ("m"         . 'sp-backward-sexp)
+          ("."         . 'sp-forward-sexp)
 
           ;; misc.
           ("SPC 1"     . sp-join-sexp)
-          ("SPC SPC 1" . 'puni-split)
+          ("SPC SPC 1" . sp-split-sexp)
           ("SPC SPC y" . my-sp-clone)))
-  :config                             ;nofmt
+  :config                               ;nofmt
   (defun my-sp-clone ()
     (interactive)
     (sp-clone-sexp)

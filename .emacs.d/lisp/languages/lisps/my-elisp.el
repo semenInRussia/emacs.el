@@ -66,7 +66,6 @@
 
 (leaf elfmt
   :ensure (elfmt :host github :repo "riscy/elfmt")
-  :global-minor-mode elfmt-global-mode
   :bind (:emacs-lisp-mode-map
          :package elisp-mode
          ([remap my-format-expression] . 'elfmt-sexp)))
@@ -77,6 +76,9 @@
 
 (leaf my-elisp-embrace
   :hook (emacs-lisp-mode-hook . my-embrace-emacs-lisp-mode-hook))
+
+(leaf debug)
+  ;:config (advice-add 'debugger-quit :after 'xah-fly-command-mode-activate))
 
 (provide 'my-elisp)
 ;;; my-elisp.el ends here

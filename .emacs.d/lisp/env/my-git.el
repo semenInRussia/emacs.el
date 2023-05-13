@@ -30,7 +30,14 @@
 (leaf magit
   :ensure t
   :hook (magit-mode-hook . visual-fill)
-  :custom (magit-refresh-status-buffer . nil))
+  :custom ((magit-refresh-status-buffer . nil)
+           (magit-disabled-section-inserters
+            . '(magit-insert-push-branch-header
+                magit-insert-tags-header
+                magit-insert-unpushed-to-upstream-or-recent
+                magit-insert-unpulled-from-upstream)))
+  :advice ((:after magit-gitignore xah-fly-insert-mode-activate)
+           (:after magit-gitignore-in-top xah-fly-insert-mode-activate)))
 
 (leaf git-timemachine
   :ensure (git-timemachine :host gitlab :repo "pidu/git-timemachine"))
