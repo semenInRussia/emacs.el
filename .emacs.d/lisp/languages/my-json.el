@@ -26,13 +26,24 @@
 ;; My configuration for json
 
 ;;; Code:
+
 (leaf json-mode
   :ensure t
   :major-mode-map json
+  :bind (:json-mode-map
+         ([:remap my-format-expression] . json-pretty-print-buffer))
+  :hook (json-mode-hook . my-json-fix-indent-funcs)
   :config                               ;nofmt
   (leaf json-snatcher
     :ensure t
-    :bind (:my-json-local-map :package json-mode ("c" . jsons-print-path))))
+    :bind (:my-json-local-map           ;nofmt
+           :package json-mode
+           ("c" . jsons-print-path)))
+
+  (defun my-json-fix-indent-funcs ()
+    "Fix the functions that changes indent in JSON files."
+    (interactive)
+    (setq-local js-indent-level 2)))
 
 (provide 'my-json)
 ;;; my-json.el ends here
