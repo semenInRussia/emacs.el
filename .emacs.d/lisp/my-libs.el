@@ -36,6 +36,8 @@
   :ensure (just :host github :repo "semenInRussia/just.el")
   :require t)
 
+(leaf queue :ensure t)
+
 (leaf request :ensure t)
 
 (provide 'my-libs)

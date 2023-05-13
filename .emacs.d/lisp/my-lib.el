@@ -277,5 +277,9 @@ which should be evaluated"
        (message "Thing `%s' took `%s's" (car it) (cdr it)))
      (--sort (< (cdr it) (cdr other)) times)))
 
+(defun my-current-year ()
+  "Return the current year."
+  (format-time-string "%Y"))
+
 (provide 'my-lib)
 ;;; my-lib.el ends here
