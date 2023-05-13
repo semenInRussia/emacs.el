@@ -31,6 +31,7 @@
   :hook ((python-mode-hook . my-devdocs-python-hook)
          (emacs-lisp-mode-hook . my-devdocs-emacs-lisp-hook)
          (rust-mode-hook . my-devdocs-rust-hook)
+         (c++-mode-hook . my-devdocs-c++-hook)
          (LaTeX-mode-hook . my-devdocs-latex-hook)
          (haskell-mode-hook . my-devdocs-haskell-hook))
   :fast-exec (("Install DevDocs Docset" 'devdocs-install)
@@ -55,9 +56,9 @@
     "Set docsets of `devdocs' for `rust-mode'."
     (setq-local devdocs-current-docs '("rust")))
 
-  (defun my-devdocs-rust-hook ()
-    "Set docsets of `devdocs'for `rust-mode'."
-    (setq-local devdocs-current-docs '("rust")))
+  (defun my-devdocs-c++-hook ()
+    "Set docsets of `devdocs' for `c++-mode'."
+    (setq-local devdocs-current-docs '("gcc~12_cpp" "cpp")))
 
   (defun my-devdocs-haskell-hook ()
     "Set docsets of `devdocs'for `haskell-mode'."
