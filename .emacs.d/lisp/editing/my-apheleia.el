@@ -1,4 +1,4 @@
-;;; my-format-all.el --- My configuration of the `format-all'
+;;; my-apheleia.el --- My configuration of the `apheleia': auto format of source code after save
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,11 +23,15 @@
 
 ;;; Commentary:
 
-;; My configuration of the `format-all'
+;; My configuration of the `apheleia'
 
 ;;; Code:
 
-(leaf format-all :ensure t)
+(require 'leaf)
 
-(provide 'my-format-all)
-;;; my-format-all.el ends here
+(leaf apheleia
+  :ensure t
+  :global-minor-mode apheleia-global-mode)
+
+(provide 'my-apheleia)
+;;; my-apheleia.el ends here

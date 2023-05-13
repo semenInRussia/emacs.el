@@ -42,7 +42,6 @@
    deadgrep
    devdocs
    flycheck
-   format-all
    magit
    package
    projectile
