@@ -45,9 +45,10 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
    (s-replace
     "writing-config"
     module-name
-    ";;; my-writing-config.el --- My configuration of `writing-config' -*- lexical-binding: t; -*-
+    (format
+     ";;; my-writing-config.el --- My configuration of `writing-config' -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022 semenInRussia
+;; Copyright (C) %s semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
@@ -75,7 +76,8 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
 (leaf writing-config)
 
 (provide 'my-writing-config)
-;;; my-writing-config.el ends here"))
+;;; my-writing-config.el ends here"
+     (format-time-string "%Y"))))
   (search-backward "(leaf "))
 
 (eval-after-load 'fast-exec
