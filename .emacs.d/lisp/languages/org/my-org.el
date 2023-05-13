@@ -42,6 +42,7 @@
                             ("\\.jpg\\'" . "start %s"))))
   :major-mode-map (org (org-mode))
   :hook ((org-mode-hook . visual-fill)
+         (org-mode-hook . visual-line-mode)
          (org-mode-hook . aas-activate-for-major-mode)
          (org-mode-hook . org-cdlatex-mode))
   :bind (("<f5>" . org-ctrl-c-ctrl-c)
@@ -106,7 +107,7 @@
           ;; other being in the `:org-mode-map' section
 
           ;; Miscellaneous
-          ("SPC" . org-toggle-checkbox)
+          ("SPC" . my-org-toggle-checkbox)
           ("RET" . org-open-at-point)
           ("r"   . my-org-schedule-to-today)
           ("/"   . org-sparse-tree))
