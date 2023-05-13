@@ -103,3 +103,14 @@ stack/
 /NVIDIA/
 /bandlab-assistant/
 /Notion/
+/Docker/
+/Docker Dekstop/
+.ruff_cache/
+.mypy_cache/
+/Motrix/
+/arch.zip
+/gpt-prompts/
+/olymp-archive/
+/pyproject.toml
+/rome.json
+/chess-parties.org
