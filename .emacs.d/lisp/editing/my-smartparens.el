@@ -48,9 +48,9 @@
           ("SPC 8"     . sp-kill-sexp)
           ("SPC k e"   . sp-backward-kill-sexp)
           ("SPC SPC g" . sp-kill-hybrid-sexp)
-          ("SPC SPC e" . sp-backward-kill-line)
+          ("SPC SPC e" . sp-backward-kill-sexp)
           ("SPC -"     . sp-rewrap-sexp)
-          ("-"         . sp-splice)
+          ("-"         . sp-splice-sexp)
           ("SPC 9"     . sp-change-enclosing)
 
           ;; Change wrap placement
