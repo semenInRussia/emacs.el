@@ -29,11 +29,6 @@
   :ensure t
   :config                               ;nofmt
 
-  (leaf flycheck-google-cpplint
-    :ensure t
-    :require t
-    :config (flycheck-add-next-checker 'c/c++-gcc '(info . c/c++-googlelint)))
-
   (leaf google-c-style
     :ensure t
     :hook (c++-mode-hook . google-set-c-style)))

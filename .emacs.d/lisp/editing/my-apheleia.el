@@ -29,9 +29,20 @@
 
 (require 'leaf)
 
+(defvar uncrustify-cfg-file (f-full "~/uncrustify.cfg"))
+
 (leaf apheleia
   :ensure t
-  :global-minor-mode apheleia-global-mode)
+  :global-minor-mode apheleia-global-mode
+  :defer-config
+  (push '(uncrustify
+          . ("uncrustify" "-f" filepath "-c" uncrustify-cfg-file "-o"))
+        ;; a formatter for C++
+        apheleia-formatters)
+  (setf (alist-get 'c++-mode apheleia-mode-alist)
+        'uncrustify)
+  (setf (alist-get 'python-mode apheleia-mode-alist)
+        'isort))
 
 (provide 'my-apheleia)
 ;;; my-apheleia.el ends here
