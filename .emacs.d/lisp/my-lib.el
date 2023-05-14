@@ -27,8 +27,13 @@
 
 ;;; Code:
 
+(declare-function sp-get-enclosing-sexp "smartparens")
+(declare-function sp-get-sexp "smartparens")
+(declare-function sp-get "smartparens")
+
 (require 'dash)
 (require 's)
+(require 'f)
 (require 'just)
 
 (defun my-alist-p (obj)
@@ -244,7 +249,7 @@ Using TESTFN in functions sush as `assoc' or `alist-get'"
 For example a/b/1.exe should be a/b/2.exe"
   (let ((dirname (f-dirname path))
         (base (f-base path))
-        (ext (f- path)))
+        (ext (f-ext path)))
     (->                                ;nofmt
      dirname
      (f-join (my-incs base))

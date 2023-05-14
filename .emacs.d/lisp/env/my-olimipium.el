@@ -25,7 +25,10 @@
 
 ;;; Code:
 
+(require 'my-lib)
+
 (require 'dash)
+(require 'f)
 
 (defcustom my-olimpium-dir "~/olimpium"
   "Directory in which should be located solutions of the olimpium tasks."
@@ -35,23 +38,25 @@
 (defun my-olimpium-new-solution ()
   "New solution of the olimpium task."
   (interactive)
-  (->>                                  ;nofmt
-   my-olimpium-dir
-   (f-directories)
-   ;; return dir with maximum number in the name, because dirs sorted
-   ;; alphabetically
-   (--max-by
-    (>
-     (string-to-number (f-base it))
-     (string-to-number (f-base other))))
-   (f-files)
-   ;; return filename with maximum number in the name, analogy with previos
-   (--max-by
-    (>
-     (string-to-number (f-base it))
-     (string-to-number (f-base other))))
-   (my-inc-filename)
-   (find-file)))
+  (let ((default-directory my-olimpium-dir))
+    (->>                                  ;nofmt
+     my-olimpium-dir
+     (f-directories)
+     ;; return dir with maximum number in the name, because dirs sorted
+     ;; alphabetically
+     (--max-by
+      (>
+       (string-to-number (f-base it))
+       (string-to-number (f-base other))))
+     (f-files)
+     (cons "0.py")                        ;if directory is empty
+     ;; return filename with maximum number in the name, analogy with previos
+     (--max-by
+      (>
+       (string-to-number (f-base it))
+       (string-to-number (f-base other))))
+     (my-inc-filename)
+     (find-file))))
 
 (with-eval-after-load 'fast-exec
   (fast-exec-bind 'olimpium
