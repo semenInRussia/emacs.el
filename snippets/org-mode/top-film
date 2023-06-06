@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: topfilm
+# key: tpfilm
+# type: command
+# --
+(my-films-add (my-films--choose-from-top))

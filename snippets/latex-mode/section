@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# contributor: semenInRussia
+# name: section
+# key: s
+# --
+\section{${1:name}}
+$0

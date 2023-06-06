@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: book
+# key: b
+# type: command
+# --
+(bibtex-Book)

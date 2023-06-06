@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: cases
+# key: cases
+# --
+\begin\{equation\}
+  \begin\{cases\}
+    $0\\\\
+  \end\{cases\}
+\end\{equation\}

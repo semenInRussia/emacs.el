@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: box
+# key: bx
+# type: command
+# --
+(defun my-is-item-of-org-list-p ()
+"Return t, when current line is item of list."
+(->>
+(just-text-at-line nil t)
+(my-one-of-prefixes-p '("+" "-"))))
+
+(if (my-is-item-of-org-list-p)
+(insert "[ ] ")
+(insert "- [ ] "))

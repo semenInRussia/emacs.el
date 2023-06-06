@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: read-string
+# key: rs
+# --
+(read-string "$0")

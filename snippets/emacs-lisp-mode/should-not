@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: should-not
+# key: shn
+# --
+(should-not $0)

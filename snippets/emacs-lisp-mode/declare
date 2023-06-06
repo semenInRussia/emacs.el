@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: declare
+# key: dl
+# --
+(declare ($0))

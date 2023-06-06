@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: pub-fn
+# key: pf
+# --
+pub fn ${1:name} ($2)$3 {
+    $0
+}

@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# contributor: semenInRussia
+# name: environment
+# key: env
+# type: command
+# --
+(cdlatex-environment)
+

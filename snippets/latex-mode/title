@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# contributor: semenInRussia
+# name: title
+# key: title
+# --
+\title{$1}
+$0

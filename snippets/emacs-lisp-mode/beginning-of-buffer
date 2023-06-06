@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: bob
+# key: bob
+# --
+(beginning-of-buffer)

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: log
+# key: log
+# --
+(message "$1 is %s" $1)

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: pandoc link
+# key: pandoc
+# --
+[[https://pandoc.org][pandoc]]

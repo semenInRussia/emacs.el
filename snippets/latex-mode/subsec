@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: subsec
+# key: ssn
+# --
+\subsection${1:*}{$0}

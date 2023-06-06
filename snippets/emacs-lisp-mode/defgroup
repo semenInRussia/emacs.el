@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: defgroup
+# key: defg
+# --
+(defgroup $1 nil
+    "${2:doc}"
+    $0)

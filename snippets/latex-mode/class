@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: class
+# key: cls
+# --
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesClass{$1}[$2]
+$0

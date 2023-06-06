@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: stepcounter
+# key: spc
+# --
+\stepcounter{$1}

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: defcustom
+# key: defc
+# --
+(defcustom ${1:name} ${2:default}
+  "${4:doc}."
+  $0)

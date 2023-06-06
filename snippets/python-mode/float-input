@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: float-input
+# key: flin
+# --
+float(input("$0"))

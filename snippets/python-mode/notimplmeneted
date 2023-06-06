@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: NotImplemented
+# key: ni
+# --
+return NotImplemented

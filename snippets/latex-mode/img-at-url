@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: image-at-url
+# key: uimg
+# type: command
+# --
+(call-interactively 'my-latex-insert-img-at-copied-url)

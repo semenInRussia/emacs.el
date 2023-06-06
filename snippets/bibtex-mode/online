@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: online
+# key: on
+# type: command
+# --
+(bibtex-Online)

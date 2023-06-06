@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# contributor: semenInRussia
+# name: usepackage
+# key: up
+# --
+\usepackage{$0}

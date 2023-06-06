@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: struct
+# key: s
+# --
+struct${2:<} ${Name} {
+  $0
+}

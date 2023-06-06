@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: figure
+# key: fig
+# --
+\begin{figure}[$1]
+  \centering
+  \includegraphics[width=$2]{$3}
+\end{figure}

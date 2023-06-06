@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: defmethod
+# key: defme
+# --
+(defmethod ${1:method} ((${2:$(-last-item (s-split "-" yas-text))} $2) ${3:args})
+  "${4:Doc}."
+  $0)
+

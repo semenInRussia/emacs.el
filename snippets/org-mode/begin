@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: begin
+# key: beg
+# --
+
+#+BEGIN_${1:Center}
+$0
+#+END_$1
+

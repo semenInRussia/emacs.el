@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: fn
+# key: f
+# --
+${3:async }fn ${1:main}$5 (${2:args})$4 {
+   $0
+}

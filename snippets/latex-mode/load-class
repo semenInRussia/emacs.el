@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: load-class
+# key: lc
+# --
+\LoadClass{${1:article}}

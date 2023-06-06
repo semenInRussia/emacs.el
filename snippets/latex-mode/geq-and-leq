@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: geq-and-leq
+# key: <=>=
+# --
+\usepackage{amssymb}
+
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\le}{\leqslant}
+

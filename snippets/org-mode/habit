@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: habit
+# key:  habit
+# --
+:PROPERTIES:
+:STYLE:    habit
+:END:

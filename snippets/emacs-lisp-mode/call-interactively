@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: call-interactively
+# key: calli
+# --
+(call-interactively #'$0)

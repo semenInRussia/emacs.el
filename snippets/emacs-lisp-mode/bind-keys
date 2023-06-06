@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: bind-keys
+# key: bk
+# --
+(bind-keys
+ :map $0)

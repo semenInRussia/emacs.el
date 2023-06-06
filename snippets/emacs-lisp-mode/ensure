@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: ensure
+# key: e
+# --
+:ensure t

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# contributor: semenInRussia
+# name: author
+# key: aut
+# --
+\author{$1}
+$0

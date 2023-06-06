@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: pi
+# type: command
+# key: pi
+# --
+(LaTeX-math-pi nil)
