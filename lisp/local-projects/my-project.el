@@ -56,15 +56,13 @@ Return value of `projectile-project-root' when DIR is nil, otherwise return nil"
 ;;;###autoload
 (defun my-projectile-project-files (root)
   "Return filenames list of the project at ROOT, with caching."
-  ;; (projectile-acquire-root)
-  (let ((root (f-full root))
-        files)
+  (let ((root (f-full root)))
     (unless (gethash root my-project-files-hash)
       (puthash root
                (my-project-files-no-cache root)
                my-project-files-hash))
-    (setq files (gethash root my-project-files-hash))
-    (--map (s-chop-prefix root (f-full it)) files)))
+    (--map (s-chop-prefix root (f-full it))
+           (gethash root my-project-files-hash))))
 
 (defun my-project-files-no-cache (root)
   "Return filenames list of the project at ROOT, without caching."
@@ -79,12 +77,12 @@ Return value of `projectile-project-root' when DIR is nil, otherwise return nil"
      (my-project-gitignore-regexps root))))
 
 ;;;###autoload
-(defun projectile-project-files-clear-cache (root)
+(defun projectile-project-files-clear-cache ()
   "Function `projectile-project-files' is cached, clear this cache for ROOT."
-  (interactive (list (projectile-acquire-root)))
-  (remhash (f-full root) my-project-files-hash))
+  (interactive)
+  (setq my-project-files-hash (make-hash-table :test 'equal)))
 
-(defun my-find-files-of-root-not-match-with-regexps (root regexps)
+(defun my-files-of-root-not-match-with-regexps (root regexps)
   "Return files list of ROOT each of it don't match with one of REGEXPS."
   (--reduce-from
    (cond
@@ -153,19 +151,6 @@ GITIGNORE-ROOT directory is directory which contains .gitginore file."
 (defun my-gitignore-comment-line-p (line)
   "Return non-nil, if a LINE of .gitignore file is commented."
   (s-prefix-p "#" (s-trim line)))
-
-(defun my-files-of-root-not-match-with-regexps (root regexps)
-  "Return files list of ROOT each of it don't match with one of REGEXPS."
-  (--reduce-from
-   (cond
-    ((my-matches-with-one-of-p (f-full it) regexps)
-     acc)
-    ((f-directory-p it)
-     (append acc
-             (my-files-of-root-not-match-with-regexps it regexps)))
-    (t (cons it acc)))
-   nil
-   (f-entries root)))
 
 (defun my-project-gitignore-regexps (root)
   "Return list of regexp from .gitignore file of project at ROOT."

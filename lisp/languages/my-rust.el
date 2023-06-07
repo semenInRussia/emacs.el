@@ -31,7 +31,6 @@
 (require 's)
 (require 'just)
 (require 'my-lib)
-(require 'my-xah)
 (require 'f)
 
 (declare-function embrace-add-pair-regexp "embrace.el")
@@ -49,11 +48,10 @@
   :ensure t
   :hook ((rust-mode-hook . my-rust-whitespace-mode)
          (rust-mode-hook . my-lsp-ensure))
-  :major-mode-map rust
-  :bind (:my-rust-local-map
-         ("p" . 'my-rust-toggle-pub)
-         ("t" . 'my-rust-visit-Cargo.toml)
-         ("m" . 'rust-toggle-mutability))
+  :bind (:rust-mode-map
+         ("C-c M-p" . 'my-rust-toggle-pub)
+         ("C-c C-t" . 'my-rust-visit-Cargo.toml)
+         ("C-c C-m" . 'rust-toggle-mutability))
   :config                               ;nofmt
   (defun my-rust-toggle-pub ()
     "Toggle public/private scope of the current rust function/imple/struct."

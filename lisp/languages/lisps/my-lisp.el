@@ -26,7 +26,8 @@
 ;;; Code:
 
 (require 'my-leaf)
-(require 'my-xah)
+
+(declare-function god-mode "god-mode.el")
 
 (require 'dash)
 (require 'my-lib)
@@ -64,15 +65,14 @@
           ("[" . 'paxedit-open-bracket)
           ("{" . 'paxedit-open-curly))
          (:my-lisp-map
-          ("o" . 'my-paxedit-transpose-forward)
-          ("u" . 'my-paxedit-transpose-backward)
-          ("x" . 'paxedit-kill)
-          ("z" . 'my-paxedit-comment)
-          ("w" . 'my-paxedit-change)
-          ("d" . 'paxedit-symbol-kill)
-          ("q" . 'paxedit-compress)
-          ("k" . 'paxedit-delete-whitespace)
-          ("y" . 'my-paxedit-duplicate)))
+          ("C-c C-t" . 'my-paxedit-transpose-forward)
+          ("C-c C-u C-t" . 'my-paxedit-transpose-backward)
+          ("C-c C-w" . 'paxedit-kill)
+          ("C-c C-;" . 'my-paxedit-comment)
+          ("C-c C_d" . 'paxedit-symbol-kill)
+          ("C-c C-q" . 'paxedit-compress)
+          ("C-c C-k" . 'paxedit-delete-whitespace)
+          ("C-c C-y" . 'my-paxedit-duplicate)))
   :hook ((emacs-lisp-mode-hook . paxedit-mode)
          (racket-mode-hook . paxedit-mode))
   :config                               ;nofmt
@@ -88,7 +88,7 @@
     "Kill the Lisp expression at the cursor and activate insert mode."
     (interactive)
     (paxedit-delete)
-    (xah-fly-insert-mode-activate))
+    (god-mode))
 
   (defun my-paxedit-duplicate ()
     "Make copy of the Lisp expression at the cursor."

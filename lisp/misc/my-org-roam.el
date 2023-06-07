@@ -32,17 +32,15 @@
   :init (f-mkdir "~/org-roam")
   :commands org-roam-ui-mode
   :defun org-roam-db-autosync-mode
-  :bind (:xah-fly-command-map
-         :package xah-fly-keys
-         ("SPC z f"   . org-roam-node-find)
-         ("SPC z t t" . org-roam-tag-add)
-         ("SPC z t d" . org-roam-tag-remove)
-         ("SPC z s s" . org-roam-ref-add)
-         ("SPC z s d" . org-roam-ref-remove)
-         ("SPC z a a" . org-roam-alias-add)
-         ("SPC z a d" . org-roam-alias-remove)
-         ("SPC z o"   . org-roam-buffer-toggle)
-         ("SPC z j"   . org-roam-node-insert))
+  :bind (("C-c z f"   . org-roam-node-find)
+         ("C-c z t t" . org-roam-tag-add)
+         ("C-c z t d" . org-roam-tag-remove)
+         ("C-c z s s" . org-roam-ref-add)
+         ("C-c z s d" . org-roam-ref-remove)
+         ("C-c z a a" . org-roam-alias-add)
+         ("C-c z a d" . org-roam-alias-remove)
+         ("C-c z o"   . org-roam-buffer-toggle)
+         ("C-c z j"   . org-roam-node-insert))
   :custom (org-roam-mode-sections . '(org-roam-backlinks-section))
   :config                               ;nofmt
   (org-roam-db-autosync-mode t)

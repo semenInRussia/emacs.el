@@ -28,20 +28,18 @@
 ;;; Code:
 
 (require 'my-leaf)
-(require 'my-xah)
 
 (leaf json-mode
   :ensure t
-  :major-mode-map json
   :bind (:json-mode-map
          ([:remap my-format-expression] . json-pretty-print-buffer))
   :hook (json-mode-hook . my-json-fix-indent-funcs)
   :config                               ;nofmt
   (leaf json-snatcher
     :ensure t
-    :bind (:my-json-local-map           ;nofmt
+    :bind (:json-mode-map
            :package json-mode
-           ("c" . jsons-print-path)))
+           ("C-c M-w" . jsons-print-path)))
 
   (defun my-json-fix-indent-funcs ()
     "Fix the functions that changes indent in JSON files."

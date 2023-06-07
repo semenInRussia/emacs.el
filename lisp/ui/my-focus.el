@@ -28,9 +28,6 @@
 
 (leaf focus
   :ensure t
-  :bind (:xah-fly-command-map
-         :package xah-fly-keys
-         ("SPC d 6" . focus-mode))
   :custom-face (focus-unfocused . '((t :inherit shadow))))
 
 (provide 'my-focus)

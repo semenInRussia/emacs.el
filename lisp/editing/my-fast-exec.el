@@ -31,42 +31,16 @@
 
 (require 'dash)
 
+(declare-function visual-fill "my-lang-utils")
+
 (leaf fast-exec
   :load-path "~/projects/fast-exec.el/"
   :defun fast-exec-use
   :require t
-  :bind (:xah-fly-command-map           ;nofmt
-         :package xah-fly-keys
-         ("=" . fast-exec-exec))
-  :commands (fast-exec-exec)
-  :config
-  (add-hook 'fast-exec-hint-buffer-mode-hook #'visual-fill)
-
-  (require 'fast-exec-initial-keymaps)
-
-  (fast-exec-use
-   deadgrep
-   devdocs
-   flycheck
-   magit
-   package
-   skeletor
-   projectile
-   suggest
-   wikinforg
-   yasnippet
-   haskell-mode)
-
-  (leaf straight :fast-exec ("Use Package" 'straight-use-package))
-  (leaf my-mipt
-    :fast-exec (("Next MIPT Task" 'my-mipt-next-task)
-                ("Previous MIPT Task" 'my-mipt-prev-task)
-                ("Open Last MIPT Task" 'my-mipt-visit-last-task)
-                ("Find MIPT Task" 'my-mipt-task-visit)
-                ("Open MIPT Task in Web Browser" 'my-mipt-task-browse-course-url))
-    :bind (:my-latex-local-map
-           :package tex
-           ("c" . 'my-copy-buffer-content-as-mipt-solution))))
+  :bind ("M-=" . fast-exec-exec)
+  :commands fast-exec-exec
+  :config (add-hook 'fast-exec-hint-buffer-mode-hook #'visual-fill)
+  (require 'my-fast-exec-misc))
 
 (provide 'my-fast-exec)
 ;;; my-fast-exec.el ends here

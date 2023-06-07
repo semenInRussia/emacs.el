@@ -28,7 +28,6 @@
 ;;; Code:
 
 (require 'my-leaf)
-(require 'my-xah)
 (require 'just)
 (require 'my-autoformat)
 
@@ -64,22 +63,13 @@ See `imenu-generic-expression'"
 
 (leaf markdown-mode
   :ensure t
-  :major-mode-map markdown
-  :bind (:my-markdown-local-map
-         ("<SPC>" . 'markdown-toggle-gfm-checkbox)
-         ("b"     . 'markdown-insert-bold)
-         ("i"     . 'markdown-insert-italic)
-         ("l"     . 'markdown-insert-link)
-         ("p"     . 'markdown-live-preview-mode)
-         ("'"     . 'markdown-edit-code-block)
-         ("<RET>" . 'markdown-follow-thing-at-point))
-  :hook ((markdown-mode-hook . visual-fill)
-         (markdown-mode-hook .
-                             (lambda ()
-                               (setq-local
-                                imenu-generic-expression
-                                my-markdown-imenu-generic-expression))))
+  :hook (markdown-mode-hook .
+                            (lambda ()
+                              (setq-local
+                               imenu-generic-expression
+                               my-markdown-imenu-generic-expression)))
   :config                               ;nofmt
+  (add-hook 'markdown-mode-hook 'visual-fill)
   (leaf markdown-toc
     :ensure t
     :bind (:my-markdown-local-map

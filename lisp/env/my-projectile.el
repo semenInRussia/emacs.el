@@ -27,6 +27,8 @@
 
 ;;; Code:
 
+(defvar projectile-command-map)
+
 (require 'my-leaf)
 (require 'fast-exec)
 
@@ -45,19 +47,24 @@
           projectile-completing-read
           projectile-project-files
           projectile-maybe-invalidate-cache)
+  :bind-keymap ("C-c p" . 'projectile-command-map)
   :defvar (projectile-known-projects projectile-project-root)
   :custom ((projectile-project-root-functions .
                                               '(projectile-root-local
                                                 my-project-root))
            (projectile-enable-caching . nil)
            (projectile-auto-discover . nil))
-  :fast-exec ("Projectile Clear Cache" 'projectile-project-files-clear-cache)
   :global-minor-mode projectile-mode
   :config
   (leaf consult-projectile
-    :bind (:xah-fly-command-map
-           :package xah-fly-keys
-           ("SPC j"  . consult-projectile-find-file))))
+    :ensure t
+    :bind (:projectile-command-map
+           :package projectile
+           ("f"  . consult-projectile-find-file)
+           ("p" . consult-projectile-switch-project)
+           ("b" . consult-projectile-switch-to-buffer))
+    :fast-exec
+    ("Projectile Clear Cache" 'projectile-project-files-clear-cache)))
 
 (advice-add
  'projectile-project-files

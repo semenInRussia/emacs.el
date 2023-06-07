@@ -36,13 +36,11 @@
            :repo "bard/emacs-run-command"
            :branch "develop")
   :defun ((run-command--run--set-last-recipe . my-run-command)
-          run-command--run
-          run-command-runner-compile)
+          run-command-runner-compile
+          run-command-run)
   :custom ((run-command-completion-method . 'ivy)
            (run-command-default-runner . #'run-command-runner-compile))
-  :bind (:xah-fly-command-map
-         :package xah-fly-keys
-         ("SPC , c" . run-command)
+  :bind (("<f5>" . run-command)
          ("S-<f5>"  . my-run-last-command))
   :config                               ;nofmt
   (leaf run-command-recipes
@@ -58,13 +56,13 @@
     "Set `run-command-last-recipe'."
     (setq-local run-command-last-recipe recipe))
 
-  (advice-add 'run-command--run :before #'run-command--run--set-last-recipe)
+  (advice-add 'run-command-run :before #'run-command--run--set-last-recipe)
 
   (defun my-run-last-command ()
     "Run command which was runned last, if commands wasn't run do nothing."
     (interactive)
     (if run-command-last-recipe
-        (run-command--run run-command-last-recipe)
+        (run-command-run run-command-last-recipe)
       (message "NOT FOUND!"))))
 
 (provide 'my-run-command)

@@ -53,12 +53,10 @@
            (lsp-bridge-code-action-preview-delay . 20)
            (lsp-bridge-signature-show-function
             . 'eldoc-box--eldoc-message-function))
-  :bind ((:xah-fly-command-map
-          :package xah-fly-keys
-          ("SPC SPC p"   . 'lsp-bridge-popup-documentation)
-          ("SPC SPC 7"   . 'lsp-bridge-rename)
-          ("SPC SPC RET" . 'lsp-bridge-code-action)
-          ("SPC , ,"     . 'lsp-bridge-find-references))
+  :bind ((("C-c C-d" . 'lsp-bridge-popup-documentation)
+          ("<f6>"    . 'lsp-bridge-rename)
+          ("C-c ll"  . 'lsp-bridge-code-action)
+          ("M-,"     . 'lsp-bridge-find-references))
          (:lsp-bridge-mode-map
           ([remap xref-pop-marker-stack] . 'lsp-bridge-pop)
           ([remap xref-find-definitions] . 'lsp-bridge-find-def)

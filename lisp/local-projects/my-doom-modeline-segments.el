@@ -163,6 +163,7 @@ Format of time is the list form the hours, minutes, seconds and zero?"
 
 (doom-modeline-def-modeline 'main
   '(bar
+    modals
     my-matches
     drag
     buffer-info-durand

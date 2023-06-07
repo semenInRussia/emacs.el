@@ -25,26 +25,17 @@
 
 ;;; Code:
 (require 'my-leaf)
-(require 'my-xah)
 
 (require 'dash)
 
 (leaf bibtex
-  :major-mode-map ((bibtex-mode)
-                   bibtex)
   :custom ((bibtex-align-at-equal-sign  . t)
            (bibtex-user-optional-fields .
                                         '(("file" "Link to document file."
                                            ":")))
            (bibtex-dialect . 'biblatex))
   :bind ((:bibtex-mode-map
-          ([remap my-format-expression] . 'bibtex-reformat))
-         (:my-bibtex-local-map
-          ("x"   . 'bibtex-kill-entry)
-          ("d"   . 'bibtex-kill-field)
-          ("e"   . 'bibtex-validate)
-          ("RET" . 'bibtex-url)
-          ("v"   . 'bibtex-yank)))
+          ([remap my-format-expression] . 'bibtex-reformat)))
   :config                               ;nofmt
   (leaf bibtex-utils :ensure t))
 

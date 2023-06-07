@@ -30,11 +30,11 @@
 (require 'my-leaf)
 (require 's)
 (require 'just)
-(require 'my-xah)
 (require 'my-lib)
 (require 'dash)
 (require 'my-autoformat)
 
+(declare-function god-mode "god-mode")
 (declare-function aas-set-snippets "aas.el")
 (declare-function my-org-list-item-p "my-org.el")
 (declare-function my-org-properties-end-p "my-org.el")
@@ -61,91 +61,22 @@
                             ("\\.jpg\\'" . "start %s"))))
   :defvar (my-org-list-item-prefix-regexp
            my-org-keywords)
-  :major-mode-map (org (org-mode))
   :hook ((org-mode-hook . org-cdlatex-mode))
   :bind (("<f5>" . org-ctrl-c-ctrl-c)
-         (:xah-fly-command-map          ;nofmt
-          ("SPC z z" . org-capture))
-         (:my-org-local-map             ;nofmt
+         ("C-c c" . org-capture)
+         (:org-mode-map
           ;; Insert anything
-          ("l"   . org-insert-link)
-          ("s"   . org-schedule)
-          ("d"   . org-deadline)
-          ("i"   . my-org-insert-image)
-          ("u"   . my-org-insert-img-at-url)
+          ("C-c M-i"   . my-org-insert-image)
+          ("C-c M-u"   . my-org-insert-img-at-url)
 
           ;; Manipulations with a subtree
-          ("c"   . org-copy-subtree)
-          ("x"   . my-org-cut)
+          ("C-c C-w"   . my-org-cut)
           ;; heading => plain text
           ;; 8 is * without shift
-          ("8"   . org-toggle-heading)
-          ("q"   . my-org-indent-subtree)
-          ("6"   . org-mark-subtree)
-          ("w"   . my-org-clear-subtree)
+          ("C-c C-M-w"   . my-org-clear-subtree)
           ([tab] . org-refile)
-          ("1"   . my-org-todo)
-          (";"   . org-set-tags-command)
-          ("o"   . org-id-get-create)
-          ("a"   . org-archive-subtree)
-          ("y"   . org-attach)
-          ("z"   . org-toggle-comment)
-
-          ;; Change the Priority of a Subtree
-          ("," . org-priority)
-          ;; Org Babel
-          ("b t" . org-babel-tangle)
-          ("b f" . org-babel-tangle-file)
-          ("b e" . org-babel-execute)
-          ("b e" . org-edit-special))
-         (:org-src-mode-map             ;nofmt
-          ([remap save-buffer] . org-edit-src-exit))
-         (:my-org-local-map
-          ;; Manipulations with a table
-          ("t n" . org-table-create-or-convert-from-region)
-          ("="   . org-table-eval-formula)
-          ("t f" . my-org-table-eval-formula-in-field)
-          ("t i" . org-table-import)
-          ("t e" . org-table-export)
-          ("t g" . org-table-recalculate)
-          ("t x" . org-table-kill-row)
-          ("-"   . org-table-insert-hline)
-          ("t o" . org-table-toggle-coordinate-overlays)
-          ;; sum
-          ("+"   . org-table-sum)
-          ("t +" . org-table-sum)
-          ("t s" . org-table-sum)
-
-          ;; Export
-          ("p"   . org-publish)
-          ("e"   . org-export-dispatch)
-
-          ;; Context Commands
-          ("'"   . org-edit-special)
-          ;; other being in the `:org-mode-map' section
-
-          ;; Miscellaneous
-          ("SPC" . my-org-toggle-checkbox)
-          ("RET" . org-open-at-point)
-          ("r"   . my-org-schedule-to-today)
-          ("/"   . org-sparse-tree))
-
-         (:org-mode-map ;; Here continoue of the Context Commands...
-          ;; M-
-          ("M-j"   . 'org-metaleft)
-          ("M-i"   . 'org-metaup)
-          ("M-k"   . 'org-metadown)
-          ("M-l"   . 'org-metaright)
-          ;; M-S-
-          ("M-S-j" . 'org-shiftmetaleft)
-          ("M-S-i" . 'org-shiftmetaup)
-          ("M-S-k" . 'org-shiftmetadown)
-          ("M-S-l" . 'org-shiftmetaright)
-          ;; C-S-
-          ("C-S-j" . 'org-shiftcontrolleft)
-          ("C-S-i" . 'org-shiftcontrolup)
-          ("C-S-k" . 'org-shiftcontroldown)
-          ("C-S-l" . 'org-shiftcontrolright)))
+          ("C-c C-t"   . my-org-todo)
+          ("C-c C-j"   . org-id-get-create)))
   ;; the following code should add some auto activating snippets, for example,
   ;; if I type "exthe", then it should be extended to the "Explore the"
   ;; see `aas-mode'
@@ -328,7 +259,7 @@ demotes a first letter after keyword word."
                  (progn
                    (skip-chars-forward "*")
                    (forward-char)
-                   (xah-fly-command-mode-activate)))
+                   (god-mode 0)))
                 ("B" . org-previous-block)
                 ("F" . org-next-block)
                 ("g" . (org-refile t))
@@ -358,14 +289,16 @@ demotes a first letter after keyword word."
                 ("E" . org-inc-effort)
                 ("/" . org-sparse-tree)
                 ("?" . org-speed-command-help))))
-    :bind (:my-org-local-map :package org ("h" . my-org-to-heading-start))
+    :bind (:org-mode-map
+           :package org
+           ("C-c M-{" . my-org-to-heading-start))
     :config                             ;nofmt
     (defun my-org-to-heading-start ()
       "Go to the beginning of the heading after activate insert mode."
       (interactive)
       (end-of-line)
       (search-backward-regexp "^\*" nil t)
-      (xah-fly-insert-mode-activate)
+      (god-mode 0)
       (unless (eq current-input-method nil) (toggle-input-method)))
 
     (defun my-org-goto-parent ()
@@ -430,10 +363,14 @@ produced."
     (leaf ox-beamer :require t))
 
   (leaf my-org-do-tidy
-    :bind (:my-org-local-map :package org ("k" . my-org-tidy)))
+    :bind (:org-mode-map
+           :package org
+           ("C-c M-q" . my-org-tidy)))
 
   (leaf my-org-options
-    :bind (:my-org-local-map :package org ("." . my-org-options-transient)))
+    :bind (:org-mode-map
+           :package org
+           ("C-c C-." . my-org-options-transient)))
 
   (leaf embrace
     :ensure t
@@ -447,16 +384,17 @@ produced."
   (leaf org-table-sticky-header :ensure t :hook org-mode-hook)
   (leaf org-autolist :ensure t :hook org-mode-hook)
 
-  (leaf rorg
-    :load-path "~/projects/rorg/"
-    :bind (:my-org-local-map
-           :package org
-           ("-" . rorg-splice-subtree)
-           ("0" . rorg-wrap-region-or-current-heading)
-           ("]" . rorg-forward-slurp-subtree)
-           ("}" . rorg-backward-barf-subtree)
-           ("{" . rorg-backward-slurp-subtree)
-           ("[" . rorg-forward-barf-subtree)))
+  ;; (leaf rorg
+  ;;   :load-path "~/projects/rorg/"
+  ;;   :bind (:org-mode-map
+  ;;          :package org
+  ;;          ("C-c C-x C-x" . rorg-splice-subtree)
+  ;;          ("C-c C-0" . rorg-wrap-region-or-current-heading)
+  ;;          ("C-c C-{" . rorg-forward-slurp-subtree)
+  ;;          ("C-c C-}" . rorg-backward-barf-subtree)
+  ;;          ("{" . rorg-backward-slurp-subtree)
+  ;;          ("[" . rorg-forward-barf-subtree))
+  ;;   )
 
   (leaf my-org-drag
     :defun ((add-right-dragger

@@ -26,13 +26,13 @@
 ;; My configuration for the macros
 
 ;;; Code:
+
 (require 'my-leaf)
 
+
 (leaf kmacro
-  :bind (:xah-fly-command-map
-         :package xah-fly-keys
-         ("\\"      . kmacro-start-or-end-macro)
-         ("SPC RET" . kmacro-call-macro-or-apply-to-lines))
+  :bind (("C-x C-k C-s" . kmacro-start-or-end-macro)
+         ("C-x C-k C-k" . kmacro-call-macro-or-apply-to-lines))
   :config                             ;nofmt
   (defun kmacro-call-macro-or-apply-to-lines (&optional top bottom)
     "If has region, call macro to lines beetween TOP BOTTOM, else call macro."

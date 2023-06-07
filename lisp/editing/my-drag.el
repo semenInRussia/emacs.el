@@ -26,16 +26,19 @@
 ;; My config for the things dragging
 
 ;;; Code:
+
 (require 'my-leaf)
 (require 'dash)
-(require 'my-xah)
 (require 'just)
+
 
 (defcustom my-drag-map
   (make-sparse-keymap)
   "Keymap for my own small drag system."
   :type 'keymap
   :group 'my)
+
+(define-prefix-command 'my-drag 'my-drag-map)
 
 (defcustom my-left-draggers nil
   "Functions, which drag stuff to left, or return nil.
@@ -141,6 +144,7 @@ True dragger mean that its function return non-nil when called interactively."
 (leaf drag-stuff
   :ensure t
   :global-minor-mode drag-stuff-global-mode
+  :bind ("C-]" . 'my-drag)
   :bind (:my-drag-map
          ("j"       . my-drag-stuff-left-char)
          ("."       . transpose-sexps)
@@ -148,9 +152,7 @@ True dragger mean that its function return non-nil when called interactively."
          ("n"       . avy-transpose-lines-in-region)
          ("l"       . my-drag-stuff-right-char)
          ("t"       . transpose-regions))
-  :config                             ;nfomt
-  (eval-after-load 'xah-fly-keys
-    '(define-key xah-fly-command-map (kbd "SPC TAB") my-drag-map))
+  :config
 
   (defun my-drag-stuff-left-char ()
     "Drag char to left."

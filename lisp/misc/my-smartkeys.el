@@ -31,7 +31,6 @@
 (declare-function sp-splice-sexp "smartparens.el")
 
 (require 'my-lib)
-(require 'my-xah)
 
 (eval-after-load 'smartparens
   '(progn
@@ -49,10 +48,8 @@
        (if (use-region-p) (exchange-point-and-mark) (sp-splice-sexp)))
 
      (leaf-keys
-      (xah-fly-command-map
-       :package xah-fly-keys
-       ("-" . my-exchange-point-and-mark-or-splice-sexp)
-       ("x" . my-kill-line-or-region)))))
+      ("C-x C-x" . my-exchange-point-and-mark-or-splice-sexp)
+      ("C-w" . my-kill-line-or-region))))
 
 (provide 'my-smartkeys)
 ;;; my-smartkeys.el ends here

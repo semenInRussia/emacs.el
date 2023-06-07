@@ -43,26 +43,15 @@
                                     my-mc-mark-like-this-or-edit-lines
                                     my-mc-mark-like-this-or-edit-lines
                                     toggle-input-method))
-  :bind (:xah-fly-command-map
-         :package xah-fly-keys
-         ("SPC f"     . my-buffer-list-or-edit-lines)
-         ("7"         . mc/mark-next-like-this-word)
-         ("SPC 7"     . mc/mark-previous-like-this-word)
-         ("SPC TAB 7" . mc/reverse-regions)
-         ("SPC d 7"   . mc/unmark-next-like-this)
-         ("SPC h"     . my-bob-or-mc-align)
-         ("SPC n"     . my-eob-or-mc-align-with-space)
-         ("SPC a"     . my-mark-all))
+  :bind (("M-i"       . 'mc/edit-lines)
+         ("C-,"       . 'mc/mark-next-like-this-word)
+         ("C-<"       . mc/mark-previous-like-this-word)
+         ;; ("SPC TAB 7" . mc/reverse-regions)
+         ;; ("SPC d 7"   . mc/unmark-next-like-this)
+         ("M-<"     . my-bob-or-mc-align)
+         ("M->"     . my-eob-or-mc-align-with-space)
+         ("C-x C-," . my-mark-all))
   :config                             ;nofmt
-
-  (defun my-buffer-list-or-edit-lines ()
-    "Do either `consult-buffer' or `mc/edit-lines' depends on context.
-
-If the region is active, then "
-    (interactive)
-    (if (use-region-p)
-        (call-interactively #'mc/edit-lines)
-      (call-interactively #'consult-buffer)))
 
   (defun my-mark-all ()
     "Mark all words like this for `multiple-cursors', otherwise mark buffer."

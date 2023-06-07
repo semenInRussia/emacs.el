@@ -34,7 +34,6 @@
 (setq auto-save-list-file-name  nil)
 (defalias 'yes-or-no-p 'y-or-n-p)
 (toggle-truncate-lines t)
-(add-hook 'prog-mode-hook 'whitespace-mode)
 
 (add-to-list 'load-path (f-join (-last-item load-path) ; path to share/lisp
                                 ".."

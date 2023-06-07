@@ -27,10 +27,11 @@
 
 ;;; Code:
 (require 'my-leaf)
-(require 'my-xah)
-(require 'my-editing)
 (require 'smartparens)
 (require 'my-lib)
+
+
+(declare-function god-mode "god-mode.el")
 
 
 (defun delete-and-edit-current-line ()
@@ -39,7 +40,7 @@
   (beginning-of-line-text)
   (sp-kill-whole-line)
   (open-line-above)
-  (xah-fly-insert-mode-init))
+  (god-mode))
 
 (defun clear-current-line ()
   "Clear content of current line (including whitespaces)."
@@ -56,19 +57,9 @@
     (forward-sexp 1)))
 
 (leaf-keys
- (xah-fly-command-map
-  :package xah-fly-keys
-  ("8"     . select-current-or-next-word)
-  ("SPC w" . clear-current-line)
-  ("w"     . delete-and-edit-current-line)
-  ("g"     . my-cancel-selection-or-delete-text-block)))
-
-(defun my-cancel-selection-or-delete-text-block ()
-  "Either `deactivate-mark' or `xah-delete-current-text-block'."
-  (interactive)
-  (if (use-region-p)
-      (deactivate-mark)
-    (xah-delete-current-text-block)))
+ (("M-@"       . select-current-or-next-word)
+  ("C-x M-DEL" . clear-current-line)
+  ("C-x w"     . delete-and-edit-current-line)))
 
 (provide 'my-deleting)
 ;;; my-deleting.el ends here

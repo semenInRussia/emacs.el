@@ -33,9 +33,7 @@
 
 (require 'dash)
 
-(declare-function fast-exec-make-some-commands "fast-exec")
-(declare-function fast-exec-bind "fast-exec")
-
+(declare-function god-mode "god-mode.el")
 
 (leaf magit
   :ensure t
@@ -46,8 +44,9 @@
                 magit-insert-tags-header
                 magit-insert-unpushed-to-upstream-or-recent
                 magit-insert-unpulled-from-upstream)))
-  :advice ((:after magit-gitignore xah-fly-insert-mode-activate)
-           (:after magit-gitignore-in-top xah-fly-insert-mode-activate)))
+  :config
+  (advice-add 'magit-gitignore :after #'god-mode)
+  (advice-add 'magit-gitignore-in-top :after #'god-mode))
 
 (leaf git-timemachine
   :ensure (git-timemachine :host gitlab :repo "pidu/git-timemachine"))

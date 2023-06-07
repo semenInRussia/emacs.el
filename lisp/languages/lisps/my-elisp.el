@@ -1,4 +1,4 @@
- ;;; my-elisp.el --- My configuration of the elisp
+;;; my-elisp.el --- My configuration of the elisp
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -28,25 +28,22 @@
 ;;; Code:
 
 (require 'my-leaf)
-(require 'my-xah)
 
 (require 'my-lisp)
 (require 's)
 (require 'dash)
 
 (leaf elisp-mode
-  :major-mode-map (elisp
-                   :modes (emacs-lisp-mode ;nofmt
-                           inferior-emacs-lisp-mode
-                           lisp-interaction-mode)
-                   :parent my-lisp-map)                             ; nofmt
-  :config                               ;nofmt
-  (add-hook 'emacs-lisp-mode 'paxedit-mode)
+  :config (add-hook 'emacs-lisp-mode 'paxedit-mode)
   (leaf inspector
     :ensure t
-    :bind (:my-elisp-local-map
+    :bind (:emacs-lisp-mode-map
            :package elisp-mode
-           ("i" . inspector-inspect-last-sexp))))
+           ("C-c C-i" . inspector-inspect-last-sexp)))
+
+  (leaf paredit
+    :ensure t
+    :hook emacs-lisp-mode-hook))
 
 (leaf suggest :ensure t)
 
@@ -54,9 +51,6 @@
 
 (leaf my-elisp-embrace
   :hook (emacs-lisp-mode-hook . my-embrace-emacs-lisp-mode-hook))
-
-(leaf debug)
-  ;:config (advice-add 'debugger-quit :after 'xah-fly-command-mode-activate))
 
 (provide 'my-elisp)
 ;;; my-elisp.el ends here

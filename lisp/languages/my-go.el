@@ -27,13 +27,13 @@
 
 ;;; Code:
 (require 'my-leaf)
-(require 'my-xah)
+
+(declare-function my-lsp-ensure "my-lsp")
 
 (leaf go-mode
   :ensure t
   :major-mode-map go
-  :hook (go-mode-hook . my-lsp-ensure)
-  :bind (:my-go-local-map ("i" . go-import-add)))
+  :hook (go-mode-hook . my-lsp-ensure))
 
 (provide 'my-go)
 ;;; my-go.el ends here

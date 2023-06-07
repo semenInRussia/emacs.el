@@ -37,8 +37,7 @@
   :custom `((pomidor-sound-tack    . nil)
             (pomidor-seconds       . 1800) ; 30min
             (pomidor-sound-tick    . nil)
-            (pomidor-confirm-end-break . nil))
-  :advice ((:after pomidor xah-fly-insert-mode-activate)))
+            (pomidor-confirm-end-break . nil)))
 
 (provide 'my-pomidor)
 ;;; my-pomidor.el ends here

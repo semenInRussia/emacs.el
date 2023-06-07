@@ -298,6 +298,60 @@ Return a list of all files containing STRING in DIRECTORY.
 ;;; Generated autoloads from my-doom-modeline-segments.el
 
 (register-definition-prefixes "my-doom-modeline-segments" '("durand-buffer-name-max" "eglot--spinner" "my-"))
+
+
+;;; Generated autoloads from my-project.el
+
+(autoload 'my-project-root "my-project" "\
+Root of the project at DIR.
+
+(fn &optional DIR)")
+(autoload 'my-projectile-project-files "my-project" "\
+Return filenames list of the project at ROOT, with caching.
+
+(fn ROOT)")
+(autoload 'projectile-project-files-clear-cache "my-project" "\
+Function `projectile-project-files' is cached, clear this cache for ROOT." t)
+(autoload 'my-projectile-files-with-string "my-project" "\
+Return a list of all files containing STRING in DIRECTORY.
+
+(fn STRING DIRECTORY &optional FILE-EXT)")
+(register-definition-prefixes "my-project" '("my-"))
+
+
+;;; Generated autoloads from my-org-editing.el
+
+(autoload 'my-org-clear-subtree "my-org-editing" "\
+Kill subtree at the position, and activate insertion mode.")
+(defvar my-org-table-cut-map '(keymap (46 . org-cut-special) (99 . org-table-delete-column) (114 . my-kill-line-or-region)))
+(autoload 'my-org-cut "my-org-editing" "\
+Cut any `org' thing.
+
+If in a table ask from the user: either kill column, kill cell or kill row, if
+in a src block cut it, otherwise kill heading" t)
+(autoload 'my-org-schedule-to-today "my-org-editing" "\
+Scheduale a `org-mode' heading to today." t)
+(autoload 'my-org-indent-subtree "my-org-editing" "\
+Indent current the `org-mode' subtree at current position." t)
+(autoload 'my-org-todo "my-org-editing" "\
+My version of the `org-todo'.
+
+Different with the original functions is that this function can be repeated by
+pressing of the previous last pressed char.  So if functions is bound to
+\"SPC l 1\", that after pressing that user can press \"1\" and this command will
+be repeated" t)
+(autoload 'my-org-insert-image "my-org-editing" "\
+Insert a image with FILENAME.
+
+By default, caption for the image don't inserts, but if CAPTION is a
+string, then define caption of the image to the CAPTION.
+
+In the interactive, If the region is active, the FILENAME will be text
+in the region.
+
+(fn FILENAME &optional CAPTION)" t)
+(register-definition-prefixes "my-org-editing" '("my-"))
+
 
 ;;; Generated autoloads from my-dired-commands.el
 

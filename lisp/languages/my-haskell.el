@@ -28,20 +28,13 @@
 
 ;;; Code:
 (require 'my-leaf)
-(require 'my-xah)
 
 (leaf haskell-mode
   :ensure t
-  :major-mode-map (haskell (haskell-mode haskell-interactive-mode))
   ;; :ensure-system-package (("hoogle" . "cabal install hoogle"))
   :hook ((haskell-mode-hook . haskell-indent-mode)
          (haskell-mode-hook . interactive-haskell-mode)
-         (haskell-mode-hook . my-lsp-ensure))
-  :bind (:my-haskell-local-map          ;nofmt
-         ("e" . 'haskell-compile)
-         ("i" . 'haskell-add-import)
-         ("g" . 'haskell-process-load)
-         ("p" . 'haskell-process-do-type)))
+         (haskell-mode-hook . my-lsp-ensure)))
 
 (provide 'my-haskell)
 ;;; my-haskell.el ends here

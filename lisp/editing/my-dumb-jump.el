@@ -35,10 +35,8 @@
   :ensure t
   :custom ((dumb-jump-prefer-searcher dumb-jump-force-searcher)
            . 'rg)
-  :bind (:xah-fly-command-map
-         :package xah-fly-keys
-         ("SPC SPC ." . xref-go-back)
-         ("SPC ."     . xref-find-definitions))
+  :bind (("M-," . xref-go-back)
+         ("M-." . xref-find-definitions))
   :hook (xref-backend-functions . dumb-jump-xref-activate))
 
 (provide 'my-dumb-jump)

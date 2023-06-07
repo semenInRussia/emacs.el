@@ -31,7 +31,6 @@
 (require 's)
 (require 'just)
 (require 'smartparens)
-(require 'my-xah)
 
 (leaf python-mode
   :ensure t
@@ -41,12 +40,10 @@
          (python-mode-hook . my-lsp-ensure))
   :custom ((lsp-bridge-python-lsp-server . nil)
            (lsp-bridge-python-multi-lsp-server . "pyright_ruff"))
-  :major-mode-map python
-  :bind (:my-python-local-map
-         :package org
-         ("f" . py-sort-imports)
-         ("o" . my-python-optional-type)
-         ("p" . my-python-split-params))
+  :bind (:python-mode
+         ("C-c C-i" . py-sort-imports)
+         ("C-c C-o" . my-python-optional-type)
+         ("C-c M-p" . my-python-split-params))
   :config                               ;nofmt
   (defun my-python-split-multi-imports-in-1-line ()
     "Find all lines importing more then 1 thing from module and split it."

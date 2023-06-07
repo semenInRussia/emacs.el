@@ -34,6 +34,7 @@
 
 (declare-function org-schedule "org.el")
 (declare-function org-mark-subtree "org.el")
+(declare-function my-open-main-agenda-file "my-organization-commands.el")
 
 (declare-function my-goto-targets-on-day "my-organization.el")
 (declare-function my-delete-and-get-text-of-org-subtree "my-organization.el")
@@ -43,12 +44,7 @@
                              '("~/agenda.org"
                                "~/tasks-archive/task-archive.org"))
            (org-agenda-span . 14))
-  :bind (("<f9>"      . org-agenda)
-         ("S-<f9>"    . org-agenda-list)
-         (:xah-fly-command-map
-          :package xah-fly-keys
-          ("SPC <f9>" . org-agenda-list)
-          ("SPC i p"  . my-open-main-agenda-file))))
+  :bind ("C-c aa"      . org-agenda))
 
 (require 'fast-exec)
 
@@ -84,9 +80,7 @@
         (org-schedule t (format-time-string "%Y-%m-%d"))))))
 
 (leaf-keys
- (xah-fly-command-map                   ;nofmt
-  :package xah-fly-keys
-  ("SPC i a" . my-add-org-subtree-to-targets-on-day)))
+ ("C-c at" . my-add-org-subtree-to-targets-on-day))
 
 (leaf org-capture
   :commands org-capture

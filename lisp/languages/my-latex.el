@@ -33,7 +33,6 @@
 (require 'dash)
 (require 'my-autoformat)
 (require 'my-company)
-(require 'my-xah)
 (require 'smartparens)
 
 (declare-function aas-set-snippets "aas.el")
@@ -118,13 +117,10 @@
             LaTeX-mark-section)
            . latex))
   :custom (TeX-master . nil)
-  :major-mode-map (latex (latex-mode))
-  :bind (:my-latex-local-map
-         ("f"  . 'calc-embedded)
-         ("1"  . latex-split-block)
-         ("6"  . my-latex-mark-inside-environment-or-math)
-         ("\\" . my-latex-equation-to-split)
-         ("x"  . my-latex-kill-section))
+  :bind (:LaTeX-mode-map
+         ("C-c C-@"  . my-latex-mark-inside-environment-or-math)
+         ("C-c C-\\" . my-latex-equation-to-split)
+         ("C-c C-w"  . my-latex-kill-section))
   :config                               ;nofmt
   (add-hook 'LaTeX-mode-hook 'visual-fill)
   (add-hook 'LaTeX-mode-hook 'turn-off-flycheck)
@@ -369,11 +365,11 @@
     :ensure t
     :hook ((LaTeX-mode-hook . latex-extra-mode)
            (LaTeX-mode-hook . visual-line-mode))
-    :bind (:my-latex-local-map
+    :bind (:LaTeX-mode-map
            :package tex
-           ("e" . latex/compile-commands-until-done)
-           ("l" . latex/next-section-same-level)
-           ("j" . latex/previous-section-same-level)))
+           ("C-c C-c" . latex/compile-commands-until-done)
+           ("C-c C-n" . latex/next-section-same-level)
+           ("C-c C-p" . latex/previous-section-same-level)))
 
   (leaf company-math
     :ensure t
@@ -395,11 +391,10 @@
 
   (leaf latex-r
     :load-path "~/projects/latex-r"
-    :commands (latex-r-cycle-math-parens latex-r-split-environment)
-    :bind (:my-latex-local-map
+    :bind (:LaTeX-mode-map
            :package latex
-           ("l" . 'latex-r-cycle-math-parens)
-           ("k" . 'latex-r-split-environment)))
+           ("C-c M-n" . 'latex-r-cycle-math-parens)
+           ("C-c C-s" . 'latex-r-split-environment)))
 
   (defun my-latex-disable-auto-fill ()
     "Disable `auto-fill-mode'."

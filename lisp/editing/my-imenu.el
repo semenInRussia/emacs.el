@@ -30,10 +30,7 @@
 (require 'my-leaf)
 
 (leaf consult-imenu
-  :custom (imenu-auto-rescan . t)
-  :bind (:xah-fly-command-map
-         :package xah-fly-keys
-         ("SPC SPC SPC" . consult-imenu)))
+  :custom (imenu-auto-rescan . t))
 
 (provide 'my-imenu)
 ;;; my-imenu.el ends here

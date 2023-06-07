@@ -25,13 +25,13 @@
 ;;; Code:
 
 (require 'org)
-(require 'xah-fly-keys)
 
 ;;;###autoload
 (defun my-org-clear-subtree ()
   "Kill subtree at the position, and activate insertion mode."
   (org-cut-subtree)
-  (xah-fly-insert-mode-activate))
+  ;; TODO: `gob-mode' insert mode
+  )
 
 (defun my-org-table-eval-formula-in-field ()
   "Eval formula with `orgtbl' syntax for the current field of the table."

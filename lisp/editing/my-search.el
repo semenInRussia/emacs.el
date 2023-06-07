@@ -30,29 +30,17 @@
 
 (leaf ctrlf
   :ensure t
-  :bind (("C-s" . ctrlf-forward-default)
-         (:xah-fly-command-map
-          :package xah-fly-keys
-          ("'" . ctrlf-forward-default))))
+  :bind ("C-s" . ctrlf-forward-default))
 
 (leaf visual-regexp
   :ensure t
-  :bind (:xah-fly-command-map
-         :package xah-fly-keys
-         ("SPC r" . vr/query-replace)))
+  :bind ("M-%" . vr/query-replace))
 
 (leaf deadgrep
   :ensure t
   :defun ((projectile-acquire-root . projectile))
   :custom (deadgrep-project-root-function . #'projectile-acquire-root)
-  :bind (:xah-fly-command-map :package xah-fly-keys
-                              ("SPC SPC '" . deadgrep)))
-
-(leaf consult-projectile
-  :ensure t
-  :bind (:xah-fly-command-map
-         :package xah-fly-keys
-         ("SPC SPC r" . consult-projectile)))
+  :bind ("C-c S" . deadgrep))
 
 (provide 'my-search)
 ;;; my-search.el ends here

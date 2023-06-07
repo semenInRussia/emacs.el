@@ -36,6 +36,7 @@
 ;; and will be evaluated when really needed
 (declare-function my-dired-save-excursion "my-dired-commands.el")
 (declare-function visual-fill "my-lang-utils.el")
+(declare-function god-mode "god-mode.el")
 
 (require 's)
 (require 'dash)
@@ -43,8 +44,7 @@
 (require 'f)
 
 (leaf dired
-  :hook ((dired-mode-hook . xah-fly-insert-mode-activate)
-         (dired-mode-hook . dired-hide-details-mode))
+  :hook ((dired-mode-hook . dired-hide-details-mode))
   :defun ((dired-mark
            dired-do-rename
            dired-current-directory
@@ -52,34 +52,14 @@
            dired-get-file-for-visit)
           (org-link-open-from-string . ol))
   :bind (:dired-mode-map
-         ("SPC"     . nil)                ; make command at space empty prefix
-
-         ;; Navigation
-         ("k"       . next-line)
-         ("i"       . previous-line)
-         ("n"       . dired-avy)
-         ("SPC h"   . beginning-of-buffer)
-         ("SPC n"   . end-of-buffer)
-         ("'"       . dired-isearch-filenames)
-
-         ;; Open file
-         ("o"       . dired-find-file-other-window)
-         ;; some other open files I define in the section "Dired Hacks: Open"
-
-         ;; Mark files
-         ("t"       . dired-mark)
-         ("SPC u"   . dired-unmark-all-marks)
-
-         ;; Misc.
-         ("y"       . dired-undo)
+         (";"       . dired-avy)
          ("A"       . agnifize-dwim)
          ("~"       . my-dired-jump-to-home)
-
-         ;; Key bindings which not change your commands
          ("a"       . execute-extended-command)
-         (","       . xah-next-window-or-frame))
+         (","       . ace-window))
 
   :config
+  (add-hook 'dired-mode-hook 'god-mode)
   (leaf dired-async
     :ensure async
     :defun dired-async-mode
@@ -89,33 +69,28 @@
     :bind (:dired-mode-map
            :package dired
            ;; Mark anything
-           ("SPC a"   . my-dired-mark-all-files)
+           ("C-x h"   . my-dired-mark-all-files)
            ;; Manipulation with file(s)
            ;; copy/move/paste also defines in the section "Dired Hacks: Ranger"
-           ("SPC g"   . my-dired-delete)
-           ("SPC x"   . my-dired-delete-all-files)
-           ("SPC y"   . my-dired-duplicate)
-           ("f"       . my-dired-rename)
-           ("SPC TAB" . my-dired-move)
-           ("s"       . my-dired-new-file)
-           ("j"       . my-dired-goto-parent-dir)))
+           ("k"       . my-dired-delete)
+           ("C-c C-x" . my-dired-delete-all-files)
+           ("C-y"     . my-dired-duplicate)
+           ("R"       . my-dired-rename)
+           ("TAB"     . my-dired-move)
+           ("o"       . my-dired-new-file)
+           ("b"       . my-dired-goto-parent-dir)))
 
   (leaf dired-filter
     :ensure t
     :require t
-    :defvar dired-filter-map
-    :defer-config
-    (require 'dired-filter)
-    (leaf-keys-bind-keymap
-     ((dired-mode-map :package dired
-                      ("." . dired-filter-map)))
-     nil 'dired-filter))
+    :bind-keymap (:dired-mode-map
+                  :package dired
+                  ("." . 'dired-filter-map)))
 
   (leaf dired-open
     :ensure t
     :bind (:dired-mode-map
            :package dired
-           ("l"   . 'dired-open-file)
            ("RET" . 'dired-open-file))
     :push ((dired-open-functions . 'my-dired-open-function-pdf))
     :defvar dired-open-functions
@@ -128,7 +103,6 @@
     (defun my-try-open-pdf-file (filename)
       "If file at FILENAME is a pdf file, then open as pdf, other return nil."
       (when (my-pdf-file filename)
-        (xah-open-in-external-app)
         (org-link-open-from-string filename)
         t))
 
@@ -157,7 +131,7 @@
       (interactive)
       (my-dired-save-excursion
        (dired-subtree-beginning)
-       (dired-previous-line 1)
+       (forward-line -1)
        (dired (thing-at-point 'filename)))))
 
   (leaf dired-collapse
@@ -177,13 +151,13 @@
     :group 'my)
 
   (advice-add 'dired-jump
-              :after (lambda (&rest _ignore) (xah-fly-insert-mode-activate))
-              '((name . "xah-fly-insert-mode-activate")))
+              :after (lambda (&rest _ignore) (god-mode))
+              '((name . god-mode)))
 
   (--each my-dired-commands-using-minibuffer
     (advice-add it :after
-                (lambda (&rest _) (xah-fly-insert-mode-activate))
-                '((name . xah-fly-insert-mode-activate))))
+                (lambda (&rest _) (god-mode))
+                '((name . god-mode))))
 
   ;; Command for printing file
   (with-eval-after-load 'lpr (setq lpr-command "PDFToPrinter"))

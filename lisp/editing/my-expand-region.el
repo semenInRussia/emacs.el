@@ -36,10 +36,8 @@
   :ensure t
   :defun (((sp-get-sexp sp-get)
            . smartparens))
-  :bind (:xah-fly-command-map
-         :package xah-fly-keys
-         ("1" . er/expand-region)
-         ("9" . my-mark-inner-or-expand-region))
+  :bind (("C-x C-<SPC>" . er/expand-region)
+         ("C-x C-@" . my-mark-inner-or-expand-region))
   :config                             ;nofmt
   (defun my-mark-inner-or-expand-region ()
     "If text is selected, expand region, otherwise mark inner of brackets."

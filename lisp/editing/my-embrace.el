@@ -32,10 +32,7 @@
   :ensure t
   :defvar embrace-semantic-units-alist
   :setq-default (embrace-show-help-p . nil)
-  :bind (:xah-fly-command-map
-         :package xah-fly-keys
-         ("/"         . embrace-commander)
-         ("SPC SPC /" . xah-goto-matching-bracket))
+  :bind ("C-."       . embrace-commander)
   :hook (emacs-lisp-mode-hook . embrace-emacs-lisp-mode-hook)
   :config                             ;nofmt
   (unless (assq ?n embrace-semantic-units-alist)

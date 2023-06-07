@@ -34,42 +34,17 @@
   :ensure t
   :global-minor-mode smartparens-global-mode
   :require smartparens-config
-  :defun sp-clone-sexp
-  :bind (;; Wrap anything
-         (global-map
-          :package xah-fly-keys
-          ("M-("       . sp-wrap-round)
-          ("M-["       . sp-wrap-square)
-          ("M-{"       . sp-wrap-curly))
-         (:xah-fly-command-map
-          :package xah-fly-keys
-          ;; Kill anything
-          ("x"         . sp-kill-whole-line)
-          ("DEL"       . delete-only-1-char)
-          ("SPC 8"     . sp-kill-sexp)
-          ("SPC k e"   . sp-backward-kill-sexp)
-          ("SPC SPC g" . sp-kill-hybrid-sexp)
-          ("SPC SPC e" . sp-backward-kill-sexp)
-          ("SPC -"     . sp-rewrap-sexp)
-          ("-"         . sp-splice-sexp)
-          ("SPC 9"     . sp-change-enclosing)
-
-          ;; Change wrap placement
-          ("]"         . 'sp-slurp-hybrid-sexp)
-          ("["         . 'sp-forward-barf-sexp)
-          ("SPC ["     . 'sp-backward-slurp-sexp)
-          ("SPC ]"     . 'sp-backward-barf-sexp)
-          ("SPC ="     . 'sp-raise-sexp)
-
-          ;; Navigation
-          ("m"         . 'sp-backward-sexp)
-          ("."         . 'sp-forward-sexp)
-
-          ;; misc.
-          ("SPC 1"     . sp-join-sexp)
-          ("SPC SPC 1" . sp-split-sexp)
-          ("SPC SPC y" . my-sp-clone)))
-  :config                               ;nofmt
+  :defun (sp-clone-sexp sp-use-paredit-bindings)
+  :bind (:smartparens-mode-map
+         ("C-c C-w" . 'sp-splice-sexp-killing-backward)
+         ("C-x C-y" . 'my-sp-clone)
+         ("C-c DEL" . 'sp-change-enclosing)
+         ("C-M-."   . 'sp-forward-slurp-sexp)
+         ("C-M-,"   . 'sp-forward-barf-sexp)
+         ("C-M->"   . 'sp-backward-slurp-sexp)
+         ("C-M-<"   . 'sp-backward-barf-sexp))
+  :config
+  (sp-use-paredit-bindings)
   (defun my-sp-clone ()
     (interactive)
     (sp-clone-sexp)

@@ -29,9 +29,7 @@
 
 (leaf dwim-shell-command
   :ensure t
-  :bind (:xah-fly-command-map
-         :package xah-fly-keys
-         ("SPC i 1" . dwim-shell-command)))
+  :bind ("M-!" . dwim-shell-command))
 
 (provide 'my-dwim-shell-command)
 ;;; my-dwim-shell-command.el ends here

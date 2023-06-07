@@ -1,6 +1,6 @@
-;;; my-goto-last-change.el --- My configuration of `goto-last-change' -*- lexical-binding: t; -*-
+;;; my-god-mode.el --- My configuration of `god-mode' -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022 semenInRussia
+;; Copyright (C) 2023 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
@@ -21,15 +21,17 @@
 
 ;;; Commentary:
 
-;; My configuration of `goto-last-change'.
+;; My configuration of `god-mode'.
 
 ;;; Code:
 
 (require 'my-leaf)
 
-(leaf goto-last-change
+(leaf god-mode
   :ensure t
-  :bind ("C-_" . 'goto-last-change))
+  :defun god-mode
+  :bind ("M-SPC" . god-mode)
+  :config (god-mode))
 
-(provide 'my-goto-last-change)
-;;; my-goto-last-change.el ends here
+(provide 'my-god-mode)
+;;; my-god-mode.el ends here

@@ -27,15 +27,22 @@
 
 (require 'my-leaf)
 
+(require 's)
+
+(defvar my-avy-map (make-sparse-keymap))
+
+(define-prefix-command 'my-avy
+                       'my-avy-map)
+
 (leaf avy
   :ensure t
   :defvar (avy-goto-word-1 avy-word-punc-regexp)
-  :defun ((s-concat . s)
-          ((sp-change-enclosing sp-splice-sexp)
+  :defun (((sp-change-enclosing sp-splice-sexp)
            . smartparens)
           (clear-current-line . my-deleting)
           (avy-jump
            avy-with
+           avy-goto-line
            avy-goto-word-1-with-action
            avy-goto-line-1-with-action
            avy-action-kill-move
@@ -44,41 +51,39 @@
            avy-action-insert-new-line-at-eol
            avy-action-insert-new-line-at-bol))
   :custom (avy-background . t)
-  :bind (:xah-fly-command-map
-         :package xah-fly-keys
-         ("n"     . nil)
+  :bind ("C-;" . 'my-avy)
+  :bind (:my-avy-map
+         (";"   . avy-goto-char)
+         ("v"   . avy-yank-word)
+         ("x"   . avy-teleport-word)
+         ("c"   . avy-copy-word)
+         ("2"   . avy-mark-word)
+         ("d"   . avy-kill-word-stay)
 
-         ("n n"   . avy-goto-char)
-         ("n v"   . avy-yank-word)
-         ("n x"   . avy-teleport-word)
-         ("n c"   . avy-copy-word)
-         ("n 8"   . avy-mark-word)
-         ("n d"   . avy-kill-word-stay)
+         ("s ;" . avy-insert-new-line-at-eol)
+         ("s h" . avy-insert-new-line-at-bol)
 
-         ("n s ;" . avy-insert-new-line-at-eol)
-         ("n s h" . avy-insert-new-line-at-bol)
+         ("5"   . avy-zap)
+         ("TAB" . avy-transpose-words)
+         ("w"   . avy-clear-line)
+         ("-"   . avy-sp-splice-sexp-in-word)
+         ("r"   . avy-kill-word-move)
+         ("o"   . avy-change-word)
+         ("9"   . avy-sp-change-enclosing-in-word)
+         ("z"   . avy-comment-line)
 
-         ("n 5"   . avy-zap)
-         ("n TAB" . avy-transpose-words)
-         ("n w"   . avy-clear-line)
-         ("n -"   . avy-sp-splice-sexp-in-word)
-         ("n r"   . avy-kill-word-move)
-         ("n o"   . avy-change-word)
-         ("n 9"   . avy-sp-change-enclosing-in-word)
-         ("n z"   . avy-comment-line)
+         ("t v" . avy-copy-region)
+         ("t d" . avy-kill-region)
+         ("t x" . avy-move-region)
+         ("t c" . avy-kill-ring-save-region)
 
-         ("n t v" . avy-copy-region)
-         ("n t d" . avy-kill-region)
-         ("n t x" . avy-move-region)
-         ("n t c" . avy-kill-ring-save-region)
+         ("n"   . avy-goto-end-of-line)
+         ("h"   . avy-goto-begin-of-line-text)
 
-         ("n ;"   . avy-goto-end-of-line)
-         ("n h"   . avy-goto-begin-of-line-text)
-
-         ("n k v" . avy-copy-line)
-         ("n k x" . avy-move-line)
-         ("n k c" . avy-kill-ring-save-whole-line)
-         ("n k d" . avy-kill-whole-line))
+         ("k v" . avy-copy-line)
+         ("k x" . avy-move-line)
+         ("k c" . avy-kill-ring-save-whole-line)
+         ("k d" . avy-kill-whole-line))
   :config
 
   (defun avy-goto-word-1-with-action (char action ;nofmt

@@ -96,9 +96,7 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
   :config (leaf espuds :ensure t :require t))
 
 (leaf leaf
-  :bind (:xah-fly-command-map
-         :package xah-fly-keys
-         ("SPC SPC j" . 'leaf-find)))
+  :bind ("C-x M-f" . 'leaf-find))
 
 (defun my-bench ()
   "Show bench analysis."

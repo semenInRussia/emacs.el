@@ -28,7 +28,7 @@
 ;;; Code:
 
 (require 'my-leaf)
-(require 'my-xah)
+
 
 ;; disable tabs
 (setq-default indent-tabs-mode nil)
@@ -42,12 +42,12 @@
       (funcall indent-line-function))))
 
 (leaf-keys
- ((prog-mode-map ("RET" . newline-and-indent))
-  (xah-fly-command-map
-   :package xah-fly-keys
-   ("RET"   . newline-and-indent)
-   ("q"     . my-indent-line-or-region)
-   ("SPC q" . join-line))))
+ (prog-mode-map ("RET" . newline-and-indent)))
+
+(leaf-keys
+ ("RET"   . newline-and-indent)
+ ("q"     . my-indent-line-or-region)
+ ("SPC q" . join-line))
 
 (provide 'my-indent)
 ;;; my-indent.el ends here

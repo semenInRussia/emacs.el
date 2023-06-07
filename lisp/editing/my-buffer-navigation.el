@@ -33,7 +33,7 @@
 
 (leaf ace-window
   :ensure t
-  :bind (:xah-fly-command-map :package xah-fly-keys ("," . ace-window)))
+  :bind ("M-o" . ace-window))
 
 (defun my-visit-last-opened-buffer ()
   "Visit buffer which was opened recently."
@@ -56,10 +56,8 @@
   (kill-buffer (current-buffer)))
 
 (leaf-keys
- (xah-fly-command-map
-  :package xah-fly-keys
-  ("SPC 0" . 'my-visit-last-opened-buffer)
-  ("SPC u" . 'my-kill-current-buffer)))
+ ("C-TAB" . 'my-visit-last-opened-buffer)
+ ("C-x k" . 'my-kill-current-buffer))
 
 (provide 'my-buffer-navigation)
 ;;; my-buffer-navigation.el ends here

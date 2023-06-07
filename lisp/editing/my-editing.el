@@ -30,7 +30,6 @@
 (require 'dash)
 (require 'my-leaf)
 (require 'my-lib)
-(require 'my-xah)
 (require 'leaf)
 (require 's)
 
@@ -131,32 +130,18 @@ With prefix arg don't indent."
          (region-beginning)
          (region-end)))))
 
-(defun yank-unindented () "Just `yunk'." (interactive) (yank 1))
-
-(defun kill-to-beginning-of-line ()
-  "Kill region from the current position to the beginning of line."
+(defun yank-unindented ()
+  "Just `yunk'."
   (interactive)
-  (kill-region (max (pos-bol)
-                    (point-min))
-               (point)))
+  (yank 1))
 
 (leaf-keys
- (:xah-fly-command-map
-  :package xah-fly-keys
-  ("SPC y"     . 'duplicate-current-line-or-region)
-  ("SPC s"     . 'open-line-below)
-  ("SPC SPC s" . 'open-line-above)
-  ("s"         . 'open-line-saving-indent)
-  ("SPC SPC b" . 'my-change-case-of-current-line)
-  ("SPC e"     . 'kill-to-beginning-of-line)))
-
-(defun my-change-case-of-current-line ()
-  "Change case of current line to next (see `xah-toggle-letter-case')."
-  (interactive)
-  (save-mark-and-excursion
-    (select-current-line)
-    (xah-toggle-letter-case))
-  (repeat-at-last-keystroke))
+ (("C-M-y"         . 'duplicate-current-line-or-region)
+  ("C-<return>"    . 'open-line-below)
+  ("C-a"           . 'beginning-of-line-text)
+  ("C-h"           . 'backward-delete-char)
+  ("C-S-<return>"  . 'open-line-above)
+  ("C-o"           . 'open-line-saving-indent)))
 
 (defvar my-last-command-is-changed-case-of-current-line
   nil "In t, when last command change case.")
@@ -182,10 +167,8 @@ With prefix arg don't indent."
       (point-min))))
 
 (leaf-keys
- (xah-fly-command-map
-  :package xah-fly-keys
-  ("SPC k 6"    . my-duplicate-last-block)
-  ("SPC SPC v"  . consult-yank-from-kill-ring)))
+ (("C-x M-y" . my-duplicate-last-block)
+  ("M-y"     . consult-yank-from-kill-ring)))
 
 (provide 'my-editing)
 ;;; my-editing.el ends here

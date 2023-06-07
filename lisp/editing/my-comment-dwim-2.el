@@ -30,9 +30,7 @@
 
 (leaf comment-dwim-2
   :ensure t
-  :bind (:xah-fly-command-map         ;nofmt
-         :package xah-fly-keys
-         ("z" . comment-dwim-2)))
+  :bind ("M-;" . comment-dwim-2))
 
 (provide 'my-comment-dwim-2)
 ;;; my-comment-dwim-2.el ends here

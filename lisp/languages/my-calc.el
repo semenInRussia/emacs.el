@@ -25,6 +25,9 @@
 ;; the file ~/.emacs.d/calc.el created automatically by `calc'
 
 ;;; Code:
+
+(declare-function god-mode "god-mode.el")
+
 (require 'my-leaf)
 
 (require 'dash)
@@ -39,7 +42,6 @@
   "List of the function after which will be actived insert mode.")
 
 (leaf calc
-  :hook (calc-start-hook . xah-fly-insert-mode-activate )
   :defun (calc-yank-internal calc-pack calc-vector-mean)
   :bind ((:calc-mode-map                ;nofmt
           :package calc
@@ -49,6 +51,7 @@
           :package calc-yank
           ([remap save-buffer] . calc-edit-finish)))
   :config                               ;nofmt
+  (add-hook 'calc-start-hook 'god-mode)
   (defun my-calc-mean-yank (vec)
     "Yank to calculator vector of numbers VEC as string and compute mean.
 
@@ -67,8 +70,8 @@ mechanism use `calc-yank'"
 
   (--each my-calc-operations
     (advice-add it :after
-                (lambda (&rest _) (xah-fly-insert-mode-activate))
-                '((name . xah-fly-insert-mode-activate)))))
+                (lambda (&rest _) (god-mode))
+                '((name . god-mode)))))
 
 (provide 'my-calc)
 ;;; my-calc.el ends here

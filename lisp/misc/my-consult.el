@@ -47,18 +47,14 @@
   :bind (:minibuffer-local-map
          ("M-s" . consult-history) ;; orig. next-matching-history-element
          ("M-r" . consult-history))
-  :bind (:xah-fly-command-map
-         :package xah-fly-keys
-         ("SPC SPC f" . find-file)
-         ("SPC '" . my-consult-ripgrep)
-         ("SPC SPC SPC" . consult-imenu)
-         ("SPC SPC n" . consult-imenu-multi))
+  :bind (("C-x C-b" . consult-buffer)
+         ("C-c i" . consult-imenu)
+         ("C-c n" . consult-imenu-multi))
   :bind (;; C-c bindings in `mode-specific-map'
          ("C-c M-x" . consult-mode-command)
-         ("C-c h" . consult-history)
+         ("C-c s" . consult-ripgrep)
          ("C-c k" . consult-kmacro)
          ("C-c m" . consult-man)
-         ("C-c i" . consult-info)
          ([remap Info-search] . consult-info)
          ("M-#" . consult-register-load)
          ("C-M-#" . consult-register)
@@ -107,6 +103,17 @@
   (leaf marginalia
     :ensure t
     :global-minor-mode marginalia-mode)
+
+  (leaf embark-consult :ensure t)
+
+  (leaf embark
+    :ensure t
+    :bind (("M-." . nil)
+           (:minibuffer-mode-map
+            :package vertico
+            ("M-." . embark-act)
+            ([remap write-file] . embark-export)
+            ([remap save-buffer] . embark-collect))))
 
   (defvar string-width 0)
 
