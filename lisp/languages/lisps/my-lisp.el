@@ -27,7 +27,7 @@
 
 (require 'my-leaf)
 
-(declare-function god-mode "god-mode.el")
+(declare-function meow-insert "meow-command.el")
 
 (require 'dash)
 (require 'my-lib)
@@ -88,7 +88,7 @@
     "Kill the Lisp expression at the cursor and activate insert mode."
     (interactive)
     (paxedit-delete)
-    (god-mode))
+    (meow-insert))
 
   (defun my-paxedit-duplicate ()
     "Make copy of the Lisp expression at the cursor."

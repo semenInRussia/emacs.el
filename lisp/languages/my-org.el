@@ -34,7 +34,7 @@
 (require 'dash)
 (require 'my-autoformat)
 
-(declare-function god-mode "god-mode")
+(declare-function meow-insert "meow-command.el")
 (declare-function aas-set-snippets "aas.el")
 (declare-function my-org-list-item-p "my-org.el")
 (declare-function my-org-properties-end-p "my-org.el")
@@ -259,7 +259,7 @@ demotes a first letter after keyword word."
                  (progn
                    (skip-chars-forward "*")
                    (forward-char)
-                   (god-mode 0)))
+                   (meow-insert 0)))
                 ("B" . org-previous-block)
                 ("F" . org-next-block)
                 ("g" . (org-refile t))
@@ -298,7 +298,7 @@ demotes a first letter after keyword word."
       (interactive)
       (end-of-line)
       (search-backward-regexp "^\*" nil t)
-      (god-mode 0)
+      (meow-insert)
       (unless (eq current-input-method nil) (toggle-input-method)))
 
     (defun my-org-goto-parent ()

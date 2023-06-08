@@ -25,7 +25,8 @@
 ;;; Code:
 (require 'my-leaf)
 (require 'dash)
-(declare-function god-mode "god")
+
+(declare-function meow-insert "meow-command.el")
 
 (defcustom my-eshell-commands-using-minibuffer
   '(completion-at-point)
@@ -44,8 +45,8 @@
 
   (--each my-eshell-commands-using-minibuffer
     (advice-add it :after
-                (lambda (&rest _) (god-mode))
-                '((name . god-mode)))))
+                (lambda (&rest _) (meow-insert))
+                '((name . meow-insert)))))
 
 (provide 'my-eshell)
 ;;; my-eshell.el ends here

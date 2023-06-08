@@ -31,7 +31,7 @@
 (require 'my-lib)
 
 
-(declare-function god-mode "god-mode.el")
+(declare-function meow-insert "meow-command.el")
 
 
 (defun delete-and-edit-current-line ()
@@ -40,7 +40,7 @@
   (beginning-of-line-text)
   (sp-kill-whole-line)
   (open-line-above)
-  (god-mode))
+  (meow-insert))
 
 (defun clear-current-line ()
   "Clear content of current line (including whitespaces)."

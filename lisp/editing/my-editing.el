@@ -139,7 +139,6 @@ With prefix arg don't indent."
  (("C-M-y"         . 'duplicate-current-line-or-region)
   ("C-<return>"    . 'open-line-below)
   ("C-a"           . 'beginning-of-line-text)
-  ("C-h"           . 'backward-delete-char)
   ("C-S-<return>"  . 'open-line-above)
   ("C-o"           . 'open-line-saving-indent)))
 

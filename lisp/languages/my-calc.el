@@ -26,7 +26,7 @@
 
 ;;; Code:
 
-(declare-function god-mode "god-mode.el")
+(declare-function meow-insert "meow-command.el")
 
 (require 'my-leaf)
 
@@ -51,7 +51,7 @@
           :package calc-yank
           ([remap save-buffer] . calc-edit-finish)))
   :config                               ;nofmt
-  (add-hook 'calc-start-hook 'god-mode)
+  (add-hook 'calc-start-hook 'meow-insert)
   (defun my-calc-mean-yank (vec)
     "Yank to calculator vector of numbers VEC as string and compute mean.
 
@@ -70,8 +70,8 @@ mechanism use `calc-yank'"
 
   (--each my-calc-operations
     (advice-add it :after
-                (lambda (&rest _) (god-mode))
-                '((name . god-mode)))))
+                (lambda (&rest _) (meow-insert))
+                '((name . meow-insert)))))
 
 (provide 'my-calc)
 ;;; my-calc.el ends here

@@ -36,7 +36,7 @@
 ;; and will be evaluated when really needed
 (declare-function my-dired-save-excursion "my-dired-commands.el")
 (declare-function visual-fill "my-lang-utils.el")
-(declare-function god-mode "god-mode.el")
+(declare-function meow-insert "meow-command.el")
 
 (require 's)
 (require 'dash)
@@ -59,7 +59,7 @@
          (","       . ace-window))
 
   :config
-  (add-hook 'dired-mode-hook 'god-mode)
+  (add-hook 'dired-mode-hook 'meow-insert)
   (leaf dired-async
     :ensure async
     :defun dired-async-mode
@@ -151,13 +151,13 @@
     :group 'my)
 
   (advice-add 'dired-jump
-              :after (lambda (&rest _ignore) (god-mode))
-              '((name . god-mode)))
+              :after (lambda (&rest _ignore) (meow-insert))
+              '((name . meow-insert)))
 
   (--each my-dired-commands-using-minibuffer
     (advice-add it :after
-                (lambda (&rest _) (god-mode))
-                '((name . god-mode))))
+                (lambda (&rest _) (meow-insert))
+                '((name . meow-insert))))
 
   ;; Command for printing file
   (with-eval-after-load 'lpr (setq lpr-command "PDFToPrinter"))
