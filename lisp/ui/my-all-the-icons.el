@@ -26,11 +26,13 @@
 ;;; Code:
 (require 'my-leaf)
 
+(leaf nerd-fonts :ensure t)
+
 (leaf all-the-icons
   :ensure t
   :require t
   :when (display-graphic-p)
-  :custom (all-the-icons-fonts-subdirectory . "c:/users/hrams/Fonts"))
+  :custom (all-the-icons-fonts-subdirectory . "~/fonts/"))
 
 (provide 'my-all-the-icons)
 ;;; my-all-the-icons.el ends here

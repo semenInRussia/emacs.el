@@ -36,35 +36,25 @@
   :group 'my
   :type 'string)
 
+(leaf nerd-icons
+  :ensure t
+  :custom `(nerd-icons-font-family . ,my-fonts-main))
+
 (set-face-attribute 'default nil :font my-fonts-main :height 210)
 
-;; (set-fontset-font t 'unicode
-;;                   (font-spec :font "all-the-icons")
-;;                   nil 'append)
-;; (set-fontset-font t 'unicode
-;;                   (font-spec :font "file-icons")
-;;                   nil 'append)
-;; (set-fontset-font t 'unicode
-;;                   (font-spec :font "Material Icons")
-;;                   nil 'append)
-;; (set-fontset-font t 'unicode
-;;                   (font-spec :font "FontAwesome")
-;;                   nil 'append)
-;; (set-fontset-font t 'unicode
-;;                   (font-spec :font "Weather Icons")
-;;                   nil 'append)
+(leaf unicode-fonts
+  :ensure t
+  :defun (unicode-fonts-setup unicode-fonts--instructions)
+  :defvar (unicode-fonts
+           unicode-fonts--instructions
+           ...)
+  :require t
+  :init (defvar ... nil)
+  :config (setq unicode-fonts--instructions
+                (-remove-item '... unicode-fonts--instructions))
+  (unicode-fonts-setup))
 
-;; (leaf unicode-fonts
-;;   :ensure t
-;;   :defun (unicode-fonts-setup unicode-fonts--instructions)
-;;   :defvar (unicode-fonts
-;;            unicode-fonts--instructions
-;;            ...)
-;;   :require t
-;;   :init (defvar ... nil)
-;;   :config (setq unicode-fonts--instructions
-;;                 (-remove-item '... unicode-fonts--instructions))
-;;   (unicode-fonts-setup))
+
 
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)

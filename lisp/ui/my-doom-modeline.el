@@ -35,26 +35,17 @@
   :ensure t
   :require t
   :init (size-indication-mode t)
-  :defun ((doom-modeline--active
-           doom-modeline-def-segment
-           doom-modeline--macro-recording
-           doom-modeline--multiple-cursors
-           doom-modeline--buffer-size
-           doom-modeline-segment--buffer-info
-           doom-modeline-def-modeline
-           doom-modeline-set-modeline)
-          ((my-pomidor-format-remaining-time
-            my-pomidor-remaining-time
-            my-pomidor-face
-            my-modeline-time-segment-format-string
-            my-pomidor-kind)
-           . my-doom-modeline)
-          (my-drag-p . my-drag))
+  :defun doom-modeline-set-modeline
   :defvar (my-modeline-time-segment-format-string
            my-pomidor-modeline-time-format)
   :custom ((doom-modeline-buffer-file-name-style . 'buffer-name)
            (doom-modeline . 'buffer-name)
            (doom-modeline-icon . t)
+           (doom-modeline-major-mode-icon . t)
+           (doom-modeline-major-mode-color-icon . t)
+           (doom-modeline-buffer-state-icon . t)
+           (doom-modeline-buffer-modification-icon . t)
+           (doom-modeline-time-icon . t)
            (xah-fly-insert-state-p . nil))
   :config                               ;nofmt
   (require 'my-doom-modeline-segments)
