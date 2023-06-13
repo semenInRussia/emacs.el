@@ -1,4 +1,4 @@
-;;; my-current-theme.el --- Load the current theme
+;;; my-load-theme --- Load the current theme
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -43,5 +43,5 @@
  `(region
    ((t (:background "white" :foreground "black" :inherit t)))))
 
-(provide 'my-current-theme)
-;;; my-current-theme.el ends here
+(provide 'my-load-theme)
+;;; my-load-theme.el ends here
