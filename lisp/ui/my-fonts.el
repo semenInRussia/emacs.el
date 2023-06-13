@@ -36,25 +36,19 @@
   :group 'my
   :type 'string)
 
-(leaf nerd-icons
-  :ensure t
-  :custom `(nerd-icons-font-family . ,my-fonts-main))
-
 (set-face-attribute 'default nil :font my-fonts-main :height 210)
 
-(leaf unicode-fonts
-  :ensure t
-  :defun (unicode-fonts-setup unicode-fonts--instructions)
-  :defvar (unicode-fonts
-           unicode-fonts--instructions
-           ...)
-  :require t
-  :init (defvar ... nil)
-  :config (setq unicode-fonts--instructions
-                (-remove-item '... unicode-fonts--instructions))
-  (unicode-fonts-setup))
-
-
+;; (leaf unicode-fonts
+;;   :ensure t
+;;   :defun (unicode-fonts-setup unicode-fonts--instructions)
+;;   :defvar (unicode-fonts
+;;            unicode-fonts--instructions
+;;            ...)
+;;   :require t
+;;   :init (defvar ... nil)
+;;   :config (setq unicode-fonts--instructions
+;;                 (-remove-item '... unicode-fonts--instructions))
+;;   (unicode-fonts-setup))
 
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
