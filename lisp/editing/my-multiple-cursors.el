@@ -51,7 +51,7 @@
          ("M-<"     . my-bob-or-mc-align)
          ("M->"     . my-eob-or-mc-align-with-space)
          ("C-x C-," . my-mark-all))
-  :config                             ;nofmt
+  :config
 
   (defun my-mark-all ()
     "Mark all words like this for `multiple-cursors', otherwise mark buffer."

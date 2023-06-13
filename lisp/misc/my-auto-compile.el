@@ -24,10 +24,10 @@
 
 ;;; Code:
 
-(require 'my-leaf)
-(require 'async)
-(require 'async-bytecomp)
 (require 'f)
+
+(declare-function async-byte-compile-file "async-bytecomp.el")
+
 
 (defun my-auto-recompile-current-elisp-file ()
   "If the opened buffer is an Elisp file and it was be compiled, recompile it."
@@ -39,6 +39,7 @@
 
 (define-minor-mode my-auto-recompile-current-elisp-file-mode
   "After each save of an Elisp file that was be compiled, recompile it.
+
 If the ARG is non-nil, then enable the mode, otherwise disable it."
   :init-value t
   (if my-auto-recompile-current-elisp-file-mode
