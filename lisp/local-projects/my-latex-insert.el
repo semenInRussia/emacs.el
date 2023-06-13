@@ -739,11 +739,5 @@ Pass to environment POS (one of R L I O | r l i o), WIDTH and LINE-HEIGHT."
 
 (my-latex-expand-define-function "wi" 'my-latex-insert-wrapimage)
 
-(leaf-keys
- (my-latex-local-map
-  :package tex
-  ("i" . my-latex-insert-image)
-  ("u" . my-latex-insert-image-at-url)))
-
 (provide 'my-latex-insert)
 ;;; my-latex-insert.el ends here

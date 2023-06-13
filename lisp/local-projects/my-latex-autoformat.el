@@ -27,11 +27,12 @@
 
 (require 'my-autoformat)
 (require 'my-lib)
-(require 'my-deleting)
 
 (require 'latex)
 (require 'dash)
-(require 'cdlatex)
+
+(declare-function cdlatex-wrap-environment "cdlatex.el")
+
 
 ;;;###autoload(autoload 'latex-mode "my-latex-autoformat")
 (my-autoformat-bind-for-major-mode
@@ -107,14 +108,14 @@ Will be expanded only on matching in empty line and not in math"
 
 (defun autoformat-latex-expand-to-enumerate-list-item ()
   "Expand, for example, 1. to the LaTeX enumerate list item."
-  (clear-current-line)
+  (delete-region (pos-bol) (pos-eol))
   (if (string-equal (LaTeX-current-environment) "enumerate")
       (LaTeX-insert-item)
     (LaTeX-env-item "enumerate")))
 
 (defun autoformat-latex-expand-to-itemized-list-item ()
   "Expand, for example, 1. to the LaTeX itemized list item."
-  (clear-current-line)
+  (delete-region (pos-bol) (pos-eol))
   (if (string-equal (LaTeX-current-environment) "itemize")
       (LaTeX-insert-item)
     (LaTeX-env-item "itemize")))

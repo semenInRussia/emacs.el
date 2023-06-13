@@ -101,6 +101,13 @@
     "beamer")
   "List of the names for built-in LaTeX documentclasses.")
 
+(add-hook 'LaTeX-mode-hook 'visual-fill)
+(add-hook 'LaTeX-mode-hook 'turn-off-flycheck)
+
+(add-hook 'LaTeX-mode-hook 'my-latex-find-master-file)
+(add-hook 'LaTeX-mode-hook 'my-latex-expansion-mode)
+(add-hook 'LaTeX-mode-hook 'my-latex-disable-auto-fill)
+
 (leaf latex
   :ensure auctex
   :mode ("\\.tex$" . latex-mode)
@@ -122,16 +129,6 @@
          ("C-c C-\\" . my-latex-equation-to-split)
          ("C-c C-w"  . my-latex-kill-section))
   :config                               ;nofmt
-  (add-hook 'LaTeX-mode-hook 'visual-fill)
-  (add-hook 'LaTeX-mode-hook 'turn-off-flycheck)
-
-  (add-hook 'LaTeX-mode-hook 'my-latex-find-master-file)
-  (add-hook 'LaTeX-mode-hook 'my-latex-expansion-mode)
-  (add-hook 'LaTeX-mode-hook 'my-latex-disable-auto-fill)
-
-  (require 'calc-lang)
-  (require 'font-latex)
-
   (leaf xenops
     :hook LaTeX-mode-hook
     :ensure t
@@ -146,6 +143,9 @@
            ("<tab>" . yas-next-field-or-cdlatex)
            ("TAB"   . yas-next-field-or-cdlatex))
     :config                             ;nofmt
+    (require 'calc-lang)
+    (require 'font-latex)
+
     (defun cdlatex-in-yas-field ()
       (when-let* ((_ (overlayp yas--active-field-overlay))
                   (end (overlay-end yas--active-field-overlay)))

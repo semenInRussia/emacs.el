@@ -26,7 +26,7 @@
 (require 'my-leaf)
 (require 'dash)
 
-(declare-function meow-insert "meow-command.el")
+;; (declare-function meow-insert "meow-command.el")
 
 (defcustom my-eshell-commands-using-minibuffer
   '(completion-at-point)
@@ -41,12 +41,15 @@
          ([remap beginning-of-line] . 'eshell-begin-on-new-line)
          ([remap beginning-of-line-text] . 'eshell-begin-on-new-line))
   :config                               ;nofmt
-  (leaf company-shell :ensure t :require t)
+  (leaf company-shell
+    :ensure t
+    :require t)
 
-  (--each my-eshell-commands-using-minibuffer
-    (advice-add it :after
-                (lambda (&rest _) (meow-insert))
-                '((name . meow-insert)))))
+  ;; (--each my-eshell-commands-using-minibuffer
+  ;;   (advice-add it :after
+  ;;               (lambda (&rest _) (meow-insert))
+  ;;               '((name . meow-insert))))
+  )
 
 (provide 'my-eshell)
 ;;; my-eshell.el ends here

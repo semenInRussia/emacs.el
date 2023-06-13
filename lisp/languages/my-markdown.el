@@ -72,9 +72,9 @@ See `imenu-generic-expression'"
   (add-hook 'markdown-mode-hook 'visual-fill)
   (leaf markdown-toc
     :ensure t
-    :bind (:my-markdown-local-map
+    :bind (:markdown-mode-map
            :package markdown-mode
-           ("t" . markdown-toc-generate-or-refresh-toc)))
+           ("C-T" . markdown-toc-generate-or-refresh-toc)))
 
   (leaf edit-indirect :ensure t)
 
