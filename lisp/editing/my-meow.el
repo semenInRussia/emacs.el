@@ -27,15 +27,21 @@
 
 (require 'my-leaf)
 
+
 (leaf meow
   :ensure t
-  :global-minor-mode meow-global-mode
   :defvar (meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
-  :defun (meow-motion-overwrite-define-key
-          meow-motion-overwrite-define-keymeow-leader-define-key
+  :defun (my-meow-setup . my-meow)
+  :defun (meow-global-mode
+          meow-motion-overwrite-define-key
+          meow-motion-overwrite-define-key
+          meow-leader-define-key
           meow-normal-define-key)
+  :require t
+  :custom (meow-use-clipboard . t)
+  :bind ("M-." . xref-find-definitions)
   :config
-  (defun meow-setup ()
+  (defun my-meow-setup ()
     (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
     (meow-motion-overwrite-define-key
      '("j" . meow-next)
@@ -102,6 +108,7 @@
      '("o" . meow-block)
      '("O" . meow-to-block)
      '("p" . meow-yank)
+     '("P" . meow-yank-pop)
      '("q" . meow-quit)
      '("Q" . meow-goto-line)
      '("r" . meow-replace)
@@ -118,8 +125,12 @@
      '("y" . meow-save)
      '("Y" . meow-sync-grab)
      '("z" . meow-pop-selection)
+     '("Z" . meow-comment)
      '("'" . repeat)
-     '("<escape>" . ignore))))
+     '(">" . meow-find-ref)
+     '("<escape>" . ignore)))
+  (my-meow-setup)
+  (meow-global-mode t))
 
 (provide 'my-meow)
 ;;; my-meow.el ends here
