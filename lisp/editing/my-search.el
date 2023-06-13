@@ -38,8 +38,6 @@
 
 (leaf deadgrep
   :ensure t
-  :defun ((projectile-acquire-root . projectile))
-  :custom (deadgrep-project-root-function . #'projectile-acquire-root)
   :bind ("C-c S" . deadgrep))
 
 (provide 'my-search)

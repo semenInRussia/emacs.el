@@ -34,7 +34,6 @@
 (require 'my-lib)
 (require 'fast-exec)
 
-(declare-function projectile-add-known-project "projectile.el")
 
 (defgroup my-zms nil
   "Group for the management of the `zms' tasks."
@@ -94,7 +93,9 @@ section"
   (let ((path (my-zms-section-path section))
         (name (my-zms-section-name section))
         (num (number-to-string (my-zms-section-num section))))
-    (projectile-add-known-project path)
+    ;; it makes section directory a project
+    ;; that can be deteceted with project.el
+    (f-mkdir (f-join path ".git"))
     (my-use-skeleton my-zms-section-template-directory
                      path
                      `(("_section-number" . ,num)
