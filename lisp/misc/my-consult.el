@@ -30,9 +30,19 @@
 
 (require 'dash)
 
+
 (leaf vertico
-  :ensure t
-  :global-minor-mode vertico-mode)
+  :ensure (vertico :host github
+                   :repo "minad/vertico"
+                   :files ("*.el" "extensions/*.el"))
+  :global-minor-mode vertico-mode
+  :init
+  (leaf vertico-directory
+    :bind (:vertico-map
+           :package vertico
+           ("RET" . vertico-directory-enter)
+           ("DEL" . vertico-directory-delete-char)
+           ("M-DEL" . vertico-directory-delete-word))))
 
 (leaf consult
   :ensure t
@@ -42,7 +52,7 @@
            ;; for my consult-ripgrep
            consult--grep
            consult--ripgrep-make-builder)
-          (projectile-project-root . projectile))
+          ((project-current project-root) . project))
   :defvar (consult-narrow-key consult-project-function)
   :bind (:minibuffer-local-map
          ("M-s" . consult-history) ;; orig. next-matching-history-element
@@ -75,11 +85,8 @@
          ("M-s e" . consult-isearch-history)
          ;; Minibuffer history
          )
-  :custom ((consult-narrow-key . "]")
-           (register-preview-delay  . 0.5)
-           (register-preview-function . #'consult-register-format)
-           (consult-project-function . 'projectile-project-root))
-
+  :custom ((register-preview-delay  . 0.5)
+           (register-preview-function . #'consult-register-format))
   :hook ((completion-list-mode-hook . consult-preview-at-point-mode))
 
   ;; The :init configuration is always executed (Not lazy)
@@ -118,15 +125,7 @@
   (defvar string-width 0)
 
   (defun compat-call (&rest b)
-    0)
-
-  (defun my-consult-ripgrep (&optional dir initial)
-    "Search with `rg' for files in DIR with INITIAL input.
-
-See `consult-grep' for details."
-    (interactive "P")
-    (or dir (setq dir (projectile-project-root)))
-    (consult--grep "Ripgrep" #'consult--ripgrep-make-builder dir initial)))
+    0))
 
 (provide 'my-consult)
 ;;; my-consult.el ends here
