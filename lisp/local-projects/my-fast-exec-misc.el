@@ -35,46 +35,19 @@
 
 (require 'fast-exec-initial-keymaps)
 
-(fast-exec-use
- deadgrep
- devdocs
- flycheck
- magit
- package
- skeletor
- projectile
- suggest
- wikinforg
- yasnippet
- haskell-mode)
+(fast-exec-use deadgrep
+               devdocs
+               flycheck
+               magit
+               package
+               skeletor
+               suggest
+               wikinforg
+               yasnippet
+               haskell-mode)
 
-(leaf straight :fast-exec ("Use Package" 'straight-use-package))
-(leaf my-mipt
-  :fast-exec (("Next MIPT Task" 'my-mipt-next-task)
-              ("Previous MIPT Task" 'my-mipt-prev-task)
-              ("Open Last MIPT Task" 'my-mipt-visit-last-task)
-              ("Find MIPT Task" 'my-mipt-task-visit)
-              ("Open MIPT Task in Web Browser" 'my-mipt-task-browse-course-url))
-  :bind (:my-latex-local-map
-         :package tex
-         ("c" . 'my-copy-buffer-content-as-mipt-solution)))(add-hook 'fast-exec-hint-buffer-mode-hook #'visual-fill)
-
-(require 'fast-exec-initial-keymaps)
-
-(fast-exec-use
- deadgrep
- devdocs
- flycheck
- magit
- package
- skeletor
- projectile
- suggest
- wikinforg
- yasnippet
- haskell-mode)
-
-(leaf straight :fast-exec ("Use Package" 'straight-use-package))
+(leaf straight
+  :fast-exec ("Use Package" 'straight-use-package))
 
 (leaf my-mipt
   :fast-exec (("Next MIPT Task" 'my-mipt-next-task)
@@ -82,9 +55,9 @@
               ("Open Last MIPT Task" 'my-mipt-visit-last-task)
               ("Find MIPT Task" 'my-mipt-task-visit)
               ("Open MIPT Task in Web Browser" 'my-mipt-task-browse-course-url))
-  :bind (:my-latex-local-map
+  :bind (:LaTeX-mode-map
          :package tex
-         ("c" . 'my-copy-buffer-content-as-mipt-solution)))
+         ("C-c M-w" . 'my-copy-buffer-content-as-mipt-solution)))
 
 (provide 'my-fast-exec-misc)
 ;;; my-fast-exec-misc.el ends here

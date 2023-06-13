@@ -29,7 +29,8 @@
 
 (require 'my-leaf)
 
-(leaf rg :ensure t)
+(leaf rg
+  :ensure t)
 
 (leaf dumb-jump
   :ensure t

@@ -99,7 +99,7 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
   :bind ("C-x M-f" . 'leaf-find))
 
 (defun my-bench ()
-  "Show bench analysis."
+  "Show bench analysis for Emacs startup."
   (interactive)
   (switch-to-buffer "*Messages*")
   (->>
@@ -111,7 +111,8 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
          (s-match "‘\\(.*?\\)’ module took \\(.*?\\)sec" it))             ;nofmt
       (cons module (string-to-number duration))))
    (--sort (> (cdr it) (cdr other)))
-   (inspector-inspect)))
+   (inspector-inspect))
+  (rename-buffer "*My Bench*"))
 
 (defun my-do-autoload-for-local-projects-files ()
   "If the opened file is a \"local projects\", make the directory autoloads."

@@ -26,6 +26,7 @@
 ;; My config for `company'
 
 ;;; Code:
+
 (require 'my-leaf)
 
 (leaf company

@@ -25,6 +25,7 @@
 ;;; Code:
 
 (declare-function 'straight-use-package "straight")
+
 (require 'cl-lib)
 (require 'my-straight)
 (straight-use-package 'leaf)

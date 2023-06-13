@@ -49,7 +49,8 @@
   (advice-add 'magit-gitignore-in-top :after #'meow-insert))
 
 (leaf git-timemachine
-  :ensure (git-timemachine :host gitlab :repo "pidu/git-timemachine"))
+  :ensure (git-timemachine :host gitlab :repo "pidu/git-timemachine")
+  :fast-exec ("Git Timemachine" 'git-timemachine))
 
 (leaf git-modes :ensure t)
 

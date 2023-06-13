@@ -28,25 +28,13 @@
 ;;; Code:
 
 (require 'my-leaf)
-(require 'smartparens)
 (require 'dash)
 (require 'just)
 
+
 (leaf expand-region
   :ensure t
-  :defun (((sp-get-sexp sp-get)
-           . smartparens))
-  :bind (("C-x C-<SPC>" . er/expand-region)
-         ("C-x C-@" . my-mark-inner-or-expand-region))
-  :config                             ;nofmt
-  (defun my-mark-inner-or-expand-region ()
-    "If text is selected, expand region, otherwise mark inner of brackets."
-    (interactive)
-    (if (use-region-p)
-        (call-interactively 'er/expand-region)
-      (--when-let
-          (sp-get-sexp)
-        (sp-get it (just-mark-region :beg-in :end-in))))))
+  :bind ("C-x C-<SPC>" . er/expand-region))
 
 (provide 'my-expand-region)
 ;;; my-expand-region.el ends here

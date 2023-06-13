@@ -24,6 +24,7 @@
 ;;; Commentary:
 
 ;;; Code:
+
 (require 'my-leaf)
 
 (require 'face-remap)
@@ -31,10 +32,14 @@
 (leaf visual-fill-column
   :ensure t
   :commands ()
-  :defun visual-fill-column-mode
-  :hook (prog-mode-hook . visual-fill))
+  :defun visual-fill-column-mode)
+
+(add-hook 'prog-mode-hook #'visual-fill)
 
 (defun visual-fill (&optional width)
+  "Make text buffer more pretty with centering it at horizontal.
+
+WIDTH is the amount of characters that will be located within display"
   (interactive)
   (or width (setq width 70))
   (setq-default visual-fill-column-width width

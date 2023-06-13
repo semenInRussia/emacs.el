@@ -35,18 +35,15 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 (toggle-truncate-lines t)
 
-(add-to-list 'load-path (f-join (-last-item load-path) ; path to share/lisp
-                                ".."
-                                "leim"))
-(add-to-list 'load-path (f-join (-last-item load-path) ; path to share/lisp
-                                ".."
-                                "leim/quail"))
-
+;;; russian input method
+;;; now I can press `C-\\' and language on which I am now
+;; writting will be changed
 (setq default-input-method "russian-computer")
 (setq default-file-name-coding-system 'utf-8)
 (setq default-keyboard-coding-system 'utf-8)
 (setq buffer-file-coding-system 'utf-8)
 
+;;; just do PPTX (powerpoint) file that can't be read
 (defun my-new-fake-pptx-file ()
   "Make this buffer, fake presentation with format (.pptx)."
   (interactive)
@@ -54,13 +51,11 @@
   (text-mode))
 
 (require 'fast-exec)
-(eval-after-load 'fast-exec
-  '(progn
-     (fast-exec-bind 'pptx
-       (fast-exec-make-some-commands
-        ("New Fake PPTX File" 'my-new-fake-pptx-file)))))
+(fast-exec-bind 'pptx
+  (fast-exec-make-some-commands
+   ("New Fake PPTX File" 'my-new-fake-pptx-file)))
 
-;; Startup time
+;;; I try to decrease the Emacs startup time
 (defun my-display-startup-time ()
   (message
    "Emacs loaded in %s with %d garbage collections."
