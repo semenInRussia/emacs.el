@@ -30,8 +30,6 @@
 (require 'f)
 (require 'just)
 
-(require 'dired)
-
 ;;;###autoload
 (defun agnifize-dwim ()
   "Agnifize that you mean.

@@ -260,38 +260,7 @@ Archieve all `org-mode' headings which has the label done.")
 
 (autoload 'my-open-main-agenda-file "my-organization-commands" "\
 Open agenda.org." t)
-
-;;;***
 
-;;;### (autoloads nil "my-project" "my-project.el" (0 0 0 0))
-;;; Generated autoloads from my-project.el
-
-(autoload 'my-project-root "my-project" "\
-Root of the project at DIR.
-
-\(fn &optional DIR)")
-
-(autoload 'my-projectile-project-files "my-project" "\
-Return filenames list of the project at ROOT, with caching.
-
-\(fn ROOT)")
-
-(autoload 'projectile-project-files-clear-cache "my-project" "\
-Function `projectile-project-files' is cached, clear this cache for ROOT.
-
-\(fn ROOT)" t)
-
-(autoload 'my-projectile-files-with-string "my-project" "\
-Return a list of all files containing STRING in DIRECTORY.
-
-\(fn STRING DIRECTORY &optional FILE-EXT)")
-
-(register-definition-prefixes "my-project" '("my-"))
-
-;;;***
-
-;;;### (autoloads nil nil ("agnifize-test.el") (0 0 0 0))
-
 ;;;***
 
 
@@ -299,26 +268,6 @@ Return a list of all files containing STRING in DIRECTORY.
 
 (register-definition-prefixes "my-doom-modeline-segments" '("durand-buffer-name-max" "eglot--spinner" "my-"))
 
-
-;;; Generated autoloads from my-project.el
-
-(autoload 'my-project-root "my-project" "\
-Root of the project at DIR.
-
-(fn &optional DIR)")
-(autoload 'my-projectile-project-files "my-project" "\
-Return filenames list of the project at ROOT, with caching.
-
-(fn ROOT)")
-(autoload 'projectile-project-files-clear-cache "my-project" "\
-Function `projectile-project-files' is cached, clear this cache for ROOT." t)
-(autoload 'my-projectile-files-with-string "my-project" "\
-Return a list of all files containing STRING in DIRECTORY.
-
-(fn STRING DIRECTORY &optional FILE-EXT)")
-(register-definition-prefixes "my-project" '("my-"))
-
-
 ;;; Generated autoloads from my-org-editing.el
 
 (autoload 'my-org-clear-subtree "my-org-editing" "\
@@ -351,6 +300,52 @@ in the region.
 
 (fn FILENAME &optional CAPTION)" t)
 (register-definition-prefixes "my-org-editing" '("my-"))
+
+
+
+;;; Generated autoloads from agnifize.el
+
+(autoload 'agnifize-dwim "agnifize" "\
+Agnifize that you mean.
+
+By default agnifize the current buffer.  If a region is selected and active
+then agnifize source code between its bounds.  If do in a `dired' buffer, then
+try agnifize marked files." t)
+(register-definition-prefixes "agnifize" '("agn"))
+
+
+
+;;; Generated autoloads from my-latex-insert.el
+
+(autoload 'my-latex-expansion-mode "my-latex-insert" "\
+Minor mode which complete text snippets for LaTeX after press dot.
+
+List of the \"snippets\" you can learn using
+function `my-latex-insert-commands-help'
+
+This is a minor mode.  If called interactively, toggle the
+`My-Latex-Expansion mode' mode.  If the prefix argument is
+positive, enable the mode, and if it is zero or negative, disable
+the mode.
+
+If called from Lisp, toggle the mode if ARG is `toggle'.  Enable
+the mode if ARG is nil, omitted, or is a positive number.
+Disable the mode if ARG is a negative number.
+
+To check whether the minor mode is enabled in the current buffer,
+evaluate `my-latex-expansion-mode'.
+
+The mode's hook is called both when the mode is enabled and when
+it is disabled.
+
+(fn &optional ARG)" t)
+(register-definition-prefixes "my-latex-insert" '("my-"))
+
+
+;;; Generated autoloads from my-latex-autoformat.el
+
+(autoload 'latex-mode "my-latex-autoformat")
+(register-definition-prefixes "my-latex-autoformat" '("autoformat-latex-" "my-"))
 
 
 ;;; Generated autoloads from my-dired-commands.el

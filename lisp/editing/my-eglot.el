@@ -37,13 +37,14 @@
   :group 'my
   :type '(repeat major-mode))
 
+;; `eglot' use `flymake' instead of `flycheck', so i disable `flycheck'
+(add-hook 'eglot-connect-hook 'turn-off-flycheck)
+
 (leaf eglot
   :disabled t
   :custom `((eglot-send-changes-idle-time . 1) ; in seconds
             )
   :custom-face (eglot-highlight-symbol-face . '((t (:inherit lazy-highlight))))
-  ;; `eglot' use `flymake' instead of `flycheck', so i disable `flycheck'
-  :hook (eglot-managed-mode-hook . turn-off-flycheck)
   :bind (("C-c lr" . 'eglot-rename)
          ("<f6>"   . 'eglot-rename)
          ("C-c la"  . 'eglot-code-actions)
