@@ -29,9 +29,8 @@
 (add-to-list 'load-path
              (locate-user-emacs-file "lisp/local-projects"))
 
-(setq custom-file
-      (expand-file-name "custom.el" user-emacs-directory))
-
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory)
+      inhibit-startup-screen t)
 
 (when (file-exists-p custom-file)
   (load custom-file))
@@ -39,7 +38,6 @@
 (add-to-list 'load-path "~/.emacs.d/lisp")
 
 (load "~/.emacs.d/lisp/local-projects/my-autoload.el")
-(setq initial-buffer-choice "~/Start.org")
 
 (defvar my-modules-order
   (list
@@ -48,9 +46,6 @@
    "package-management"
    "my-libs.el"
    "my-lib.el"
-   "ui/my-all-the-icons.el"
-   "ui/my-doom-modeline.el"
-   "editing/my-xah.el"
    "editing"
    "languages/lisps/my-lisp.el"
    "languages/my-autoformat.el"
@@ -58,6 +53,8 @@
    "env"
    "ui")
   "Names of the directories and files that define an order to load.")
+
+(message "Good luck mam!")
 
 (defvar my-modules-files-ignore-regexps
   '("/local-projects/" "/test/" "/features/" ".*-step\\.el" "/site-lisp/")
@@ -90,7 +87,8 @@
   "Require MODULE, if has any errors, then debug that."
   (unless (featurep module)
     (let ((start-time (current-time)))
-      (ignore-errors (require module nil t))
+      (or (ignore-errors (require module nil t))
+          (lwarn "startup" :error "I can't load the module: %s" module))
       (message "`%s' module took %ssec"
                module
                (float-time (time-since start-time))))))
@@ -141,6 +139,7 @@ The same to
       (my-remove-from my-modules-files it)))
   (my-mapc my-modules-files file (my-require-or-debug-file file)))
 
+(my-load-all-config-modules)
 (my-load-all-config-modules)
 
 (defgroup my nil "Group for all my config files." :group 'tools)
