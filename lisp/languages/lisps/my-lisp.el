@@ -27,7 +27,7 @@
 
 (require 'my-leaf)
 
-(declare-function meow-insert "meow-command.el")
+(declare-function meow-insert "meow-commands.el")
 
 (require 'dash)
 (require 'my-lib)
@@ -54,22 +54,16 @@
 
 (leaf paxedit
   :ensure t
-  :preface (define-prefix-command 'my-lisp-map)
   :defun (paxedit-delete
           paxedit-sexp-region
           paxedit-transpose-backward
           paxedit-transpose-forward)
   :bind ((:paxedit-mode-map
-          (";" . 'paxedit-insert-semicolon)
-          ("(" . 'paxedit-open-round)
-          ("[" . 'paxedit-open-bracket)
-          ("{" . 'paxedit-open-curly))
-         (:my-lisp-map
           ("C-c C-t" . 'my-paxedit-transpose-forward)
           ("C-c C-u C-t" . 'my-paxedit-transpose-backward)
           ("C-c C-w" . 'paxedit-kill)
           ("C-c C-;" . 'my-paxedit-comment)
-          ("C-c C_d" . 'paxedit-symbol-kill)
+          ("C-c C-d" . 'paxedit-symbol-kill)
           ("C-c C-q" . 'paxedit-compress)
           ("C-c C-k" . 'paxedit-delete-whitespace)
           ("C-c C-y" . 'my-paxedit-duplicate)))

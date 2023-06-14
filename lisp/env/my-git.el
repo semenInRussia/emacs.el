@@ -33,7 +33,6 @@
 
 (require 'dash)
 
-(declare-function meow-insert "meow-command.el")
 
 (leaf magit
   :ensure t
@@ -45,8 +44,6 @@
                 magit-insert-unpushed-to-upstream-or-recent
                 magit-insert-unpulled-from-upstream)))
   :config
-  (advice-add 'magit-gitignore :after #'meow-insert)
-  (advice-add 'magit-gitignore-in-top :after #'meow-insert))
 
 (leaf git-timemachine
   :ensure (git-timemachine :host gitlab :repo "pidu/git-timemachine")

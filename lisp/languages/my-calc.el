@@ -26,8 +26,6 @@
 
 ;;; Code:
 
-(declare-function meow-insert "meow-command.el")
-
 (require 'my-leaf)
 
 (require 'dash)
@@ -51,7 +49,6 @@
           :package calc-yank
           ([remap save-buffer] . calc-edit-finish)))
   :config                               ;nofmt
-  (add-hook 'calc-start-hook 'meow-insert)
   (defun my-calc-mean-yank (vec)
     "Yank to calculator vector of numbers VEC as string and compute mean.
 
@@ -66,12 +63,7 @@ mechanism use `calc-yank'"
        (s-join "\n"))))
     (calc-yank-internal 0 vec)
     (calc-pack (length (s-lines vec)))
-    (calc-vector-mean nil))
-
-  (--each my-calc-operations
-    (advice-add it :after
-                (lambda (&rest _) (meow-insert))
-                '((name . meow-insert)))))
+    (calc-vector-mean nil)))
 
 (provide 'my-calc)
 ;;; my-calc.el ends here

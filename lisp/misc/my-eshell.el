@@ -26,7 +26,6 @@
 (require 'my-leaf)
 (require 'dash)
 
-;; (declare-function meow-insert "meow-command.el")
 
 (defcustom my-eshell-commands-using-minibuffer
   '(completion-at-point)
