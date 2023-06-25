@@ -27,9 +27,10 @@
 (require 'my-leaf)
 (require 'my-flycheck)
 (require 'dash)
-(require 'company)
+(require 'corfu)
 
 (require 'fast-exec)
+
 
 (leaf posframe :ensure t)
 
@@ -37,7 +38,7 @@
   :load-path* "lisp/site-lisp/lsp-bridge"
   :hook ((lsp-bridge-user-multiserver-dir . "~/lsp/multi")
          (lsp-bridge-user-langserver-dir . "~/lsp/single/")
-         (lsp-bridge-mode-hook . (lambda () (company-mode 0))))
+         (lsp-bridge-mode-hook . (lambda () (corfu-mode 0))))
   :custom (;; features
            (lsp-bridge-enable-hover-diagnostic . t)
            (acm-enable-tabnine . nil)
@@ -53,21 +54,21 @@
            (lsp-bridge-code-action-preview-delay . 20)
            (lsp-bridge-signature-show-function
             . 'eldoc-box--eldoc-message-function))
-  :bind ((("C-c C-d" . 'lsp-bridge-popup-documentation)
-          ("<f6>"    . 'lsp-bridge-rename)
-          ("C-c ll"  . 'lsp-bridge-code-action)
-          ("M-,"     . 'lsp-bridge-find-references))
-         (:lsp-bridge-mode-map
-          ([remap xref-pop-marker-stack] . 'lsp-bridge-pop)
-          ([remap xref-find-definitions] . 'lsp-bridge-find-def)
-          ([remap consult-imenu-multi] . 'lsp-bridge-workspace-list-symbols)
-          ([remap my-format-expression] . 'lsp-bridge-code-format)
-          ([remap next-error] . 'lsp-bridge-diagnostic-jump-next)
-          ([remap previous-error] . 'lsp-bridge-diagnostic-jump-prev))
-         (:lsp-bridge-call-hierarchy-mode-map
-          ("ESC" . nil)
-          ("M-n" . 'lsp-bridge-call-hierarchy-next)
-          ("M-p" . 'lsp-bridge-call-hierarchy-prev)))
+  :bind (:lsp-bridge-mode-map
+         ("C-c C-d" . 'lsp-bridge-popup-documentation)
+         ("<f6>"    . 'lsp-bridge-rename)
+         ("C-c ll"  . 'lsp-bridge-code-action)
+         ("M-,"     . 'lsp-bridge-find-references)
+         ([remap xref-pop-marker-stack] . 'lsp-bridge-pop)
+         ([remap xref-find-definitions] . 'lsp-bridge-find-def)
+         ([remap consult-imenu-multi] . 'lsp-bridge-workspace-list-symbols)
+         ([remap my-format-expression] . 'lsp-bridge-code-format)
+         ([remap next-error] . 'lsp-bridge-diagnostic-jump-next)
+         ([remap previous-error] . 'lsp-bridge-diagnostic-jump-prev))
+  (:lsp-bridge-call-hierarchy-mode-map
+   ("ESC" . nil)
+   ("M-n" . 'lsp-bridge-call-hierarchy-next)
+   ("M-p" . 'lsp-bridge-call-hierarchy-prev))
   :fast-exec (("Start a LSP Server for Current Buffer" 'lsp-bridge-mode)
               ("Reconnect the LSP Server" 'lsp-bridge-restart-process))
   :config (add-hook 'lsp-bridge-mode-hook #'turn-off-flycheck))

@@ -32,7 +32,6 @@
 (require 'yasnippet)
 (require 'dash)
 (require 'my-autoformat)
-(require 'my-company)
 (require 'smartparens)
 
 (declare-function aas-set-snippets "aas.el")
@@ -202,6 +201,7 @@
 
   (leaf cdlatex
     :ensure t
+    :defvar cdlatex-tab-hook
     :hook ((cdlatex-tab-hook . yas-expand)
            (cdlatex-tab-hook . cdlatex-in-yas-field)
            (LaTeX-mode-hook  . turn-on-cdlatex))
@@ -371,21 +371,21 @@
            ("C-c C-n" . latex/next-section-same-level)
            ("C-c C-p" . latex/previous-section-same-level)))
 
-  (leaf company-math
-    :ensure t
-    :hook (LaTeX-mode-hook . my-company-math-setup)
-    :config                             ;nofmt
-    (defun my-company-math-setup ()
-      "Setup for `company-math'."
-      (add-to-list 'company-backends 'company-math-symbols-latex)
-      (add-to-list 'company-backends 'company-latex-commands)))
+  ;; (leaf company-math
+  ;;   :ensure t
+  ;;   :hook (LaTeX-mode-hook . my-company-math-setup)
+  ;;   :config                             ;nofmt
+  ;;   (defun my-company-math-setup ()
+  ;;     "Setup for `company-math'."
+  ;;     (add-to-list 'company-backends 'company-math-symbols-latex)
+  ;;     (add-to-list 'company-backends 'company-latex-commands)))
 
-  (leaf company-auctex
-    :ensure t
-    :require t
-    :defun company-auctex-init
-    :after auctex
-    :config (company-auctex-init))
+  ;; (leaf company-auctex
+  ;;   :ensure t
+  ;;   :require t
+  ;;   :defun company-auctex-init
+  ;;   :after auctex
+  ;;   :config (company-auctex-init))
 
   (leaf my-latex-math-spaces :hook latex-mode)
 

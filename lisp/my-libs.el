@@ -42,5 +42,7 @@
 
 (leaf request :ensure t)
 
+(leaf async :ensure t)
+
 (provide 'my-libs)
 ;;; my-libs.el ends here

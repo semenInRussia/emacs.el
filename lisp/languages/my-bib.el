@@ -28,6 +28,7 @@
 
 (require 'dash)
 
+
 (leaf bibtex
   :custom ((bibtex-align-at-equal-sign  . t)
            (bibtex-user-optional-fields .
@@ -39,20 +40,20 @@
   :config                               ;nofmt
   (leaf bibtex-utils :ensure t))
 
-(leaf company-bibtex
-  :ensure (company-bibtex :repo "semenInRussia/company-bibtex")
-  :defvar company-backends
-  :hook (org-mode-hook . company-bibtex-org-mode-hook)
-  :custom (company-bibtex-org-citation-regex . "\\(ebib:\\|cite:@\\)")
-  :config (add-to-list 'company-backends 'company-bibtex)
-  (defun company-bibtex-org-mode-hook ()
-    "Hook for `org-mode' enabling `comapany-bibtex' for current buffer."
-    (interactive "P")
-    (->>
-     company-backends
-     (--remove
-      (and (listp it) (eq (car it) 'company-bbdb)))
-     (setq-local company-backends))))
+;; (leaf company-bibtex
+;; :ensure (company-bibtex :repo "semenInRussia/company-bibtex")
+;;   :defvar company-backends
+;;   :hook (org-mode-hook . company-bibtex-org-mode-hook)
+;;   :custom (company-bibtex-org-citation-regex . "\\(ebib:\\|cite:@\\)")
+;;   :config (add-to-list 'company-backends 'company-bibtex)
+;;   (defun company-bibtex-org-mode-hook ()
+;;     "Hook for `org-mode' enabling `comapany-bibtex' for current buffer."
+;;     (interactive "P")
+;;     (->>
+;;      company-backends
+;;      (--remove
+;;       (and (listp it) (eq (car it) 'company-bbdb)))
+;;      (setq-local company-backends))))
 
 (provide 'my-bib)
 ;;; my-bib.el ends here

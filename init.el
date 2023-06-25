@@ -26,6 +26,12 @@
 
 (require 'cl-lib)
 
+(let ((dirs (directory-files-recursively "~/.emacs.d/lisp" ".*" t)))
+  (mapc (lambda (dir)
+          (when (file-directory-p dir)
+            (add-to-list 'load-path dir)))
+        dirs))
+
 (add-to-list 'load-path
              (locate-user-emacs-file "lisp/local-projects"))
 
@@ -39,108 +45,12 @@
 
 (load "~/.emacs.d/lisp/local-projects/my-autoload.el")
 
-(defvar my-modules-order
-  (list
-   "packagement/my-straight.el"
-   "packagement/my-leaf.el"
-   "package-management"
-   "my-libs.el"
-   "my-lib.el"
-   "editing"
-   "languages/lisps/my-lisp.el"
-   "languages/my-autoformat.el"
-   "languages"
-   "env"
-   "ui")
-  "Names of the directories and files that define an order to load.")
+(defvar my-modules-el-file "~/.emacs.d/dist/my-modules.el")
 
-(message "Good luck mam!")
+(unless (file-exists-p (directory-file-name my-modules-el-file))
+  (make-directory (directory-file-name my-modules-el-file)))
 
-(defvar my-modules-files-ignore-regexps
-  '("/local-projects/" "/test/" "/features/" ".*-step\\.el" "/site-lisp/")
-  "List of the regexps that indicates that a file to load shouldn't be loaded.")
-
-(defun my-file-igored-as-module-p (filename)
-  "Return non-nil if a module at FILENAME can't be a configuration module."
-  (cl-some
-   (lambda (regexp) (string-match-p regexp filename))
-   my-modules-files-ignore-regexps))
-
-(defvar my-modules-files
-  (cl-remove-if
-   #'my-file-igored-as-module-p
-   (directory-files-recursively "~/.emacs.d/lisp" ".el$" nil)))
-
-(let ((dirs (directory-files-recursively "~/.emacs.d/lisp" ".*" t)))
-  (while dirs
-    (when (file-directory-p (car dirs))
-      (add-to-list 'load-path (car dirs)))
-    (setq dirs (cdr dirs))))
-
-(defvar my-load-modules-all (length my-modules-files))
-
-(defun my-require-or-debug-file (filename)
-  "Require the module in FILENAME, if catch errors, debug it."
-  (my-require-or-debug (intern (file-name-base filename))))
-
-(defun my-require-or-debug (module)
-  "Require MODULE, if has any errors, then debug that."
-  (unless (featurep module)
-    (let ((start-time (current-time)))
-      (or (ignore-errors (require module nil t))
-          (lwarn "startup" :error "I can't load the module: %s" module))
-      (message "`%s' module took %ssec"
-               module
-               (float-time (time-since start-time))))))
-
-(defvar my-config-modules-prefix "~/.emacs.d/lisp/")
-
-(defmacro my-extend (var lst)
-  "Extend a variable called VAR with type list with LST.
-The same to
-\(setq var (append var lst))"
-  `(setq ,var (append ,var ,lst)))
-
-(defmacro my-remove-from (var elt)
-  "Remove an ELT from the list at VAR.
-The same to
-\(setq var (remove elt var))"
-  `(setq ,var (remove ,elt ,var)))
-
-(defmacro my-mapc (lst elt &rest body)
-  "Evaluate a BODY with variable called ELT setted to element of a LST."
-  `(cl-do
-       ((lst (cdr ,lst) (cdr lst))
-        (,elt
-         (car ,lst)
-         (car lst)))
-       ((null ,elt))
-     ,@body))
-
-(defun my-load-all-config-modules ()
-  "Load all configuration modules."
-  (cl-do*
-      ((_ nil)
-       (sketch-order (cdr my-modules-order) (cdr sketch-order))
-       (it
-        (concat my-config-modules-prefix (car sketch-order))
-        (and
-         sketch-order
-         (concat my-config-modules-prefix (car sketch-order)))))
-      ((null it))
-    (if (file-directory-p it)
-        (my-mapc my-modules-files file
-                 (and
-                  (string-prefix-p it file)
-                  (not (string-equal it file))
-                  (my-remove-from my-modules-files it)
-                  (my-require-or-debug-file file)))
-      (my-require-or-debug-file it)
-      (my-remove-from my-modules-files it)))
-  (my-mapc my-modules-files file (my-require-or-debug-file file)))
-
-(my-load-all-config-modules)
-(my-load-all-config-modules)
+(require 'my-modules my-modules-el-file)
 
 (defgroup my nil "Group for all my config files." :group 'tools)
 

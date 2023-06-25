@@ -1004,13 +1004,13 @@ This is a version of `flatten-list', but it isn't change \\=' to \\='quote."
   "Get symbol which has `symbol-name' as concatenation of the each of SYMBOLS."
   (->> symbols (-map 'symbol-name) (apply 's-concat) (intern)))
 
-(defun my-major-mode-to-hook (major-mode)
-  "Return hook for MAJOR-MODE: python-mode => python-mode-hook."
-  (my-symbol-append major-mode '-hook))
+(defun my-major-mode-to-hook (mm)
+  "Return hook for major-mode (MM): python-mode => python-mode-hook."
+  (my-symbol-append mm '-hook))
 
-(defun my-major-mode-to-map (major-mode)
-  "Return map for MAJOR-MODE: python-mode => python-mode-map."
-  (my-symbol-append major-mode '-map))
+(defun my-major-mode-to-map (mm)
+  "Return map for major-mode (MM): python-mode => python-mode-map."
+  (my-symbol-append mm '-map))
 
 (defun my-map-to-major-mode (map)
   "Return `major-mode' of MAP: python-mode-map => `python-mode'."
@@ -1193,7 +1193,7 @@ Otherwise nil"
 Using TESTFN in functions sush as `assoc' or `alist-get'"
   (->>
    alist1
-   (--remove (assoc (car it) alist2))
+   (--remove (assoc (car it) alist2 testfn))
    (append alist2)))
 
 (defun my-regexp-opt-of-regexp (regexps)
@@ -1492,15 +1492,13 @@ which should be evaluated"
 
 (provide 'my-comment-dwim-2)
 ;;; my-comment-dwim-2.el ends here
-;;; my-company.el --- My config for `company'
+;;; my-corfu.el.el --- My configuration of `corfu' -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022 Semen Khramtsov
+;; Copyright (C) 2023 semenInRussia
 
-;; Author: Semen Khramtsov <hrams205@gmail.com>
+;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
-
-;; This file is not part of GNU Emacs.
+;; Homepage: https://github.com/semeninrussia/emacs.el
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -1513,33 +1511,44 @@ which should be evaluated"
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
-;; My config for `company'
+;; My configuration of `corfu'.  I choose `corfu' over `company' because
+;; `company' have a big load time (about 9 secs on my computer) why `corfu'
+;; 3 secs
 
 ;;; Code:
 
 
 
 
-(leaf company
+
+(leaf corfu
   :ensure t
-  :defvar company-backends
-  :global-minor-mode global-company-mode
-  :config (add-to-list 'company-backends 'company-keywords)
-  :custom ((company-idle-delay                . 0.3)
-           (company-minimum-prefix-length     . 2)
-           (company-show-numbers              . t)
-           (company-tooltip-limit             . 15)
-           (company-tooltip-align-annotations . t)
-           (company-tooltip-flip-when-above   . t)
-           (company-dabbrev-ignore-case       . nil)))
+  :global-minor-mode global-corfu-mode
+  :custom ((corfu-auto-prefix . 1)
+           (corfu-auto . t)))
 
+(leaf cape
+  :ensure t
+  :require t
+  :config
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-elisp-block)
+  (add-to-list 'completion-at-point-functions #'cape-history)
+  (add-to-list 'completion-at-point-functions #'cape-keyword)
+  (add-to-list 'completion-at-point-functions #'cape-sgml)
+  ;; (add-to-list 'completion-at-point-functions #'cape-tex)
+  (add-to-list 'completion-at-point-functions #'cape-abbrev)
+  (add-to-list 'completion-at-point-functions #'cape-symbol)
+  (add-to-list 'completion-at-point-functions #'cape-symbol)
+  ;; (add-to-list 'completion-at-point-functions #'cape-line)
+  )
 
-
-;;; my-company.el ends here
+;;; my-corfu.el ends here
 ;;; my-drag.el --- My config for the things dragging
 
 ;; Copyright (C) 2022 Semen Khramtsov
@@ -2321,7 +2330,7 @@ With prefix arg don't indent."
 
 
 (require 'dash)
-(require 'company)
+(require 'corfu)
 
 (require 'fast-exec)
 
@@ -2332,7 +2341,7 @@ With prefix arg don't indent."
   :load-path* "lisp/site-lisp/lsp-bridge"
   :hook ((lsp-bridge-user-multiserver-dir . "~/lsp/multi")
          (lsp-bridge-user-langserver-dir . "~/lsp/single/")
-         (lsp-bridge-mode-hook . (lambda () (company-mode 0))))
+         (lsp-bridge-mode-hook . (lambda () (corfu-mode 0))))
   :custom (;; features
            (lsp-bridge-enable-hover-diagnostic . t)
            (acm-enable-tabnine . nil)
@@ -3379,6 +3388,7 @@ List of racket expressions in which this function should work:
 
 (require 'dash)
 
+
 (leaf bibtex
   :custom ((bibtex-align-at-equal-sign  . t)
            (bibtex-user-optional-fields .
@@ -3390,20 +3400,20 @@ List of racket expressions in which this function should work:
   :config                               ;nofmt
   (leaf bibtex-utils :ensure t))
 
-(leaf company-bibtex
-  :ensure (company-bibtex :repo "semenInRussia/company-bibtex")
-  :defvar company-backends
-  :hook (org-mode-hook . company-bibtex-org-mode-hook)
-  :custom (company-bibtex-org-citation-regex . "\\(ebib:\\|cite:@\\)")
-  :config (add-to-list 'company-backends 'company-bibtex)
-  (defun company-bibtex-org-mode-hook ()
-    "Hook for `org-mode' enabling `comapany-bibtex' for current buffer."
-    (interactive "P")
-    (->>
-     company-backends
-     (--remove
-      (and (listp it) (eq (car it) 'company-bbdb)))
-     (setq-local company-backends))))
+;; (leaf company-bibtex
+;; :ensure (company-bibtex :repo "semenInRussia/company-bibtex")
+;;   :defvar company-backends
+;;   :hook (org-mode-hook . company-bibtex-org-mode-hook)
+;;   :custom (company-bibtex-org-citation-regex . "\\(ebib:\\|cite:@\\)")
+;;   :config (add-to-list 'company-backends 'company-bibtex)
+;;   (defun company-bibtex-org-mode-hook ()
+;;     "Hook for `org-mode' enabling `comapany-bibtex' for current buffer."
+;;     (interactive "P")
+;;     (->>
+;;      company-backends
+;;      (--remove
+;;       (and (listp it) (eq (car it) 'company-bbdb)))
+;;      (setq-local company-backends))))
 
 
 
@@ -3805,8 +3815,10 @@ mechanism use `calc-yank'"
 ;;; Code:
 
 
+
 (require 'dash)
 (require 'custom)
+
 
 (defvar my-html-suported-modes
   '(web-mode mhtml-mode)
@@ -3826,7 +3838,6 @@ mechanism use `calc-yank'"
 (leaf mhtml-mode
   :ensure t
   :mode "\\.html$"
-  :major-mode-map `(html ,my-html-suported-modes)
   :hook (mhtml-mode-hook . my-lsp-ensure)
   :config                               ;nofmt
   (leaf auto-rename-tag
@@ -3851,9 +3862,9 @@ mechanism use `calc-yank'"
   (leaf impatient-mode
     :ensure t
     :defun (imp-visit-buffer impatient-mode)
-    :bind (:my-html-local-map
+    :bind (:html-mode-map
            :package mhtml-mode
-           ("e" . my-enable-impatient-mode))
+           ("C-c C-e" . my-enable-impatient-mode))
     :config                             ;nofmt
     (defun my-enable-impatient-mode ()
       "Enable `impatient-mode' open page of the file in the web browser."
@@ -4066,8 +4077,6 @@ WIDTH is the amount of characters that will be located within display"
 (require 'dash)
 
 
-
-
 (require 'smartparens)
 
 (declare-function aas-set-snippets "aas.el")
@@ -4237,6 +4246,7 @@ WIDTH is the amount of characters that will be located within display"
 
   (leaf cdlatex
     :ensure t
+    :defvar cdlatex-tab-hook
     :hook ((cdlatex-tab-hook . yas-expand)
            (cdlatex-tab-hook . cdlatex-in-yas-field)
            (LaTeX-mode-hook  . turn-on-cdlatex))
@@ -4406,21 +4416,21 @@ WIDTH is the amount of characters that will be located within display"
            ("C-c C-n" . latex/next-section-same-level)
            ("C-c C-p" . latex/previous-section-same-level)))
 
-  (leaf company-math
-    :ensure t
-    :hook (LaTeX-mode-hook . my-company-math-setup)
-    :config                             ;nofmt
-    (defun my-company-math-setup ()
-      "Setup for `company-math'."
-      (add-to-list 'company-backends 'company-math-symbols-latex)
-      (add-to-list 'company-backends 'company-latex-commands)))
+  ;; (leaf company-math
+  ;;   :ensure t
+  ;;   :hook (LaTeX-mode-hook . my-company-math-setup)
+  ;;   :config                             ;nofmt
+  ;;   (defun my-company-math-setup ()
+  ;;     "Setup for `company-math'."
+  ;;     (add-to-list 'company-backends 'company-math-symbols-latex)
+  ;;     (add-to-list 'company-backends 'company-latex-commands)))
 
-  (leaf company-auctex
-    :ensure t
-    :require t
-    :defun company-auctex-init
-    :after auctex
-    :config (company-auctex-init))
+  ;; (leaf company-auctex
+  ;;   :ensure t
+  ;;   :require t
+  ;;   :defun company-auctex-init
+  ;;   :after auctex
+  ;;   :config (company-auctex-init))
 
   (leaf my-latex-math-spaces :hook latex-mode)
 
@@ -7364,17 +7374,7 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
   :bind (:eshell-mode-map
          :package esh-mode
          ([remap beginning-of-line] . 'eshell-begin-on-new-line)
-         ([remap beginning-of-line-text] . 'eshell-begin-on-new-line))
-  :config                               ;nofmt
-  (leaf company-shell
-    :ensure t
-    :require t)
-
-  ;; (--each my-eshell-commands-using-minibuffer
-  ;;   (advice-add it :after
-  ;;               (lambda (&rest _) (meow-insert))
-  ;;               '((name . meow-insert))))
-  )
+         ([remap beginning-of-line-text] . 'eshell-begin-on-new-line)))
 
 
 
@@ -8535,8 +8535,17 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
 ;; Join all my config files into one init.el.  I use this script to make one
 ;; big init.el file which has more fast startup time.
 
+;; `build-config' command joins all modules files from the .emacs.d/lisp into one
+;; dist/my-modules.el and compile it.  When i start Emacs init.el files just
+;; require my-modules.el, my-autoloads.el and custom.el which have already
+;; byte-compiled (or even better NATIVE-compiled).  One big file instead of a lot
+;; of small is better in load time, because every `require` statement also take
+;; a bit of time.
+
 ;;; Code:
 
+;; NOTE that here i don't use external libraries like `dash' or `s', because I sometimes
+;; need to build configuration when old configuration was broken and `dash'/`s' haven't been loaded
 (require 'cl-lib)
 
 (defvar my-modules-el-file "~/.emacs.d/dist/my-modules.el")

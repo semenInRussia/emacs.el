@@ -38,17 +38,7 @@
   :bind (:eshell-mode-map
          :package esh-mode
          ([remap beginning-of-line] . 'eshell-begin-on-new-line)
-         ([remap beginning-of-line-text] . 'eshell-begin-on-new-line))
-  :config                               ;nofmt
-  (leaf company-shell
-    :ensure t
-    :require t)
-
-  ;; (--each my-eshell-commands-using-minibuffer
-  ;;   (advice-add it :after
-  ;;               (lambda (&rest _) (meow-insert))
-  ;;               '((name . meow-insert))))
-  )
+         ([remap beginning-of-line-text] . 'eshell-begin-on-new-line)))
 
 (provide 'my-eshell)
 ;;; my-eshell.el ends here
