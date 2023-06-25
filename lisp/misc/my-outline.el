@@ -29,7 +29,9 @@
 
 
 (leaf outline
-  :ensure t)
+  :ensure t
+  :bind (:outline-minor-mode-map
+         ("S-TAB" . outline-cycle)))
 
 (provide 'my-outline)
 ;;; my-outline.el ends here

@@ -115,12 +115,11 @@
 
   (leaf embark
     :ensure t
-    :bind (("M-." . nil)
-           (:minibuffer-mode-map
-            :package vertico
-            ("M-." . embark-act)
-            ([remap write-file] . embark-export)
-            ([remap save-buffer] . embark-collect))))
+    :bind (:minibuffer-mode-map
+           :package vertico
+           ("M-." . embark-act)
+           ([remap write-file] . embark-export)
+           ([remap save-buffer] . embark-collect)))
 
   (defvar string-width 0)
 

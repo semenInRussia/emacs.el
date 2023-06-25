@@ -1,12 +1,9 @@
-;;; my-recentf.el --- My config for `recentf'
+;;; my-recentf.el --- My configuration of `recentf' -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022 Semen Khramtsov
-
-;; Author: Semen Khramtsov <hrams205@gmail.com>
+;; Copyright (C) 2022 semenInRussia
+;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
-
-;; This file is not part of GNU Emacs.
+;; Homepage: https://github.com/semeninrussia/emacs.el
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -19,19 +16,18 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
-;; My config for `recentf'
+;; My configuration of `recentf'.
 
 ;;; Code:
-
 (require 'my-leaf)
 
 (leaf recentf
-  :global-minor-mode recentf-mode
-  :custom ((recentf-max-saved-items . 100000)))
+  :ensure t
+  :global-minor-mode recentf-mode)
 
 (provide 'my-recentf)
 ;;; my-recentf.el ends here

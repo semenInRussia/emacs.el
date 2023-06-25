@@ -36,7 +36,7 @@
   :defun flycheck-mode
   :global-minor-mode global-flycheck-mode
   :config                             ;nofmt
-  (defun turn-off-flycheck ()
+  (defun turn-off-flycheck (&rest _)
     "Disable `flycheck-mode' locally for current buffer."
     (interactive)
     (flycheck-mode 0)))

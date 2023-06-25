@@ -29,13 +29,15 @@
 
 (require 'my-leaf)
 
+
 (leaf eldoc                             ;elfmt
   :ensure t
-  :custom (eldoc-idle-delay . 0.01)
+  :custom (eldoc-idle-delay . 0.2)
   :config (leaf eldoc-box
             :ensure t
             :defun eldoc-box-hover-mode
             :defvar global-eldoc-box-hover-mode
+            :bind ("C-x C-x" . 'eldoc-box-quit-frame)
             :init (define-global-minor-mode global-eldoc-box-hover-mode
                     eldoc-box-hover-mode
                     (lambda () (eldoc-box-hover-mode 1)))

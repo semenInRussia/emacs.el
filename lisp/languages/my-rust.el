@@ -26,6 +26,7 @@
 ;; My configuration for rust
 
 ;;; Code:
+
 (require 'my-leaf)
 (require 'dash)
 (require 's)
@@ -38,6 +39,7 @@
 
 (autoload 'my-rust-find-Cargo.toml-in-directory "my-rust.el")
 
+
 (defcustom my-rust-maybe-pub-words
   '(async fn mod struct enum type trait)
   "List of the symbols indicating words which can be public in Rust."
@@ -46,13 +48,14 @@
 
 (leaf rust-mode
   :ensure t
-  :hook ((rust-mode-hook . my-rust-whitespace-mode)
-         (rust-mode-hook . my-lsp-ensure))
+  :hook (rust-mode-hook . my-rust-whitespace-mode)
   :bind (:rust-mode-map
          ("C-c M-p" . 'my-rust-toggle-pub)
          ("C-c C-t" . 'my-rust-visit-Cargo.toml)
          ("C-c C-m" . 'rust-toggle-mutability))
   :config                               ;nofmt
+  (add-hook 'rust-mode-hook #'my-lsp-ensure)
+
   (defun my-rust-toggle-pub ()
     "Toggle public/private scope of the current rust function/imple/struct."
     (interactive)
@@ -94,8 +97,7 @@
   (leaf embrace
     :after embrace
     :hook (rust-mode-hook . my-rust-embrace-hook)
-    :config                             ;nofmt
-
+    :config
     (defun my-rust-embrace-hook ()
       "Add parens to `embrace' parens for `rust-mode'."
       (interactive)

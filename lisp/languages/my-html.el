@@ -26,9 +26,11 @@
 ;; My configuration for html
 
 ;;; Code:
+
 (require 'my-leaf)
 (require 'dash)
 (require 'custom)
+
 
 (defvar my-html-suported-modes
   '(web-mode mhtml-mode)
@@ -48,7 +50,6 @@
 (leaf mhtml-mode
   :ensure t
   :mode "\\.html$"
-  :major-mode-map `(html ,my-html-suported-modes)
   :hook (mhtml-mode-hook . my-lsp-ensure)
   :config                               ;nofmt
   (leaf auto-rename-tag
@@ -73,9 +74,9 @@
   (leaf impatient-mode
     :ensure t
     :defun (imp-visit-buffer impatient-mode)
-    :bind (:my-html-local-map
+    :bind (:html-mode-map
            :package mhtml-mode
-           ("e" . my-enable-impatient-mode))
+           ("C-c C-e" . my-enable-impatient-mode))
     :config                             ;nofmt
     (defun my-enable-impatient-mode ()
       "Enable `impatient-mode' open page of the file in the web browser."

@@ -1529,11 +1529,22 @@ which should be evaluated"
   :ensure t
   :global-minor-mode global-corfu-mode
   :custom ((corfu-auto-prefix . 1)
-           (corfu-auto . t)))
+           (corfu-auto . t)
+           (corfu-auto-delay . 0.5)))
 
 (leaf cape
   :ensure t
   :require t
+  :defun (cape-symbol
+          cape-dabbrev
+          cape-file
+          cape-elisp-block
+          cape-history
+          cape-keyword
+          cape-sgml
+          cape-tex
+          cape-abbrev
+          cape-symbol)
   :config
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file)

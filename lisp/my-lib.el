@@ -47,13 +47,13 @@
   "Get symbol which has `symbol-name' as concatenation of the each of SYMBOLS."
   (->> symbols (-map 'symbol-name) (apply 's-concat) (intern)))
 
-(defun my-major-mode-to-hook (major-mode)
-  "Return hook for MAJOR-MODE: python-mode => python-mode-hook."
-  (my-symbol-append major-mode '-hook))
+(defun my-major-mode-to-hook (mm)
+  "Return hook for major-mode (MM): python-mode => python-mode-hook."
+  (my-symbol-append mm '-hook))
 
-(defun my-major-mode-to-map (major-mode)
-  "Return map for MAJOR-MODE: python-mode => python-mode-map."
-  (my-symbol-append major-mode '-map))
+(defun my-major-mode-to-map (mm)
+  "Return map for major-mode (MM): python-mode => python-mode-map."
+  (my-symbol-append mm '-map))
 
 (defun my-map-to-major-mode (map)
   "Return `major-mode' of MAP: python-mode-map => `python-mode'."
@@ -236,7 +236,7 @@ Otherwise nil"
 Using TESTFN in functions sush as `assoc' or `alist-get'"
   (->>
    alist1
-   (--remove (assoc (car it) alist2))
+   (--remove (assoc (car it) alist2 testfn))
    (append alist2)))
 
 (defun my-regexp-opt-of-regexp (regexps)

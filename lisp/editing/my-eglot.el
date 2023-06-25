@@ -31,6 +31,9 @@
 
 (require 'dash)
 
+(declare-function turn-off-flycheck "my-flycheck.el")
+
+
 (defcustom my-eglot-major-modes
   '(rust-mode python-mode haskell-mode)
   "List of the major modes in which should work `eglot'."
@@ -38,10 +41,10 @@
   :type '(repeat major-mode))
 
 ;; `eglot' use `flymake' instead of `flycheck', so i disable `flycheck'
-(add-hook 'eglot-connect-hook 'turn-off-flycheck)
+(add-hook 'eglot-connect-hook #'turn-off-flycheck)
+
 
 (leaf eglot
-  :disabled t
   :custom `((eglot-send-changes-idle-time . 1) ; in seconds
             )
   :custom-face (eglot-highlight-symbol-face . '((t (:inherit lazy-highlight))))

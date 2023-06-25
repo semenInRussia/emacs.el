@@ -40,7 +40,7 @@
          (python-mode-hook . my-lsp-ensure))
   :custom ((lsp-bridge-python-lsp-server . nil)
            (lsp-bridge-python-multi-lsp-server . "pyright_ruff"))
-  :bind (:python-mode
+  :bind (:python-mode-map
          ("C-c C-i" . py-sort-imports)
          ("C-c C-o" . my-python-optional-type)
          ("C-c M-p" . my-python-split-params))

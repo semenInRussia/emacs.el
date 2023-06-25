@@ -42,8 +42,7 @@
             . '(magit-insert-push-branch-header
                 magit-insert-tags-header
                 magit-insert-unpushed-to-upstream-or-recent
-                magit-insert-unpulled-from-upstream)))
-  :config
+                magit-insert-unpulled-from-upstream))))
 
 (leaf git-timemachine
   :ensure (git-timemachine :host gitlab :repo "pidu/git-timemachine")

@@ -22,7 +22,7 @@
 ;;; Commentary:
 
 ;; My configuration of `corfu'.  I choose `corfu' over `company' because
-;; `company' have a big load time (about 9 secs on my computer) why `corfu'
+;; `company' have a big load time (about 9 secs on my computer) while `corfu'
 ;; 3 secs
 
 ;;; Code:
