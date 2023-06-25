@@ -35,9 +35,8 @@
 (setq font-lock-maximum-decoration t
       truncate-partial-width-windows nil)
 
-(with-eval-after-load 'my-doom-themes
-  (require 'doom-themes-autoloads)
-  (load-theme 'doom-1337 t))
+(require 'doom-themes-autoloads)
+(load-theme 'doom-1337 t)
 
 (custom-set-faces
  `(region
