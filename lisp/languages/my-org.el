@@ -34,16 +34,22 @@
 (require 'dash)
 (require 'my-autoformat)
 
-(declare-function meow-insert "meow-command.el")
-(declare-function aas-set-snippets "aas.el")
-(declare-function my-org-list-item-p "my-org.el")
-(declare-function my-org-properties-end-p "my-org.el")
-(declare-function my-org-heading-p "my-org.el")
-(declare-function my-autoformat-bind-for-major-mode "my-autoformat.el")
+(defvar org-mode-hook)
+
+(add-hook 'org-mode-hook 'visual-fill)
+(add-hook 'org-mode-hook 'visual-line-mode)
+(add-hook 'org-mode-hook 'aas-activate-for-major-mode)
+
 
 (leaf org
   :ensure t
   :defun ((transient-define-prefix . transient)
+          (my-autoformat-bind-for-major-mode . my-autoformat)
+          (my-org-heading-p . my-org)
+          (my-org-properties-end-p . my-org)
+          (my-org-list-item-p . my-org)
+          (aas-set-snippets . aas)
+          (meow-insert . meow-command)
           (my-org-keywords . my-org)
           (my-org-skip-backward-keyword . my-org)
           (embrace-org-mode-hook . my-org)
@@ -62,8 +68,7 @@
   :defvar (my-org-list-item-prefix-regexp
            my-org-keywords)
   :hook ((org-mode-hook . org-cdlatex-mode))
-  :bind (("<f5>" . org-ctrl-c-ctrl-c)
-         ("C-c c" . org-capture)
+  :bind (("C-c c" . org-capture)
          (:org-mode-map
           ;; Insert anything
           ("C-c M-i"   . my-org-insert-image)
@@ -74,7 +79,7 @@
           ;; heading => plain text
           ;; 8 is * without shift
           ("C-c C-M-w"   . my-org-clear-subtree)
-          ([tab] . org-refile)
+          ("C-c tab" . org-refile)
           ("C-c C-t"   . my-org-todo)
           ("C-c C-j"   . org-id-get-create)))
   ;; the following code should add some auto activating snippets, for example,
@@ -86,10 +91,7 @@
         "misc " "miscellaneous"
         "Misc " "Miscellaneous"
         "iau" "I am use")
-  :config                               ;nofmt
-  (add-hook 'org-mode-hook 'visual-fill)
-  (add-hook 'org-mode-hook 'visual-line-mode)
-  (add-hook 'org-mode-hook 'aas-activate-for-major-mode)
+  :config
   (leaf my-org-editing
     :commands (my-org-clear-subtree
                my-org-clear-subtree
@@ -101,7 +103,16 @@
                my-org-todo
                my-org-todo))
 
-  (leaf xenops :ensure t :hook org-mode-hook)
+  (leaf xenops
+    :ensure t
+    :after org
+    :hook org-mode-hook)
+
+  (leaf cdlatex
+    :ensure t
+    :require t)
+
+  (defun doom-docs-org-mode () (interactive))
 
   (leaf my-org-autoformat
     :config                             ;nofmt
@@ -316,6 +327,7 @@ demotes a first letter after keyword word."
 
   (leaf consult
     :bind (:org-mode-map
+           :package org
            ([remap consult-imenu] . consult-outline)))
 
   ;; I am bind the command `org-export' with \"SPC l e\" in the root `leaf'
@@ -381,20 +393,24 @@ produced."
       (embrace-org-mode-hook)
       (setq-local embrace-show-help-p nil)))
 
-  (leaf org-table-sticky-header :ensure t :hook org-mode-hook)
-  (leaf org-autolist :ensure t :hook org-mode-hook)
+  (leaf org-table-sticky-header
+    :ensure t
+    :hook org-mode-hook)
 
-  ;; (leaf rorg
-  ;;   :load-path "~/projects/rorg/"
-  ;;   :bind (:org-mode-map
-  ;;          :package org
-  ;;          ("C-c C-x C-x" . rorg-splice-subtree)
-  ;;          ("C-c C-0" . rorg-wrap-region-or-current-heading)
-  ;;          ("C-c C-{" . rorg-forward-slurp-subtree)
-  ;;          ("C-c C-}" . rorg-backward-barf-subtree)
-  ;;          ("{" . rorg-backward-slurp-subtree)
-  ;;          ("[" . rorg-forward-barf-subtree))
-  ;;   )
+  (leaf org-autolist
+    :ensure t
+    :hook org-mode-hook)
+
+  (leaf rorg
+    :load-path "~/projects/rorg/"
+    :bind (:org-mode-map
+           :package org
+           ("C-c C-x C-x" . rorg-splice-subtree)
+           ("C-c C-0" . rorg-wrap-region-or-current-heading)
+           ("C-c C-{" . rorg-forward-slurp-subtree)
+           ("C-c C-}" . rorg-backward-barf-subtree)
+           ("{" . rorg-backward-slurp-subtree)
+           ("[" . rorg-forward-barf-subtree)))
 
   (leaf my-org-drag
     :defun ((add-right-dragger

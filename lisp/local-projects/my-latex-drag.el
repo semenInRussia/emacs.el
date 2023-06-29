@@ -24,6 +24,7 @@
 ;; Function to drag items in LaTeX.
 
 ;;; Code:
+
 (require 'just)
 (require 'my-drag)
 

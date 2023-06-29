@@ -33,8 +33,7 @@
 
 (declare-function cdlatex-wrap-environment "cdlatex.el")
 
-
-;;;###autoload(autoload 'latex-mode "my-latex-autoformat")
+;;;###autoload(add-hook 'LaTeX-mode-hook '(lambda () (require 'my-latex-autoformat)))
 (my-autoformat-bind-for-major-mode
  'latex-mode
  'autoformat-latex-capitalize-special-commands

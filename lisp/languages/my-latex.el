@@ -107,12 +107,14 @@
 (add-hook 'LaTeX-mode-hook 'my-latex-expansion-mode)
 (add-hook 'LaTeX-mode-hook 'my-latex-disable-auto-fill)
 
-(leaf latex
+
+(leaf auctex
   :ensure auctex
-  :mode ("\\.tex$" . latex-mode)
-  :defun (((my-latex-command-left-paren my-latex-command-left-paren-regexp)
-           . my-latex)
-          ((er/mark-LaTeX-math er/mark-LaTeX-inside-environment)
+  :mode ("\\.tex$" . latex-mode))
+
+
+(leaf tex-mode
+  :defun (((er/mark-LaTeX-math er/mark-LaTeX-inside-environment)
            . expand-region)
           (latex-complete-envnames . tex-mode)
           ((LaTeX-current-environment
@@ -123,13 +125,15 @@
             LaTeX-mark-section)
            . latex))
   :custom (TeX-master . nil)
-  :bind (:LaTeX-mode-map
+  :bind (:latex-mode-map
+         :package tex-mode
          ("C-c C-@"  . my-latex-mark-inside-environment-or-math)
          ("C-c C-\\" . my-latex-equation-to-split)
          ("C-c C-w"  . my-latex-kill-section))
   :config                               ;nofmt
   (leaf xenops
     :hook LaTeX-mode-hook
+    :after tex-mode
     :ensure t
     :custom (xenops-math-image-scale-factor . 2))
 
@@ -137,41 +141,42 @@
     :load-path* "lisp/languages/latex/"
     :hook (LaTeX-mode-hook . my-latex-expansion-mode))
 
-  (leaf yasnippet
-    :bind (:yas-keymap
-           ("<tab>" . yas-next-field-or-cdlatex)
-           ("TAB"   . yas-next-field-or-cdlatex))
-    :config                             ;nofmt
-    (require 'calc-lang)
-    (require 'font-latex)
+  ;; (leaf yasnippet
+  ;;   :bind (:yas-keymap
+  ;;          ("<tab>" . yas-next-field-or-cdlatex)
+  ;;          ("TAB"   . yas-next-field-or-cdlatex))
+  ;;   :disabled t
+  ;;   :config                             ;nofmt
+  ;;   (require 'calc-lang)
+  ;;   (require 'font-latex)
 
-    (defun cdlatex-in-yas-field ()
-      (when-let* ((_ (overlayp yas--active-field-overlay))
-                  (end (overlay-end yas--active-field-overlay)))
-        (if (>= (point) end)
-            (let ((s (thing-at-point 'sexp)))
-              (unless (and s
-                           (assoc
-                            (substring-no-properties s)
-                            cdlatex-command-alist-comb))
-                (yas-next-field-or-maybe-expand)
-                t))
-          (let (cdlatex-tab-hook minp)
-            (setq minp
-                  (min
-                   (save-excursion (cdlatex-tab) (point))
-                   (overlay-end yas--active-field-overlay)))
-            (goto-char minp)
-            t))))
+  ;;   (defun cdlatex-in-yas-field ()
+  ;;     (when-let* ((_ (overlayp yas--active-field-overlay))
+  ;;                 (end (overlay-end yas--active-field-overlay)))
+  ;;       (if (>= (point) end)
+  ;;           (let ((s (thing-at-point 'sexp)))
+  ;;             (unless (and s
+  ;;                          (assoc
+  ;;                           (substring-no-properties s)
+  ;;                           cdlatex-command-alist-comb))
+  ;;               (yas-next-field-or-maybe-expand)
+  ;;               t))
+  ;;         (let (cdlatex-tab-hook minp)
+  ;;           (setq minp
+  ;;                 (min
+  ;;                  (save-excursion (cdlatex-tab) (point))
+  ;;                  (overlay-end yas--active-field-overlay)))
+  ;;           (goto-char minp)
+  ;;           t))))
 
-    (defun yas-next-field-or-cdlatex nil
-      "Jump to the next Yas field correctly with cdlatex active."
-      (interactive)
-      (if (or
-           (bound-and-true-p cdlatex-mode)
-           (bound-and-true-p org-cdlatex-mode))
-          (cdlatex-tab)
-        (yas-next-field-or-maybe-expand))))
+  ;;   (defun yas-next-field-or-cdlatex nil
+  ;;     "Jump to the next Yas field correctly with cdlatex active."
+  ;;     (interactive)
+  ;;     (if (or
+  ;;          (bound-and-true-p cdlatex-mode)
+  ;;          (bound-and-true-p org-cdlatex-mode))
+  ;;         (cdlatex-tab)
+  ;;       (yas-next-field-or-maybe-expand))))
 
   (defun my-latex-mark-inside-environment-or-math ()
     "If the cursor place inside of the math environment mark that."
@@ -201,28 +206,25 @@
 
   (leaf cdlatex
     :ensure t
-    :defvar cdlatex-tab-hook
-    :hook ((cdlatex-tab-hook . yas-expand)
-           (cdlatex-tab-hook . cdlatex-in-yas-field)
-           (LaTeX-mode-hook  . turn-on-cdlatex))
+    :hook (LaTeX-mode-hook  . turn-on-cdlatex)
     :bind (:cdlatex-mode-map
            ("<tab>" . cdlatex-tab)
-           (";" . my-latex-dollar)
-           ("(" .  self-insert-command)
-           (")" .  self-insert-command)
-           ("{" .  self-insert-command)
-           ("}" .  self-insert-command)
-           ("[" .  self-insert-command)
-           ("]" .  self-insert-command)
-           ("\"" . self-insert-command)
-           ("\\" . self-insert-command))
-    ;; fields
+           (";" . my-latex-dollar))
     :custom (cdlatex-math-modify-alist
              .
              '((?q "\\sqrt" nil t nil nil)
                (?u "\\breve" "\\uline" t nil nil)
                (?v "\\vec" nil t nil nil)))
-    :config                             ;nofmt
+    :config
+    (define-key cdlatex-mode-map "(" nil)
+    (define-key cdlatex-mode-map ")" nil)
+    (define-key cdlatex-mode-map "{" nil)
+    (define-key cdlatex-mode-map "}" nil)
+    (define-key cdlatex-mode-map "[" nil)
+    (define-key cdlatex-mode-map "]" nil)
+    (define-key cdlatex-mode-map "\"" nil)
+    (define-key cdlatex-mode-map "\\" nil)
+
     (defun my-latex-dollar ()
       "Insert dollars and turn input method into English."
       (interactive)
@@ -236,162 +238,37 @@
             (sp-wrap-with-pair "$")
           (sp-insert-pair "$")))))
 
-  (leaf embrace
-    :after (embrace cdlatex)
-    :defun (embrace-build-help embrace-add-pair-regexp)
-    :hook ((LaTeX-mode-hook . embrace-LaTeX-mode-hook)
-           (LaTeX-mode-hook . my-embrace-LaTeX-mode-hook))
-    :config                             ;nofmt
-    (defun my-embrace-LaTeX-mode-hook ()
-      "My additional `embrace-LaTeX-mode-hook'."
-      (interactive)
-      (setq-local embrace-show-help-p nil)
-      (--each
-          (-concat cdlatex-math-modify-alist-default
-                   cdlatex-math-modify-alist)
-        (my-embrace-add-paren-of-cdlatex-math it))
-      (my-embrace-add-paren-latex-command ?a "answer")
-      (embrace-add-pair-regexp ?\\
-                               (rx "\\"
-                                   (1+ wordchar)
-                                   (* space)
-                                   (? "[" (*? any) "]" (* space))
-                                   "{")
-                               "}"
-                               'my-embrace-with-latex-command
-                               (embrace-build-help "\\name{" "}"))
-      (embrace-add-pair-regexp ?d
-                               "\\\\left."
-                               "\\\\right."
-                               'my-embrace-with-latex-left-right
-                               (embrace-build-help
-                                "\\left(" "\\right)"))
-      (embrace-add-pair-regexp
-       ?e
-       "\\\\begin{\\(.*?\\)}\\(\\[.*?\\]\\)*"
-       "\\\\end{\\(.*?\\)}"
-       'my-embrace-with-latex-env
-       (embrace-build-help "\\begin{name}" "\\end{name}")
-       t))
-
-    (defun my-embrace-add-paren-of-cdlatex-math (element)
-      "Add an ELEMENT of the `cdlatex-math-modify-alist' to the `embrace' parens."
-      (let* ((key (-first-item element))
-             (cmd
-              (s-chop-prefix
-               "\\"
-               (or (-third-item element) (-second-item element))))
-             (type (-fourth-item element)))
-        (if type
-            (my-embrace-add-paren-latex-command key cmd)
-          (my-embrace-add-paren-latex-style-command key cmd))))
-
-    (defun my-embrace-add-paren-latex-command (key name)
-      "Add paren at KEY for the LaTeX command with NAME in `embrace'."
-      (embrace-add-pair-regexp
-       key
-       (my-latex-command-left-paren-regexp name)
-       "}"
-       (-const (cons (my-latex-command-left-paren name) "}"))
-       (embrace-build-help (my-latex-command-left-paren name) "}")))
-
-    (defun my-latex-command-left-paren (name)
-      "Return paren right of the LaTeX command named NAME."
-      (s-concat "\\" name "{"))
-
-    (defun my-latex-command-left-paren-regexp (name)
-      (rx "\\"
-          (literal name)
-          (* space)
-          (? "[" (*? any) "]" (* space))
-          "{"))
-
-    (defun my-embrace-add-paren-latex-style-command (key name)
-      "Add paren at KEY for the style LaTeX command with NAME in `embrace'."
-      (embrace-add-pair-regexp key
-                               (my-latex-style-command-left-paren-regexp name)
-                               "}"
-                               (-const
-                                (cons
-                                 (my-latex-style-command-left-paren name)
-                                 "}"))
-                               (embrace-build-help
-                                (my-latex-style-command-left-paren name)
-                                "}")))
-
-    (defun my-latex-style-command-left-paren (name)
-      "Return paren right of the LaTeX command named NAME."
-      (s-concat "{\\" name " "))
-
-    (defun my-latex-style-command-left-paren-regexp (name)
-      (rx "{" (* space) "\\" (literal name) (* space)))
-
-    (defun my-embrace-with-latex-command ()
-      "Return pair from the left and right pair for a LaTeX command."
-      (let ((name (read-string "Name of a LaTeX command, please: ")))
-        (cons (s-concat "\\" name "{") "}")))
-
-    (defun my-embrace-with-latex-left-right ()
-      "Return pair from the left and right pair for the LaTeX command \\left."
-      (cons
-       (s-concat "\\left" (read-char "Left paren, please: "))
-       (s-concat "\\right" (read-char "Right paren, please: "))))
-
-    (defun my-embrace-with-latex-env ()
-      "Return pair from the left and right pair for the LaTeX command \\left."
-      (let ((env
-             (read-string "Name of the environment, please: "
-                          (latex-complete-envnames))))
-        (cons
-         (s-concat "\\begin{" env "}")
-         (s-concat "\\end{" env "}")))))
+  (leaf my-latex-embrace
+    :after embrace
+    :defun my-embrace-LaTeX-mode-hook
+    :defun (embrace-LaTeX-mode-hook . embrace)
+    :config
+    (add-hook 'LaTeX-mode-hook #'embrace-LaTeX-mode-hook)
+    (add-hook 'LaTeX-mode-hook #'my-embrace-LaTeX-mode-hook)
+    (when (eq major-mode 'latex-mode)
+      (embrace-LaTeX-mode-hook)
+      (my-embrace-LaTeX-mode-hook)))
 
   (leaf smartparens-latex
     :after smartparens
-    :config                             ;nofmt
-    (sp-with-modes
-        '(tex-mode plain-tex-mode latex-mode LaTeX-mode)
-      (sp-local-pair " ``"
-                     "''"
-                     :trigger "\""
-                     :unless '(sp-latex-point-after-backslash sp-in-math-p)
-                     :post-handlers '(sp-latex-skip-double-quote))
-      (sp-local-pair " \"<"
-                     "\">"
-                     :trigger "<"
-                     :unless '(sp-latex-point-after-backslash sp-in-math-p))))
+    :require t)
 
   (leaf latex-extra
     :ensure t
     :hook ((LaTeX-mode-hook . latex-extra-mode)
            (LaTeX-mode-hook . visual-line-mode))
-    :bind (:LaTeX-mode-map
-           :package tex
+    :bind (:latex-mode-map
+           :package tex-mode
            ("C-c C-c" . latex/compile-commands-until-done)
            ("C-c C-n" . latex/next-section-same-level)
            ("C-c C-p" . latex/previous-section-same-level)))
 
-  ;; (leaf company-math
-  ;;   :ensure t
-  ;;   :hook (LaTeX-mode-hook . my-company-math-setup)
-  ;;   :config                             ;nofmt
-  ;;   (defun my-company-math-setup ()
-  ;;     "Setup for `company-math'."
-  ;;     (add-to-list 'company-backends 'company-math-symbols-latex)
-  ;;     (add-to-list 'company-backends 'company-latex-commands)))
-
-  ;; (leaf company-auctex
-  ;;   :ensure t
-  ;;   :require t
-  ;;   :defun company-auctex-init
-  ;;   :after auctex
-  ;;   :config (company-auctex-init))
-
-  (leaf my-latex-math-spaces :hook latex-mode)
+  (leaf my-latex-math-spaces
+    :hook latex-mode)
 
   (leaf latex-r
     :load-path "~/projects/latex-r"
-    :bind (:LaTeX-mode-map
+    :bind (:latex-mode-map
            :package latex
            ("C-c M-n" . 'latex-r-cycle-math-parens)
            ("C-c C-s" . 'latex-r-split-environment)))
