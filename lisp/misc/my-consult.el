@@ -22,12 +22,11 @@
 
 ;;; Commentary:
 
-;; My config for `consult'
+;; My config for `consult'.
 
 ;;; Code:
 
 (require 'my-leaf)
-
 (require 'dash)
 
 
@@ -46,13 +45,9 @@
 
 (leaf consult
   :ensure t
-  :defun ((consult-register-format
-           consult-register-window
-           consult-xref
-           ;; for my consult-ripgrep
-           consult--grep
-           consult--ripgrep-make-builder)
-          ((project-current project-root) . project))
+  :defun (consult-register-format
+          consult-register-window
+          consult-xref)
   :defvar (consult-narrow-key consult-project-function)
   :bind (:minibuffer-local-map
          ("M-s" . consult-history) ;; orig. next-matching-history-element
@@ -82,9 +77,7 @@
          ("M-s k" . consult-keep-lines)
          ("M-s u" . consult-focus-lines)
          ;; Isearch integration
-         ("M-s e" . consult-isearch-history)
-         ;; Minibuffer history
-         )
+         ("M-s e" . consult-isearch-history))
   :custom ((register-preview-delay  . 0.5)
            (register-preview-function . #'consult-register-format))
   :hook ((completion-list-mode-hook . consult-preview-at-point-mode))
@@ -102,6 +95,7 @@
     :custom ((xref-show-xrefs-function . #'consult-xref)
              (xref-show-definitions-function . #'consult-xref)))
 
+  ;; more fast way to search things inside `completing-read'
   (leaf orderless
     :ensure t
     :require t
@@ -112,14 +106,6 @@
     :global-minor-mode marginalia-mode)
 
   (leaf embark-consult :ensure t)
-
-  (leaf embark
-    :ensure t
-    :bind (:minibuffer-mode-map
-           :package vertico
-           ("M-." . embark-act)
-           ([remap write-file] . embark-export)
-           ([remap save-buffer] . embark-collect)))
 
   (defvar string-width 0)
 
