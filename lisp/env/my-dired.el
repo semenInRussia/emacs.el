@@ -53,9 +53,7 @@
   :bind (:dired-mode-map
          (";"       . dired-avy)
          ("A"       . agnifize-dwim)
-         ("~"       . my-dired-jump-to-home)
-         ("a"       . execute-extended-command)
-         (","       . ace-window))
+         ("~"       . my-dired-jump-to-home))
 
   :config
   (leaf dired-async
@@ -70,13 +68,8 @@
            ("C-x h"   . my-dired-mark-all-files)
            ;; Manipulation with file(s)
            ;; copy/move/paste also defines in the section "Dired Hacks: Ranger"
-           ("k"       . my-dired-delete)
-           ("C-c C-x" . my-dired-delete-all-files)
            ("C-y"     . my-dired-duplicate)
-           ("R"       . my-dired-rename)
-           ("TAB"     . my-dired-move)
-           ("o"       . my-dired-new-file)
-           ("b"       . my-dired-goto-parent-dir)))
+           ("C-m"     . my-dired-new-file)))
 
   (leaf dired-filter
     :ensure t
@@ -112,7 +105,7 @@
     :ensure t
     :bind (:dired-mode-map
            :package dired
-           ("m" . 'dired-ranger-move)
+           ("M" . 'dired-ranger-move)
            ("v" . 'dired-ranger-paste)
            ("c" . 'dired-ranger-copy)))
 
