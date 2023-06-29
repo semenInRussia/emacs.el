@@ -38,11 +38,7 @@
   :bind (:smartparens-mode-map
          ("C-c C-w" . 'sp-splice-sexp-killing-backward)
          ("C-x C-y" . 'my-sp-clone)
-         ("C-c DEL" . 'sp-change-enclosing)
-         ("C-M-."   . 'sp-forward-slurp-sexp)
-         ("C-M-,"   . 'sp-forward-barf-sexp)
-         ("C-M->"   . 'sp-backward-slurp-sexp)
-         ("C-M-<"   . 'sp-backward-barf-sexp))
+         ("C-c DEL" . 'sp-change-enclosing))
   :config
   (sp-use-paredit-bindings)
   (defun my-sp-clone ()

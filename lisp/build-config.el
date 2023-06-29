@@ -44,6 +44,7 @@
    "package-management/my-straight.el"
    "package-management/my-leaf.el"
    "package-management"
+   "misc/my-gcmh.el"
    "my-libs.el"
    "my-lib.el"
    "editing"
@@ -61,14 +62,28 @@
 (defun my-build-config ()
   "Build my config."
   (interactive)
-  (my-join-modules-into-modules.el)
-  (byte-compile-file my-modules-el-file))
+  (let ((default-directory (file-name-directory my-modules-el-file))
+        (compiled-file (concat my-modules-el-file "c")))
+    (message "Join config files...")
+    (my-join-modules-into-modules.el)
+    (print " done")
+
+    (when (file-exists-p compiled-file)
+      (delete-file compiled-file))
+
+    (message "Byte-compile my-modules.el...")
+    (byte-compile-file my-modules-el-file)
+    (print "done and start native-compile")
+
+    (native-compile-async (list my-modules-el-file))))
 
 (defun my-file-igored-as-module-p (filename)
   "Return non-nil if a module at FILENAME can't be a configuration module."
-  (cl-some
-   (lambda (regexp) (string-match-p regexp filename))
-   my-modules-files-ignore-regexps))
+  (or
+   (not (string-suffix-p ".el" filename))
+   (cl-some
+    (lambda (regexp) (string-match-p regexp filename))
+    my-modules-files-ignore-regexps)))
 
 (defmacro my-remove-from (var elt)
   "Remove an ELT from the list at VAR.
@@ -78,7 +93,6 @@ The same to
 
 (defun my-all-modules-files ()
   "Return list of all modules filenames using `my-modules-order'."
-  (interactive "P")
   (let ((order (mapcar
                 (lambda (it) (concat my-config-modules-prefix it))
                 my-modules-order))
@@ -95,7 +109,8 @@ The same to
        ((file-directory-p order-item)
         (setq sorted
               (append sorted (cl-remove-if
-                              (lambda (f) (member f sorted))
+                              (lambda (f) (or (my-file-igored-as-module-p f)
+                                              (member f sorted)))
                               (directory-files-recursively order-item ".el$")))))
        (t
         (setq sorted (append sorted (list order-item))))))

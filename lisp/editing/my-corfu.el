@@ -33,9 +33,12 @@
 (leaf corfu
   :ensure t
   :global-minor-mode global-corfu-mode
-  :custom ((corfu-auto-prefix . 1)
+  :custom (;; by default 2 but 1 one is better
+           (corfu-auto-prefix . 1)
+           ;; by default to run `corfu' you should press `C-M-kp-begin'
            (corfu-auto . t)
-           (corfu-auto-delay . 0.5)))
+           ;; I don't like 0sec, because it worth for yasnippets
+           (corfu-auto-delay . 0.4)))
 
 (leaf cape
   :ensure t

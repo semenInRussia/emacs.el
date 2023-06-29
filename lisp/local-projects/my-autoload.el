@@ -79,15 +79,6 @@ Add some parens for the Emacs-Lisp embrace.")
 
 ;;;***
 
-;;;### (autoloads nil "my-latex-autoformat" "my-latex-autoformat.el"
-;;;;;;  (0 0 0 0))
-;;; Generated autoloads from my-latex-autoformat.el
-(autoload 'latex-mode "my-latex-autoformat")
-
-(register-definition-prefixes "my-latex-autoformat" '("autoformat-latex-" "my-"))
-
-;;;***
-
 ;;;### (autoloads nil "my-latex-drag" "my-latex-drag.el" (0 0 0 0))
 ;;; Generated autoloads from my-latex-drag.el
 
@@ -344,8 +335,30 @@ it is disabled.
 
 ;;; Generated autoloads from my-latex-autoformat.el
 
-(autoload 'latex-mode "my-latex-autoformat")
+(add-hook 'LaTeX-mode-hook '(lambda () (require 'my-latex-autoformat)))
 (register-definition-prefixes "my-latex-autoformat" '("autoformat-latex-" "my-"))
+
+
+
+;;; Generated autoloads from my-latex-embrace.el
+
+(autoload 'my-embrace-LaTeX-mode-hook "my-latex-embrace" "\
+My additional `embrace-LaTeX-mode-hook'." t)
+(register-definition-prefixes "my-latex-embrace" '("my-"))
+
+
+;;; Generated autoloads from my-latex-drag.el
+
+(autoload 'my-latex-try-drag-right-list-item "my-latex-drag" "\
+If the dragger for LaTeX list item should be work, drag that to right." t)
+(autoload 'my-latex-try-drag-left-list-item "my-latex-drag" "\
+If the dragger for LaTeX list item should be work, drag that to left." t)
+(register-definition-prefixes "my-latex-drag" '("my-latex-"))
+
+
+;;; Generated autoloads from my-meow-structural.el
+
+(register-definition-prefixes "my-meow-structural" '("my-meow-structural-"))
 
 
 ;;; Generated autoloads from my-dired-commands.el

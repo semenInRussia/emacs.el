@@ -55,8 +55,8 @@
               ("Open Last MIPT Task" 'my-mipt-visit-last-task)
               ("Find MIPT Task" 'my-mipt-task-visit)
               ("Open MIPT Task in Web Browser" 'my-mipt-task-browse-course-url))
-  :bind (:LaTeX-mode-map
-         :package tex
+  :bind (:latex-mode-map
+         :package tex-mode
          ("C-c M-w" . 'my-copy-buffer-content-as-mipt-solution)))
 
 (provide 'my-fast-exec-misc)

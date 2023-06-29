@@ -26,6 +26,7 @@
 ;; My config for `prettify-mode'
 
 ;;; Code:
+
 (require 'my-leaf)
 
 (leaf prog-mode :hook (LaTeX-mode-hook . prettify-symbols-mode))

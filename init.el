@@ -47,10 +47,12 @@
 
 (defvar my-modules-el-file "~/.emacs.d/dist/my-modules.el")
 
-(unless (file-exists-p (directory-file-name my-modules-el-file))
-  (make-directory (directory-file-name my-modules-el-file)))
+(unless (file-exists-p (file-name-directory my-modules-el-file))
+  (make-directory (file-name-directory my-modules-el-file)))
 
-(require 'my-modules my-modules-el-file)
+(add-to-list 'load-path (file-name-directory my-modules-el-file))
+
+(require 'my-modules)
 
 (defgroup my nil "Group for all my config files." :group 'tools)
 

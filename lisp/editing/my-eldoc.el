@@ -37,7 +37,7 @@
             :ensure t
             :defun eldoc-box-hover-mode
             :defvar global-eldoc-box-hover-mode
-            :bind ("C-x C-x" . 'eldoc-box-quit-frame)
+            :bind ("C-h C-k" . 'eldoc-box-quit-frame)
             :init (define-global-minor-mode global-eldoc-box-hover-mode
                     eldoc-box-hover-mode
                     (lambda () (eldoc-box-hover-mode 1)))

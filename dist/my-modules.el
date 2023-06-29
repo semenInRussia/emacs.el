@@ -77,793 +77,794 @@
 (straight-use-package 'leaf)
 (require 'leaf)
 
-(defun my-plist-get (plst key &optional def)
-  "Return the value at KEY in PLST, if key isn't provided return DEF."
-  (let (prev-key
-        prev-val
-        (result def))
-    (unless (keywordp (car plst))
-      (setq plst (cdr plst)))
-    (while plst
+(eval-and-compile
+  (defun my-plist-get (plst key &optional def)
+    "Return the value at KEY in PLST, if key isn't provided return DEF."
+    (let (prev-key
+          prev-val
+          (result def))
+      (unless (keywordp (car plst))
+        (setq plst (cdr plst)))
+      (while plst
+        (when (eq prev-key key)
+          (setq result prev-val)
+          ;; stop loop
+          (setq plst nil))
+        (setq prev-key (car plst))
+        (setq prev-val (cadr plst))
+        ;; skip both: value and key
+        (setq plst (cddr plst)))
       (when (eq prev-key key)
-        (setq result prev-val)
-        (setq plst nil)                 ; stop loop
-        )
-      (setq prev-key (car plst))
-      (setq prev-val (cadr plst))
-      ;; skip both: value and key
-      (setq plst (cddr plst)))
-    (when (eq prev-key key)
-      (setq result prev-val))
-    result))
+        (setq result prev-val))
+      result))
 
-(defun my-leaf-keywords-init ()
-  "Initialize keywords for macro `leaf'."
-  (setq leaf-alias-keyword-alist '((:ensure . :straight)))
-  (setq leaf-keywords
-        '(:disabled
-          (unless
-              (eval
-               (car leaf--value))
-            `(,@leaf--body))
-          :leaf-path
-          (if
-              (and leaf--body
-                   (eval
-                    (car leaf--value)))
-              `((leaf-handler-leaf-path ,leaf--name)
-                ,@leaf--body)
-            `(,@leaf--body))
-          :leaf-protect
-          (if
-              (and leaf--body
-                   (eval
-                    (car leaf--value)))
-              `((leaf-handler-leaf-protect ,leaf--name ,@leaf--body))
-            `(,@leaf--body))
-          :load-path
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(add-to-list 'load-path ,elm))
-               leaf--value)
-            ,@leaf--body)
-          :load-path*
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(add-to-list 'load-path
-                               (locate-user-emacs-file ,elm)))
-               leaf--value)
-            ,@leaf--body)
-          :leaf-autoload
-          `(,@(when
-                  (car leaf--value)
-                (mapcar
+  (defun my-leaf-keywords-init ()
+    "Initialize keywords for macro `leaf'."
+    (setq leaf-alias-keyword-alist '((:ensure . :straight)))
+    (setq leaf-keywords
+          '(:disabled
+            (unless
+                (eval
+                 (car leaf--value))
+              `(,@leaf--body))
+            :leaf-path
+            (if
+                (and leaf--body
+                     (eval
+                      (car leaf--value)))
+                `((leaf-handler-leaf-path ,leaf--name)
+                  ,@leaf--body)
+              `(,@leaf--body))
+            :leaf-protect
+            (if
+                (and leaf--body
+                     (eval
+                      (car leaf--value)))
+                `((leaf-handler-leaf-protect ,leaf--name ,@leaf--body))
+              `(,@leaf--body))
+            :load-path
+            `(,@(mapcar
                  (lambda
                    (elm)
-                   `(unless
-                        (fboundp ',(car elm))
-                      (autoload #',(car elm)
-                        ,(cdr elm)
-                        nil t)))
-                 (reverse leaf--autoload)))
-            ,@leaf--body)
-          :defun
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(declare-function ,(car elm)
-                                    ,(symbol-name
-                                      (cdr elm))))
-               leaf--value)
-            ,@leaf--body)
-          :defvar
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(defvar ,elm))
-               leaf--value)
-            ,@leaf--body)
-          :leaf-defun
-          `(,@(when
-                  (car leaf--value)
-                (mapcar
+                   `(add-to-list 'load-path ,elm))
+                 leaf--value)
+              ,@leaf--body)
+            :load-path*
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(add-to-list 'load-path
+                                 (locate-user-emacs-file ,elm)))
+                 leaf--value)
+              ,@leaf--body)
+            :leaf-autoload
+            `(,@(when
+                    (car leaf--value)
+                  (mapcar
+                   (lambda
+                     (elm)
+                     `(unless
+                          (fboundp ',(car elm))
+                        (autoload #',(car elm)
+                          ,(cdr elm)
+                          nil t)))
+                   (reverse leaf--autoload)))
+              ,@leaf--body)
+            :defun
+            `(,@(mapcar
                  (lambda
                    (elm)
                    `(declare-function ,(car elm)
-                                      ,(cdr elm)))
-                 (reverse leaf--autoload)))
-            ,@leaf--body)
-          :leaf-defvar
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(defvar ,elm))
-               leaf--value)
-            ,@leaf--body)
-          :preface
-          `(,@leaf--value ,@leaf--body)
-          :major-mode-map
-          (let*
-              ((arguments
-                (car leaf--value))
-               name major-modes parent)
-            (cond
-             ((eq arguments t)
-              (setq name leaf--name)
-              (setq major-modes
-                    (list name)))
-             ((symbolp arguments)
-              (setq name arguments)
-              (setq major-modes
-                    (list leaf--name)))
-             ((listp arguments)
-              (setq name
-                    (my-plist-get arguments :name
-                                  (cl-find-if
-                                   (lambda
-                                     (x)
-                                     (and
-                                      (symbolp x)
-                                      (not
-                                       (keywordp x))))
-                                   arguments)))
-              (setq major-modes
-                    (my-plist-get arguments :major-modes
-                                  (or
-                                   (cl-find-if 'listp arguments)
-                                   (list name))))
-              (setq parent
-                    (my-plist-get arguments :parent)))
-             (t
-              (leaf-error "Expected eiter `symbol', t or `list'")))
-            `((eval-after-load 'xah-fly-keys
-                '(my-define-local-major-mode-map ',name ',major-modes ',parent))
-              ,@leaf--body))
-          :when
-          (when leaf--body
-            `((when ,@(if
-                          (= 1
-                             (length leaf--value))
-                          leaf--value
-                        `((and ,@leaf--value)))
-                ,@leaf--body)))
-          :unless
-          (when leaf--body
-            `((unless ,@(if
+                                      ,(symbol-name
+                                        (cdr elm))))
+                 leaf--value)
+              ,@leaf--body)
+            :defvar
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(defvar ,elm))
+                 leaf--value)
+              ,@leaf--body)
+            :leaf-defun
+            `(,@(when
+                    (car leaf--value)
+                  (mapcar
+                   (lambda
+                     (elm)
+                     `(declare-function ,(car elm)
+                                        ,(cdr elm)))
+                   (reverse leaf--autoload)))
+              ,@leaf--body)
+            :leaf-defvar
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(defvar ,elm))
+                 leaf--value)
+              ,@leaf--body)
+            :preface
+            `(,@leaf--value ,@leaf--body)
+            :major-mode-map
+            (let*
+                ((arguments
+                  (car leaf--value))
+                 name major-modes parent)
+              (cond
+               ((eq arguments t)
+                (setq name leaf--name)
+                (setq major-modes
+                      (list name)))
+               ((symbolp arguments)
+                (setq name arguments)
+                (setq major-modes
+                      (list leaf--name)))
+               ((listp arguments)
+                (setq name
+                      (my-plist-get arguments :name
+                                    (cl-find-if
+                                     (lambda
+                                       (x)
+                                       (and
+                                        (symbolp x)
+                                        (not
+                                         (keywordp x))))
+                                     arguments)))
+                (setq major-modes
+                      (my-plist-get arguments :major-modes
+                                    (or
+                                     (cl-find-if 'listp arguments)
+                                     (list name))))
+                (setq parent
+                      (my-plist-get arguments :parent)))
+               (t
+                (leaf-error "Expected eiter `symbol', t or `list'")))
+              `((eval-after-load 'xah-fly-keys
+                  '(my-define-local-major-mode-map ',name ',major-modes ',parent))
+                ,@leaf--body))
+            :when
+            (when leaf--body
+              `((when ,@(if
                             (= 1
                                (length leaf--value))
                             leaf--value
                           `((and ,@leaf--value)))
-                ,@leaf--body)))
-          :if
-          (when leaf--body
-            `((if ,@(if
-                        (= 1
-                           (length leaf--value))
-                        leaf--value
-                      `((and ,@leaf--value)))
-                  (progn ,@leaf--body))))
-          :doc
-          `(,@leaf--body)
-          :req
-          `(,@leaf--body)
-          :tag
-          `(,@leaf--body)
-          :comment
-          `(,@leaf--body)
-          :file
-          `(,@leaf--body)
-          :url
-          `(,@leaf--body)
-          :added
-          `(,@leaf--body)
-          :emacs<
-          (when leaf--body
-            `((when
-                  (version< emacs-version ,leaf--value)
-                ,@leaf--body)))
-          :emacs<=
-          (when leaf--body
-            `((when
-                  (version<= emacs-version ,leaf--value)
-                ,@leaf--body)))
-          :emacs=
-          (when leaf--body
-            `((when
-                  (version= emacs-version ,leaf--value)
-                ,@leaf--body)))
-          :emacs>
-          (when leaf--body
-            `((when
-                  (version< ,leaf--value emacs-version)
-                ,@leaf--body)))
-          :emacs>=
-          (when leaf--body
-            `((when
-                  (version<= ,leaf--value emacs-version)
-                ,@leaf--body)))
-          :package
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(leaf-handler-package ,leaf--name ,(car elm)
-                                        ,(cdr elm)))
-               leaf--value)
-            ,@leaf--body)
-          :feather
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(leaf-handler-package ,leaf--name ,(car elm)
-                                        ,(cdr elm)))
-               leaf--value)
-            (feather-add-after-installed-hook-sexp ,(caar
-                                                     (last leaf--value))
-                                                   ,@leaf--body))
-          :straight
-          `(,@(mapcar (lambda (elm) `(straight-use-package ',(if (eq elm t)
-                                                                 leaf--name
-                                                               elm)))
-                      leaf--value) ,@leaf--body)
-          :el-get
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(el-get-bundle ,@elm))
-               leaf--value)
-            ,@leaf--body)
-          :ensure-system-package
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 (let
-                     ((a
-                       (car elm))
-                      (d
-                       (cdr elm)))
-                   (cond
-                    ((null d)
-                     `(unless
-                          (executable-find ,(symbol-name a))
-                        (system-packages-install ,(symbol-name a))))
-                    ((symbolp d)
-                     `(unless ,(if
-                                   (stringp a)
-                                   `(file-exists-p ,a)
-                                 `(executable-find ,(symbol-name a)))
-                        (system-packages-install ,(symbol-name d))))
-                    ((stringp d)
-                     `(unless ,(if
-                                   (stringp a)
-                                   `(file-exists-p ,a)
-                                 `(executable-find ,(symbol-name a)))
-                        (async-shell-command ,d))))))
-               leaf--value)
-            ,@leaf--body)
-          :after
-          (when leaf--body
-            (let
-                ((ret
-                  `(progn ,@leaf--body)))
-              (dolist
-                  (elm leaf--value)
-                (setq ret
-                      `(eval-after-load ',elm ',ret)))
-              `(,ret)))
-          :commands
-          (progn
-            (leaf-register-autoload leaf--value leaf--name)
-            `(,@leaf--body))
-          :bind
-          (progn
-            (leaf-register-autoload
-             (cadr leaf--value)
-             leaf--name)
-            `((leaf-keys ,(car leaf--value))
-              ,@leaf--body))
-          :bind*
-          (progn
-            (leaf-register-autoload
-             (cadr leaf--value)
-             leaf--name)
-            `((leaf-keys* ,(car leaf--value))
-              ,@leaf--body))
-          :bind-keymap
-          `((leaf-keys-bind-keymap ,(car leaf--value)
-                                   nil ',leaf--name)
-            ,@leaf--body)
-          :bind-keymap*
-          `((leaf-keys-bind-keymap* ,(car leaf--value)
-                                    nil ',leaf--name)
-            ,@leaf--body)
-          :mode
-          (progn
-            (leaf-register-autoload
-             (mapcar #'cdr leaf--value)
-             leaf--name)
+                  ,@leaf--body)))
+            :unless
+            (when leaf--body
+              `((unless ,@(if
+                              (= 1
+                                 (length leaf--value))
+                              leaf--value
+                            `((and ,@leaf--value)))
+                  ,@leaf--body)))
+            :if
+            (when leaf--body
+              `((if ,@(if
+                          (= 1
+                             (length leaf--value))
+                          leaf--value
+                        `((and ,@leaf--value)))
+                    (progn ,@leaf--body))))
+            :doc
+            `(,@leaf--body)
+            :req
+            `(,@leaf--body)
+            :tag
+            `(,@leaf--body)
+            :comment
+            `(,@leaf--body)
+            :file
+            `(,@leaf--body)
+            :url
+            `(,@leaf--body)
+            :added
+            `(,@leaf--body)
+            :emacs<
+            (when leaf--body
+              `((when
+                    (version< emacs-version ,leaf--value)
+                  ,@leaf--body)))
+            :emacs<=
+            (when leaf--body
+              `((when
+                    (version<= emacs-version ,leaf--value)
+                  ,@leaf--body)))
+            :emacs=
+            (when leaf--body
+              `((when
+                    (version= emacs-version ,leaf--value)
+                  ,@leaf--body)))
+            :emacs>
+            (when leaf--body
+              `((when
+                    (version< ,leaf--value emacs-version)
+                  ,@leaf--body)))
+            :emacs>=
+            (when leaf--body
+              `((when
+                    (version<= ,leaf--value emacs-version)
+                  ,@leaf--body)))
+            :package
             `(,@(mapcar
                  (lambda
                    (elm)
-                   `(add-to-list 'auto-mode-alist
-                                 '(,(car elm)
-                                   \,
-                                   (cdr elm))))
+                   `(leaf-handler-package ,leaf--name ,(car elm)
+                                          ,(cdr elm)))
                  leaf--value)
-              ,@leaf--body))
-          :interpreter
-          (progn
-            (leaf-register-autoload
-             (mapcar #'cdr leaf--value)
-             leaf--name)
+              ,@leaf--body)
+            :feather
             `(,@(mapcar
                  (lambda
                    (elm)
-                   `(add-to-list 'interpreter-mode-alist
-                                 '(,(car elm)
-                                   \,
-                                   (cdr elm))))
+                   `(leaf-handler-package ,leaf--name ,(car elm)
+                                          ,(cdr elm)))
                  leaf--value)
-              ,@leaf--body))
-          :magic
-          (progn
-            (leaf-register-autoload
-             (mapcar #'cdr leaf--value)
-             leaf--name)
+              (feather-add-after-installed-hook-sexp ,(caar
+                                                       (last leaf--value))
+                                                     ,@leaf--body))
+            :straight
+            `(,@(mapcar (lambda (elm) `(straight-use-package ',(if (eq elm t)
+                                                                   leaf--name
+                                                                 elm)))
+                        leaf--value) ,@leaf--body)
+            :el-get
             `(,@(mapcar
                  (lambda
                    (elm)
-                   `(add-to-list 'magic-mode-alist
-                                 '(,(car elm)
-                                   \,
-                                   (cdr elm))))
+                   `(el-get-bundle ,@elm))
                  leaf--value)
-              ,@leaf--body))
-          :magic-fallback
-          (progn
-            (leaf-register-autoload
-             (mapcar #'cdr leaf--value)
-             leaf--name)
+              ,@leaf--body)
+            :ensure-system-package
             `(,@(mapcar
                  (lambda
                    (elm)
-                   `(add-to-list 'magic-fallback-mode-alist
-                                 '(,(car elm)
-                                   \,
-                                   (cdr elm))))
+                   (let
+                       ((a
+                         (car elm))
+                        (d
+                         (cdr elm)))
+                     (cond
+                      ((null d)
+                       `(unless
+                            (executable-find ,(symbol-name a))
+                          (system-packages-install ,(symbol-name a))))
+                      ((symbolp d)
+                       `(unless ,(if
+                                     (stringp a)
+                                     `(file-exists-p ,a)
+                                   `(executable-find ,(symbol-name a)))
+                          (system-packages-install ,(symbol-name d))))
+                      ((stringp d)
+                       `(unless ,(if
+                                     (stringp a)
+                                     `(file-exists-p ,a)
+                                   `(executable-find ,(symbol-name a)))
+                          (async-shell-command ,d))))))
                  leaf--value)
-              ,@leaf--body))
-          :hook
-          (progn
-            (leaf-register-autoload
-             (mapcar #'cdr leaf--value)
-             leaf--name)
+              ,@leaf--body)
+            :after
+            (when leaf--body
+              (let
+                  ((ret
+                    `(progn ,@leaf--body)))
+                (dolist
+                    (elm leaf--value)
+                  (setq ret
+                        `(eval-after-load ',elm ',ret)))
+                `(,ret)))
+            :commands
+            (progn
+              (leaf-register-autoload leaf--value leaf--name)
+              `(,@leaf--body))
+            :bind
+            (progn
+              (leaf-register-autoload
+               (cadr leaf--value)
+               leaf--name)
+              `((leaf-keys ,(car leaf--value))
+                ,@leaf--body))
+            :bind*
+            (progn
+              (leaf-register-autoload
+               (cadr leaf--value)
+               leaf--name)
+              `((leaf-keys* ,(car leaf--value))
+                ,@leaf--body))
+            :bind-keymap
+            `((leaf-keys-bind-keymap ,(car leaf--value)
+                                     nil ',leaf--name)
+              ,@leaf--body)
+            :bind-keymap*
+            `((leaf-keys-bind-keymap* ,(car leaf--value)
+                                      nil ',leaf--name)
+              ,@leaf--body)
+            :mode
+            (progn
+              (leaf-register-autoload
+               (mapcar #'cdr leaf--value)
+               leaf--name)
+              `(,@(mapcar
+                   (lambda
+                     (elm)
+                     `(add-to-list 'auto-mode-alist
+                                   '(,(car elm)
+                                     \,
+                                     (cdr elm))))
+                   leaf--value)
+                ,@leaf--body))
+            :interpreter
+            (progn
+              (leaf-register-autoload
+               (mapcar #'cdr leaf--value)
+               leaf--name)
+              `(,@(mapcar
+                   (lambda
+                     (elm)
+                     `(add-to-list 'interpreter-mode-alist
+                                   '(,(car elm)
+                                     \,
+                                     (cdr elm))))
+                   leaf--value)
+                ,@leaf--body))
+            :magic
+            (progn
+              (leaf-register-autoload
+               (mapcar #'cdr leaf--value)
+               leaf--name)
+              `(,@(mapcar
+                   (lambda
+                     (elm)
+                     `(add-to-list 'magic-mode-alist
+                                   '(,(car elm)
+                                     \,
+                                     (cdr elm))))
+                   leaf--value)
+                ,@leaf--body))
+            :magic-fallback
+            (progn
+              (leaf-register-autoload
+               (mapcar #'cdr leaf--value)
+               leaf--name)
+              `(,@(mapcar
+                   (lambda
+                     (elm)
+                     `(add-to-list 'magic-fallback-mode-alist
+                                   '(,(car elm)
+                                     \,
+                                     (cdr elm))))
+                   leaf--value)
+                ,@leaf--body))
+            :hook
+            (progn
+              (leaf-register-autoload
+               (mapcar #'cdr leaf--value)
+               leaf--name)
+              `(,@(mapcar
+                   (lambda
+                     (elm)
+                     `(add-hook ',(car elm)
+                                #',(cdr elm)))
+                   leaf--value)
+                ,@leaf--body))
+            :advice
+            (progn
+              (leaf-register-autoload
+               (cadr leaf--value)
+               leaf--name)
+              `(,@(mapcar
+                   (lambda
+                     (elm)
+                     `(advice-add ,@elm))
+                   (car leaf--value))
+                ,@leaf--body))
+            :advice-remove
+            (progn
+              (leaf-register-autoload
+               (cadr leaf--value)
+               leaf--name)
+              `(,@(mapcar
+                   (lambda
+                     (elm)
+                     `(advice-remove ,@elm))
+                   (car leaf--value))
+                ,@leaf--body))
+            :pre-setq
             `(,@(mapcar
                  (lambda
                    (elm)
-                   `(add-hook ',(car elm)
-                              #',(cdr elm)))
+                   `(setq ,(car elm)
+                          ,(cdr elm)))
                  leaf--value)
-              ,@leaf--body))
-          :advice
-          (progn
-            (leaf-register-autoload
-             (cadr leaf--value)
-             leaf--name)
+              ,@leaf--body)
+            :pre-setf
             `(,@(mapcar
                  (lambda
                    (elm)
-                   `(advice-add ,@elm))
-                 (car leaf--value))
-              ,@leaf--body))
-          :advice-remove
-          (progn
-            (leaf-register-autoload
-             (cadr leaf--value)
-             leaf--name)
-            `(,@(mapcar
-                 (lambda
-                   (elm)
-                   `(advice-remove ,@elm))
-                 (car leaf--value))
-              ,@leaf--body))
-          :pre-setq
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(setq ,(car elm)
-                        ,(cdr elm)))
-               leaf--value)
-            ,@leaf--body)
-          :pre-setf
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(setf ,(car elm)
-                        ,(cdr elm)))
-               leaf--value)
-            ,@leaf--body)
-          :pre-push
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(push ,(cdr elm)
-                        ,(car elm)))
-               leaf--value)
-            ,@leaf--body)
-          :pl-pre-setq
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(setq ,(car elm)
-                        (leaf-handler-auth ,leaf--name ,(car elm)
-                                           ,(cdr elm))))
-               leaf--value)
-            ,@leaf--body)
-          :auth-pre-setq
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(setq ,(car elm)
-                        (leaf-handler-auth ,leaf--name ,(car elm)
-                                           ,(cdr elm))))
-               leaf--value)
-            ,@leaf--body)
-          :custom
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(customize-set-variable ',(car elm)
-                                          ,(cdr elm)
-                                          ,(leaf--create-custom-comment :custom)))
-               leaf--value)
-            ,@leaf--body)
-          :custom*
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(customize-set-variable ',(car elm)
-                                          ,(cdr elm)
-                                          ,(leaf--create-custom-comment :custom*)))
-               leaf--value)
-            ,@leaf--body)
-          :pl-custom
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(customize-set-variable ',(car elm)
-                                          (leaf-handler-auth ,leaf--name ,(car elm)
-                                                             ,(cdr elm))
-                                          ,(leaf--create-custom-comment :pl-custom
-                                                                        (cdr elm))))
-               leaf--value)
-            ,@leaf--body)
-          :auth-custom
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(customize-set-variable ',(car elm)
-                                          (leaf-handler-auth ,leaf--name ,(car elm)
-                                                             ,(cdr elm))
-                                          ,(leaf--create-custom-comment :auth-custom
-                                                                        (cdr elm))))
-               leaf--value)
-            ,@leaf--body)
-          :custom-face
-          `((custom-set-faces ,@(mapcar
-                                 (lambda
-                                   (elm)
-                                   `'(,(car elm)
-                                      ,(car
-                                        (cddr elm))
-                                      nil ,(leaf--create-custom-comment :custom-face)))
-                                 leaf--value))
-            ,@leaf--body)
-          :init
-          `(,@leaf--value ,@leaf--body)
-          :hydra
-          (progn
-            (leaf-register-autoload
-             (cadr leaf--value)
-             leaf--name)
-            `(,@(mapcar
-                 (lambda
-                   (elm)
-                   `(defhydra ,@elm))
-                 (car leaf--value))
-              ,@leaf--body))
-          :mode-hydra
-          (progn
-            (leaf-register-autoload
-             (cadr leaf--value)
-             leaf--name)
-            `(,@(mapcar
-                 (lambda
-                   (elm)
-                   `(major-mode-hydra-define+ ,@elm))
-                 (car leaf--value))
-              ,@leaf--body))
-          :pretty-hydra
-          (progn
-            (leaf-register-autoload
-             (cadr leaf--value)
-             leaf--name)
-            `(,@(mapcar
-                 (lambda
-                   (elm)
-                   `(pretty-hydra-define+ ,@elm))
-                 (car leaf--value))
-              ,@leaf--body))
-          :transient
-          (progn
-            `(,@(mapcar
-                 (lambda
-                   (elm)
-                   `(transient-define-prefix ,@elm))
-                 (car leaf--value))
-              ,@leaf--body))
-          :combo
-          (progn
-            (leaf-register-autoload
-             (cadr leaf--value)
-             leaf--name)
-            `(,@(mapcar
-                 (lambda
-                   (elm)
-                   `(key-combo-define ,@elm))
-                 (car leaf--value))
-              ,@leaf--body))
-          :combo*
-          (progn
-            (leaf-register-autoload
-             (cadr leaf--value)
-             leaf--name)
-            `(,@(mapcar
-                 (lambda
-                   (elm)
-                   `(key-combo-define ,@elm))
-                 (car leaf--value))
-              ,@leaf--body))
-          :smartrep
-          (progn
-            (leaf-register-autoload
-             (cadr leaf--value)
-             leaf--name)
-            `(,@(mapcar
-                 (lambda
-                   (elm)
-                   `(smartrep-define-key ,@elm))
-                 (car leaf--value))
-              ,@leaf--body))
-          :smartrep*
-          (progn
-            (leaf-register-autoload
-             (cadr leaf--value)
-             leaf--name)
-            `(,@(mapcar
-                 (lambda
-                   (elm)
-                   `(smartrep-define-key ,@elm))
-                 (car leaf--value))
-              ,@leaf--body))
-          :chord
-          (progn
-            (leaf-register-autoload
-             (cadr leaf--value)
-             leaf--name)
-            `((leaf-key-chords ,(car leaf--value))
-              ,@leaf--body))
-          :chord*
-          (progn
-            (leaf-register-autoload
-             (cadr leaf--value)
-             leaf--name)
-            `((leaf-key-chords* ,(car leaf--value))
-              ,@leaf--body))
-          :mode-hook
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(leaf-keywords-handler-mode-hook ,leaf--name ,(car elm)
-                                                   ,@(cadr elm)))
-               leaf--value)
-            ,@leaf--body)
-          :require
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(require ',elm))
-               leaf--value)
-            ,@leaf--body)
-          :global-minor-mode
-          (progn
-            (mapc
-             (lambda
-               (elm)
-               (leaf-register-autoload
-                (car elm)
-                (cdr elm)))
-             leaf--value)
-            `(,@(mapcar
-                 (lambda
-                   (elm)
-                   `(,(car elm)
-                     1))
+                   `(setf ,(car elm)
+                          ,(cdr elm)))
                  leaf--value)
-              ,@leaf--body))
-          :delight
-          `(,@(mapcar
+              ,@leaf--body)
+            :pre-push
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(push ,(cdr elm)
+                          ,(car elm)))
+                 leaf--value)
+              ,@leaf--body)
+            :pl-pre-setq
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(setq ,(car elm)
+                          (leaf-handler-auth ,leaf--name ,(car elm)
+                                             ,(cdr elm))))
+                 leaf--value)
+              ,@leaf--body)
+            :auth-pre-setq
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(setq ,(car elm)
+                          (leaf-handler-auth ,leaf--name ,(car elm)
+                                             ,(cdr elm))))
+                 leaf--value)
+              ,@leaf--body)
+            :custom
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(customize-set-variable ',(car elm)
+                                            ,(cdr elm)
+                                            ,(leaf--create-custom-comment :custom)))
+                 leaf--value)
+              ,@leaf--body)
+            :custom*
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(customize-set-variable ',(car elm)
+                                            ,(cdr elm)
+                                            ,(leaf--create-custom-comment :custom*)))
+                 leaf--value)
+              ,@leaf--body)
+            :pl-custom
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(customize-set-variable ',(car elm)
+                                            (leaf-handler-auth ,leaf--name ,(car elm)
+                                                               ,(cdr elm))
+                                            ,(leaf--create-custom-comment :pl-custom
+                                                                          (cdr elm))))
+                 leaf--value)
+              ,@leaf--body)
+            :auth-custom
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(customize-set-variable ',(car elm)
+                                            (leaf-handler-auth ,leaf--name ,(car elm)
+                                                               ,(cdr elm))
+                                            ,(leaf--create-custom-comment :auth-custom
+                                                                          (cdr elm))))
+                 leaf--value)
+              ,@leaf--body)
+            :custom-face
+            `((custom-set-faces ,@(mapcar
+                                   (lambda
+                                     (elm)
+                                     `'(,(car elm)
+                                        ,(car
+                                          (cddr elm))
+                                        nil ,(leaf--create-custom-comment :custom-face)))
+                                   leaf--value))
+              ,@leaf--body)
+            :init
+            `(,@leaf--value ,@leaf--body)
+            :hydra
+            (progn
+              (leaf-register-autoload
+               (cadr leaf--value)
+               leaf--name)
+              `(,@(mapcar
+                   (lambda
+                     (elm)
+                     `(defhydra ,@elm))
+                   (car leaf--value))
+                ,@leaf--body))
+            :mode-hydra
+            (progn
+              (leaf-register-autoload
+               (cadr leaf--value)
+               leaf--name)
+              `(,@(mapcar
+                   (lambda
+                     (elm)
+                     `(major-mode-hydra-define+ ,@elm))
+                   (car leaf--value))
+                ,@leaf--body))
+            :pretty-hydra
+            (progn
+              (leaf-register-autoload
+               (cadr leaf--value)
+               leaf--name)
+              `(,@(mapcar
+                   (lambda
+                     (elm)
+                     `(pretty-hydra-define+ ,@elm))
+                   (car leaf--value))
+                ,@leaf--body))
+            :transient
+            (progn
+              `(,@(mapcar
+                   (lambda
+                     (elm)
+                     `(transient-define-prefix ,@elm))
+                   (car leaf--value))
+                ,@leaf--body))
+            :combo
+            (progn
+              (leaf-register-autoload
+               (cadr leaf--value)
+               leaf--name)
+              `(,@(mapcar
+                   (lambda
+                     (elm)
+                     `(key-combo-define ,@elm))
+                   (car leaf--value))
+                ,@leaf--body))
+            :combo*
+            (progn
+              (leaf-register-autoload
+               (cadr leaf--value)
+               leaf--name)
+              `(,@(mapcar
+                   (lambda
+                     (elm)
+                     `(key-combo-define ,@elm))
+                   (car leaf--value))
+                ,@leaf--body))
+            :smartrep
+            (progn
+              (leaf-register-autoload
+               (cadr leaf--value)
+               leaf--name)
+              `(,@(mapcar
+                   (lambda
+                     (elm)
+                     `(smartrep-define-key ,@elm))
+                   (car leaf--value))
+                ,@leaf--body))
+            :smartrep*
+            (progn
+              (leaf-register-autoload
+               (cadr leaf--value)
+               leaf--name)
+              `(,@(mapcar
+                   (lambda
+                     (elm)
+                     `(smartrep-define-key ,@elm))
+                   (car leaf--value))
+                ,@leaf--body))
+            :chord
+            (progn
+              (leaf-register-autoload
+               (cadr leaf--value)
+               leaf--name)
+              `((leaf-key-chords ,(car leaf--value))
+                ,@leaf--body))
+            :chord*
+            (progn
+              (leaf-register-autoload
+               (cadr leaf--value)
+               leaf--name)
+              `((leaf-key-chords* ,(car leaf--value))
+                ,@leaf--body))
+            :mode-hook
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(leaf-keywords-handler-mode-hook ,leaf--name ,(car elm)
+                                                     ,@(cadr elm)))
+                 leaf--value)
+              ,@leaf--body)
+            :require
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(require ',elm))
+                 leaf--value)
+              ,@leaf--body)
+            :global-minor-mode
+            (progn
+              (mapc
                (lambda
                  (elm)
-                 `(delight ,@elm))
+                 (leaf-register-autoload
+                  (car elm)
+                  (cdr elm)))
                leaf--value)
-            ,@leaf--body)
-          :diminish
-          `((with-eval-after-load ',leaf--name ,@(mapcar
-                                                  (lambda
-                                                    (elm)
-                                                    `(diminish ',(car elm)
-                                                               ,(cdr elm)))
-                                                  leaf--value))
-            ,@leaf--body)
-          :blackout
-          `((with-eval-after-load ',leaf--name ,@(mapcar
-                                                  (lambda
-                                                    (elm)
-                                                    `(blackout ',(car elm)
-                                                               ,(cdr elm)))
-                                                  leaf--value))
-            ,@leaf--body)
-          :grugru
-          `((grugru-define-multiple ,@leaf--value)
-            ,@leaf--body)
-          :fast-exec
-          (let*
-              ((arguments
-                (car leaf--value))
-               (name leaf--name)
-               (bindings
-                (if
-                    (consp
-                     (car arguments))
-                    arguments
-                  (list arguments))))
-            (--each bindings
-              (unless
-                  (eq
+              `(,@(mapcar
+                   (lambda
+                     (elm)
+                     `(,(car elm)
+                       1))
+                   leaf--value)
+                ,@leaf--body))
+            :delight
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(delight ,@elm))
+                 leaf--value)
+              ,@leaf--body)
+            :diminish
+            `((with-eval-after-load ',leaf--name ,@(mapcar
+                                                    (lambda
+                                                      (elm)
+                                                      `(diminish ',(car elm)
+                                                                 ,(cdr elm)))
+                                                    leaf--value))
+              ,@leaf--body)
+            :blackout
+            `((with-eval-after-load ',leaf--name ,@(mapcar
+                                                    (lambda
+                                                      (elm)
+                                                      `(blackout ',(car elm)
+                                                                 ,(cdr elm)))
+                                                    leaf--value))
+              ,@leaf--body)
+            :grugru
+            `((grugru-define-multiple ,@leaf--value)
+              ,@leaf--body)
+            :fast-exec
+            (let*
+                ((arguments
+                  (car leaf--value))
+                 (name leaf--name)
+                 (bindings
+                  (if
+                      (consp
+                       (car arguments))
+                      arguments
+                    (list arguments))))
+              (--each bindings
+                (unless
+                    (eq
+                     (-second-item it)
+                     'quote)
+                  (leaf-register-autoload
                    (-second-item it)
-                   'quote)
-                (leaf-register-autoload
-                 (-second-item it)
-                 leaf--name)))
-            `((progn
-                (fast-exec-bind ',name
-                  (fast-exec-make-some-commands ,@bindings))
-                ,@leaf--body)))
-          :leaf-defer
-          (let*
-              ((eval-after-p
-                (and leaf--body
-                     (eval
-                      (car leaf--value))
-                     (leaf-list-memq leaf-defer-keywords
-                                     (leaf-plist-keys leaf--raw))))
-               (file
-                (leaf-this-file))
-               (let-or-progn
-                (if file
-                    `(let
-                         ((leaf--load-file-name ,file)))
-                  '(progn))))
-            (if eval-after-p
-                `((eval-after-load ',leaf--name
-                    '(,@let-or-progn ,@leaf--body)))
-              `(,@leaf--body)))
-          :aas
-          (let*
-              ((arguments
-                (car leaf--value))
-               (has-special-keymap
-                (and
-                 (symbolp
-                  (car arguments))
-                 (not
-                  (keywordp
-                   (car arguments)))))
-               (keymap
-                (if has-special-keymap
-                    (car arguments)
-                  leaf--name))
-               (bindings
-                (if has-special-keymap
-                    (cdr arguments)
-                  arguments)))
-            `((eval-after-load 'aas
-                '(aas-set-snippets ',keymap ,@bindings))
-              ,@leaf--body))
-          :setq
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(setq ,(car elm)
-                        ,(cdr elm)))
-               leaf--value)
-            ,@leaf--body)
-          :setq-default
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(setq-default ,(car elm)
-                                ,(cdr elm)))
-               leaf--value)
-            ,@leaf--body)
-          :setf
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(setf ,(car elm)
-                        ,(cdr elm)))
-               leaf--value)
-            ,@leaf--body)
-          :push
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(push ,(cdr elm)
-                        ,(car elm)))
-               leaf--value)
-            ,@leaf--body)
-          :pl-setq
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(setq ,(car elm)
-                        (leaf-handler-auth ,leaf--name ,(car elm)
-                                           ,(cdr elm))))
-               leaf--value)
-            ,@leaf--body)
-          :auth-setq
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(setq ,(car elm)
-                        (leaf-handler-auth ,leaf--name ,(car elm)
-                                           ,(cdr elm))))
-               leaf--value)
-            ,@leaf--body)
-          :pl-setq-default
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(setq-default ,(car elm)
-                                (leaf-handler-auth ,leaf--name ,(car elm)
-                                                   ,(cdr elm))))
-               leaf--value)
-            ,@leaf--body)
-          :auth-setq-default
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(setq-default ,(car elm)
-                                (leaf-handler-auth ,leaf--name ,(car elm)
-                                                   ,(cdr elm))))
-               leaf--value)
-            ,@leaf--body)
-          :config
-          `(,@leaf--value ,@leaf--body)
-          :defer-config
-          `((eval-after-load ',leaf--name
-              '(progn ,@leaf--value))
-            ,@leaf--body))))
+                   leaf--name)))
+              `((progn
+                  (fast-exec-bind ',name
+                    (fast-exec-make-some-commands ,@bindings))
+                  ,@leaf--body)))
+            :leaf-defer
+            (let*
+                ((eval-after-p
+                  (and leaf--body
+                       (eval
+                        (car leaf--value))
+                       (leaf-list-memq leaf-defer-keywords
+                                       (leaf-plist-keys leaf--raw))))
+                 (file
+                  (leaf-this-file))
+                 (let-or-progn
+                  (if file
+                      `(let
+                           ((leaf--load-file-name ,file)))
+                    '(progn))))
+              (if eval-after-p
+                  `((eval-after-load ',leaf--name
+                      '(,@let-or-progn ,@leaf--body)))
+                `(,@leaf--body)))
+            :aas
+            (let*
+                ((arguments
+                  (car leaf--value))
+                 (has-special-keymap
+                  (and
+                   (symbolp
+                    (car arguments))
+                   (not
+                    (keywordp
+                     (car arguments)))))
+                 (keymap
+                  (if has-special-keymap
+                      (car arguments)
+                    leaf--name))
+                 (bindings
+                  (if has-special-keymap
+                      (cdr arguments)
+                    arguments)))
+              `((eval-after-load 'aas
+                  '(aas-set-snippets ',keymap ,@bindings))
+                ,@leaf--body))
+            :setq
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(setq ,(car elm)
+                          ,(cdr elm)))
+                 leaf--value)
+              ,@leaf--body)
+            :setq-default
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(setq-default ,(car elm)
+                                  ,(cdr elm)))
+                 leaf--value)
+              ,@leaf--body)
+            :setf
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(setf ,(car elm)
+                          ,(cdr elm)))
+                 leaf--value)
+              ,@leaf--body)
+            :push
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(push ,(cdr elm)
+                          ,(car elm)))
+                 leaf--value)
+              ,@leaf--body)
+            :pl-setq
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(setq ,(car elm)
+                          (leaf-handler-auth ,leaf--name ,(car elm)
+                                             ,(cdr elm))))
+                 leaf--value)
+              ,@leaf--body)
+            :auth-setq
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(setq ,(car elm)
+                          (leaf-handler-auth ,leaf--name ,(car elm)
+                                             ,(cdr elm))))
+                 leaf--value)
+              ,@leaf--body)
+            :pl-setq-default
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(setq-default ,(car elm)
+                                  (leaf-handler-auth ,leaf--name ,(car elm)
+                                                     ,(cdr elm))))
+                 leaf--value)
+              ,@leaf--body)
+            :auth-setq-default
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(setq-default ,(car elm)
+                                  (leaf-handler-auth ,leaf--name ,(car elm)
+                                                     ,(cdr elm))))
+                 leaf--value)
+              ,@leaf--body)
+            :config
+            `(,@leaf--value ,@leaf--body)
+            :defer-config
+            `((eval-after-load ',leaf--name
+                '(progn ,@leaf--value))
+              ,@leaf--body))))
 
-(my-leaf-keywords-init)
+  (my-leaf-keywords-init)
 
-(defun my-flatten-list (lst)
-  "LST of the lists of the lists ... to list of the atom elements.
+  (defun my-flatten-list (lst)
+    "LST of the lists of the lists ... to list of the atom elements.
 
 This is a version of `flatten-list', but it isn't change \\=' to \\='quote."
-  (delete 'quote (flatten-list lst)))
+    (delete 'quote (flatten-list lst))))
 
 
 
@@ -905,6 +906,42 @@ This is a version of `flatten-list', but it isn't change \\=' to \\='quote."
 
 
 ;;; my-projects.el ends here
+;;; my-gcmh.el --- My configuration of `gcmh' -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2023 semenInRussia
+
+;; Author: semenInRussia <hrams205@gmail.com>
+;; Version: 0.1
+;; Homepage: https://github.com/semeninrussia/emacs.el
+
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; My configuration of `gcmh'.
+
+;;; Code:
+
+
+
+
+
+(leaf gcmh
+  :ensure t
+  :global-minor-mode gcmh-mode)
+
+;;; my-gcmh.el ends here
 ;;; my-libs.el --- Some libraries
 
 ;; Copyright (C) 2022 Semen Khramtsov
@@ -1516,7 +1553,7 @@ which should be evaluated"
 ;;; Commentary:
 
 ;; My configuration of `corfu'.  I choose `corfu' over `company' because
-;; `company' have a big load time (about 9 secs on my computer) why `corfu'
+;; `company' have a big load time (about 9 secs on my computer) while `corfu'
 ;; 3 secs
 
 ;;; Code:
@@ -1528,9 +1565,12 @@ which should be evaluated"
 (leaf corfu
   :ensure t
   :global-minor-mode global-corfu-mode
-  :custom ((corfu-auto-prefix . 1)
+  :custom (;; by default 2 but 1 one is better
+           (corfu-auto-prefix . 1)
+           ;; by default to run `corfu' you should press `C-M-kp-begin'
            (corfu-auto . t)
-           (corfu-auto-delay . 0.5)))
+           ;; I don't like 0sec, because it worth for yasnippets
+           (corfu-auto-delay . 0.4)))
 
 (leaf cape
   :ensure t
@@ -1983,7 +2023,7 @@ With prefix arg don't indent."
             :ensure t
             :defun eldoc-box-hover-mode
             :defvar global-eldoc-box-hover-mode
-            :bind ("C-x C-x" . 'eldoc-box-quit-frame)
+            :bind ("C-h C-k" . 'eldoc-box-quit-frame)
             :init (define-global-minor-mode global-eldoc-box-hover-mode
                     eldoc-box-hover-mode
                     (lambda () (eldoc-box-hover-mode 1)))
@@ -2451,7 +2491,14 @@ With prefix arg don't indent."
 
 ;;; Commentary:
 
-;; My configuration of `meow'.
+;; My configuration of `meow'.  `meow' is a modal editing mode for Emacs.
+;; It was inspired by kakoune and has Helix-like key bindings.  I don't love
+;; virgin `meow' (without any configs), because every command is "hardcoded" with
+;; contributers.  For example the keybindings "o" and "O" is hardcoded with Lisp expresion
+;; and jump only around round parentheses, but can also around quotes, double-quotes, symbols,
+;; i think that use `forward-sexp', `backward-sexp' and `mark-sexp' is the better choice.  So
+;; i try to move on `boon': also modal editing mode for Emacs that was created 9 years
+;; ago, while `meow' only 3 and has by 3 times lesser stars on GitHub.
 
 ;;; Code:
 
@@ -2461,14 +2508,16 @@ With prefix arg don't indent."
 
 (leaf meow
   :ensure t
+  :require t
   :defvar (meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
   :defun (my-meow-setup . my-meow)
   :defun (meow-global-mode
           meow-motion-overwrite-define-key
           meow-motion-overwrite-define-key
           meow-leader-define-key
-          meow-normal-define-key)
-  :require t
+          meow-normal-define-key
+          meow-leader-define-keys
+          meow-leader-define-state)
   :custom (meow-use-clipboard . t)
   :bind ("M-." . xref-find-definitions)
   :config
@@ -2536,8 +2585,8 @@ With prefix arg don't indent."
      '("L" . meow-right-expand)
      '("m" . meow-join)
      '("n" . meow-search)
-     '("o" . meow-block)
-     '("O" . meow-to-block)
+     '("o" . meow-to-block)
+     '("o" . embark-act)
      '("p" . meow-yank)
      '("P" . meow-yank-pop)
      '("q" . meow-quit)
@@ -2558,10 +2607,13 @@ With prefix arg don't indent."
      '("z" . meow-pop-selection)
      '("Z" . meow-comment)
      '("'" . repeat)
-     '(">" . meow-find-ref)
+     '("%" . meow-query-replace-regexp)
      '("<escape>" . ignore)))
   (my-meow-setup)
   (meow-global-mode t))
+
+
+
 
 
 
@@ -2773,11 +2825,7 @@ EOB - is `end-of-buffer'"
   :bind (:smartparens-mode-map
          ("C-c C-w" . 'sp-splice-sexp-killing-backward)
          ("C-x C-y" . 'my-sp-clone)
-         ("C-c DEL" . 'sp-change-enclosing)
-         ("C-M-."   . 'sp-forward-slurp-sexp)
-         ("C-M-,"   . 'sp-forward-barf-sexp)
-         ("C-M->"   . 'sp-backward-slurp-sexp)
-         ("C-M-<"   . 'sp-backward-barf-sexp))
+         ("C-c DEL" . 'sp-change-enclosing))
   :config
   (sp-use-paredit-bindings)
   (defun my-sp-clone ()
@@ -4163,12 +4211,14 @@ WIDTH is the amount of characters that will be located within display"
 (add-hook 'LaTeX-mode-hook 'my-latex-expansion-mode)
 (add-hook 'LaTeX-mode-hook 'my-latex-disable-auto-fill)
 
-(leaf latex
+
+(leaf auctex
   :ensure auctex
-  :mode ("\\.tex$" . latex-mode)
-  :defun (((my-latex-command-left-paren my-latex-command-left-paren-regexp)
-           . my-latex)
-          ((er/mark-LaTeX-math er/mark-LaTeX-inside-environment)
+  :mode ("\\.tex$" . latex-mode))
+
+
+(leaf tex-mode
+  :defun (((er/mark-LaTeX-math er/mark-LaTeX-inside-environment)
            . expand-region)
           (latex-complete-envnames . tex-mode)
           ((LaTeX-current-environment
@@ -4179,13 +4229,15 @@ WIDTH is the amount of characters that will be located within display"
             LaTeX-mark-section)
            . latex))
   :custom (TeX-master . nil)
-  :bind (:LaTeX-mode-map
+  :bind (:latex-mode-map
+         :package tex-mode
          ("C-c C-@"  . my-latex-mark-inside-environment-or-math)
          ("C-c C-\\" . my-latex-equation-to-split)
          ("C-c C-w"  . my-latex-kill-section))
   :config                               ;nofmt
   (leaf xenops
     :hook LaTeX-mode-hook
+    :after tex-mode
     :ensure t
     :custom (xenops-math-image-scale-factor . 2))
 
@@ -4193,41 +4245,42 @@ WIDTH is the amount of characters that will be located within display"
     :load-path* "lisp/languages/latex/"
     :hook (LaTeX-mode-hook . my-latex-expansion-mode))
 
-  (leaf yasnippet
-    :bind (:yas-keymap
-           ("<tab>" . yas-next-field-or-cdlatex)
-           ("TAB"   . yas-next-field-or-cdlatex))
-    :config                             ;nofmt
-    (require 'calc-lang)
-    (require 'font-latex)
+  ;; (leaf yasnippet
+  ;;   :bind (:yas-keymap
+  ;;          ("<tab>" . yas-next-field-or-cdlatex)
+  ;;          ("TAB"   . yas-next-field-or-cdlatex))
+  ;;   :disabled t
+  ;;   :config                             ;nofmt
+  ;;   (require 'calc-lang)
+  ;;   (require 'font-latex)
 
-    (defun cdlatex-in-yas-field ()
-      (when-let* ((_ (overlayp yas--active-field-overlay))
-                  (end (overlay-end yas--active-field-overlay)))
-        (if (>= (point) end)
-            (let ((s (thing-at-point 'sexp)))
-              (unless (and s
-                           (assoc
-                            (substring-no-properties s)
-                            cdlatex-command-alist-comb))
-                (yas-next-field-or-maybe-expand)
-                t))
-          (let (cdlatex-tab-hook minp)
-            (setq minp
-                  (min
-                   (save-excursion (cdlatex-tab) (point))
-                   (overlay-end yas--active-field-overlay)))
-            (goto-char minp)
-            t))))
+  ;;   (defun cdlatex-in-yas-field ()
+  ;;     (when-let* ((_ (overlayp yas--active-field-overlay))
+  ;;                 (end (overlay-end yas--active-field-overlay)))
+  ;;       (if (>= (point) end)
+  ;;           (let ((s (thing-at-point 'sexp)))
+  ;;             (unless (and s
+  ;;                          (assoc
+  ;;                           (substring-no-properties s)
+  ;;                           cdlatex-command-alist-comb))
+  ;;               (yas-next-field-or-maybe-expand)
+  ;;               t))
+  ;;         (let (cdlatex-tab-hook minp)
+  ;;           (setq minp
+  ;;                 (min
+  ;;                  (save-excursion (cdlatex-tab) (point))
+  ;;                  (overlay-end yas--active-field-overlay)))
+  ;;           (goto-char minp)
+  ;;           t))))
 
-    (defun yas-next-field-or-cdlatex nil
-      "Jump to the next Yas field correctly with cdlatex active."
-      (interactive)
-      (if (or
-           (bound-and-true-p cdlatex-mode)
-           (bound-and-true-p org-cdlatex-mode))
-          (cdlatex-tab)
-        (yas-next-field-or-maybe-expand))))
+  ;;   (defun yas-next-field-or-cdlatex nil
+  ;;     "Jump to the next Yas field correctly with cdlatex active."
+  ;;     (interactive)
+  ;;     (if (or
+  ;;          (bound-and-true-p cdlatex-mode)
+  ;;          (bound-and-true-p org-cdlatex-mode))
+  ;;         (cdlatex-tab)
+  ;;       (yas-next-field-or-maybe-expand))))
 
   (defun my-latex-mark-inside-environment-or-math ()
     "If the cursor place inside of the math environment mark that."
@@ -4257,28 +4310,25 @@ WIDTH is the amount of characters that will be located within display"
 
   (leaf cdlatex
     :ensure t
-    :defvar cdlatex-tab-hook
-    :hook ((cdlatex-tab-hook . yas-expand)
-           (cdlatex-tab-hook . cdlatex-in-yas-field)
-           (LaTeX-mode-hook  . turn-on-cdlatex))
+    :hook (LaTeX-mode-hook  . turn-on-cdlatex)
     :bind (:cdlatex-mode-map
            ("<tab>" . cdlatex-tab)
-           (";" . my-latex-dollar)
-           ("(" .  self-insert-command)
-           (")" .  self-insert-command)
-           ("{" .  self-insert-command)
-           ("}" .  self-insert-command)
-           ("[" .  self-insert-command)
-           ("]" .  self-insert-command)
-           ("\"" . self-insert-command)
-           ("\\" . self-insert-command))
-    ;; fields
+           (";" . my-latex-dollar))
     :custom (cdlatex-math-modify-alist
              .
              '((?q "\\sqrt" nil t nil nil)
                (?u "\\breve" "\\uline" t nil nil)
                (?v "\\vec" nil t nil nil)))
-    :config                             ;nofmt
+    :config
+    (define-key cdlatex-mode-map "(" nil)
+    (define-key cdlatex-mode-map ")" nil)
+    (define-key cdlatex-mode-map "{" nil)
+    (define-key cdlatex-mode-map "}" nil)
+    (define-key cdlatex-mode-map "[" nil)
+    (define-key cdlatex-mode-map "]" nil)
+    (define-key cdlatex-mode-map "\"" nil)
+    (define-key cdlatex-mode-map "\\" nil)
+
     (defun my-latex-dollar ()
       "Insert dollars and turn input method into English."
       (interactive)
@@ -4292,162 +4342,37 @@ WIDTH is the amount of characters that will be located within display"
             (sp-wrap-with-pair "$")
           (sp-insert-pair "$")))))
 
-  (leaf embrace
-    :after (embrace cdlatex)
-    :defun (embrace-build-help embrace-add-pair-regexp)
-    :hook ((LaTeX-mode-hook . embrace-LaTeX-mode-hook)
-           (LaTeX-mode-hook . my-embrace-LaTeX-mode-hook))
-    :config                             ;nofmt
-    (defun my-embrace-LaTeX-mode-hook ()
-      "My additional `embrace-LaTeX-mode-hook'."
-      (interactive)
-      (setq-local embrace-show-help-p nil)
-      (--each
-          (-concat cdlatex-math-modify-alist-default
-                   cdlatex-math-modify-alist)
-        (my-embrace-add-paren-of-cdlatex-math it))
-      (my-embrace-add-paren-latex-command ?a "answer")
-      (embrace-add-pair-regexp ?\\
-                               (rx "\\"
-                                   (1+ wordchar)
-                                   (* space)
-                                   (? "[" (*? any) "]" (* space))
-                                   "{")
-                               "}"
-                               'my-embrace-with-latex-command
-                               (embrace-build-help "\\name{" "}"))
-      (embrace-add-pair-regexp ?d
-                               "\\\\left."
-                               "\\\\right."
-                               'my-embrace-with-latex-left-right
-                               (embrace-build-help
-                                "\\left(" "\\right)"))
-      (embrace-add-pair-regexp
-       ?e
-       "\\\\begin{\\(.*?\\)}\\(\\[.*?\\]\\)*"
-       "\\\\end{\\(.*?\\)}"
-       'my-embrace-with-latex-env
-       (embrace-build-help "\\begin{name}" "\\end{name}")
-       t))
-
-    (defun my-embrace-add-paren-of-cdlatex-math (element)
-      "Add an ELEMENT of the `cdlatex-math-modify-alist' to the `embrace' parens."
-      (let* ((key (-first-item element))
-             (cmd
-              (s-chop-prefix
-               "\\"
-               (or (-third-item element) (-second-item element))))
-             (type (-fourth-item element)))
-        (if type
-            (my-embrace-add-paren-latex-command key cmd)
-          (my-embrace-add-paren-latex-style-command key cmd))))
-
-    (defun my-embrace-add-paren-latex-command (key name)
-      "Add paren at KEY for the LaTeX command with NAME in `embrace'."
-      (embrace-add-pair-regexp
-       key
-       (my-latex-command-left-paren-regexp name)
-       "}"
-       (-const (cons (my-latex-command-left-paren name) "}"))
-       (embrace-build-help (my-latex-command-left-paren name) "}")))
-
-    (defun my-latex-command-left-paren (name)
-      "Return paren right of the LaTeX command named NAME."
-      (s-concat "\\" name "{"))
-
-    (defun my-latex-command-left-paren-regexp (name)
-      (rx "\\"
-          (literal name)
-          (* space)
-          (? "[" (*? any) "]" (* space))
-          "{"))
-
-    (defun my-embrace-add-paren-latex-style-command (key name)
-      "Add paren at KEY for the style LaTeX command with NAME in `embrace'."
-      (embrace-add-pair-regexp key
-                               (my-latex-style-command-left-paren-regexp name)
-                               "}"
-                               (-const
-                                (cons
-                                 (my-latex-style-command-left-paren name)
-                                 "}"))
-                               (embrace-build-help
-                                (my-latex-style-command-left-paren name)
-                                "}")))
-
-    (defun my-latex-style-command-left-paren (name)
-      "Return paren right of the LaTeX command named NAME."
-      (s-concat "{\\" name " "))
-
-    (defun my-latex-style-command-left-paren-regexp (name)
-      (rx "{" (* space) "\\" (literal name) (* space)))
-
-    (defun my-embrace-with-latex-command ()
-      "Return pair from the left and right pair for a LaTeX command."
-      (let ((name (read-string "Name of a LaTeX command, please: ")))
-        (cons (s-concat "\\" name "{") "}")))
-
-    (defun my-embrace-with-latex-left-right ()
-      "Return pair from the left and right pair for the LaTeX command \\left."
-      (cons
-       (s-concat "\\left" (read-char "Left paren, please: "))
-       (s-concat "\\right" (read-char "Right paren, please: "))))
-
-    (defun my-embrace-with-latex-env ()
-      "Return pair from the left and right pair for the LaTeX command \\left."
-      (let ((env
-             (read-string "Name of the environment, please: "
-                          (latex-complete-envnames))))
-        (cons
-         (s-concat "\\begin{" env "}")
-         (s-concat "\\end{" env "}")))))
+  (leaf my-latex-embrace
+    :after embrace
+    :defun my-embrace-LaTeX-mode-hook
+    :defun (embrace-LaTeX-mode-hook . embrace)
+    :config
+    (add-hook 'LaTeX-mode-hook #'embrace-LaTeX-mode-hook)
+    (add-hook 'LaTeX-mode-hook #'my-embrace-LaTeX-mode-hook)
+    (when (eq major-mode 'latex-mode)
+      (embrace-LaTeX-mode-hook)
+      (my-embrace-LaTeX-mode-hook)))
 
   (leaf smartparens-latex
     :after smartparens
-    :config                             ;nofmt
-    (sp-with-modes
-        '(tex-mode plain-tex-mode latex-mode LaTeX-mode)
-      (sp-local-pair " ``"
-                     "''"
-                     :trigger "\""
-                     :unless '(sp-latex-point-after-backslash sp-in-math-p)
-                     :post-handlers '(sp-latex-skip-double-quote))
-      (sp-local-pair " \"<"
-                     "\">"
-                     :trigger "<"
-                     :unless '(sp-latex-point-after-backslash sp-in-math-p))))
+    :require t)
 
   (leaf latex-extra
     :ensure t
     :hook ((LaTeX-mode-hook . latex-extra-mode)
            (LaTeX-mode-hook . visual-line-mode))
-    :bind (:LaTeX-mode-map
-           :package tex
+    :bind (:latex-mode-map
+           :package tex-mode
            ("C-c C-c" . latex/compile-commands-until-done)
            ("C-c C-n" . latex/next-section-same-level)
            ("C-c C-p" . latex/previous-section-same-level)))
 
-  ;; (leaf company-math
-  ;;   :ensure t
-  ;;   :hook (LaTeX-mode-hook . my-company-math-setup)
-  ;;   :config                             ;nofmt
-  ;;   (defun my-company-math-setup ()
-  ;;     "Setup for `company-math'."
-  ;;     (add-to-list 'company-backends 'company-math-symbols-latex)
-  ;;     (add-to-list 'company-backends 'company-latex-commands)))
-
-  ;; (leaf company-auctex
-  ;;   :ensure t
-  ;;   :require t
-  ;;   :defun company-auctex-init
-  ;;   :after auctex
-  ;;   :config (company-auctex-init))
-
-  (leaf my-latex-math-spaces :hook latex-mode)
+  (leaf my-latex-math-spaces
+    :hook latex-mode)
 
   (leaf latex-r
     :load-path "~/projects/latex-r"
-    :bind (:LaTeX-mode-map
+    :bind (:latex-mode-map
            :package latex
            ("C-c M-n" . 'latex-r-cycle-math-parens)
            ("C-c C-s" . 'latex-r-split-environment)))
@@ -4736,16 +4661,22 @@ See `imenu-generic-expression'"
 
 
 
-(declare-function meow-insert "meow-command.el")
-(declare-function aas-set-snippets "aas.el")
-(declare-function my-org-list-item-p "my-org.el")
-(declare-function my-org-properties-end-p "my-org.el")
-(declare-function my-org-heading-p "my-org.el")
-(declare-function my-autoformat-bind-for-major-mode "my-autoformat.el")
+(defvar org-mode-hook)
+
+(add-hook 'org-mode-hook 'visual-fill)
+(add-hook 'org-mode-hook 'visual-line-mode)
+(add-hook 'org-mode-hook 'aas-activate-for-major-mode)
+
 
 (leaf org
   :ensure t
   :defun ((transient-define-prefix . transient)
+          (my-autoformat-bind-for-major-mode . my-autoformat)
+          (my-org-heading-p . my-org)
+          (my-org-properties-end-p . my-org)
+          (my-org-list-item-p . my-org)
+          (aas-set-snippets . aas)
+          (meow-insert . meow-command)
           (my-org-keywords . my-org)
           (my-org-skip-backward-keyword . my-org)
           (embrace-org-mode-hook . my-org)
@@ -4764,8 +4695,7 @@ See `imenu-generic-expression'"
   :defvar (my-org-list-item-prefix-regexp
            my-org-keywords)
   :hook ((org-mode-hook . org-cdlatex-mode))
-  :bind (("<f5>" . org-ctrl-c-ctrl-c)
-         ("C-c c" . org-capture)
+  :bind (("C-c c" . org-capture)
          (:org-mode-map
           ;; Insert anything
           ("C-c M-i"   . my-org-insert-image)
@@ -4776,7 +4706,7 @@ See `imenu-generic-expression'"
           ;; heading => plain text
           ;; 8 is * without shift
           ("C-c C-M-w"   . my-org-clear-subtree)
-          ([tab] . org-refile)
+          ("C-c tab" . org-refile)
           ("C-c C-t"   . my-org-todo)
           ("C-c C-j"   . org-id-get-create)))
   ;; the following code should add some auto activating snippets, for example,
@@ -4788,10 +4718,7 @@ See `imenu-generic-expression'"
         "misc " "miscellaneous"
         "Misc " "Miscellaneous"
         "iau" "I am use")
-  :config                               ;nofmt
-  (add-hook 'org-mode-hook 'visual-fill)
-  (add-hook 'org-mode-hook 'visual-line-mode)
-  (add-hook 'org-mode-hook 'aas-activate-for-major-mode)
+  :config
   (leaf my-org-editing
     :commands (my-org-clear-subtree
                my-org-clear-subtree
@@ -4803,7 +4730,16 @@ See `imenu-generic-expression'"
                my-org-todo
                my-org-todo))
 
-  (leaf xenops :ensure t :hook org-mode-hook)
+  (leaf xenops
+    :ensure t
+    :after org
+    :hook org-mode-hook)
+
+  (leaf cdlatex
+    :ensure t
+    :require t)
+
+  (defun doom-docs-org-mode () (interactive))
 
   (leaf my-org-autoformat
     :config                             ;nofmt
@@ -5018,6 +4954,7 @@ demotes a first letter after keyword word."
 
   (leaf consult
     :bind (:org-mode-map
+           :package org
            ([remap consult-imenu] . consult-outline)))
 
   ;; I am bind the command `org-export' with \"SPC l e\" in the root `leaf'
@@ -5083,20 +5020,24 @@ produced."
       (embrace-org-mode-hook)
       (setq-local embrace-show-help-p nil)))
 
-  (leaf org-table-sticky-header :ensure t :hook org-mode-hook)
-  (leaf org-autolist :ensure t :hook org-mode-hook)
+  (leaf org-table-sticky-header
+    :ensure t
+    :hook org-mode-hook)
 
-  ;; (leaf rorg
-  ;;   :load-path "~/projects/rorg/"
-  ;;   :bind (:org-mode-map
-  ;;          :package org
-  ;;          ("C-c C-x C-x" . rorg-splice-subtree)
-  ;;          ("C-c C-0" . rorg-wrap-region-or-current-heading)
-  ;;          ("C-c C-{" . rorg-forward-slurp-subtree)
-  ;;          ("C-c C-}" . rorg-backward-barf-subtree)
-  ;;          ("{" . rorg-backward-slurp-subtree)
-  ;;          ("[" . rorg-forward-barf-subtree))
-  ;;   )
+  (leaf org-autolist
+    :ensure t
+    :hook org-mode-hook)
+
+  (leaf rorg
+    :load-path "~/projects/rorg/"
+    :bind (:org-mode-map
+           :package org
+           ("C-c C-x C-x" . rorg-splice-subtree)
+           ("C-c C-0" . rorg-wrap-region-or-current-heading)
+           ("C-c C-{" . rorg-forward-slurp-subtree)
+           ("C-c C-}" . rorg-backward-barf-subtree)
+           ("{" . rorg-backward-slurp-subtree)
+           ("[" . rorg-forward-barf-subtree)))
 
   (leaf my-org-drag
     :defun ((add-right-dragger
@@ -6881,6 +6822,7 @@ Format of time is the list form the hours, minutes, seconds and zero?"
 
 
 
+
 (leaf prog-mode :hook (LaTeX-mode-hook . prettify-symbols-mode))
 
 
@@ -7110,10 +7052,9 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
 
 ;;; Commentary:
 
-;; My config for `consult'
+;; My config for `consult'.
 
 ;;; Code:
-
 
 
 
@@ -7135,13 +7076,9 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
 
 (leaf consult
   :ensure t
-  :defun ((consult-register-format
-           consult-register-window
-           consult-xref
-           ;; for my consult-ripgrep
-           consult--grep
-           consult--ripgrep-make-builder)
-          ((project-current project-root) . project))
+  :defun (consult-register-format
+          consult-register-window
+          consult-xref)
   :defvar (consult-narrow-key consult-project-function)
   :bind (:minibuffer-local-map
          ("M-s" . consult-history) ;; orig. next-matching-history-element
@@ -7171,9 +7108,7 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
          ("M-s k" . consult-keep-lines)
          ("M-s u" . consult-focus-lines)
          ;; Isearch integration
-         ("M-s e" . consult-isearch-history)
-         ;; Minibuffer history
-         )
+         ("M-s e" . consult-isearch-history))
   :custom ((register-preview-delay  . 0.5)
            (register-preview-function . #'consult-register-format))
   :hook ((completion-list-mode-hook . consult-preview-at-point-mode))
@@ -7191,6 +7126,7 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
     :custom ((xref-show-xrefs-function . #'consult-xref)
              (xref-show-definitions-function . #'consult-xref)))
 
+  ;; more fast way to search things inside `completing-read'
   (leaf orderless
     :ensure t
     :require t
@@ -7201,14 +7137,6 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
     :global-minor-mode marginalia-mode)
 
   (leaf embark-consult :ensure t)
-
-  (leaf embark
-    :ensure t
-    :bind (:minibuffer-mode-map
-           :package vertico
-           ("M-." . embark-act)
-           ([remap write-file] . embark-export)
-           ([remap save-buffer] . embark-collect)))
 
   (defvar string-width 0)
 
@@ -7344,6 +7272,71 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
 
 
 ;;; my-devdocs.el ends here
+;;; my-embark.el --- My configuration of `embark' -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2023 semenInRussia
+
+;; Author: semenInRussia <hrams205@gmail.com>
+;; Version: 0.1
+;; Homepage: https://github.com/semeninrussia/emacs.el
+
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; My configuration of `embark'.
+
+;;; Code:
+
+
+
+
+
+;; TODO: put it to other more right place
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+
+
+(leaf embark
+  :ensure t
+  :bind (("C-." . embark-act)
+         ("C-M-." . embark-act-dwim)
+         (:minibuffer-mode-map
+          :package minibuffer           ; built-in
+          ("C-," . my-embark-act-noexit)
+          ("C-<" . my-embark-act-all-noexit)
+          ("C->" . embark-act-all)
+          ([remap write-file] . embark-export)
+          ([remap save-buffer] . embark-collect)))
+
+  :config
+
+  (defun my-embark-act-noexit ()
+    "Do `embark-act' without exit from the minibuffer."
+    (interactive)
+    (let ((embark-quit-after-action nil))
+      (call-interactively #'embark-act)))
+
+  (defun my-embark-act-all-noexit ()
+    "Do `embark-act-all' without exit from the minibuffer."
+    (interactive)
+    (let ((embark-quit-after-action nil))
+      (call-interactively #'embark-act-all))))
+
+
+
+;;; my-embark.el ends here
 ;;; my-eshell.el --- My configuration of `eshell' -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022 semenInRussia
@@ -8567,6 +8560,7 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
    "package-management/my-straight.el"
    "package-management/my-leaf.el"
    "package-management"
+   "misc/my-gcmh.el"
    "my-libs.el"
    "my-lib.el"
    "editing"
@@ -8584,14 +8578,28 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
 (defun my-build-config ()
   "Build my config."
   (interactive)
-  (my-join-modules-into-modules.el)
-  (byte-compile-file my-modules-el-file))
+  (let ((default-directory (file-name-directory my-modules-el-file))
+        (compiled-file (concat my-modules-el-file "c")))
+    (message "Join config files...")
+    (my-join-modules-into-modules.el)
+    (print " done")
+
+    (when (file-exists-p compiled-file)
+      (delete-file compiled-file))
+
+    (message "Byte-compile my-modules.el...")
+    (byte-compile-file my-modules-el-file)
+    (print "done and start native-compile")
+
+    (native-compile-async (list my-modules-el-file))))
 
 (defun my-file-igored-as-module-p (filename)
   "Return non-nil if a module at FILENAME can't be a configuration module."
-  (cl-some
-   (lambda (regexp) (string-match-p regexp filename))
-   my-modules-files-ignore-regexps))
+  (or
+   (not (string-suffix-p ".el" filename))
+   (cl-some
+    (lambda (regexp) (string-match-p regexp filename))
+    my-modules-files-ignore-regexps)))
 
 (defmacro my-remove-from (var elt)
   "Remove an ELT from the list at VAR.
@@ -8601,7 +8609,6 @@ The same to
 
 (defun my-all-modules-files ()
   "Return list of all modules filenames using `my-modules-order'."
-  (interactive "P")
   (let ((order (mapcar
                 (lambda (it) (concat my-config-modules-prefix it))
                 my-modules-order))
@@ -8618,7 +8625,8 @@ The same to
        ((file-directory-p order-item)
         (setq sorted
               (append sorted (cl-remove-if
-                              (lambda (f) (member f sorted))
+                              (lambda (f) (or (my-file-igored-as-module-p f)
+                                              (member f sorted)))
                               (directory-files-recursively order-item ".el$")))))
        (t
         (setq sorted (append sorted (list order-item))))))
