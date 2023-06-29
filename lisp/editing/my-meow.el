@@ -21,7 +21,14 @@
 
 ;;; Commentary:
 
-;; My configuration of `meow'.
+;; My configuration of `meow'.  `meow' is a modal editing mode for Emacs.
+;; It was inspired by kakoune and has Helix-like key bindings.  I don't love
+;; virgin `meow' (without any configs), because every command is "hardcoded" with
+;; contributers.  For example the keybindings "o" and "O" is hardcoded with Lisp expresion
+;; and jump only around round parentheses, but can also around quotes, double-quotes, symbols,
+;; i think that use `forward-sexp', `backward-sexp' and `mark-sexp' is the better choice.  So
+;; i try to move on `boon': also modal editing mode for Emacs that was created 9 years
+;; ago, while `meow' only 3 and has by 3 times lesser stars on GitHub.
 
 ;;; Code:
 
@@ -30,14 +37,16 @@
 
 (leaf meow
   :ensure t
+  :require t
   :defvar (meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
   :defun (my-meow-setup . my-meow)
   :defun (meow-global-mode
           meow-motion-overwrite-define-key
           meow-motion-overwrite-define-key
           meow-leader-define-key
-          meow-normal-define-key)
-  :require t
+          meow-normal-define-key
+          meow-leader-define-keys
+          meow-leader-define-state)
   :custom (meow-use-clipboard . t)
   :bind ("M-." . xref-find-definitions)
   :config
@@ -105,8 +114,8 @@
      '("L" . meow-right-expand)
      '("m" . meow-join)
      '("n" . meow-search)
-     '("o" . meow-block)
-     '("O" . meow-to-block)
+     '("o" . meow-to-block)
+     '("o" . embark-act)
      '("p" . meow-yank)
      '("P" . meow-yank-pop)
      '("q" . meow-quit)
@@ -127,10 +136,12 @@
      '("z" . meow-pop-selection)
      '("Z" . meow-comment)
      '("'" . repeat)
-     '(">" . meow-find-ref)
+     '("%" . meow-query-replace-regexp)
      '("<escape>" . ignore)))
   (my-meow-setup)
   (meow-global-mode t))
+
+(require 'my-meow-structural)
 
 (provide 'my-meow)
 ;;; my-meow.el ends here
