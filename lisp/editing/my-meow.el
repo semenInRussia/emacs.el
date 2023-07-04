@@ -29,6 +29,7 @@
 ;; i think that use `forward-sexp', `backward-sexp' and `mark-sexp' is the better choice.  So
 ;; i try to move on `boon': also modal editing mode for Emacs that was created 9 years
 ;; ago, while `meow' only 3 and has by 3 times lesser stars on GitHub.
+;; I try to fight with it using my own structural state (see `my-structural')
 
 ;;; Code:
 
@@ -38,7 +39,10 @@
 (leaf meow
   :ensure t
   :require t
-  :defvar (meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+  :require my-meow-structural
+  :defvar (meow-cheatsheet-layout
+           meow-cheatsheet-layout-qwerty
+           meow-replace-state-name-list)
   :defun (my-meow-setup . my-meow)
   :defun (meow-global-mode
           meow-motion-overwrite-define-key
@@ -48,7 +52,6 @@
           meow-leader-define-keys
           meow-leader-define-state)
   :custom (meow-use-clipboard . t)
-  :bind ("M-." . xref-find-definitions)
   :config
   (defun my-meow-setup ()
     (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
@@ -139,9 +142,21 @@
      '("%" . meow-query-replace-regexp)
      '("<escape>" . ignore)))
   (my-meow-setup)
-  (meow-global-mode t))
+  (meow-global-mode t)
 
-(require 'my-meow-structural)
+  ;; settings show of `meow' state in modeline
+  ;;
+  ;; I prefer more short names of states
+  ;; , so NORMAL => N
+  ;;      BEACON => B
+  ;;      and etc
+  (setq meow-replace-state-name-list
+        '((structural . "S") ;; structural is my own state
+          (normal . "N")
+          (motion . "M")
+          (keypad . "K")
+          (insert . "I")
+          (beacon . "B"))))
 
 (provide 'my-meow)
 ;;; my-meow.el ends here
