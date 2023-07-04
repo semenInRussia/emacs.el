@@ -40,23 +40,24 @@
   :group 'my
   :type '(repeat major-mode))
 
-;; `eglot' use `flymake' instead of `flycheck', so i disable `flycheck'
-(add-hook 'eglot-connect-hook #'turn-off-flycheck)
-
-
 (leaf eglot
   :custom `((eglot-send-changes-idle-time . 1) ; in seconds
-            )
+            (eglot--executable-find . "C:\\tools\\find.exe"))
+
   :custom-face (eglot-highlight-symbol-face . '((t (:inherit lazy-highlight))))
-  :bind (("C-c lr" . 'eglot-rename)
+  :bind (:eglot-mode-map
+         ("C-c lr" . 'eglot-rename)
          ("<f6>"   . 'eglot-rename)
          ("C-c la"  . 'eglot-code-actions)
-         (:eglot-mode-map
-          ([remap my-format-expression] . 'eglot-format)))
+         ("C-c ll"  . 'eglot-code-actions)
+         ([remap my-format-expression] . 'eglot-format))
   :fast-exec (("Start a LSP Server for Current Buffer" 'eglot)
               ("Reconnect the LSP Server" 'eglot-reconnect)
               ("Disable the LSP Server" 'eglot-shutdown))
   :config                               ;nofmt
+  ;; `eglot' use `flymake' instead of `flycheck', so i disable `flycheck'
+  (add-hook 'eglot-managed-mode-hook #'turn-off-flycheck)
+
   (leaf flymake
     :require t
     :bind (:flymake-mode-map
