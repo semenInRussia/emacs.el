@@ -99,5 +99,21 @@
     (with-eval-after-load 'marginalia
       (add-to-list 'marginalia-prompt-categories '("recipe\\|package" . straight)))))
 
+;; support of agnifize.el: my small Emacs package
+(leaf agnifize
+  :bind ((:embark-file-map
+          :package embark
+          ("Q" . 'agnifize-file))
+         (:embark-buffer-map
+          :package embark
+          ("Q" . 'agnifize-buffer))
+         (:embark-region-map
+          :package embark
+          ("Q" . 'agnifize-region))))
+
+;; a = "djeidje "
+;; name = "Semen"
+
+
 (provide 'my-embark)
 ;;; my-embark.el ends here
