@@ -35,14 +35,30 @@
                    :repo "minad/vertico"
                    :files ("*.el" "extensions/*.el"))
   :global-minor-mode vertico-mode
-  :init
+  :config
+  ;; I press `M-delete' to go the up directory inside of `vertico'
   (leaf vertico-directory
     :bind (:vertico-map
            :package vertico
-           ("RET" . vertico-directory-enter)
+           ;; instead I press TAB
+           ;; ("RET" . vertico-directory-enter)
            ("DEL" . vertico-directory-delete-char)
-           ("M-DEL" . vertico-directory-delete-word))))
+           ("M-DEL" . vertico-directory-delete-word)))
 
+  ;; beautifull icons inside `vertico'
+  (leaf all-the-icons-completion
+    :ensure t
+    :defun all-the-icons-completion-mode
+    ;; I load it after init because otherwise it doesn't work
+    ;; I don't know WHYYY!?
+    :hook after-init-hook))
+
+;; some useful things:
+;;
+;; - `ripgrep' in the project
+;; - choose one from `kill-ring' with preview
+;; - `imenu' with preview
+;; - switch to buffer one of the project buffers, recent opened files and other
 (leaf consult
   :ensure t
   :defun (consult-register-format
@@ -55,9 +71,14 @@
   :bind (("C-x C-b" . consult-buffer)
          ("C-c i" . consult-imenu)
          ("C-c n" . consult-imenu-multi))
-  :bind (;; C-c bindings in `mode-specific-map'
-         ("C-c M-x" . consult-mode-command)
+  :bind ((:project-prefix-map
+          ;; instead of built-in `projectile-find-regexp'
+          ;; sometimes use command from `projectile-prefix-map' more useful
+          ;; , than "C-c s" for example, when you swithch to project and need to find regexp
+          ("g" . consult-ripgrep))
+         ;; C-c bindings in `mode-specific-map'
          ("C-c s" . consult-ripgrep)
+         ("C-c M-x" . consult-mode-command)
          ("C-c k" . consult-kmacro)
          ("C-c m" . consult-man)
          ([remap Info-search] . consult-info)
@@ -66,20 +87,11 @@
          ;; Other custom bindings
          ;; M-g bindings in `goto-map'
          ("M-g e" . consult-compile-error)
-         ("M-g I" . consult-imenu-multi)
-         ;; M-s bindings in `search-map'
-         ("M-s d" . consult-find)
-         ("M-s D" . consult-locate)
-         ("M-s g" . consult-grep)
-         ("M-s G" . consult-git-grep)
-         ("M-s l" . consult-line)
-         ("M-s L" . consult-line-multi)
-         ("M-s k" . consult-keep-lines)
-         ("M-s u" . consult-focus-lines)
-         ;; Isearch integration
-         ("M-s e" . consult-isearch-history))
+         ("M-g I" . consult-imenu-multi))
   :custom ((register-preview-delay  . 0.5)
            (register-preview-function . #'consult-register-format))
+
+  ;; i don't know what does the next line
   :hook ((completion-list-mode-hook . consult-preview-at-point-mode))
 
   ;; The :init configuration is always executed (Not lazy)
@@ -101,15 +113,24 @@
     :require t
     :custom (completion-styles . '(orderless)))
 
+  ;; show a bit of additional info inside the `vertico' `minibuffer'
   (leaf marginalia
     :ensure t
     :global-minor-mode marginalia-mode)
 
-  (leaf embark-consult :ensure t)
+  ;; `embark' is anything like to flexible keymap that changes depending on
+  ;; when I call `embark-act'
+  ;;
+  ;; here only the integration of `embark' with `vertico', the configuration of
+  ;; `vertico' inside `my-embark'
+  (leaf embark-consult
+    :ensure t
+    :after consult)
 
+  ;; the following lines fix some things which are wrong in my emacs@29
   (defvar string-width 0)
 
-  (defun compat-call (&rest b)
+  (defun compat-call (&rest _)
     0))
 
 (provide 'my-consult)

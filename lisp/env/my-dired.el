@@ -51,9 +51,9 @@
            dired-get-file-for-visit)
           (org-link-open-from-string . ol))
   :bind (:dired-mode-map
-         (";"       . dired-avy)
-         ("A"       . agnifize-dwim)
-         ("~"       . my-dired-jump-to-home))
+         (";" . dired-avy)
+         ("A" . agnifize-dwim)
+         ("~" . my-dired-jump-to-home))
 
   :config
   (leaf dired-async
@@ -69,7 +69,7 @@
            ;; Manipulation with file(s)
            ;; copy/move/paste also defines in the section "Dired Hacks: Ranger"
            ("C-y"     . my-dired-duplicate)
-           ("C-m"     . my-dired-new-file)))
+           ("C-o"     . my-dired-new-file)))
 
   (leaf dired-filter
     :ensure t
@@ -101,14 +101,6 @@
       "Return t, when FILENAME is path to a PDF file."
       (s-suffix-p ".pdf" filename)))
 
-  (leaf dired-ranger
-    :ensure t
-    :bind (:dired-mode-map
-           :package dired
-           ("M" . 'dired-ranger-move)
-           ("v" . 'dired-ranger-paste)
-           ("c" . 'dired-ranger-copy)))
-
   (leaf dired-subtree
     :ensure t
     :defun dired-subtree-beginning
@@ -127,19 +119,11 @@
 
   (leaf dired-collapse
     :ensure t
-    :hook (dired-mode-hook . dired-collapse-mode))
+    :hook dired-mode-hook)
 
-  (defcustom my-dired-commands-using-minibuffer
-    '(dired-filter-by-file
-      dired-filter-by-extension
-      my-dired-new-file
-      dired-byte-compile
-      dired-do-delete
-      dired-create-directory
-      dired-isearch-filenames)
-    "List of the `dired' commands using the minubuffer."
-    :type '(repeat symbol)
-    :group 'my)
+  (leaf all-the-icons-dired
+    :ensure t
+    :hook dired-mode-hook)
 
   ;; Command for printing file
   (with-eval-after-load 'lpr (setq lpr-command "PDFToPrinter"))

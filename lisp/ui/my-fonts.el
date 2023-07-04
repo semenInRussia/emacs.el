@@ -36,7 +36,9 @@
   :group 'my
   :type 'string)
 
-(set-face-attribute 'default nil :font my-fonts-main :height 210)
+(leaf all-the-icons :ensure t)
+
+(set-face-attribute 'default nil :family my-fonts-main :height 210)
 
 ;; (leaf unicode-fonts
 ;;   :ensure t
