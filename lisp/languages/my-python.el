@@ -26,11 +26,13 @@
 ;; My configuration for `python'
 
 ;;; Code:
+
 (require 'my-leaf)
 (require 'dash)
 (require 's)
 (require 'just)
 (require 'smartparens)
+
 
 (leaf python-mode
   :ensure t
@@ -70,11 +72,10 @@
 
 Active region is region from BEG to END"
     (interactive "r")
-    (let ((init-pos (point)))
-      (goto-char end)
-      (insert "]")
-      (goto-char beg)
-      (insert "Optional[")))
+    (goto-char end)
+    (insert "]")
+    (goto-char beg)
+    (insert "Optional["))
 
   (defun my-python-fix-whitespaces-mode ()
     "Fix `whitespace-mode' for `python-mode'."

@@ -24,6 +24,7 @@
 
 ;;; Code:
 
+(declare-function straight-use-package "straight.el")
 (defvar bootstrap-version)
 
 (let ((bootstrap-file
@@ -38,7 +39,7 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-(straight-use-package 'org)
+(add-to-list 'load-path "~/projects/fast-exec.el")
 
 (provide 'my-straight)
 ;;; my-straight.el ends here

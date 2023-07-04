@@ -23,27 +23,24 @@
 
 ;;; Commentary:
 
-;; My Configuration For The Lanugage `racket'
+;; My Configuration for the Lanugage `racket'
 
 ;;; Code:
 
+(require 'my-leaf)
+
 (leaf racket-mode
   :ensure t
-  :major-mode-map (racket               ;nofmt
-                   :modes (racket-mode racket-repl-mode)
-                   :parent my-lisp-map)
   :defvar (my-racket-meta-return-functions
            my-racket-meta-return-cond-clauses-expression-names)
   :defun ((my-racket-meta-return-contracted .
                                             (my-racket
                                              my-racket-meta-return-test-case
                                              my-racket-meta-return-let)))
-  :bind ((:racket-mode-map               ;nofmt
-          ("M-RET" . 'my-racket-meta-return))
-         (:my-racket-local-map
-          ("i"     . 'racket-add-require-for-identifier)))
+  :bind (:racket-mode-map
+         ("M-RET" . 'my-racket-meta-return))
   :hook ((racket-mode-hook . racket-xp-mode)
-         ;; `flycheck' is very slow plus `racket-xp-mode' highlight
+         ;; `flycheck' is enough slow plus `racket-xp-mode' highlight
          ;; errors too, so i disable `flycheck' for Racket
          (racket-mode-hook . turn-off-flycheck)
          ;; enable structured editing for the `racket-mode'

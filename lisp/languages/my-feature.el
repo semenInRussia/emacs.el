@@ -27,15 +27,15 @@
 
 (require 'my-leaf)
 
-;; NOTE that I support only `ecukes' now
+;; NOTE that here support only `ecukes' now.
+;; `ecukes' is cucumber for `emacs-lisp-mode'
 (leaf feature-mode
   :ensure t
-  :major-mode-map feature
   :hook (feature-mode-hook . my-feature-mode-hook)
   :bind (:feature-mode-map
          ("RET" . newline-and-indent)
          ("M-RET" . my-feature-add-and-statement))
-  :config                               ;nofmt
+  :config
   (defun my-feature-mode-hook ()
     "My hook of the `feature-mode'."
     (setq-local outline-regexp "\\( *Feature:\\| *Scenario:\\)"))
@@ -43,7 +43,8 @@
   (defun my-feature-add-and-statement ()
     "Add a \"And\" feature statement, like to statement at the current line."
     (interactive)
-    (duplicate-current-line 1)
+    (end-of-line)
+    (insert "\n" (buffer-substring-no-properties (pos-bol) (pos-eol)))
     (forward-line 1)))
 
 (provide 'my-feature)

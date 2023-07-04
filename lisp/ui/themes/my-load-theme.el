@@ -27,8 +27,9 @@
 ;; See `doom-themes' (list of themes at starting comments)
 
 ;; List of my favorite themes:
-;; - `gruber-darker'
-;; - `doom-monokai-classic'
+;; - `doom-1337'.  The best one, I think
+;; - `gruber-darker'.  Cool, but `org-mode' and `vertico' are bad
+;; - `doom-monokai-classic'.  Cool
 ;; - `solarized'
 ;; - `flatland-theme'
 
@@ -38,9 +39,9 @@
 (require 'doom-themes-autoloads)
 (load-theme 'doom-1337 t)
 
-(custom-set-faces
- `(region
-   ((t (:background "white" :foreground "black" :inherit t)))))
+;; (custom-set-faces
+;;  `(region
+;;    ((t (:background "white" :foreground "black" :inherit t)))))
 
 (provide 'my-load-theme)
 ;;; my-load-theme.el ends here

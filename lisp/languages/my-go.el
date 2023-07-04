@@ -32,7 +32,6 @@
 
 (leaf go-mode
   :ensure t
-  :major-mode-map go
   :hook (go-mode-hook . my-lsp-ensure))
 
 (provide 'my-go)

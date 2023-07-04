@@ -30,6 +30,8 @@
 (require 'f)
 (require 'just)
 
+(declare-function dired-get-marked-files "dired.el")
+
 ;;;###autoload
 (defun agnifize-dwim ()
   "Agnifize that you mean.
@@ -46,25 +48,35 @@ try agnifize marked files."
         (dired-get-marked-files)
       (message "Agnifize file: %s" it)
       (agnifize-file it)))
-   (t (agnifize-buffer))))
+   (t (agnifize-current-buffer))))
 
+;;;###autoload
 (defun agnifize-file (filename)
   "Visit file with FILENAME and agnifize it."
   (with-temp-buffer
     (insert-file-contents filename)
-    (agnifize-buffer)
+    (agnifize-current-buffer)
     (f-write (buffer-string) 'utf-8 filename)))
 
-(defun agnifize-buffer ()
-  "Agnifize the current buffer."
+(defun agnifize-current-buffer ()
+  "Agnifize current buffer."
   (interactive)
+  (agnifize-buffer (current-buffer)))
+
+(defun agnifize-buffer (&optional buffer)
+  "Agnifize the BUFFER.
+
+BUFFER defaults to the current"
+  (or buffer (setq buffer (current-buffer)))
+  (switch-to-buffer buffer t)
   (agnifize-region (point-min) (point-max)))
 
+;;;###autoload
 (defun agnifize-region (&optional beg end)
   "Change a semen python code using Agnia coding style in a region.
 
 A region begins with BEG and ends with END"
-  (interactive)
+  (interactive "r")
   (agnifize--change-comments beg end)
   (agnifize--delete-empty-lines beg end)
   (agnifize--minimize-bin-ops beg end)
@@ -127,11 +139,10 @@ Each of the should be consist only one character")
   (or end (setq end (point-max)))
   ;; here I don't use built-in comment functions, because I should remove
   ;; dependency from `python-mode' which has a slow speed-up
-  (just-for-each-line* beg end
-    (when (search-forward "#" (pos-eol) t)
-      (backward-char)
-      (just-delete-chars-backward " ")
-      (kill-line))))
+  (while (search-forward "#" nil t)
+    (backward-char)
+    (kill-line)
+    (delete-char -1)))
 
 (defun agnifize--delete-empty-lines (beg end)
   "Remove empty lines from region between BEG and END."
