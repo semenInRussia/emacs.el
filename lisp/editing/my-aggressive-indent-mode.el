@@ -27,6 +27,7 @@
 
 (require 'my-leaf)
 
+
 (leaf aggressive-indent-mode
   :ensure t
   :global-minor-mode aggressive-indent-global-mode

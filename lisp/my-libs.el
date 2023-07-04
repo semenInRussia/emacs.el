@@ -26,7 +26,9 @@
 ;; Some libraries
 
 ;;; Code:
+
 (require 'my-leaf)
+
 
 (leaf s :ensure t :require t)
 
