@@ -31,28 +31,45 @@
 
 
 (leaf corfu
-  :ensure t
+  :ensure (corfu
+           :repo "minad/corfu"
+           :files ("*.el" "extensions/*"))
   :global-minor-mode global-corfu-mode
   :custom (;; by default 2 but 1 one is better
            (corfu-auto-prefix . 1)
-           ;; by default to run `corfu' you should press `C-M-kp-begin'
+           ;; by default to run `corfu' you should press `C-M-i'
            (corfu-auto . t)
-           ;; I don't like 0sec, because it worth for yasnippets
-           (corfu-auto-delay . 0.4)))
+           ;; I don't like 0sec, because it bad for yasnippets
+           (corfu-auto-delay . 0.4))
+  :config
+  (leaf corfu-echo
+    :require t
+    :global-minor-mode corfu-echo-mode)
+
+  (leaf corfu-indexed
+    :require t
+    :global-minor-mode corfu-indexed-mode))
+
+(leaf kind-icon
+  :ensure t
+  :require t
+  :defun kind-icon-margin-formatter
+  :defvar corfu-margin-formatters
+  :custom ((kind-icon-default-style . '(
+                                        :padding 0
+                                        :stroke 0
+                                        :margin 0
+                                        :radius 0
+                                        :height 0.5
+                                        :scale 1))
+           (kind-icon-default-face . 'corfu-default))
+  :config (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (leaf cape
   :ensure t
   :require t
-  :defun (cape-symbol
-          cape-dabbrev
-          cape-file
-          cape-elisp-block
-          cape-history
-          cape-keyword
-          cape-sgml
-          cape-tex
-          cape-abbrev
-          cape-symbol)
+  :defun (cape-symbol cape-dabbrev cape-file cape-elisp-block cape-history
+                      cape-keyword cape-sgml cape-tex cape-abbrev cape-symbol)
   :config
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file)
