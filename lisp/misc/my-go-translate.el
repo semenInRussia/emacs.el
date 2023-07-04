@@ -29,17 +29,25 @@
 (require 'fast-exec)
 (require 'dash)
 
+
 (leaf go-translate
   :ensure t
   :custom (gts-translate-list . '(("en" "ru")))
+  :bind (;; so I can just hit C-. or o with T following to translate a thing
+         ;; at point
+         (:embark-region-map
+          :package embark
+          ("T" . gts-do-translate)))
   :defvar gts-default-translator
   :defun (gts-buffer-render gts-translator gts-prompt-picker gts-google-engine)
   :fast-exec ("Translate a String" 'gts-do-translate)
-  :defer-config (setq gts-default-translator
-                      (gts-translator :picker
-                                      (gts-prompt-picker)
-                                      :engines  ;nofmt
-                                      (list (gts-google-engine))
-                                      :render (gts-buffer-render))))
+  :defer-config
+  ;; I use Google Translate with the output in the separate buffer
+  (setq gts-default-translator
+        (gts-translator :picker
+                        (gts-prompt-picker)
+                        :engines
+                        (list (gts-google-engine))
+                        :render (gts-buffer-render))))
 (provide 'my-go-translate)
 ;;; my-go-translate.el ends here
