@@ -62,14 +62,10 @@
 (defun my-build-config ()
   "Build my config."
   (interactive)
-  (let ((default-directory (file-name-directory my-modules-el-file))
-        (compiled-file (concat my-modules-el-file "c")))
+  (let ((default-directory (file-name-directory my-modules-el-file)))
     (message "Join config files...")
     (my-join-modules-into-modules.el)
     (print " done")
-
-    (when (file-exists-p compiled-file)
-      (delete-file compiled-file))
 
     (message "Byte-compile my-modules.el...")
     (byte-compile-file my-modules-el-file)
