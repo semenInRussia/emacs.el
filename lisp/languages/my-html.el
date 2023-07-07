@@ -32,43 +32,40 @@
 (require 'custom)
 
 
-(defvar my-html-suported-modes
+(defvar my-html-supported-modes
   '(web-mode mhtml-mode)
   "List of `html` major modes."
   ;; :group 'my
   ;; :type '(repeat symbol)
   )
 
-(defun my-html-suported-modes-hooks ()
-  "Return list from the hooks for each of `my-html-suported-modes'."
-  (-map 'my-major-mode-to-hook my-html-suported-modes))
+(defun my-html-supported-modes-hooks ()
+  "Return list from the hooks for each of `my-html-supported-modes'."
+  (-map 'my-major-mode-to-hook my-html-supported-modes))
 
-(defun my-html-suported-modes-maps ()
-  "Return list from the maps for each of `my-html-suported-modes'."
-  (-map 'my-major-mode-to-map my-html-suported-modes))
+(defun my-html-supported-modes-maps ()
+  "Return list from the maps for each of `my-html-supported-modes'."
+  (-map 'my-major-mode-to-map my-html-supported-modes))
 
 (leaf mhtml-mode
-  :ensure t
   :mode "\\.html$"
   :hook (mhtml-mode-hook . my-lsp-ensure)
   :config                               ;nofmt
   (leaf auto-rename-tag
-    :ensure t
-    :hook `(,(my-html-suported-modes-hooks)
-            . auto-rename-tag-mode))
+    :ensure t)
 
   (leaf tagedit
     :ensure t
-    :bind `(,(--map
-              `(,it
-                :package ,(my-map-to-major-mode it)
-                ([remap sp-kill-hybrid-sexp] . tagedit-kill)
-                ([remap sp-join-sexp]        . tagedit-join-tags)
-                ([remap sp-raise-sexp]       . tagedit-raise-tag)
-                ([remap sp-splice-sexp]      . tagedit-splice-tag)
-                ([remap sp-change-enclosing]  . tagedit-kill-attribute))
-              (my-html-suported-modes-maps))))
-
+    ;;    :bind `(,(--map
+    ;; `(,it
+    ;;   :package ,(my-map-to-major-mode it)
+    ;;   ([remap sp-kill-hybrid-sexp] . tagedit-kill)
+    ;;   ([remap sp-join-sexp]        . tagedit-join-tags)
+    ;;   ([remap sp-raise-sexp]       . tagedit-raise-tag)
+    ;;   ([remap sp-splice-sexp]      . tagedit-splice-tag)
+    ;;   ([remap sp-change-enclosing]  . tagedit-kill-attribute))
+    ;; (my-html-supported-modes-maps))))
+    )
   (leaf emmet-mode :ensure t :hook mhtml-mode-hook)
 
   (leaf impatient-mode

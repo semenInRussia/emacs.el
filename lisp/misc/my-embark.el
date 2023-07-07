@@ -78,7 +78,7 @@
   (defun my-embark-magit-status (file)
     "Run `magit-status` on repo containing the embark target."
     (interactive "GFile: ")
-    (magit-status (locate-dominating-file file ".git")))
+    (magit-status-setup-buffer (locate-dominating-file file ".git")))
 
   ;; was grabbed from the offical wiki
   (with-eval-after-load 'straight

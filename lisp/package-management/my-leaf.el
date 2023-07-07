@@ -28,33 +28,16 @@
 
 (require 'cl-lib)
 (require 'my-straight)
-(straight-use-package 'leaf)
-(require 'leaf)
+
 
 (eval-and-compile
-  (defun my-plist-get (plst key &optional def)
-    "Return the value at KEY in PLST, if key isn't provided return DEF."
-    (let (prev-key
-          prev-val
-          (result def))
-      (unless (keywordp (car plst))
-        (setq plst (cdr plst)))
-      (while plst
-        (when (eq prev-key key)
-          (setq result prev-val)
-          ;; stop loop
-          (setq plst nil))
-        (setq prev-key (car plst))
-        (setq prev-val (cadr plst))
-        ;; skip both: value and key
-        (setq plst (cddr plst)))
-      (when (eq prev-key key)
-        (setq result prev-val))
-      result))
+  ;; `eval-and-compile' really install the package in compile time,
+  ;; it's important, because the rest config use `leaf' macro
+  (straight-use-package 'leaf)
+  (require 'leaf)
 
   (defun my-leaf-keywords-init ()
     "Initialize keywords for macro `leaf'."
-    (setq leaf-alias-keyword-alist '((:ensure . :straight)))
     (setq leaf-keywords
           '(:disabled
             (unless
@@ -139,43 +122,6 @@
               ,@leaf--body)
             :preface
             `(,@leaf--value ,@leaf--body)
-            :major-mode-map
-            (let*
-                ((arguments
-                  (car leaf--value))
-                 name major-modes parent)
-              (cond
-               ((eq arguments t)
-                (setq name leaf--name)
-                (setq major-modes
-                      (list name)))
-               ((symbolp arguments)
-                (setq name arguments)
-                (setq major-modes
-                      (list leaf--name)))
-               ((listp arguments)
-                (setq name
-                      (my-plist-get arguments :name
-                                    (cl-find-if
-                                     (lambda
-                                       (x)
-                                       (and
-                                        (symbolp x)
-                                        (not
-                                         (keywordp x))))
-                                     arguments)))
-                (setq major-modes
-                      (my-plist-get arguments :major-modes
-                                    (or
-                                     (cl-find-if 'listp arguments)
-                                     (list name))))
-                (setq parent
-                      (my-plist-get arguments :parent)))
-               (t
-                (leaf-error "Expected eiter `symbol', t or `list'")))
-              `((eval-after-load 'xah-fly-keys
-                  '(my-define-local-major-mode-map ',name ',major-modes ',parent))
-                ,@leaf--body))
             :when
             (when leaf--body
               `((when ,@(if
@@ -243,8 +189,9 @@
             `(,@(mapcar
                  (lambda
                    (elm)
-                   `(leaf-handler-package ,leaf--name ,(car elm)
-                                          ,(cdr elm)))
+                   `(eval-and-compile
+                      (leaf-handler-package ,leaf--name ,(car elm)
+                                            ,(cdr elm))))
                  leaf--value)
               ,@leaf--body)
             :feather
@@ -258,10 +205,13 @@
                                                        (last leaf--value))
                                                      ,@leaf--body))
             :straight
-            `(,@(mapcar (lambda (elm) `(straight-use-package ',(if (eq elm t)
-                                                                   leaf--name
-                                                                 elm)))
-                        leaf--value) ,@leaf--body)
+            `(,@(mapcar (lambda (elm)
+	        	  `(eval-and-compile
+	        	     (my-straight-load-package ',(if (eq elm t)
+                                                             leaf--name
+                                                           elm))))
+                        leaf--value)
+	      ,@leaf--body)
             :el-get
             `(,@(mapcar
                  (lambda
@@ -810,15 +760,10 @@
             :defer-config
             `((eval-after-load ',leaf--name
                 '(progn ,@leaf--value))
-              ,@leaf--body))))
+              ,@leaf--body)))
+    (setq leaf-alias-keyword-alist '((:ensure . :straight))))
 
-  (my-leaf-keywords-init)
-
-  (defun my-flatten-list (lst)
-    "LST of the lists of the lists ... to list of the atom elements.
-
-This is a version of `flatten-list', but it isn't change \\=' to \\='quote."
-    (delete 'quote (flatten-list lst))))
+  (my-leaf-keywords-init))
 
 (provide 'my-leaf)
 ;;; my-leaf.el ends here

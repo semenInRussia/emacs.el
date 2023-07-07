@@ -36,6 +36,27 @@
 (require 'f)
 (require 'just)
 
+
+(defun my-plist-get (plst key &optional def)
+  "Return the value at KEY in PLST, if key isn't provided return DEF."
+  (let (prev-key
+        prev-val
+        (result def))
+    (unless (keywordp (car plst))
+      (setq plst (cdr plst)))
+    (while plst
+      (when (eq prev-key key)
+        (setq result prev-val)
+        ;; stop loop
+        (setq plst nil))
+      (setq prev-key (car plst))
+      (setq prev-val (cadr plst))
+      ;; skip both: value and key
+      (setq plst (cddr plst)))
+    (when (eq prev-key key)
+      (setq result prev-val))
+    result))
+
 (defun my-alist-p (obj)
   "Return t, when OBJ is `alist'."
   (and

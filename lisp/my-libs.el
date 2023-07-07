@@ -30,21 +30,54 @@
 (require 'my-leaf)
 
 
-(leaf s :ensure t :require t)
+(eval-and-compile
+  ;; `eval-and-compile' installs all libraries in compile-time
+  ;; , so "(require \\='dash)" compiles successufelly
+  (leaf dash
+    :ensure t
+    :global-minor-mode global-dash-fontify-mode
+    :require t)
 
-(leaf f :ensure t :require t)
+  (leaf s
+    :ensure t
+    :require t)
 
-(leaf dash :ensure t :global-minor-mode global-dash-fontify-mode :require t)
+  (leaf f
+    :ensure t
+    :require t)
 
-(leaf just                              ;nofmt
-  :ensure (just :host github :repo "semenInRussia/just.el")
-  :require t)
+  ;; (straight-use-package '(just :host github :repo "semenInRussia/just.el"))
+  (leaf just                              ;nofmt
+    :ensure (just :host github :repo "semenInRussia/just.el")
+    :require t)
 
-(leaf queue :ensure t)
+  (leaf queue
+    :ensure t)
 
-(leaf request :ensure t)
+  (leaf request
+    :ensure t)
 
-(leaf async :ensure t)
+  (leaf async
+    :ensure t)
+
+  (leaf alert
+    :ensure t)
+
+  (leaf compat
+    :ensure t)
+
+  (leaf fringe-helper
+    :ensure t)
+
+  (leaf ht
+    :ensure t)
+
+  (leaf ov
+    :ensure t)
+
+  (leaf indicators
+    :ensure t))
+
 
 (provide 'my-libs)
 ;;; my-libs.el ends here
