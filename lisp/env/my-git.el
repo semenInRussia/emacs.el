@@ -36,6 +36,8 @@
 
 (leaf magit
   :ensure t
+  :bind (:magit-mode-map
+         ("D" . magit-file-delete))
   :custom ((magit-refresh-status-buffer . nil)
            (magit-disabled-section-inserters
             . '(magit-insert-push-branch-header
