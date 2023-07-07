@@ -41,6 +41,7 @@
 (require 'just)
 (require 'f)
 
+
 (leaf dired
   :hook ((dired-mode-hook . dired-hide-details-mode))
   :defun ((dired-mark
@@ -51,9 +52,9 @@
           (org-link-open-from-string . ol))
   :bind (:dired-mode-map
          (";" . dired-avy)
+         ("h" . dired-up-directory)
          ("A" . agnifize-dwim)
          ("~" . my-dired-jump-to-home))
-
   :config
   (leaf dired-async
     :ensure async
@@ -75,7 +76,7 @@
     :require t
     :bind-keymap (:dired-mode-map
                   :package dired
-                  ("." . 'dired-filter-map)))
+                  ("." . dired-filter-map)))
 
   (leaf dired-open
     :ensure t
@@ -120,7 +121,7 @@
     :ensure t
     :hook dired-mode-hook)
 
-  (leaf all-the-icons-dired
+  (leaf nerd-icons-dired
     :ensure t
     :hook dired-mode-hook)
 
