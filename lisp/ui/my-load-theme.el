@@ -1,4 +1,4 @@
-;;; my-doom-themes.el --- My file loading `doom-themes'
+;;; my-load-theme --- Load the current theme
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -23,12 +23,43 @@
 
 ;;; Commentary:
 
-;; My file loading `doom-themes'
-
 ;;; Code:
+;; See `doom-themes' (list of themes at starting comments)
+
+;; List of my favorite themes:
+;; - `doom-1337'.  The best one, I think
+;; - `gruber-darker'.  Cool, but `org-mode' and `vertico' are bad
+;; - `doom-monokai-classic'.  Cool
+;; - `solarized'
+;; - `flatland-theme'
+
 (require 'my-leaf)
 
-(leaf doom-themes :ensure t)
+(setq font-lock-maximum-decoration t
+      truncate-partial-width-windows nil)
 
-(provide 'my-doom-themes)
-;;; my-doom-themes.el ends here
+(leaf doom-themes
+  :ensure t)
+
+(leaf gruber-darker-theme
+  :ensure t
+  :require t)
+
+(leaf monokai-theme
+  :ensure t)
+
+(leaf nano-theme
+  :ensure t
+  :require t
+  :defun nano-dark
+  :config (nano-dark))
+
+;; (require 'doom-themes-autoloads)
+;; (load-theme 'doom-1337 t)
+
+;; (custom-set-faces
+;;  `(region
+;;    ((t (:background "white")))))
+
+(provide 'my-load-theme)
+;;; my-load-theme.el ends here
