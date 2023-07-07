@@ -25,21 +25,92 @@
 ;;; Code:
 
 (declare-function straight-use-package "straight.el")
-(defvar bootstrap-version)
+(eval-and-compile
+  ;; `eval-and-compile' really install the package in compile time,
+  ;; it's important, because `my-leaf' needs in `straight-use-package' to install
+  ;; itself and `leaf' needed in the rest config, because `leaf' macro
+  (defvar bootstrap-version)
+  (setq straight-check-for-modifications nil)
+  (let ((bootstrap-file
+         (expand-file-name
+          "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 6))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer (url-retrieve-synchronously
+                            "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+                            'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage)))
 
-(let ((bootstrap-file
-       (expand-file-name
-        "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 6))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer (url-retrieve-synchronously
-                          "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-                          'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+(declare-function straight--convert-recipe "straight.el")
+(declare-function straight--add-package-to-load-path "straight.el")
+(declare-function straight--add-package-to-info-path "straight.el")
+(declare-function straight--file "straight.el")
+(declare-function straight--load-package-autoloads "straight.el")
+(declare-function straight--compute-dependencies "straight.el")
 
-(add-to-list 'load-path "~/projects/fast-exec.el")
+(eval-and-compile
+  (setq straight-find-executable "C:\\tools\\find.exe")
+  (defun my-straight-load-package (melpa-style-recipe)
+    "Load a package with a given MELPA-STYLE-RECIPE.
+
+Loading a package means load autoloads (if they exists) and add a package source
+root into `load-path'.  It doesn't install package and doesn't generate
+autoloads file, if one of them wasn't installed/genrated, then nothing happened,
+you should ensure that it was installed with `straight-use-package'.  Also it
+doesn't load source code, only autoloads.  Also it tries add TeXinfo
+documentation into info load path, if provided of course.
+
+To load whole package (not only autoloads) use `require', after call this
+function that add package to the load path `load-path'.
+
+MELPA-STYLE-RECIPE specifies a package, suggest you check offical straight
+documentation.
+
+If called interactively, then choose a package from the installed packages, that
+placed at the straight build directory"
+    (interactive
+     ;; this interactive statement copied from `straight-use-package' impl
+     (list
+      (intern
+       (completing-read
+        "Which recipe? "
+        (cddr ;; it skips "." and ".." dirs
+         (directory-files (straight--file
+                           straight-base-dir
+                           "straight"
+                           straight-build-dir)))))))
+    ;; (let ((package (if (symbolp melpa-style-recipe)
+    ;;                    (symbol-name melpa-style-recipe)
+    ;;                  (cadr (plist-member
+    ;;                         (straight--convert-recipe melpa-style-recipe)
+    ;;                         :package)))))
+    ;;   ;; add to the `load-path'
+    ;;   (straight--add-package-to-load-path
+    ;;    (list :package package))
+    ;;   ;; install TeX-info docsets
+    ;;   (straight--add-package-to-info-path
+    ;;    (list :package package))
+    ;;   ;; load autoloads
+    ;;   (straight--load-package-autoloads package))
+    (straight-use-package melpa-style-recipe))
+  
+  ;; (defvar my-straight-ignore-pkg-rx "emacs_backtrace.txt")
+  ;; (mapc
+  ;;  (lambda (pkg)
+  ;;    (unless (string-match-p my-straight-ignore-pkg-rx pkg)
+  ;;      (message "Loading %s..." pkg)
+  ;;      (my-straight-load-package (intern pkg))))
+  ;;  (cddr ;; skip "." and ".."
+  ;;   (directory-files (straight--file
+  ;;                     straight-base-dir
+  ;;                     "straight"
+  ;;                     straight-build-dir))))
+  )
+
+(eval-and-compile
+  (add-to-list 'load-path "~/projects/fast-exec.el"))
 
 (provide 'my-straight)
 ;;; my-straight.el ends here
