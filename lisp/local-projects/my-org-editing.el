@@ -30,32 +30,12 @@
 (defun my-org-clear-subtree ()
   "Kill subtree at the position, and activate insertion mode."
   (org-cut-subtree)
-  ;; TODO: `gob-mode' insert mode
-  )
+  (meow-insert-mode))
 
 (defun my-org-table-eval-formula-in-field ()
   "Eval formula with `orgtbl' syntax for the current field of the table."
   (interactive)
   (org-table-eval-formula '(4)))
-
-;;;###autoload
-(defvar my-org-table-cut-map
-  '(keymap
-    (?. . org-cut-special)
-    (?c . org-table-delete-column)
-    (?r . my-kill-line-or-region)))
-
-;;;###autoload
-(defun my-org-cut ()
-  "Cut any `org' thing.
-
-If in a table ask from the user: either kill column, kill cell or kill row, if
-in a src block cut it, otherwise kill heading"
-  (interactive)
-  (cond
-   ((org-at-table-p)
-    (set-transient-map my-org-table-cut-map))
-   (t (org-cut-subtree))))
 
 ;;;###autoload
 (defun my-org-schedule-to-today ()
@@ -70,18 +50,6 @@ in a src block cut it, otherwise kill heading"
   (save-excursion
     (org-mark-subtree)
     (indent-region (region-beginning) (region-end))))
-
-;;;###autoload
-(defun my-org-todo ()
-  "My version of the `org-todo'.
-
-Different with the original functions is that this function can be repeated by
-pressing of the previous last pressed char.  So if functions is bound to
-\"SPC l 1\", that after pressing that user can press \"1\" and this command will
-be repeated"
-  (interactive)
-  (call-interactively #'org-todo)
-  (one-shot-keybinding "1" 'my-org-todo))
 
 ;;;###autoload
 (defun my-org-insert-image (filename &optional caption)
