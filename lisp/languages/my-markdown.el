@@ -69,7 +69,6 @@ See `imenu-generic-expression'"
                                imenu-generic-expression
                                my-markdown-imenu-generic-expression)))
   :config                               ;nofmt
-  (add-hook 'markdown-mode-hook 'visual-fill)
   (leaf markdown-toc
     :ensure t
     :bind (:markdown-mode-map

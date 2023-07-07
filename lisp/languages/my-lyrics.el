@@ -86,7 +86,6 @@ instead of intro can be other word"
     (setq-local comment-start "#")
     (setq-local indent-line-function 'my-lyrics-indent-line)
     (setq-local indent-region-function 'indent-region-line-by-line)
-    (visual-fill)
     (setq-local font-lock-defaults '(my-lyrics-highlights))))
 
 (provide 'my-lyrics)

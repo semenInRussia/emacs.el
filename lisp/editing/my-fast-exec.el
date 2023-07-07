@@ -28,19 +28,18 @@
 ;;; Code:
 
 (require 'my-leaf)
-
 (require 'dash)
 
-(declare-function visual-fill "my-lang-utils")
 
-(leaf fast-exec
-  :load-path "~/projects/fast-exec.el/"
-  :defun fast-exec-use
-  :require t
-  :bind ("M-=" . fast-exec-exec)
-  :commands fast-exec-exec
-  :config (add-hook 'fast-exec-hint-buffer-mode-hook #'visual-fill)
-  (require 'my-fast-exec-misc))
+(eval-and-compile
+  ;; install `fast-exec' in compile-time
+  (leaf fast-exec
+    :load-path "~/projects/fast-exec.el/"
+    :defun fast-exec-use
+    :require t
+    :bind ("M-=" . fast-exec-exec)
+    :commands fast-exec-exec
+    (require 'my-fast-exec-misc)))
 
 (provide 'my-fast-exec)
 ;;; my-fast-exec.el ends here

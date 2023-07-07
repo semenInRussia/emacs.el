@@ -100,7 +100,6 @@
     "beamer")
   "List of the names for built-in LaTeX documentclasses.")
 
-(add-hook 'LaTeX-mode-hook 'visual-fill)
 (add-hook 'LaTeX-mode-hook 'turn-off-flycheck)
 
 (add-hook 'LaTeX-mode-hook 'my-latex-find-master-file)

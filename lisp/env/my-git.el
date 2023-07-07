@@ -36,7 +36,6 @@
 
 (leaf magit
   :ensure t
-  :hook (magit-mode-hook . visual-fill)
   :custom ((magit-refresh-status-buffer . nil)
            (magit-disabled-section-inserters
             . '(magit-insert-push-branch-header

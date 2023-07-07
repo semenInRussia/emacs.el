@@ -35,7 +35,6 @@
 ;; the most heavy functions placed at the `my-dired-commands'
 ;; and will be evaluated when really needed
 (declare-function my-dired-save-excursion "my-dired-commands.el")
-(declare-function visual-fill "my-lang-utils.el")
 
 (require 's)
 (require 'dash)

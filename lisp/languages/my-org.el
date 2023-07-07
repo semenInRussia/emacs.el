@@ -37,7 +37,6 @@
 (defvar org-mode-hook)
 
 (add-hook 'org-mode-hook 'visual-fill)
-(add-hook 'org-mode-hook 'visual-line-mode)
 (add-hook 'org-mode-hook 'aas-activate-for-major-mode)
 
 

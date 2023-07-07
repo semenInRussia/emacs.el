@@ -29,10 +29,6 @@
 (require 'my-leaf)
 (require 'fast-exec)
 
-(declare-function visual-fill "my-writing-config")
-
-(add-hook 'fast-exec-hint-buffer-mode-hook #'visual-fill)
-
 (require 'fast-exec-initial-keymaps)
 
 (fast-exec-use deadgrep

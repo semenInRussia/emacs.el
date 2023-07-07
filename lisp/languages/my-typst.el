@@ -27,12 +27,9 @@
 
 (require 'my-leaf)
 
-(declare-function visual-fill "my-lang-utils.el")
-
 (leaf typst-mode
   :ensure t
-  :commands typst-mode
-  :config (add-hook 'typst-mode-hook #'visual-fill))
+  :commands typst-mode)
 
 (provide 'my-typst)
 ;;; my-typst.el ends here
