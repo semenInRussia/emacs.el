@@ -46,6 +46,10 @@
 
   (leaf paredit
     :ensure t
+    :hook emacs-lisp-mode-hook)
+
+  (leaf eros
+    :ensure t
     :hook emacs-lisp-mode-hook))
 
 (leaf suggest :ensure t)
