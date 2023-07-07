@@ -40,29 +40,25 @@
            ;; by default to run `corfu' you should press `C-M-i'
            (corfu-auto . t)
            ;; I don't like 0sec, because it bad for yasnippets
-           (corfu-auto-delay . 0.4))
+           (corfu-auto-delay . 0.4)
+           ;; the default value (15) is really small
+           (corfu-min-width . 40))
   :config
   (leaf corfu-echo
     :require t
-    :global-minor-mode corfu-echo-mode)
-
-  (leaf corfu-indexed
-    :require t
-    :global-minor-mode corfu-indexed-mode))
+    :global-minor-mode corfu-echo-mode))
 
 (leaf kind-icon
   :ensure t
   :require t
   :defun kind-icon-margin-formatter
   :defvar corfu-margin-formatters
-  :custom ((kind-icon-default-style . '(
-                                        :padding 0
-                                        :stroke 0
-                                        :margin 0
-                                        :radius 0
-                                        :height 0.5
-                                        :scale 1))
-           (kind-icon-default-face . 'corfu-default))
+  :custom (kind-icon-default-style . '(:padding 0
+                                       :stroke 0
+                                       :margin 0
+                                       :radius 0
+                                       :height 0.5
+                                       :scale 1))
   :config (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (leaf cape
