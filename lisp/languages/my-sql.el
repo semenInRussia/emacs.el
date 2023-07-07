@@ -26,8 +26,8 @@
 ;;; Code:
 (require 'my-leaf)
 
+
 (leaf sql
-  :ensure t
   :fast-exec ("Open SQL Lite Connection" 'sql-sqlite))
 
 (provide 'my-sql)

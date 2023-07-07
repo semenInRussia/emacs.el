@@ -33,8 +33,11 @@
 (require 's)
 (require 'dash)
 
+
 (leaf elisp-mode
-  :config (add-hook 'emacs-lisp-mode 'paxedit-mode)
+  :config
+  (add-hook 'emacs-lisp-mode 'paxedit-mode)
+
   (leaf inspector
     :ensure t
     :bind (:emacs-lisp-mode-map

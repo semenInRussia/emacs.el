@@ -34,7 +34,6 @@
   :group 'my)
 
 (leaf eshell
-  :ensure t
   :bind (:eshell-mode-map
          :package esh-mode
          ([remap beginning-of-line] . 'eshell-begin-on-new-line)

@@ -26,7 +26,6 @@
 (require 'my-leaf)
 
 (leaf recentf
-  :ensure t
   :global-minor-mode recentf-mode)
 
 (provide 'my-recentf)

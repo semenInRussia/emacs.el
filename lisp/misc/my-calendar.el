@@ -27,7 +27,6 @@
 (require 'my-leaf)
 
 (leaf calendar
-  :ensure t
   :defvar calendar-holidays
   :bind ("C-c C" . calendar)
   :config                               ;nofmt

@@ -27,9 +27,7 @@
 (require 'my-leaf)
 
 (leaf cc-mode
-  :ensure t
-  :config                               ;nofmt
-
+  :config
   (leaf google-c-style
     :ensure t
     :hook (c++-mode-hook . google-set-c-style)))

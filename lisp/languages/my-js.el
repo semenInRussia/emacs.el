@@ -30,7 +30,6 @@
 (require 'my-leaf)
 
 (leaf js
-  :ensure t
   :defvar lsp-bridge-single-lang-server-mode-list
   :hook (js-mode-hook . my-lsp-ensure)
   :defvar lsp-bridge-multi-lang-server-mode-list
