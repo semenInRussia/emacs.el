@@ -36,7 +36,9 @@
              (locate-user-emacs-file "lisp/local-projects"))
 
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory)
-      inhibit-startup-screen t)
+      inhibit-startup-message "~/.emacs.d/GoodLuck.txt"
+      inhibit-message "Good Luck"
+      initial-major-mode 'fundamental-mode)
 
 (when (file-exists-p custom-file)
   (load custom-file))
