@@ -65,12 +65,8 @@
   (let ((default-directory (file-name-directory my-modules-el-file)))
     (message "Join config files...")
     (my-join-modules-into-modules.el)
-    (print " done")
-
     (message "Byte-compile my-modules.el...")
     (byte-compile-file my-modules-el-file)
-    (print "done and start native-compile")
-
     (native-compile-async (list my-modules-el-file))))
 
 (defun my-file-igored-as-module-p (filename)
@@ -126,7 +122,7 @@ The same to
 (defun my-join-modules (dest)
   "Join all configuration modules into one file with DEST filename."
   (with-temp-buffer
-    (mapc #'insert-file-contents-literally (nreverse (my-all-modules-files)))
+    (mapc #'insert-file-contents (nreverse (my-all-modules-files)))
     (goto-char (point-max))
     (replace-regexp-in-region "^(provide 'my-[a-zA-Z-]*?)" "\n"
                               (point-min)
