@@ -1,4 +1,4 @@
-;;; build-config.el --- Join all my config files into one init.el -*- lexical-binding: t; -*-
+;;; my-build-config.el --- Join all my config files into one init.el -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2023 semenInRussia
 
@@ -91,7 +91,7 @@ The same to
         order-item
         (files (cl-remove-if
                 #'my-file-igored-as-module-p
-                (directory-files-recursively "~/.emacs.d/lisp" ".el$" nil)))
+                (directory-files-recursively "~/.emacs.d/lisp" "my-.*\\.el$" nil)))
         f
         sorted)
     (while order
@@ -134,5 +134,5 @@ The same to
     (delete-file dest)
     (write-region (point-min) (point-max) dest)))
 
-(provide 'build-config)
-;;; build-config.el ends here
+(provide 'my-build-config)
+;;; my-build-config.el ends here
