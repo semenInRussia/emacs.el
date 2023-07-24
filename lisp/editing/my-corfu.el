@@ -30,6 +30,9 @@
 (require 'my-leaf)
 
 
+(leaf compat
+  :ensure (compat :repo "emacs-straight/compat" :host github))
+
 (leaf corfu
   :ensure (corfu
            :repo "minad/corfu"
@@ -44,25 +47,39 @@
            ;; the default value (15) is really small
            (corfu-min-width . 40))
   :config
-  (leaf corfu-echo
+  ;; show documentation of every auto-completion item
+  (leaf corfu-popupinfo
     :require t
-    :global-minor-mode corfu-echo-mode))
+    :defvar corfu-popupinfo--buffer-parameters
+    :global-minor-mode corfu-popupinfo-mode))
+
+(leaf svg-lib
+  :ensure t
+  :require t)
+
+(leaf nerd-icons
+  :ensure t)
 
 (leaf kind-icon
-  :ensure t
+  :ensure (kind-icon :repo "emacs-straight/kind-icon"
+                     :host github)
   :require t
   :defun kind-icon-margin-formatter
   :defvar corfu-margin-formatters
-  :custom (kind-icon-default-style . '(:padding 0
-                                       :stroke 0
-                                       :margin 0
-                                       :radius 0
-                                       :height 0.5
-                                       :scale 1))
+  :custom ((kind-icon-use-icons . t)
+           (kind-icon-default-face . 'corfu-default)
+           (kind-icon-blend-background . nil)
+           (kind-icon-default-style . `(
+                                        :padding 0
+                                        :stroke 0
+                                        :margin 0
+                                        :radius 0
+                                        :height 0.5
+                                        :scale 1)))
   :config (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (leaf cape
-  :ensure t
+  :ensure (cape :repo "minad/cape" :host github)
   :require t
   :defun (cape-symbol cape-dabbrev cape-file cape-elisp-block cape-history
                       cape-keyword cape-sgml cape-tex cape-abbrev cape-symbol)
@@ -75,8 +92,7 @@
   (add-to-list 'completion-at-point-functions #'cape-sgml)
   ;; (add-to-list 'completion-at-point-functions #'cape-tex)
   (add-to-list 'completion-at-point-functions #'cape-abbrev)
-  (add-to-list 'completion-at-point-functions #'cape-symbol)
-  (add-to-list 'completion-at-point-functions #'cape-symbol)
+  ;; (add-to-list 'completion-at-point-functions #'cape-symbol)
   ;; (add-to-list 'completion-at-point-functions #'cape-line)
   )
 
