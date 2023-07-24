@@ -31,8 +31,13 @@
 (require 'dash)
 (require 's)
 
+
+(leaf avy
+  :ensure (avy :repo "abo-abo/avy" :host github))
+
 (leaf ace-window
-  :ensure t
+  :ensure (ace-window :repo "abo-abo/ace-window"
+                      :host github)
   :bind ("M-o" . ace-window))
 
 (defun my-visit-last-opened-buffer ()
@@ -56,8 +61,7 @@
   (kill-buffer (current-buffer)))
 
 (leaf-keys
- ("C-TAB" . 'my-visit-last-opened-buffer)
- ("C-x k" . 'my-kill-current-buffer))
+ ("C-TAB" . 'my-visit-last-opened-buffer))
 
 (provide 'my-buffer-navigation)
 ;;; my-buffer-navigation.el ends here
