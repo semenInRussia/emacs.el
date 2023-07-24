@@ -42,24 +42,19 @@
   :ensure t)
 
 (leaf gruber-darker-theme
-  :ensure t
-  :require t)
+  :ensure t)
 
 (leaf monokai-theme
   :ensure t)
 
-(leaf nano-theme
-  :ensure t
-  :require t
-  :defun nano-dark
-  :config (nano-dark))
-
-;; (require 'doom-themes-autoloads)
-;; (load-theme 'doom-1337 t)
+(require 'doom-themes-autoloads)
+(load-theme 'doom-1337 t)
 
 ;; (custom-set-faces
 ;;  `(region
 ;;    ((t (:background "white")))))
+
+(setq line-spacing 0.2)
 
 (provide 'my-load-theme)
 ;;; my-load-theme.el ends here
