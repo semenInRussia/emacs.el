@@ -63,9 +63,6 @@
   (leaf alert
     :ensure t)
 
-  (leaf compat
-    :ensure t)
-
   (leaf fringe-helper
     :ensure t)
 
