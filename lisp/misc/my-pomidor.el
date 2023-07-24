@@ -33,9 +33,9 @@
 
 (leaf pomidor
   :ensure t
-  :hook (emacs-startup-hook . pomidor)
   :bind (("<f12>" . pomidor)
-         (:pomidor-mode-map ("Q" . kill-buffer)))
+         (:pomidor-mode-map
+          ("Q" . kill-buffer)))
   :custom ((pomidor-sound-tack    . nil)
            (pomidor-seconds       . 1800) ; 30min
            (pomidor-sound-tick    . nil)
