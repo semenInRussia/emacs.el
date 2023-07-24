@@ -46,8 +46,6 @@
            (org-agenda-span . 14))
   :bind ("C-c aa"      . org-agenda))
 
-(require 'fast-exec)
-
 (leaf org-agenda
   :after org
   :fast-exec ("Plane New Day" 'my-agenda-plan-new-day)

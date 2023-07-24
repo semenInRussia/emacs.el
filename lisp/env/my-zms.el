@@ -32,7 +32,6 @@
 (require 'f)
 
 (require 'my-lib)
-(require 'fast-exec)
 
 
 (defgroup my-zms nil

@@ -26,7 +26,7 @@
 ;;; Code:
 (require 'my-leaf)
 (require 'dash)
-(require 'fast-exec)
+
 
 (leaf devdocs
   :ensure t

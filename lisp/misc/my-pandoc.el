@@ -27,9 +27,6 @@
 
 ;;; Code:
 (require 'my-leaf)
-
-(require 'fast-exec)
-
 (require 'dash)
 (require 'f)
 (require 's)

@@ -27,8 +27,6 @@
 ;;; Code:
 
 (require 'my-leaf)
-(require 'fast-exec)
-
 (require 'fast-exec-initial-keymaps)
 
 (fast-exec-use deadgrep

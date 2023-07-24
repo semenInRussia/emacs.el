@@ -24,7 +24,6 @@
 ;;; Code:
 
 (require 'my-leaf)
-(require 'fast-exec)
 (require 'dash)
 
 (leaf cowsay

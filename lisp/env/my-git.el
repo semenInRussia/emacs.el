@@ -28,14 +28,16 @@
 ;;; Code:
 
 (require 'my-leaf)
-
-(require 'fast-exec)
-
 (require 'dash)
 
 
+(leaf magit-section :ensure t)
+(leaf with-editor :ensure t)
+(leaf git-commit :ensure t)
+
 (leaf magit
-  :ensure t
+  :ensure (magit :repo "magit/magit"
+                 :host github)
   :bind (:magit-mode-map
          ("D" . magit-file-delete))
   :custom ((magit-refresh-status-buffer . nil)
@@ -43,24 +45,28 @@
             . '(magit-insert-push-branch-header
                 magit-insert-tags-header
                 magit-insert-unpushed-to-upstream-or-recent
-                magit-insert-unpulled-from-upstream))))
+                magit-insert-unpulled-from-upstream)))
+  :config
+  (add-hook 'magit-mode-hook #'hl-line-mode)
+  (magit-auto-revert-mode 0))
 
 (leaf git-timemachine
-  :ensure (git-timemachine :host gitlab :repo "pidu/git-timemachine")
+  :ensure (git-timemachine :repo "pidu/git-timemachine" :host gitlab)
   :fast-exec ("Git Timemachine" 'git-timemachine))
 
-(leaf git-modes :ensure t)
+(leaf git-modes
+  :ensure (git-modes :repo "magit/git-modes" :host github))
 
 (leaf gitignore-templates
   :fast-exec ("Insert Git Ignore" 'gitignore-templates-insert))
 
 (leaf github-clone
-  :ensure t
+  :ensure (github-clone :repo "dgtized/github-clone.el" :host github)
   :custom (github-clone-directory . "~/projects")
   :fast-exec ("Clone a GitHub Project" 'github-clone))
 
 (leaf line-reminder
-  :ensure t
+  :ensure (line-reminder :repo "emacs-vs/line-reminder" :host github)
   :hook prog-mode-hook
   :custom ((line-reminder-bitmap . 'filled-rectangle)
            (line-reminder-show-option . 'indicators)))

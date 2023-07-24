@@ -26,7 +26,6 @@
 ;;; Code:
 (require 'my-leaf)
 
-(require 'fast-exec)
 (require 'dash)
 
 
@@ -49,5 +48,6 @@
                         :engines
                         (list (gts-google-engine))
                         :render (gts-buffer-render))))
+
 (provide 'my-go-translate)
 ;;; my-go-translate.el ends here

@@ -27,8 +27,6 @@
 ;;; Code:
 (require 'my-leaf)
 
-(require 'fast-exec)
-
 (require 'dash)
 (require 's)
 
@@ -85,9 +83,11 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
      (format-time-string "%Y"))))
   (search-backward "(leaf "))
 
-(fast-exec-bind 'writing-config
-  (fast-exec-make-some-commands
-   ("New Config Module" 'my-new-config-module)))
+(with-eval-after-load 'fast-exec
+  (fast-exec-bind
+   'writing-config
+   (fast-exec-make-some-commands
+    ("New Config Module" 'my-new-config-module))))
 
 (leaf ecukes
   :ensure t

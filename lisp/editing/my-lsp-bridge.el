@@ -29,10 +29,9 @@
 (require 'dash)
 (require 'corfu)
 
-(require 'fast-exec)
 
-
-(leaf posframe :ensure t)
+(leaf posframe
+  :ensure (posframe :repo "tumashu/posframe" :host github))
 
 (leaf lsp-bridge
   :load-path* "lisp/site-lisp/lsp-bridge"
@@ -58,6 +57,7 @@
          ("C-c C-d" . 'lsp-bridge-popup-documentation)
          ("<f6>"    . 'lsp-bridge-rename)
          ("C-c ll"  . 'lsp-bridge-code-action)
+         ("C-c la"  . 'lsp-bridge-code-action)
          ("M-,"     . 'lsp-bridge-find-references)
          ([remap xref-pop-marker-stack] . 'lsp-bridge-pop)
          ([remap xref-find-definitions] . 'lsp-bridge-find-def)

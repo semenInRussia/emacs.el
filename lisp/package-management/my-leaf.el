@@ -24,16 +24,16 @@
 
 ;;; Code:
 
-(declare-function 'straight-use-package "straight")
+(require 'my-straight)
 
 (require 'cl-lib)
-(require 'my-straight)
+(eval-when-compile (require 'fast-exec))
 
 
 (eval-and-compile
   ;; `eval-and-compile' really install the package in compile time,
   ;; it's important, because the rest config use `leaf' macro
-  (straight-use-package 'leaf)
+  (straight-use-package '(leaf :repo "conao3/leaf.el"))
   (require 'leaf)
 
   (defun my-leaf-keywords-init ()
@@ -212,6 +212,14 @@
                                                            elm))))
                         leaf--value)
 	      ,@leaf--body)
+            :pie
+            `(,@(mapcar (lambda (elm)
+                          `(eval-and-compile
+                             (my-pie-recipe ',(if (eq elm t)
+                                                  leaf--name
+                                                elm))))
+                        leaf--value)
+              ,@leaf--body)
             :el-get
             `(,@(mapcar
                  (lambda
@@ -642,10 +650,12 @@
                   (leaf-register-autoload
                    (-second-item it)
                    leaf--name)))
-              `((progn
+              `((with-eval-after-load 'fast-exec
+                  ;; `require' macros needed in `eval-and-compile'
+                  (eval-and-compile (require 'fast-exec))
                   (fast-exec-bind ',name
-                    (fast-exec-make-some-commands ,@bindings))
-                  ,@leaf--body)))
+                    (fast-exec-make-some-commands ,@bindings)))
+                ,@leaf--body))
             :leaf-defer
             (let*
                 ((eval-after-p
@@ -761,7 +771,12 @@
             `((eval-after-load ',leaf--name
                 '(progn ,@leaf--value))
               ,@leaf--body)))
-    (setq leaf-alias-keyword-alist '((:ensure . :straight))))
+    (setq leaf-alias-keyword-alist '((:ensure . :straight)
+                                     ;; I prefer use `setq' over `custom-set'
+                                     ;;
+                                     ;; the main reason is speed, it speed up my
+                                     ;; config in 2.4 times!!! (17secs => 7secs)
+                                     (:custom . :setq))))
 
   (my-leaf-keywords-init))
 
