@@ -52,7 +52,19 @@
     :commands nerd-icons-completion-mode
     ;; `marginalia' and this both use the same way to display info inside `vertico',
     ;; if i load it before `marginalia', then it wasn't working
-    :hook marginalia-mode-hook))
+    :hook marginalia-mode-hook)
+
+
+  ;; more fast way to search things inside `completing-read'
+  (leaf orderless
+    :ensure t
+    :require t
+    :custom (completion-styles . '(orderless)))
+
+  ;; show a bit of additional info inside the `vertico' `minibuffer'
+  (leaf marginalia
+    :ensure t
+    :global-minor-mode marginalia-mode))
 
 ;; some useful things:
 ;;
@@ -106,18 +118,7 @@
     :custom ((xref-show-xrefs-function . #'consult-xref)
              (xref-show-definitions-function . #'consult-xref)))
 
-  ;; more fast way to search things inside `completing-read'
-  (leaf orderless
-    :ensure t
-    :require t
-    :custom (completion-styles . '(orderless)))
-
-  ;; show a bit of additional info inside the `vertico' `minibuffer'
-  (leaf marginalia
-    :ensure t
-    :global-minor-mode marginalia-mode)
-
-  ;; `embark' is anything like to flexible keymap that changes depending on
+  ;; `embark' like to flexible keymap that changes depending on
   ;; when I call `embark-act'
   ;;
   ;; here only the integration of `embark' with `vertico', the configuration of
