@@ -29,8 +29,9 @@
 ;;; Code:
 (require 'my-leaf)
 
+
 (leaf haskell-mode
-  :ensure t
+  :ensure (haskell-mode :repo "haskell/haskell-mode" :host github)
   ;; :ensure-system-package (("hoogle" . "cabal install hoogle"))
   :hook ((haskell-mode-hook . haskell-indent-mode)
          (haskell-mode-hook . interactive-haskell-mode)

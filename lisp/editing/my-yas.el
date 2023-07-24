@@ -31,7 +31,7 @@
 (require 's)
 
 (leaf yasnippet
-  :ensure t
+  :ensure (yasnippet :repo "joaotavora/yasnippet")
   :defun (yas--table-hash
           yas--filter-templates-by-condition
           yas--namehash-templates-alist)

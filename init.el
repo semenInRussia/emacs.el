@@ -1,19 +1,8 @@
-;;; init.el --- Initialize emacs lisp code for my emacs -*- lexical-binding: t; -*-
+;;; init.el --- Initialize Emacs Lisp code for my Emacs -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2023
 
 ;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.0.1
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -25,38 +14,40 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'subr-x)  ;; for `string-remove-prefix'
 
+;; every custom variable of my config have the following group
+(defgroup my nil "Group for all my config files." :group 'tools)
+
+;; add every directory of my config to the `load-path'
+(add-to-list 'load-path "~/.emacs.d/lisp")
 (let ((dirs (directory-files-recursively "~/.emacs.d/lisp" ".*" t)))
   (mapc (lambda (dir)
           (when (file-directory-p dir)
             (add-to-list 'load-path dir)))
         dirs))
 
-(add-to-list 'load-path
-             (locate-user-emacs-file "lisp/local-projects"))
+;; local-projects is my own small "packages" which aren't so big to create real packages
+(add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects"))
+(load "~/.emacs.d/lisp/local-projects/my-autoload")
 
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory)
-      inhibit-startup-message "~/.emacs.d/GoodLuck.txt"
-      inhibit-message "Good Luck"
-      initial-major-mode 'fundamental-mode)
+;; don't use .emacs.d for custom.el which I don't use
+;;
+;; in the most of configurations, after it Emacs load custom.el, but I fount it
+;; a bit useless.  I prefer `setq' over `custom'
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
-(when (file-exists-p custom-file)
-  (load custom-file))
-
-(add-to-list 'load-path "~/.emacs.d/lisp")
-
-(load "~/.emacs.d/lisp/local-projects/my-autoload.el")
-
+;; the most part of the config located inside "~/.emacs.d/lisp" I join all .el
+;; files into the my-modules file for fast start up
 (defvar my-modules-el-file "~/.emacs.d/dist/my-modules.el")
 
 (unless (file-exists-p (file-name-directory my-modules-el-file))
-  (make-directory (file-name-directory my-modules-el-file)))
+  (user-error "File \"my-modules.el\" didn't created, suggest use --modules option"))
 
 (add-to-list 'load-path (file-name-directory my-modules-el-file))
 
-(require 'my-modules)
-
-(defgroup my nil "Group for all my config files." :group 'tools)
+(let ((file-name-handler-alist nil))
+  (require 'my-modules))
 
 (provide 'init)
 ;;; init.el ends here

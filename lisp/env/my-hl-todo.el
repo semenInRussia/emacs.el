@@ -28,8 +28,8 @@
 ;;; Code:
 (require 'my-leaf)
 
-(leaf hl-todo                           ;nofmt
-  :ensure t
+(leaf hl-todo
+  :ensure (hl-todo :repo "tarsius/hl-todo" :host github)
   :global-minor-mode global-hl-todo-mode)
 
 (provide 'my-hl-todo)

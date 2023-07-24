@@ -27,8 +27,9 @@
 
 (require 'my-leaf)
 
+
 (leaf goto-last-change
-  :ensure t
+  :ensure (goto-last-change :repo "camdez/goto-last-change.el" :host github)
   :bind ("C-_" . 'goto-last-change))
 
 (provide 'my-goto-last-change)

@@ -29,7 +29,7 @@
 (require 'my-leaf)
 
 (leaf embrace
-  :ensure t
+  :ensure (embrace :repo "cute-jumper/embrace.el" :host github)
   :defvar embrace-semantic-units-alist
   :setq-default (embrace-show-help-p . nil)
   :bind ("C-."       . embrace-commander)

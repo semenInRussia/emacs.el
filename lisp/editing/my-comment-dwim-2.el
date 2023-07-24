@@ -29,7 +29,8 @@
 (require 'my-leaf)
 
 (leaf comment-dwim-2
-  :ensure t
+  :ensure (comment-dwim-2 :repo "remyferre/comment-dwim-2"
+                          :host github)
   :bind ("M-;" . comment-dwim-2))
 
 (provide 'my-comment-dwim-2)

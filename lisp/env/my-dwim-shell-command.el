@@ -28,7 +28,7 @@
 (require 'my-leaf)
 
 (leaf dwim-shell-command
-  :ensure t
+  :ensure (dwim-shell-command :repo "xenodium/dwim-shell-command" :host github)
   :bind ("M-!" . dwim-shell-command))
 
 (provide 'my-dwim-shell-command)

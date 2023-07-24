@@ -26,10 +26,12 @@
 ;; My configuration of the `flycheck'
 
 ;;; Code:
+
 (require 'my-leaf)
 
-(leaf flycheck                          ;nofmt
-  :ensure t
+
+(leaf flycheck
+  :ensure (flycheck :repo "flycheck/flycheck" :host github)
   :bind (:flycheck-mode-map
          ([remap next-error] . 'flycheck-next-error)
          ([remap previous-error] . 'flycheck-previous-error))

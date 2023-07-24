@@ -23,7 +23,9 @@
 ;; My configuration of `recentf'.
 
 ;;; Code:
+
 (require 'my-leaf)
+
 
 (leaf recentf
   :global-minor-mode recentf-mode)

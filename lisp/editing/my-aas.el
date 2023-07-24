@@ -28,7 +28,9 @@
 ;;; Code:
 (require 'my-leaf)
 
-(leaf aas :ensure t :global-minor-mode aas-global-mode)
+(leaf aas
+  :ensure t
+  :global-minor-mode aas-global-mode)
 
 (provide 'my-aas)
 ;;; my-aas.el ends here

@@ -27,10 +27,9 @@
 (require 'my-leaf)
 
 (leaf cc-mode
-  :config
-  (leaf google-c-style
-    :ensure t
-    :hook (c++-mode-hook . google-set-c-style)))
+  :config (leaf google-c-style
+            :ensure (google-c-style :repo "google/styleguide" :host github)
+            :hook (c++-mode-hook . google-set-c-style)))
 
 (provide 'my-c)
 ;;; my-c.el ends here

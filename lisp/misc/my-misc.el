@@ -43,17 +43,17 @@
 (setq default-keyboard-coding-system 'utf-8)
 (setq buffer-file-coding-system 'utf-8)
 
-;;; just do PPTX (powerpoint) file that can't be read
+;;; just make PPTX (powerpoint) file that can't be read
 (defun my-new-fake-pptx-file ()
   "Make this buffer, fake presentation with format (.pptx)."
   (interactive)
   (->> "~/broken.pptx" (f-read) (insert))
   (text-mode))
 
-(require 'fast-exec)
-(fast-exec-bind 'pptx
-  (fast-exec-make-some-commands
-   ("New Fake PPTX File" 'my-new-fake-pptx-file)))
+(with-eval-after-load 'fast-exec
+ (fast-exec-bind 'pptx
+                 (fast-exec-make-some-commands
+                  ("New Fake PPTX File" 'my-new-fake-pptx-file))))
 
 ;;; I try to decrease the Emacs startup time
 (defun my-display-startup-time ()

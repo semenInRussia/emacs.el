@@ -27,10 +27,11 @@
 
 (require 'my-leaf)
 
+
 ;; NOTE that here support only `ecukes' now.
 ;; `ecukes' is cucumber for `emacs-lisp-mode'
 (leaf feature-mode
-  :ensure t
+  :ensure (feature-mode :repo "michaelklishin/cucumber.el" :host github)
   :hook (feature-mode-hook . my-feature-mode-hook)
   :bind (:feature-mode-map
          ("RET" . newline-and-indent)

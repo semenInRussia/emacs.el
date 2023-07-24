@@ -32,6 +32,8 @@
 
 (leaf nerd-icons :ensure t)
 
+(leaf shrink-path :ensure t)
+
 (leaf doom-modeline
   :ensure t
   :ensure t

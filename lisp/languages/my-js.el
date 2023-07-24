@@ -39,10 +39,11 @@
   (add-to-list 'lsp-bridge-multi-lang-server-mode-list
                '((typescript-mode js-mode)
                  . "typescript_rome"))
-  (leaf js-comint :ensure t))
+  (leaf js-comint
+    :ensure (js-comint :repo "redguardtoo/js-comint" :host github)))
 
 (leaf typescript-mode
-  :ensure t
+  :ensure (typescript-mode :repo "emacs-typescript/typescript.el" :host github)
   :hook (typescript-mode-hook . my-lsp-ensure)
   :custom (typescript-indent-level . 2)
   :config                               ;nofmt

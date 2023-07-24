@@ -52,10 +52,10 @@
   :hook (mhtml-mode-hook . my-lsp-ensure)
   :config                               ;nofmt
   (leaf auto-rename-tag
-    :ensure t)
+    :ensure (auto-rename-tag :repo "jcs-elpa/auto-rename-tag" :host github))
 
   (leaf tagedit
-    :ensure t
+    :ensure (tagedit :repo "magnars/tagedit" :host github)
     ;;    :bind `(,(--map
     ;; `(,it
     ;;   :package ,(my-map-to-major-mode it)
@@ -66,10 +66,12 @@
     ;;   ([remap sp-change-enclosing]  . tagedit-kill-attribute))
     ;; (my-html-supported-modes-maps))))
     )
-  (leaf emmet-mode :ensure t :hook mhtml-mode-hook)
+  (leaf emmet-mode
+    :ensure (emmet-mode :repo "smihica/emmet-mode" :host github)
+    :hook mhtml-mode-hook)
 
   (leaf impatient-mode
-    :ensure t
+    :ensure (impatient-mode :repo "skeeto/impatient-mode" :host github)
     :defun (imp-visit-buffer impatient-mode)
     :bind (:html-mode-map
            :package mhtml-mode

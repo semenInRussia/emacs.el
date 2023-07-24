@@ -27,6 +27,9 @@
 (require 'my-leaf)
 (require 'f)
 
+(leaf emacsql
+  :ensure t)
+
 (leaf org-roam
   :ensure t
   :init (f-mkdir "~/org-roam")
@@ -48,10 +51,13 @@
   (add-to-list 'Info-directory-list
                (f-full "~/.emacs.d/straight/repos/org-roam/doc"))
 
-  (require 'org-roam-export)
-  (require 'org-roam-protocol)
+  ;; (require 'org-roam-export)
+  ;; (require 'org-roam-protocol)
 
-  (leaf org-roam-ui                     ;nofmt
+  (leaf simple-httpd
+    :ensure t)
+
+  (leaf org-roam-ui
     :ensure t
     :defun org-roam-ui-mode
     :config (org-roam-ui-mode t)))

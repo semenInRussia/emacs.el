@@ -31,7 +31,6 @@
 
 
 (leaf project
-  :ensure t
   :bind-keymap ("C-c p" . project-prefix-map))
 
 (provide 'my-project)

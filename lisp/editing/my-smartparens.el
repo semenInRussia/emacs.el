@@ -31,7 +31,7 @@
 (require 'my-lib)
 
 (leaf smartparens
-  :ensure t
+  :ensure (smartparens :repo "Fuco1/smartparens" :host github)
   :global-minor-mode smartparens-global-mode
   :require smartparens-config
   :defun (sp-clone-sexp sp-use-paredit-bindings)

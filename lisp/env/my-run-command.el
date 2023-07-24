@@ -32,7 +32,6 @@
 
 (leaf run-command
   :ensure (run-command
-           :type git
            :host github
            :repo "bard/emacs-run-command"
            :branch "develop")

@@ -70,12 +70,13 @@ See `imenu-generic-expression'"
                                my-markdown-imenu-generic-expression)))
   :config                               ;nofmt
   (leaf markdown-toc
-    :ensure t
+    :ensure (markdown-mode :repo "jrblevin/markdown-mode" :host github)
     :bind (:markdown-mode-map
            :package markdown-mode
            ("C-T" . markdown-toc-generate-or-refresh-toc)))
 
-  (leaf edit-indirect :ensure t)
+  (leaf edit-indirect
+    :ensure (edit-indirect :repo "Fanael/edit-indirect" :host github))
 
   (my-autoformat-bind-for-major-mode
    'markdown-mode

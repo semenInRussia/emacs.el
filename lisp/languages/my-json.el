@@ -30,13 +30,13 @@
 (require 'my-leaf)
 
 (leaf json-mode
-  :ensure t
+  :ensure (json-mode :repo "joshwnj/json-mode" :host github)
   :bind (:json-mode-map
          ([:remap my-format-expression] . json-pretty-print-buffer))
   :hook (json-mode-hook . my-json-fix-indent-funcs)
   :config                               ;nofmt
   (leaf json-snatcher
-    :ensure t
+    :ensure (json-snatcher :repo "Sterlingg/json-snatcher" :host github)
     :bind (:json-mode-map
            :package json-mode
            ("C-c M-w" . jsons-print-path)))

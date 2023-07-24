@@ -28,16 +28,20 @@
 ;;; Code:
 (require 'my-leaf)
 
+
 (leaf ctrlf
-  :ensure t
+  :ensure (ctrlf :repo "radian-software/ctrlf" :host github)
   :bind ("C-s" . ctrlf-forward-default))
 
 (leaf visual-regexp
-  :ensure t
+  :ensure (visual-regexp :repo "benma/visual-regexp.el" :host github)
   :bind ("M-%" . vr/query-replace))
 
+(leaf spinner
+  :ensure t)
+
 (leaf deadgrep
-  :ensure t
+  :ensure (deadgrep :repo "Wilfred/deadgrep" :host github)
   :bind ("C-c S" . deadgrep))
 
 (provide 'my-search)

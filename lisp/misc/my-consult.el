@@ -37,6 +37,7 @@
   :global-minor-mode vertico-mode
   :config
   ;; I press `M-delete' to go the up directory inside of `vertico'
+  ;; and TAB to enter into the directory.
   (leaf vertico-directory
     :bind (:vertico-map
            :package vertico
@@ -46,12 +47,12 @@
            ("M-DEL" . vertico-directory-delete-word)))
 
   ;; beautifull icons inside `vertico'
-  (leaf all-the-icons-completion
+  (leaf nerd-icons-completion
     :ensure t
-    :defun all-the-icons-completion-mode
-    ;; I load it after init because otherwise it doesn't work
-    ;; I don't know WHYYY!?
-    :hook after-init-hook))
+    :commands nerd-icons-completion-mode
+    ;; `marginalia' and this both use the same way to display info inside `vertico',
+    ;; if i load it before `marginalia', then it wasn't working
+    :hook marginalia-mode-hook))
 
 ;; some useful things:
 ;;
@@ -93,9 +94,7 @@
 
   ;; i don't know what does the next line
   :hook ((completion-list-mode-hook . consult-preview-at-point-mode))
-
-  ;; The :init configuration is always executed (Not lazy)
-  :init
+  :config
 
   ;; This adds thin lines, sorting and hides the mode line of the window.
   (advice-add #'register-preview :override #'consult-register-window)
@@ -125,7 +124,7 @@
   ;; `vertico' inside `my-embark'
   (leaf embark-consult
     :ensure t
-    :after consult)
+    :hook (embark-collect-mode-hook . consult-preview-at-point-mode))
 
   ;; the following lines fix some things which are wrong in my emacs@29
   (defvar string-width 0)

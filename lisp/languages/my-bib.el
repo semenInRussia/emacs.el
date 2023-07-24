@@ -1,29 +1,18 @@
-;;; my-bib.el --- My configuration of `bib' -*- lexical-binding: t; -*-
+;;; my-bib.el --- My configuration for bibliography management -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022 semenInRussia
+;; Copyright (C) 2022-2023 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; Homepage: https://github.com/semeninrussia/emacs.el
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
-;; My configuration of `bib'.
+;; My configuration for bibliography management.
 
 ;;; Code:
+
 (require 'my-leaf)
 
 (require 'dash)
@@ -38,22 +27,63 @@
   :bind ((:bibtex-mode-map
           ([remap my-format-expression] . 'bibtex-reformat)))
   :config                               ;nofmt
-  (leaf bibtex-utils :ensure t))
+  (leaf bibtex-utils
+    :ensure (bibtex-utils :repo "plantarum/bibtex-utils" :host github)))
 
-;; (leaf company-bibtex
-;; :ensure (company-bibtex :repo "semenInRussia/company-bibtex")
-;;   :defvar company-backends
-;;   :hook (org-mode-hook . company-bibtex-org-mode-hook)
-;;   :custom (company-bibtex-org-citation-regex . "\\(ebib:\\|cite:@\\)")
-;;   :config (add-to-list 'company-backends 'company-bibtex)
-;;   (defun company-bibtex-org-mode-hook ()
-;;     "Hook for `org-mode' enabling `comapany-bibtex' for current buffer."
-;;     (interactive "P")
-;;     (->>
-;;      company-backends
-;;      (--remove
-;;       (and (listp it) (eq (car it) 'company-bbdb)))
-;;      (setq-local company-backends))))
+;; load `citar', but for `embark'
+(leaf citar
+  :ensure t
+  :hook (org-mode-hook . citar-capf-setup)
+  :bind (:org-mode-map
+         :package org
+         ("C-c C-S-b" . 'org-cite-insert))
+  :custom ((org-cite-global-bibliography . '("~/bib.bib"))
+           (org-cite-insert-processor   . 'citar)
+           (org-cite-follow-processor   . 'citar)
+           (org-cite-activate-processor . 'citar)
+           (citar-bibliography . org-cite-global-bibliography))
+  :defvar (org-cite-global-bibliography
+           citar-indicators
+           citar-bibliography
+           org-roam-directory)
+  :config
+  ;; `citar' have integration with `all-the-icons',
+  ;; but not with `nerd-icons'
+
+  ;; TODO: `nerd-icons' + `citar'
+
+  ;; (defvar my-citar-indicator-notes-nerd-icons
+  ;;   (citar-indicator-create
+  ;;    :symbol (nerd-icons-codicon "nf-cod-notebook")
+  ;;    :function #'citar-has-notes
+  ;;    :padding "  "
+  ;;    :tag "has:notes"))
+
+  ;; (setq citar-indicators
+  ;;       (list
+  ;;        ;; plain text
+  ;;        citar-indicator-files
+  ;;        my-citar-indicator-notes-nerd-icons))
+
+  ;; `citar' + `embark'
+  (leaf citar-embark
+    :ensure t
+    :after (citar embark)
+    :global-minor-mode citar-embark-mode)
+
+  ;; `org-roam' + `citar':
+  (leaf parsebib :ensure t)
+
+  (leaf citar-org-roam
+    :ensure t
+    :after org-roam
+    :global-minor-mode citar-org-roam-mode
+    :config
+    ;; `org-roam' has your own the bibliography.bib file
+    ;; -- (in my config)
+    (with-eval-after-load 'org-roam
+      (add-to-list 'org-cite-global-bibliography (f-join org-roam-directory "bibliography.bib"))
+      (add-to-list 'citar-bibliography (f-join org-roam-directory "bibliography.bib")))))
 
 (provide 'my-bib)
 ;;; my-bib.el ends here

@@ -28,7 +28,7 @@
 (require 'my-leaf)
 
 (leaf elm-mode
-  :ensure t
+  :ensure (elm-mode :repo "jcollard/elm-mode" :host github)
   :hook (elm-mode-hook . my-lsp-ensure)
   :bind (:elm-mode-map
          ([remap my-format-expression] . elm-format)))

@@ -26,11 +26,11 @@
 ;;; Code:
 
 (require 'my-leaf)
+(require 'dash)
+(require 'my-lib)
 
 (declare-function meow-insert "meow-commands.el")
 
-(require 'dash)
-(require 'my-lib)
 
 (defun my-lisp-sexp-whole-line-p ()
   "Return t, when the Lisp sexp at the point being at whole of line."
@@ -53,7 +53,7 @@
   (repeat-at-last-keystroke))
 
 (leaf paxedit
-  :ensure t
+  :ensure (paxedit :repo "promethial/paxedit" :host github)
   :defun (paxedit-delete
           paxedit-sexp-region
           paxedit-transpose-backward
@@ -95,7 +95,8 @@
       (goto-char end)
       (insert sep sexp))))
 
-(leaf lisp-mode :custom (lisp-body-indent . 2))
+(leaf lisp-mode
+  :custom (lisp-body-indent . 2))
 
 (provide 'my-lisp)
 ;;; my-lisp.el ends here

@@ -33,7 +33,7 @@
 
 
 (leaf expand-region
-  :ensure t
+  :ensure (expand-region :repo "magnars/expand-region.el" :host github)
   :bind ("C-x C-<SPC>" . er/expand-region))
 
 (provide 'my-expand-region)

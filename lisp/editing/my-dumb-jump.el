@@ -30,10 +30,11 @@
 (require 'my-leaf)
 
 (leaf rg
-  :ensure t)
+  :ensure (rg :repo "dajva/rg.el"
+              :host github))
 
 (leaf dumb-jump
-  :ensure t
+  :ensure (dumb-jump :repo "jacktasia/dumb-jump" :host github)
   :custom ((dumb-jump-prefer-searcher dumb-jump-force-searcher)
            . 'rg)
   :bind (("M-," . xref-go-back)

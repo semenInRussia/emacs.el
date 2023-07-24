@@ -32,8 +32,10 @@
 
 (defvar uncrustify-cfg-file (f-full "~/uncrustify.cfg"))
 
+
 (leaf apheleia
-  :ensure t
+  :ensure (apheleia :repo "radian-software/apheleia"
+                    :host github)
   :defvar (apheleia-formatters apheleia-mode-alist)
   :global-minor-mode apheleia-global-mode
   :defer-config

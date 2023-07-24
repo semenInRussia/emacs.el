@@ -26,12 +26,14 @@
 ;; My configuration of the `go'
 
 ;;; Code:
+
 (require 'my-leaf)
 
 (declare-function my-lsp-ensure "my-lsp")
 
+
 (leaf go-mode
-  :ensure t
+  :ensure (go-mode :repo "dominikh/go-mode.el" :host github)
   :hook (go-mode-hook . my-lsp-ensure))
 
 (provide 'my-go)
