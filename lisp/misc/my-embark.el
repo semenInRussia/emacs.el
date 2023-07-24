@@ -35,7 +35,7 @@
 
 (leaf embark
   :defvar (embark-keymap-alist marginalia-prompt-categories)
-  :defun (magit-status . magit)
+  :defun (magit-status-setup-buffer . magit)
   :ensure t
   :bind (("C-." . embark-act)
          ("C-M-." . embark-dwim)
@@ -51,6 +51,7 @@
          (:embark-file-map
           ("G" . my-embark-magit-status)))
 
+  ;; eval after `embark' was loaded
   :config
 
   (defun my-embark-act-noexit ()
@@ -65,8 +66,16 @@
     (let ((embark-quit-after-action nil))
       (call-interactively #'embark-act-all)))
 
-  ;; some additional actions
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none))))
 
+  ;;; SOME ADDITIONAL ACTIONS
+
+  ;; googling a thing
+  ;;
   ;; was grabbed from the offical wiki
   (defun my-embark-google-search (term)
     "Open google.com to search a given TERM."
@@ -74,12 +83,16 @@
     (browse-url
      (format "http://google.com/search?q=%s" term)))
 
+  ;; support of `magit'
+  ;;
   ;; was grabbed from the offical wiki
   (defun my-embark-magit-status (file)
     "Run `magit-status` on repo containing the embark target."
     (interactive "GFile: ")
     (magit-status-setup-buffer (locate-dominating-file file ".git")))
 
+  ;; support of `straight'
+  ;;
   ;; was grabbed from the offical wiki
   (with-eval-after-load 'straight
     (defvar-keymap embark-straight-map
@@ -100,6 +113,7 @@
       (add-to-list 'marginalia-prompt-categories '("recipe\\|package" . straight)))))
 
 ;; support of agnifize.el: my small Emacs package
+;; to make a regular Python code into bad code (my sister agnia write bad code)
 (leaf agnifize
   :bind ((:embark-file-map
           :package embark
@@ -110,10 +124,6 @@
          (:embark-region-map
           :package embark
           ("Q" . 'agnifize-region))))
-
-;; a = "djeidje "
-;; name = "Semen"
-
 
 (provide 'my-embark)
 ;;; my-embark.el ends here
