@@ -30,24 +30,11 @@
 (require 'my-leaf)
 
 
-;; disable tabs
+;; disable tabs, sorry Richard
 (setq-default indent-tabs-mode nil)
-
-(defun my-indent-line-or-region ()
-  "If text selected, then indent it, otherwise indent current line."
-  (interactive)
-  (save-excursion
-    (if (use-region-p)
-        (indent-region (region-beginning) (region-end))
-      (funcall indent-line-function))))
 
 (leaf-keys
  (prog-mode-map ("RET" . newline-and-indent)))
-
-(leaf-keys
- ("RET"   . newline-and-indent)
- ("q"     . my-indent-line-or-region)
- ("SPC q" . join-line))
 
 (provide 'my-indent)
 ;;; my-indent.el ends here
