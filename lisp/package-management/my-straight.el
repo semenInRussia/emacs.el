@@ -25,11 +25,14 @@
 ;;; Code:
 
 (declare-function straight-use-package "straight.el")
+
+
 (eval-and-compile
   ;; `eval-and-compile' really install the package in compile time,
   ;; it's important, because `my-leaf' needs in `straight-use-package' to install
   ;; itself and `leaf' needed in the rest config, because `leaf' macro
   (defvar bootstrap-version)
+  (setq straight-find-executable "C:\\tools\\find.exe")
   (setq straight-check-for-modifications nil)
   (let ((bootstrap-file
          (expand-file-name
@@ -51,7 +54,14 @@
 (declare-function straight--compute-dependencies "straight.el")
 
 (eval-and-compile
-  (setq straight-find-executable "C:\\tools\\find.exe")
+  ;; don't build packages, think that they're already installed
+  (advice-add 'straight--package-might-be-modified-p :override 'ignore)
+  ;; but after init, new packages can be installed,
+  ;; so packages can be (re)builded
+  (add-hook 'after-init-hook
+	    (lambda ()
+	      (advice-remove 'straight--package-might-be-modified-p 'ignore)))
+
   (defun my-straight-load-package (melpa-style-recipe)
     "Load a package with a given MELPA-STYLE-RECIPE.
 
@@ -81,33 +91,8 @@ placed at the straight build directory"
                            straight-base-dir
                            "straight"
                            straight-build-dir)))))))
-    ;; (let ((package (if (symbolp melpa-style-recipe)
-    ;;                    (symbol-name melpa-style-recipe)
-    ;;                  (cadr (plist-member
-    ;;                         (straight--convert-recipe melpa-style-recipe)
-    ;;                         :package)))))
-    ;;   ;; add to the `load-path'
-    ;;   (straight--add-package-to-load-path
-    ;;    (list :package package))
-    ;;   ;; install TeX-info docsets
-    ;;   (straight--add-package-to-info-path
-    ;;    (list :package package))
-    ;;   ;; load autoloads
-    ;;   (straight--load-package-autoloads package))
-    (straight-use-package melpa-style-recipe))
-  
-  ;; (defvar my-straight-ignore-pkg-rx "emacs_backtrace.txt")
-  ;; (mapc
-  ;;  (lambda (pkg)
-  ;;    (unless (string-match-p my-straight-ignore-pkg-rx pkg)
-  ;;      (message "Loading %s..." pkg)
-  ;;      (my-straight-load-package (intern pkg))))
-  ;;  (cddr ;; skip "." and ".."
-  ;;   (directory-files (straight--file
-  ;;                     straight-base-dir
-  ;;                     "straight"
-  ;;                     straight-build-dir))))
-  )
+    (setq straight-find-executable "C:\\tools\\find.exe")
+    (straight-use-package melpa-style-recipe)))
 
 (eval-and-compile
   (add-to-list 'load-path "~/projects/fast-exec.el"))
