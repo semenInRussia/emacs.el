@@ -28,55 +28,12 @@
 ;;; Code:
 (require 'my-leaf)
 
-(declare-function consult-buffer "consult")
 
 (leaf multiple-cursors
-  :ensure t
-  :defun (mc/vertical-align-with-space
-          mc/edit-lines
-          mc/mark-all-words-like-this)
-  :defvar multiple-cursors-mode
-  :custom (my-mc-cmds-to-run-once .
-                                  '(my-mark-all
-                                    my-bob-or-mc-align
-                                    my-eob-or-align-with-spaces
-                                    my-mc-mark-like-this-or-edit-lines
-                                    my-mc-mark-like-this-or-edit-lines
-                                    toggle-input-method))
+  :ensure (multiple-cursors :repo "magnars/multiple-cursors.el" :host github)
   :bind (("M-i"       . 'mc/edit-lines)
          ("C-,"       . 'mc/mark-next-like-this-word)
-         ("C-<"       . mc/mark-previous-like-this-word)
-         ;; ("SPC TAB 7" . mc/reverse-regions)
-         ;; ("SPC d 7"   . mc/unmark-next-like-this)
-         ("M-<"     . my-bob-or-mc-align)
-         ("M->"     . my-eob-or-mc-align-with-space)
-         ("C-x C-," . my-mark-all))
-  :config
-
-  (defun my-mark-all ()
-    "Mark all words like this for `multiple-cursors', otherwise mark buffer."
-    (interactive)
-    (if multiple-cursors-mode
-        (mc/mark-all-words-like-this)
-      (call-interactively 'mark-whole-buffer)))
-
-  (defun my-bob-or-mc-align ()
-    "If enabled `multiple-cursors', then mark then align by regexp, other bob.
-
-BOB - is `beginning-of-buffer'"
-    (interactive)
-    (if multiple-cursors-mode
-        (call-interactively 'mc/vertical-align)
-      (call-interactively 'beginning-of-buffer)))
-
-  (defun my-eob-or-mc-align-with-space ()
-    "If enabled `multiple-cursors', then align by spaces, other eob.
-
-EOB - is `end-of-buffer'"
-    (interactive)
-    (if multiple-cursors-mode
-        (mc/vertical-align-with-space)
-      (goto-char (point-max)))))
+         ("C-<"       . mc/mark-previous-like-this-word)))
 
 (provide 'my-multiple-cursors)
 ;;; my-multiple-cursors.el ends here
