@@ -31,13 +31,6 @@
 (require 'dash)
 (require 's)
 
-(defvar my-calc-operations
-  '(calcDigit-start
-    calc-convert-units
-    calc-algebraic-entry
-    calc-solve-for
-    calc-store)
-  "List of the function after which will be actived insert mode.")
 
 (leaf calc
   :defun (calc-yank-internal calc-pack calc-vector-mean)
@@ -48,7 +41,7 @@
          (:calc-edit-mode-map
           :package calc-yank
           ([remap save-buffer] . calc-edit-finish)))
-  :config                               ;nofmt
+  :config
   (defun my-calc-mean-yank (vec)
     "Yank to calculator vector of numbers VEC as string and compute mean.
 
