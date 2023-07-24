@@ -29,28 +29,22 @@
 (require 'my-leaf)
 (require 'dash)
 
-;; you can install this font, usin `nerd-fonts' (search in the `github')
+;; you can install this font, from the GitHub repo `nerd-fonts'
 (defcustom my-fonts-main
-  "Hack Nerd Font Mono"
+  "JetBrains Mono"
   "Name of the main font to display all."
   :group 'my
   :type 'string)
 
-(leaf all-the-icons :ensure t)
+(defcustom my-font-size
+  20
+  "Name of the main font to display all."
+  :group 'my
+  :type 'number)
 
-(set-face-attribute 'default nil :family my-fonts-main :height 210)
-
-;; (leaf unicode-fonts
-;;   :ensure t
-;;   :defun (unicode-fonts-setup unicode-fonts--instructions)
-;;   :defvar (unicode-fonts
-;;            unicode-fonts--instructions
-;;            ...)
-;;   :require t
-;;   :init (defvar ... nil)
-;;   :config (setq unicode-fonts--instructions
-;;                 (-remove-item '... unicode-fonts--instructions))
-;;   (unicode-fonts-setup))
+(set-face-attribute 'default nil
+                    :height (* my-font-size 10)
+                    :family my-fonts-main)
 
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
