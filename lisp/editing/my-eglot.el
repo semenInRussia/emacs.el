@@ -26,25 +26,16 @@
 ;;; Code:
 
 (require 'my-leaf)
-
-(require 'fast-exec)
-
 (require 'dash)
 
 (declare-function turn-off-flycheck "my-flycheck.el")
 
 
-(defcustom my-eglot-major-modes
-  '(rust-mode python-mode haskell-mode)
-  "List of the major modes in which should work `eglot'."
-  :group 'my
-  :type '(repeat major-mode))
-
 (leaf eglot
   :custom `((eglot-send-changes-idle-time . 1) ; in seconds
             (eglot--executable-find . "C:\\tools\\find.exe"))
-
   :custom-face (eglot-highlight-symbol-face . '((t (:inherit lazy-highlight))))
+  :defun eglot-inlay-hints-mode
   :bind (:eglot-mode-map
          ("C-c lr" . 'eglot-rename)
          ("<f6>"   . 'eglot-rename)
@@ -54,20 +45,26 @@
   :fast-exec (("Start a LSP Server for Current Buffer" 'eglot)
               ("Reconnect the LSP Server" 'eglot-reconnect)
               ("Disable the LSP Server" 'eglot-shutdown))
-  :config                               ;nofmt
+  :config
   ;; `eglot' use `flymake' instead of `flycheck', so i disable `flycheck'
   (add-hook 'eglot-managed-mode-hook #'turn-off-flycheck)
 
+  ;; don't use inlay hints, because they're a bit useless for me
+  ;;
+  ;; I'm "True Emacs user"!!!
+  (add-hook 'eglot-managed-mode-hook #'eglot-inlay-hints-mode)
+
   (leaf flymake
-    :require t
     :bind (:flymake-mode-map
            ("C-c fd" . 'flymake-show-project-diagnostics)
            ([remap next-error] . 'flymake-goto-next-error)
            ([remap prev-error] . 'flymake-goto-prev-error)))
 
-  (leaf eldoc-box
-    :after my-eldoc
-    :hook (eglot-managed-mode-hook . eldoc-box-hover-mode)))
+  ;; set default LSP servers for all supported languages
+  (defvar eglot-server-programs)  ; make compiler happier
+  ;; python (pyright)
+  (setf (alist-get '(python-mode python-ts-mode) eglot-server-programs)
+        '("pyright-langserver" "--stdio")))
 
 (provide 'my-eglot)
 ;;; my-eglot.el ends here
