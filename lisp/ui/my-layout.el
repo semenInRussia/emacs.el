@@ -27,18 +27,18 @@
 
 (require 'disp-table)
 
-(setq default-frame-alist
-      (append (list
-               '(min-height . 1)
-               '(height     . 45)
-               '(min-width  . 1)
-               '(width      . 81)
-               '(vertical-scroll-bars . nil)
-               '(internal-border-width . 24)
-               '(left-fringe    . 1)
-               '(right-fringe   . 1)
-               '(tool-bar-lines . 0)
-               '(menu-bar-lines . 0))))
+;; (setq default-frame-alist
+;;       (append (list
+;;                '(min-height . 1)
+;;                '(height     . 45)
+;;                '(min-width  . 1)
+;;                '(width      . 81)
+;;                '(vertical-scroll-bars . nil)
+;;                '(internal-border-width . 24)
+;;                '(left-fringe    . 1)
+;;                '(right-fringe   . 1)
+;;                '(tool-bar-lines . 0)
+;;                '(menu-bar-lines . 0))))
 
 ;; on OSX, type the line below (in terminal) to get a 1 pixel border
 ;; defaults write com.apple.universalaccess increaseContrast -bool YES
@@ -68,10 +68,6 @@
       inhibit-startup-echo-area-message t
       initial-scratch-message nil)
 
-(tooltip-mode 0)
-(horizontal-scroll-bar-mode 0)
-(scroll-bar-mode 0)
-(menu-bar-mode 0)
 ;; (global-hl-line-mode 0)
 (setq x-underline-at-descent-line t)
 
@@ -85,5 +81,10 @@
 
 ;; Hide org markup for README
 (setq org-hide-emphasis-markers t)
+
+;; paddings
+(leaf spacious-padding
+  :ensure t
+  :global-minor-mode spacious-padding-mode)
 
 ;;; my-layout.el ends here
