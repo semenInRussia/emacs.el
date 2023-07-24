@@ -37,7 +37,7 @@
 
 
 (leaf meow
-  :ensure t
+  :ensure (meow :repo "meow-edit/meow" :host github)
   :require t
   :require my-meow-structural
   :defvar (meow-cheatsheet-layout
@@ -91,6 +91,8 @@
      '(";" . meow-reverse)
      '("," . meow-inner-of-thing)
      '("." . meow-bounds-of-thing)
+     '("<" . previous-error)
+     '(">" . next-error)
      '("[" . meow-beginning-of-thing)
      '("]" . meow-end-of-thing)
      '("a" . meow-append)
@@ -117,7 +119,7 @@
      '("L" . meow-right-expand)
      '("m" . meow-join)
      '("n" . meow-search)
-     '("o" . meow-to-block)
+     '("O" . meow-to-block)
      '("o" . embark-act)
      '("p" . meow-yank)
      '("P" . meow-yank-pop)
