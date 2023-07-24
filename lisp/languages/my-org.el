@@ -32,18 +32,11 @@
 (require 'just)
 (require 'my-lib)
 (require 'dash)
-(require 'my-autoformat)
-
-(defvar org-mode-hook)
-
-(add-hook 'org-mode-hook 'visual-fill)
-(add-hook 'org-mode-hook 'aas-activate-for-major-mode)
 
 
 (leaf org
   :ensure t
-  :defun ((transient-define-prefix . transient)
-          (my-autoformat-bind-for-major-mode . my-autoformat)
+  :defun ((my-autoformat-bind-for-major-mode . my-autoformat)
           (my-org-heading-p . my-org)
           (my-org-properties-end-p . my-org)
           (my-org-list-item-p . my-org)
@@ -54,8 +47,8 @@
           (embrace-org-mode-hook . my-org)
           org-current-level)
   :custom ((org-refile-use-outline-path . nil)
-           (org-fold-core-style  . 'overlays)
            (org-refile-targets   . '((org-agenda-files :maxlevel . 2)))
+           (org-fold-core-style  . 'overlays)
            (org-startup-folded   . t)
            (org-startup-indented . t)
            (org-startup-with-inline-images . t)
@@ -66,7 +59,6 @@
                             ("\\.jpg\\'" . "start %s"))))
   :defvar (my-org-list-item-prefix-regexp
            my-org-keywords)
-  :hook ((org-mode-hook . org-cdlatex-mode))
   :bind (("C-c c" . org-capture)
          (:org-mode-map
           ;; Insert anything
@@ -75,10 +67,8 @@
 
           ;; Manipulations with a subtree
           ("C-c C-w"   . my-org-cut)
-          ;; heading => plain text
-          ;; 8 is * without shift
-          ("C-c C-M-w"   . my-org-clear-subtree)
-          ("C-c tab" . org-refile)
+          ("C-c C-M-w" . my-org-clear-subtree)
+          ("C-c tab"   . org-refile)
           ("C-c C-t"   . my-org-todo)
           ("C-c C-j"   . org-id-get-create)))
   ;; the following code should add some auto activating snippets, for example,
@@ -91,6 +81,9 @@
         "Misc " "Miscellaneous"
         "iau" "I am use")
   :config
+  (add-hook 'org-mode-hook 'visual-line-mode)
+  (add-hook 'org-mode-hook 'aas-activate-for-major-mode)
+
   (leaf my-org-editing
     :commands (my-org-clear-subtree
                my-org-clear-subtree
@@ -102,154 +95,19 @@
                my-org-todo
                my-org-todo))
 
-  (leaf xenops
-    :ensure t
-    :after org
-    :hook org-mode-hook)
-
   (leaf cdlatex
-    :ensure t
-    :require t)
+    :ensure (cdlatex :repo "cdominik/cdlatex" :host github)
+    :hook (org-mode-hook . org-cdlatex-mode))
 
   (defun doom-docs-org-mode () (interactive))
 
   (leaf my-org-autoformat
-    :config                             ;nofmt
-    (defcustom my-org-list-labels-regexps
-      '("\\+" "-" "[0-9]+\\.")
-      "List of the regexp prefixes indicates a label of a `org-mode' list item.
+    :hook (org-mode-hook . my-autoformat-mode))
 
-Label is thing which just decorates a list, but it's not item content, for
-example in the following list
-
-- a
-- b
-- c
-
-Label is \"-\""
-      :group 'my
-      :type '(repeat string))
-
-    (defcustom my-org-keywords
-      '("TODO" "DONE")
-      "List of the `org-mode' keywords sush as TODO or DONE."
-      :group 'my
-      :type '(repeat string))
-
-    (defcustom my-org-list-label-regexp
-      (my-regexp-opt-of-regexp my-org-list-labels-regexps)
-      "Regexp indicates a item of a `org-mode' list.
-
-Label is thing which just decorates a list, but it's not item content, for
-example in the following list
-
-- a
-- b
-- c
-
-Label is \"-\", you should consider that spaces before label shouldn't be in the
-regexp"
-      :group 'my
-      :type '(repeat string))
-
-    (defcustom my-org-list-item-checkbox-regexp
-      "\\[.\\]"
-      "Regexp indicates a `org-mode' checkbox."
-      :group 'my
-      :type 'regexp)
-
-    (defcustom my-org-list-item-prefix-regexp
-      (rx line-start
-          (0+ " ")
-          (regexp my-org-list-label-regexp)
-          (? (1+ " ") (regexp my-org-list-item-checkbox-regexp))
-          (0+ " "))
-      "Regexp indicates a list item."
-      :group 'my
-      :type 'regexp)
-
-    (my-autoformat-bind-for-major-mode
-     'org-mode
-     'my-org-sentence-capitalization
-     'my-org-list-item-capitalization
-     'my-org-heading-capitalization)
-
-    (defun my-org-sentence-capitalization ()
-      "Capitalize first letter of a sentence in the `org-mode'."
-      (interactive)
-      (cond
-       ((just-call-on-prev-line*
-         (or
-          (just-line-is-whitespaces-p)
-          (my-org-heading-p)
-          (my-org-properties-end-p)
-          (my-org-list-item-p)))
-        (my-autoformat-sentence-capitalization t))
-       ((just-call-on-prev-line* (equal (pos-bol) (point-min)))
-        (my-autoformat-sentence-capitalization))
-       (t
-        (just-call-on-backward-char*
-         (and
-          (looking-back my-autoformat-sentence-end nil)
-          (looking-at-p "[[:alpha:]]")
-          (upcase-char 1))))))
-
-    (defun my-org-heading-p ()
-      "Return t, when the cursor located at a `org-mode' heading text."
-      ;; NOTE: don't handle cases when bold word located at the beginning of the
-      ;; line.  For example:
-      ;;
-      ;; *bold word*
-      ;;
-      ;; this function in the above case return t, but excepted nil
-      (just-line-prefix-p "*"))
-
-    (defun my-org-list-item-capitalization ()
-      "Capitalize first letter of a itemized list item."
-      (interactive)
-      (just-call-on-backward-char*
-       (and
-        (looking-at-p "[[:alpha:]]")
-        (my-org-list-item-p)
-        (looking-back my-org-list-item-prefix-regexp nil)
-        (upcase-char 1))))
-
-    (defun my-org-list-item-p ()
-      "Return t, when the cursor located at an item of a `org-mode' list."
-      (just-line-regexp-prefix-p my-org-list-item-prefix-regexp))
-
-    (defun my-org-properties-end-p ()
-      "Get t, if the point placed at the end of `org-mode' subtree properties."
-      (string-equal (just-text-at-line nil t) ":END:"))
-
-    (defun my-org-heading-capitalization ()
-      "Capitalize first letter of a `org-mode' heading.
-
-When `org-mode' heading has any keyword (like to TODO or DONE) first letter
-demotes a first letter after keyword word."
-      (interactive "d")
-      (when (just-call-on-backward-char*
-             (and
-              (my-org-heading-p)
-              (looking-at-p "[[:alpha:]]")
-              (progn
-                (skip-chars-backward " ")
-                (my-org-skip-backward-keyword)
-                (skip-chars-backward " *")
-                (bolp))))
-        (upcase-char -1)))
-
-    (defun my-org-skip-backward-keyword ()
-      "If right at the cursor placed `org-mode' keyword, then skipt it."
-      (when (member (thing-at-point 'symbol) my-org-keywords)
-        (backward-sexp))))
-
-  (leaf org-download
-    :ensure t
-    :hook (dired-mode-hook . org-download-enable))
-
+  ;; it disabled, sorry,,,
   (leaf org-keys
     :require t
+    :disabled t
     :custom ((org-use-speed-commands . t)
              (org-speed-commands
               .
@@ -329,7 +187,6 @@ demotes a first letter after keyword word."
            :package org
            ([remap consult-imenu] . consult-outline)))
 
-  ;; I am bind the command `org-export' with \"SPC l e\" in the root `leaf'
   (leaf ox
     :custom ((org-export-coding-system . 'utf-8)
              (org-export-with-smart-quotes . t)
@@ -342,9 +199,9 @@ demotes a first letter after keyword word."
                                          ("" "cmap" nil ("pdflatex"))
                                          ("" "float" nil
                                           ("pdflatex" "xelatex")))))
-    :defer-config                       ;nofmt
+    :defer-config
     (leaf latex-extra
-      :ensure t
+      :ensure (latex-extra :repo "Malabarba/latex-extra" :host github)
       :defun latex/compile-commands-until-done
       :config                           ;nofmt
       (defun my-org-latex-compile (filename &optional snippet)
@@ -369,9 +226,12 @@ produced."
 
       (defalias 'org-latex-compile 'my-org-latex-compile))
 
-    (leaf ox-json :ensure t :require t)
+    (leaf json-snatcher
+      :ensure t)
 
-    (leaf ox-beamer :require t))
+    (leaf ox-json
+      :ensure (ox-json :repo "jlumpe/ox-json" :host github)
+      :require t))
 
   (leaf my-org-do-tidy
     :bind (:org-mode-map
@@ -382,19 +242,6 @@ produced."
     :bind (:org-mode-map
            :package org
            ("C-c C-." . my-org-options-transient)))
-
-  (leaf embrace
-    :ensure t
-    :hook (org-mode-hook . my-embrace-org-mode-hook)
-    :config                             ;nofmt
-    (defun my-embrace-org-mode-hook ()
-      "Enable `embrace' specially for `org-mode'."
-      (embrace-org-mode-hook)
-      (setq-local embrace-show-help-p nil)))
-
-  (leaf org-table-sticky-header
-    :ensure t
-    :hook org-mode-hook)
 
   (leaf org-autolist
     :ensure t
@@ -408,10 +255,12 @@ produced."
            ("C-c C-0" . rorg-wrap-region-or-current-heading)
            ("C-c C-{" . rorg-forward-slurp-subtree)
            ("C-c C-}" . rorg-backward-barf-subtree)
-           ("{" . rorg-backward-slurp-subtree)
-           ("[" . rorg-forward-barf-subtree)))
+           ("C-c {" . rorg-backward-slurp-subtree)
+           ("C-c [" . rorg-forward-barf-subtree)))
 
+  ;; it disabled with me
   (leaf my-org-drag
+    :disabled t
     :defun ((add-right-dragger
              add-left-dragger
              add-down-dragger
@@ -426,6 +275,10 @@ produced."
     (add-left-dragger 'my-drag-org-left)
     (add-down-dragger 'my-drag-org-down)
     (add-up-dragger 'my-drag-org-up)))
+
+(leaf org-download
+  :ensure (org-download :repo "abo-abo/org-download" :host github)
+  :hook (dired-mode-hook . org-download-enable))
 
 (provide 'my-org)
 ;;; my-org.el ends here

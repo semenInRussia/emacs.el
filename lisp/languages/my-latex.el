@@ -31,21 +31,16 @@
 (require 'f)
 (require 'yasnippet)
 (require 'dash)
-(require 'my-autoformat)
 (require 'smartparens)
 
-(declare-function aas-set-snippets "aas.el")
 
-(defvar autoformat-latex-enumerate-list-items-triggers)
-(defvar autoformat-latex-itemized-list-items-triggers)
+(declare-function aas-set-snippets "aas.el")
 
 (declare-function my-embrace-add-paren-of-cdlatex-math "my-latex.el")
 (declare-function my-embrace-add-paren-latex-command "my-latex.el")
 (declare-function my-embrace-add-paren-latex-style-command "my-latex.el")
 (declare-function my-latex-style-command-left-paren-regexp "my-latex.el")
 (declare-function my-latex-style-command-left-paren "my-latex.el")
-
-(declare-function autoformat-latex-expand-to-enumerate-list-item-p "my-latex.el")
 
 (declare-function TeX-master-file-ask "tex.el")
 (declare-function cdlatex-wrap-environment "cdlatex.el")
@@ -55,6 +50,7 @@
 (defvar cdlatex-command-alist-comb)
 (defvar cdlatex-math-modify-alist)
 (defvar cdlatex-math-modify-alist-default)
+
 
 (defcustom my-latex-master-files-alist
   '(("~/zms/*/solutions/*.tex" . "../Solution.tex"))
@@ -108,7 +104,7 @@
 
 
 (leaf auctex
-  :ensure auctex
+  :ensure (auctex :repo "emacs-straight/auctex" :host github)
   :mode ("\\.tex$" . latex-mode))
 
 
@@ -131,9 +127,9 @@
          ("C-c C-w"  . my-latex-kill-section))
   :config                               ;nofmt
   (leaf xenops
+    :ensure (xenops :repo "dandavison/xenops")
     :hook LaTeX-mode-hook
     :after tex-mode
-    :ensure t
     :custom (xenops-math-image-scale-factor . 2))
 
   (leaf my-latex-insert
@@ -185,7 +181,7 @@
       (er/mark-LaTeX-inside-environment)))
 
   (leaf laas
-    :ensure t
+    :ensure (laas :repo "tecosaur/LaTeX-auto-activating-snippets" :host github)
     :hook LaTeX-mode-hook
     :aas (laas-mode
           :cond #'texmathp
@@ -204,7 +200,7 @@
           "grd" "^\\circ"))
 
   (leaf cdlatex
-    :ensure t
+    :ensure (cdlatex :repo "cdominik/cdlatex" :host github)
     :hook (LaTeX-mode-hook  . turn-on-cdlatex)
     :bind (:cdlatex-mode-map
            ("<tab>" . cdlatex-tab)
@@ -253,7 +249,7 @@
     :require t)
 
   (leaf latex-extra
-    :ensure t
+    :ensure (latex-extra :repo "Malabarba/latex-extra" :host github)
     :hook ((LaTeX-mode-hook . latex-extra-mode)
            (LaTeX-mode-hook . visual-line-mode))
     :bind (:latex-mode-map
@@ -278,9 +274,11 @@
     (auto-fill-mode 0))
 
   (leaf my-latex-drag
+    :after my-drag
     :defun ((add-up-dragger add-down-dragger) . my-drag)
     :commands (my-latex-try-drag-left-list-item
                my-latex-try-drag-right-list-item)
+    ;; eval after `my-drag' is loaded
     :init
     (add-up-dragger 'my-latex-try-drag-left-list-item)
     (add-down-dragger 'my-latex-try-drag-right-list-item)))

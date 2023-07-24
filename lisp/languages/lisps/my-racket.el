@@ -28,10 +28,17 @@
 ;;; Code:
 
 (require 'my-leaf)
+(require 'my-lib)
+(require 'dash)
+(require 'smartparens)
+
+(declare-function my-autoformat-bind-for-major-mode "my-autoformat")
+
 
 (leaf racket-mode
-  :ensure t
+  :ensure (racket-mode :repo "greghendershott/racket-mode" :host github)
   :defvar (my-racket-meta-return-functions
+           racket-xp-mode-hook
            my-racket-meta-return-cond-clauses-expression-names)
   :defun ((my-racket-meta-return-contracted .
                                             (my-racket
@@ -46,7 +53,7 @@
          ;; enable structured editing for the `racket-mode'
          (racket-mode-hook . paxedit-mode))
   :custom (racket-xp-mode-hook . nil)
-  :config                               ;nofmt
+  :config                                      ;nofmt
   (remove-hook 'racket-mode-hook 'racket-mode) ;fix a bug
 
   (defcustom my-racket-meta-return-functions nil
@@ -125,9 +132,8 @@ List of racket expressions in which this function should work:
       (forward-char -1)
       t))
 
-  (add-to-list
-   'my-racket-meta-return-functions
-   'my-racket-meta-return-cond-clauses)
+  (add-to-list 'my-racket-meta-return-functions
+               'my-racket-meta-return-cond-clauses)
 
   (defun my-racket-meta-return-contracted ()
     "Add new argument form to the expression of the Racket `contracted'."
@@ -149,10 +155,15 @@ List of racket expressions in which this function should work:
                #'my-racket-meta-return-contracted))
 
 (leaf scribble-mode
-  :ensure t
-  :config                               ;nofmt
-  (my-autoformat-bind-for-major-mode 'scribble-mode
-                                     'my-autoformat-sentence-capitalization))
+  :ensure (scribble-mode :repo "emacs-pe/scribble-mode" :host github)
+  :config
+  (add-hook
+   'scribble-mode-hook
+   (defun my-autoformat-scribble ()
+     "Define `my-autoformat' things for `scribble-mode'."
+     (require 'my-autoformat)
+     (my-autoformat-bind-for-major-mode 'scribble-mode
+                                        'my-autoformat-sentence-capitalization))))
 
 (provide 'my-racket)
 ;;; my-racket.el ends here
