@@ -37,7 +37,13 @@
   :ensure (corfu
            :repo "minad/corfu"
            :files ("*.el" "extensions/*"))
-  :global-minor-mode global-corfu-mode
+  ;; so when auto-completion is provided, load `corfu'
+  ;;
+  ;; I load `corfu' only when it really needed.  It's awesome idea, until
+  ;; `corfu' don't take some seconds before load, it make Emacs a little worth,
+  ;; but with `my-use-afk' it's still cool
+  :commands corfu--in-region
+  :init (setq-default completion-in-region-function 'corfu--in-region)
   :custom (;; by default 2 but 1 one is better
            (corfu-auto-prefix . 1)
            ;; by default to run `corfu' you should press `C-M-i'
@@ -47,36 +53,33 @@
            ;; the default value (15) is really small
            (corfu-min-width . 40))
   :config
+  ;; `completion-in-region-function' was already changed, but
+  ;; `global-corfu-mode' enable auto complete, if `corfu-auto' is non-nil
+  (global-corfu-mode t)
+
   ;; show documentation of every auto-completion item
   (leaf corfu-popupinfo
-    :require t
-    :defvar corfu-popupinfo--buffer-parameters
-    :global-minor-mode corfu-popupinfo-mode))
+    :bind (:corfu-map
+           :package corfu
+           ("M-i" . 'corfu-popupinfo-toggle)))
 
-(leaf svg-lib
-  :ensure t
-  :require t)
-
-(leaf nerd-icons
-  :ensure t)
-
-(leaf kind-icon
-  :ensure (kind-icon :repo "emacs-straight/kind-icon"
-                     :host github)
-  :require t
-  :defun kind-icon-margin-formatter
-  :defvar corfu-margin-formatters
-  :custom ((kind-icon-use-icons . t)
-           (kind-icon-default-face . 'corfu-default)
-           (kind-icon-blend-background . nil)
-           (kind-icon-default-style . `(
-                                        :padding 0
-                                        :stroke 0
-                                        :margin 0
-                                        :radius 0
-                                        :height 0.5
-                                        :scale 1)))
-  :config (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+  (leaf kind-icon
+    :ensure (kind-icon :repo "emacs-straight/kind-icon"
+                       :host github)
+    :after corfu
+    :defun kind-icon-margin-formatter
+    :defvar corfu-margin-formatters
+    :custom ((kind-icon-use-icons . t)
+             (kind-icon-default-face . 'corfu-default)
+             (kind-icon-blend-background . nil)
+             (kind-icon-default-style . `(
+                                          :padding 0
+                                          :stroke 0
+                                          :margin 0
+                                          :radius 0
+                                          :height 0.5
+                                          :scale 1)))
+    :config (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)))
 
 (leaf cape
   :ensure (cape :repo "minad/cape" :host github)
@@ -96,4 +99,5 @@
   ;; (add-to-list 'completion-at-point-functions #'cape-line)
   )
 
+(provide 'my-corfu)
 ;;; my-corfu.el ends here
