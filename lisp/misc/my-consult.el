@@ -34,7 +34,12 @@
   :ensure (vertico :host github
                    :repo "minad/vertico"
                    :files ("*.el" "extensions/*.el"))
-  :global-minor-mode vertico-mode
+  :commands vertico--advice
+  ;; it's part of `vertico-mode'
+  :init
+  (advice-add 'completing-read-default :around #'vertico--advice)
+  (advice-add 'completing-read-multiple :around #'vertico--advice)
+  :config (vertico-mode t)
   :config
   ;; I press `M-delete' to go the up directory inside of `vertico'
   ;; and TAB to enter into the directory.
@@ -47,6 +52,9 @@
            ("M-DEL" . vertico-directory-delete-word)))
 
   ;; beautifull icons inside `vertico'
+  (leaf nerd-icons
+    :ensure t)
+
   (leaf nerd-icons-completion
     :ensure t
     :commands nerd-icons-completion-mode
@@ -74,9 +82,10 @@
 ;; - switch to buffer one of the project buffers, recent opened files and other
 (leaf consult
   :ensure t
-  :defun (consult-register-format
-          consult-register-window
-          consult-xref)
+  :commands (consult-register-format
+             consult-register-window
+             consult-xref)
+  :init (autoload 'consult-xref "consult-xref")
   :defvar (consult-narrow-key consult-project-function)
   :bind (:minibuffer-local-map
          ("M-s" . consult-history) ;; orig. next-matching-history-element
