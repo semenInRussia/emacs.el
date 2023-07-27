@@ -134,6 +134,41 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
 
 (add-hook 'after-save-hook 'my-do-autoload-for-local-projects-files)
 
+(eval-when-compile
+  (require 'dash)
+  (require 's)
+  (require 'f))
+
+(defun my-move-all-straight-packages-files-into-dir (dest)
+  "Move all files of all installed and packages built with `straight' into DEST."
+  (interactive (list "~/.emacs.d/telpa"))
+  (f-mkdir-full-path dest)
+  (my-copy-files
+   (file-expand-wildcards (concat "~/.emacs.d/straight/build/" "*/*"))
+   dest)
+  (my-create-package-autoloads dest))
+
+(defun my-create-package-autoloads (dest)
+  "Create one file of package autoloads in the DEST from other autoloads files."
+  (let ((default-directory dest))
+    (with-temp-buffer
+      (->>
+       dest
+       directory-files
+       (--filter (s-suffix-p "-autoloads.el" it))
+       (mapc #'insert-file-contents))
+      (write-region (point-min) (point-max) (f-join dest "my-package-autoloads.el")))))
+
+(defun my-copy-files (files dest)
+  "Copy all FILES into the directory DEST."
+  (--each files
+    (if (f-dir-p it)
+        (ignore-errors
+          (copy-directory it
+                          (f-join dest (f-filename it))))
+      (copy-file it
+                 (f-join dest (f-filename it))
+                 'ok-if-exists))))
 
 (provide 'my-writing-config)
 ;;; my-writing-config.el ends here
