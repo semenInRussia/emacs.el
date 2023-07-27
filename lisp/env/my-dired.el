@@ -77,6 +77,8 @@
     :ensure (dired-filter
              :repo "Fuco1/dired-hacks"
              :host github)
+    :disabled t
+    :defvar dired-filter-map
     :bind-keymap (:dired-mode-map
                   :package dired
                   ("." . dired-filter-map)))

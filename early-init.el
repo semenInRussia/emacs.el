@@ -110,10 +110,13 @@ my-modules.el file with the `my-build-config' function
 
 This is function for `command-line-functions'."
    (when (string-equal argi "--modules")
-     (message "Start build my-modules.el...")
-     (require 'my-build-config (locate-user-emacs-file "lisp/my-build-config.el"))
-     ;; build config
-     (my-build-config)
-     ;; return non-nil value
-     ;; it means that argument was successfully handled
-     t)))
+     (prog1 t
+       (message "Start build my-modules.el...")
+       (require 'my-build-config
+		(locate-user-emacs-file "lisp/my-build-config.el"))
+       (my-build-config))))
+ ;; --install
+ (defun my-install-cli-handle-arg (arg)
+   (when (string-equal argi "--install")
+     (prog1 t
+       (setq my-straight-packages-already-installed-p nil)))))

@@ -29,7 +29,6 @@
 
 (require 'my-leaf)
 (require 'f)
-(require 'yasnippet)
 (require 'dash)
 (require 'smartparens)
 
