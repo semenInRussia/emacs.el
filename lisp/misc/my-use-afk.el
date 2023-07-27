@@ -31,6 +31,8 @@
   '(;; `consult' command `consult-buffer', really frequently useful by me,
     ;; I use it in 99% of Emacs sessions, load it when in AFK
     consult
+    ;; auto-completion (`corfu')
+    corfu
     ;; my configuration really tied with `embark'.
     ;; I use it for: change reGisTeR of the region, kill the sexp at point,
     ;; do things on the minibuffer items, browse the URL at the cursor
@@ -93,7 +95,6 @@
     gts-engine-bing
     go-translate
     ;; run-command
-    run-command-recipes
     run-command)
   "This is the list of modules which should be loaded after some seconds of AFK.
 
@@ -129,12 +130,11 @@ It load the respective Emacs package from the `my-use-afk-modules' list after
 `my-use-afk-timeout' seconds depends on `my-use-afk-counter', change the value
 of this counter and run timer to load itself after the seconds of AFK"
   (interactive)
-  ;; do some things to tell idle, that after this function loading should work
   (let ((module (nth my-use-afk-counter my-use-afk-modules)))
     (cond
      ((null module)                     ; all things already loaded -> stop
       (message "All heavy things have already loaded")
-      (cancel-timer my-use-afk-timer)
+      (my-use-afk-stop)
       t)
      ((featurep module)      ; the current thing already loaded -> load the next
       (message "The module have already loaded: %s" module)
@@ -142,7 +142,7 @@ of this counter and run timer to load itself after the seconds of AFK"
       (my-use-afk-next))
      (t                                 ; just load the current module
       (message "Load the module, because u in AFK: %s..." module)
-      (unless (ignore-errors (require module)) ; can't load module
+      (unless (ignore-errors (require module))  ; can't load module
         (message "Can't load the module in afk: %s" module))
       (cl-incf my-use-afk-counter)
       (run-with-timer
@@ -162,6 +162,11 @@ of this counter and run timer to load itself after the seconds of AFK"
                 (current-idle-time))
            (my-use-afk-next))))))))
 
+(defun my-use-afk-stop ()
+  "Don't using AFK time to load heavy things anymore."
+  (interactive)
+  (cancel-timer my-use-afk-timer))
+
 (defun my-use-afk-first-start ()
   "Load all heavy things in AFK starting from the first one.
 
@@ -175,7 +180,20 @@ It useful when an error in AFK loading was occured and you need to try fix it."
   (setq my-use-afk-timer
         (run-with-idle-timer my-use-afk-timeout t 'my-use-afk-next)))
 
-(my-use-afk-first-start)
+(define-minor-mode my-use-afk-mode
+  "Use time when user do nothing (AFK time) to load heavy things.
+
+It's useful, because when this mode is enabled and user doing nothing Emacs do a
+hard work to don't do it when user type a text."
+  :global t
+  :group 'misc
+  :init-value nil
+  (if my-use-afk-mode
+      (my-use-afk-first-start)
+    (my-use-afk-stop)))
+
+;; when Emacs is started start using AFK
+(add-hook 'after-init-hook 'my-use-afk-mode)
 
 (provide 'my-use-afk)
 ;;; my-use-afk.el ends here
