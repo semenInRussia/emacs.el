@@ -33,8 +33,9 @@
 (eval-and-compile
   ;; `eval-and-compile' installs all libraries in compile-time
   ;; , so "(require \\='dash)" compiles successufelly
+  
   (leaf dash
-    :ensure t
+    :ensure (dash :repo "magnars/dash.el" :host github)
     :global-minor-mode global-dash-fontify-mode
     :require t)
 
@@ -73,8 +74,11 @@
     :ensure t)
 
   (leaf indicators
-    :ensure t))
+    :ensure t)
 
+  (leaf svg-lib
+    :ensure t
+    :require t))
 
 (provide 'my-libs)
 ;;; my-libs.el ends here
