@@ -31,6 +31,7 @@
   ;; `eval-and-compile' really install the package in compile time,
   ;; it's important, because `my-leaf' needs in `straight-use-package' to install
   ;; itself and `leaf' needed in the rest config, because `leaf' macro
+  (defvar my-straight-packages-already-installed-p (not (member "--install" command-line-args)))
   (defvar bootstrap-version)
   (setq straight-find-executable "C:\\tools\\find.exe")
   (setq straight-check-for-modifications nil)
@@ -44,23 +45,24 @@
                             'silent 'inhibit-cookies)
         (goto-char (point-max))
         (eval-print-last-sexp)))
-    (load bootstrap-file nil 'nomessage)))
+    (load bootstrap-file nil 'nomessage))
 
-(declare-function straight--convert-recipe "straight.el")
-(declare-function straight--add-package-to-load-path "straight.el")
-(declare-function straight--add-package-to-info-path "straight.el")
-(declare-function straight--file "straight.el")
-(declare-function straight--load-package-autoloads "straight.el")
-(declare-function straight--compute-dependencies "straight.el")
+  (declare-function straight--convert-recipe "straight.el")
+  (declare-function straight--add-package-to-load-path "straight.el")
+  (declare-function straight--add-package-to-info-path "straight.el")
+  (declare-function straight--file "straight.el")
+  (declare-function straight--load-package-autoloads "straight.el")
+  (declare-function straight--compute-dependencies "straight.el")
 
-(eval-and-compile
   ;; don't build packages, think that they're already installed
-  (advice-add 'straight--package-might-be-modified-p :override 'ignore)
-  ;; but after init, new packages can be installed,
-  ;; so packages can be (re)builded
+  (unless my-straight-packages-already-installed-p
+    (advice-add 'straight--package-might-be-modified-p :override 'ignore))
+
+  ;; but after init, new packages can be installed, so packages can be
+  ;; (re)builded
   (add-hook 'after-init-hook
-	    (lambda ()
-	      (advice-remove 'straight--package-might-be-modified-p 'ignore)))
+            (lambda ()
+              (advice-remove 'straight--package-might-be-modified-p 'ignore)))
 
   (defun my-straight-load-package (melpa-style-recipe)
     "Load a package with a given MELPA-STYLE-RECIPE.
@@ -91,11 +93,9 @@ placed at the straight build directory"
                            straight-base-dir
                            "straight"
                            straight-build-dir)))))))
-    (setq straight-find-executable "C:\\tools\\find.exe")
-    (straight-use-package melpa-style-recipe)))
-
-(eval-and-compile
-  (add-to-list 'load-path "~/projects/fast-exec.el"))
+    (unless my-straight-packages-already-installed-p
+      (setq straight-find-executable "C:\\tools\\find.exe")
+      (straight-use-package melpa-style-recipe))))
 
 (provide 'my-straight)
 ;;; my-straight.el ends here
