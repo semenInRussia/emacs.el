@@ -27,14 +27,15 @@
 
 ;;; Code:
 
+(require 'meow-core)                    ; for `meow-normal-mode'
 (require 'meow-util)
 (require 'meow-command)
+
 
 (defgroup my-meow-structural '()
   "Structural editing for `meow' modal editing mode.
 Originally was written for original `meow' QWERTY layout."
   :group 'editing)
-
 
 ;;; Variables that defines original paredit keybidings
 
@@ -68,53 +69,63 @@ Originally was written for original `meow' QWERTY layout."
 (defun my-meow-structural-mark-sexp ()
   "Mark the s-expression after the cursor."
   (interactive)
-  (meow--execute-kbd-macro my-meow-structural-kbd-mark-sexp))
+  ;; go to the beginning of the sexp at point
+  (my-meow-structural--just-forward-sexp)
+  (my-meow-structural--just-backward-sexp)
+  (save-excursion
+    ;; push mark to the end of the next s-expression
+    (my-meow-structural--just-forward-sexp)
+    (my-meow-structural--maybe-start-sexp-selection)))
 
-(defun my-meow-structural--just-forward-sexp (&optional n)
+(defun my-meow-structural--just-forward-sexp ()
   "Just go the forward N th sexp."
   (meow--execute-kbd-macro my-meow-structural-kbd-forward-sexp))
 
-(defun my-meow-structural--just-backward-sexp (&optional n)
+(defun my-meow-structural--just-backward-sexp ()
   "Just go the backward N th sexp."
   (meow--execute-kbd-macro my-meow-structural-kbd-backward-sexp))
 
-(defun my-meow-structural--just-backward-up-sexp (&optional n)
+(defun my-meow-structural--just-backward-up-sexp ()
   "Just go the backward-up N th sexp."
   (meow--execute-kbd-macro my-meow-structural-kbd-backward-up-sexp))
 
-(defun my-meow-structural--just-forward-down-sexp (&optional n)
+(defun my-meow-structural--just-forward-down-sexp ()
   "Just go the forward-down N th sexp."
   (meow--execute-kbd-macro my-meow-structural-kbd-forward-down-sexp))
 
 (defun my-meow-structural-forward-sexp ()
   "Go the next s-expression."
   (interactive)
-  (unless (equal 'sexp (cdr (meow--selection-type)))
-    (meow--cancel-selection))
-  (my-meow-structural--just-forward-sexp)
-  (my-meow-structural-mark-sexp))
+  (my-meow-structural--maybe-start-sexp-selection)
+  (my-meow-structural--just-forward-sexp))
 
 (defun my-meow-structural-backward-sexp ()
   "Go the backward s-expression."
   (interactive)
-  (unless (equal 'sexp (cdr (meow--selection-type)))
-    (meow--cancel-selection))
-  (my-meow-structural--just-backward-sexp)
-  (my-meow-structural-mark-sexp))
+  (my-meow-structural--maybe-start-sexp-selection)
+  (my-meow-structural--just-backward-sexp))
+
+(defun my-meow-structural--maybe-start-sexp-selection (&optional pt)
+  "If the current selection isn't expandable, then start new sexp selection.
+
+Start expansion at the point PT.  PT defaults to the value of `point'"
+  (or pt (setq pt (point)))
+  (unless (meow--select-expandable-p)
+    ;; cancel old selection and start new
+    (set-mark pt)
+    (setq meow--selection '(select . sexp))))
 
 (defun my-meow-structural-backward-up-sexp ()
   "Backward up the s-expression."
   (interactive)
-  (unless (equal 'sexp (cdr (meow--selection-type)))
-    (meow--cancel-selection))
   (my-meow-structural--just-backward-up-sexp)
   (my-meow-structural-mark-sexp))
 
 (defun my-meow-structural-forward-down-sexp ()
   "Forward down s-expression."
   (interactive)
-  (unless (equal 'sexp (cdr (meow--selection-type)))
-    (meow--cancel-selection))
+  (when (and (region-active-p) (meow--direction-forward-p))
+    (my-meow-structural--just-backward-sexp))
   (my-meow-structural--just-forward-down-sexp)
   (my-meow-structural-mark-sexp))
 

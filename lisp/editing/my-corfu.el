@@ -23,7 +23,7 @@
 
 ;; My configuration of `corfu'.  I choose `corfu' over `company' because
 ;; `company' have a big load time (about 9 secs on my computer) while `corfu'
-;; 3 secs
+;; 3secs
 
 ;;; Code:
 
@@ -44,6 +44,8 @@
   ;; but with `my-use-afk' it's still cool
   :commands corfu--in-region
   :init (setq-default completion-in-region-function 'corfu--in-region)
+  ;; make border of auto-completion minibuffer white, it looks like nice
+  :custom-face ((corfu-border . '((t :background "white"))))
   :custom (;; by default 2 but 1 one is better
            (corfu-auto-prefix . 1)
            ;; by default to run `corfu' you should press `C-M-i'
@@ -67,7 +69,7 @@
     :ensure (kind-icon :repo "emacs-straight/kind-icon"
                        :host github)
     :after corfu
-    :defun kind-icon-margin-formatter
+    :commands kind-icon-margin-formatter
     :defvar corfu-margin-formatters
     :custom ((kind-icon-use-icons . t)
              (kind-icon-default-face . 'corfu-default)
@@ -84,20 +86,20 @@
 (leaf cape
   :ensure (cape :repo "minad/cape" :host github)
   :require t
-  :defun (cape-symbol cape-dabbrev cape-file cape-elisp-block cape-history
-                      cape-keyword cape-sgml cape-tex cape-abbrev cape-symbol)
+  :commands (cape-symbol
+             cape-dabbrev cape-file cape-elisp-block cape-history
+             cape-keyword cape-sgml cape-tex cape-abbrev cape-symbol)
   :config
+  ;; (add-to-list 'completion-at-point-functions #'cape-tex)
+  ;; (add-to-list 'completion-at-point-functions #'cape-symbol)
+  ;; (add-to-list 'completion-at-point-functions #'cape-line)
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file)
   (add-to-list 'completion-at-point-functions #'cape-elisp-block)
   (add-to-list 'completion-at-point-functions #'cape-history)
   (add-to-list 'completion-at-point-functions #'cape-keyword)
   (add-to-list 'completion-at-point-functions #'cape-sgml)
-  ;; (add-to-list 'completion-at-point-functions #'cape-tex)
-  (add-to-list 'completion-at-point-functions #'cape-abbrev)
-  ;; (add-to-list 'completion-at-point-functions #'cape-symbol)
-  ;; (add-to-list 'completion-at-point-functions #'cape-line)
-  )
+  (add-to-list 'completion-at-point-functions #'cape-abbrev))
 
 (provide 'my-corfu)
 ;;; my-corfu.el ends here

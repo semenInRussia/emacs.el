@@ -37,6 +37,7 @@
   :ensure (apheleia :repo "radian-software/apheleia"
                     :host github)
   :defvar (apheleia-formatters apheleia-mode-alist)
+  :require apheleia-core
   :global-minor-mode apheleia-global-mode
   :defer-config
   (push '(uncrustify

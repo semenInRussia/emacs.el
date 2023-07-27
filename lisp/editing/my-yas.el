@@ -26,9 +26,11 @@
 ;; My configuration for the `yasnippet'
 
 ;;; Code:
-(require 'my-leaf)
 
+
+(require 'my-leaf)
 (require 's)
+
 
 (leaf yasnippet
   :ensure (yasnippet :repo "joaotavora/yasnippet")
@@ -40,22 +42,6 @@
                               ',(list
                                  (locate-user-emacs-file "snippets")))
             (yas-wrap-around-region . t)))
-
-(leaf yasnippet
-  :doc "Load `fast-exec' keymaps for `yasnippet'."
-  :after fast-exec
-  :config                               ;nofmt
-  (defun yas--fetch (table key)
-    "Fetch templates in TABLE by KEY.
-
-Return a list of cons (NAME . TEMPLATE) where NAME is a
-string and TEMPLATE is a `yas--template' structure."
-    (let* ((key (s-downcase key))
-	   (keyhash (yas--table-hash table))
-	   (namehash (and keyhash (gethash key keyhash))))
-      (when namehash
-	(yas--filter-templates-by-condition
-	 (yas--namehash-templates-alist namehash))))))
 
 (provide 'my-yas)
 ;;; my-yas.el ends here

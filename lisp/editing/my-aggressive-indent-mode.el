@@ -28,9 +28,8 @@
 (require 'my-leaf)
 
 
-(leaf aggressive-indent-mode
-  :ensure (aggressive-indent-mode :repo "Malabarba/aggressive-indent-mode"
-                                  :host github)
+(leaf aggressive-indent
+  :ensure t
   :hook emacs-lisp-mode-hook
   :config
   (advice-add 'indent-region-line-by-line

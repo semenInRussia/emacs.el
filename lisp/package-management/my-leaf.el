@@ -654,7 +654,7 @@
                   ;; `require' macros needed in `eval-and-compile'
                   (eval-and-compile (require 'fast-exec))
                   (fast-exec-bind ',name
-                    (fast-exec-make-some-commands ,@bindings)))
+                                  (fast-exec-make-some-commands ,@bindings)))
                 ,@leaf--body))
             :leaf-defer
             (let*
@@ -771,7 +771,8 @@
             `((eval-after-load ',leaf--name
                 '(progn ,@leaf--value))
               ,@leaf--body)))
-    (setq leaf-alias-keyword-alist '((:ensure . :straight)
+    (setq leaf-alias-keyword-alist '(;; `straight' over package.el
+                                     (:ensure . :straight)
                                      ;; I prefer use `setq' over `custom-set'
                                      ;;
                                      ;; the main reason is speed, it speed up my
