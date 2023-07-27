@@ -302,8 +302,17 @@ Agnifize that you mean.
 By default agnifize the current buffer.  If a region is selected and active
 then agnifize source code between its bounds.  If do in a `dired' buffer, then
 try agnifize marked files." t)
-(register-definition-prefixes "agnifize" '("agn"))
+(autoload 'agnifize-file "agnifize" "\
+Visit file with FILENAME and agnifize it.
 
+(fn FILENAME)")
+(autoload 'agnifize-region "agnifize" "\
+Change a semen python code using Agnia coding style in a region.
+
+A region begins with BEG and ends with END
+
+(fn &optional BEG END)" t)
+(register-definition-prefixes "agnifize" '("agn"))
 
 
 ;;; Generated autoloads from my-latex-insert.el
@@ -335,9 +344,8 @@ it is disabled.
 
 ;;; Generated autoloads from my-latex-autoformat.el
 
-(add-hook 'LaTeX-mode-hook '(lambda () (require 'my-latex-autoformat)))
+(add-hook 'LaTeX-mode-hook (lambda () (require 'my-latex-autoformat)))
 (register-definition-prefixes "my-latex-autoformat" '("autoformat-latex-" "my-"))
-
 
 
 ;;; Generated autoloads from my-latex-embrace.el
@@ -360,6 +368,51 @@ If the dragger for LaTeX list item should be work, drag that to left." t)
 
 (register-definition-prefixes "my-meow-structural" '("my-meow-structural-"))
 
+
+
+;;; Generated autoloads from my-org-editing.el
+
+(autoload 'my-org-clear-subtree "my-org-editing" "\
+Kill subtree at the position, and activate insertion mode.")
+(autoload 'my-org-schedule-to-today "my-org-editing" "\
+Scheduale a `org-mode' heading to today." t)
+(autoload 'my-org-indent-subtree "my-org-editing" "\
+Indent current the `org-mode' subtree at current position." t)
+(autoload 'my-org-insert-image "my-org-editing" "\
+Insert a image with FILENAME.
+
+By default, caption for the image don't inserts, but if CAPTION is a
+string, then define caption of the image to the CAPTION.
+
+In the interactive, If the region is active, the FILENAME will be text
+in the region.
+
+(fn FILENAME &optional CAPTION)" t)
+(register-definition-prefixes "my-org-editing" '("my-"))
+
+
+;;; Generated autoloads from my-drag.el
+
+(register-definition-prefixes "my-drag" '("add-" "my-" "stop-drag"))
+
+
+;;; Generated autoloads from my-org-autoformat.el
+
+(add-hook 'org-mode-hook (lambda () (require 'my-org-autoformat)))
+(register-definition-prefixes "my-org-autoformat" '("my-org-"))
+
+
+;;; Generated autoloads from my-autoformat.el
+
+(register-definition-prefixes "my-autoformat" '("my-"))
+
+
+
+;;; Generated autoloads from my-build-config.el
+
+(autoload 'my-build-config "my-build-config" "\
+Build my config." t)
+(register-definition-prefixes "my-build-config" '("my-"))
 
 ;;; Generated autoloads from my-dired-commands.el
 
