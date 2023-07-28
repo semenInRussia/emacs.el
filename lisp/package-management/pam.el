@@ -116,6 +116,17 @@ Defaults to 2 functions:
 
 ;;; Public
 
+(define-minor-mode pam-install-everything-mode
+  "Toggle should or shouldn't `pam' install new packages.
+
+With enabled this minor mode, `pam-use-package' will use `straight-use-package'
+to install a package while the default behaviour is do nothing because already
+all is installed"
+  :global t
+  :init-value nil
+  :variable pam-need-to-install-pkgs-p
+  :group 'pam)
+
 (defun pam-use-package (melpa-style-recipe &optional no-clone no-build)
   "Activate the package and MAYBE install it.
 
@@ -168,17 +179,6 @@ command."
   (interactive (read (read-string "Which recipe to rebuild: ")))
   (pam--with-straight-hooks
     (straight-rebuild-package melpa-style-recipe recursive)))
-
-(define-minor-mode pam-install-everything-mode
-  "Toggle should or shouldn't `pam' install new packages.
-
-With enabled this minor mode, `pam-use-package' will use `straight-use-package'
-to install a package while the default behaviour is do nothing because already
-all is installed"
-  :global t
-  :init-value nil
-  :variable pam-need-to-install-pkgs-p
-  :group 'pam)
 
 (defun pam-activate ()
   "Activate all installed `pam' packages.
