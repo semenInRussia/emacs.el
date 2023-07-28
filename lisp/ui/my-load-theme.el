@@ -47,8 +47,20 @@
 (leaf monokai-theme
   :ensure t)
 
-(require 'doom-themes-autoloads)
-(load-theme 'doom-1337 t)
+(leaf modus-themes
+  :custom ((modus-themes-bold-constructs . t)
+           (modus-themes-italic-constructs . t))
+  :config
+  (load-theme 'modus-operandi t)
+  (global-hl-line-mode))
+
+(leaf ef-themes
+  :require t
+  :config
+  (load-theme 'ef-cyprus t)
+  (global-hl-line-mode))
+
+;; (load-theme 'doom-1337 t)
 
 ;; (custom-set-faces
 ;;  `(region
