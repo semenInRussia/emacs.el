@@ -16,3 +16,4 @@ url/
 var/
 xenops/
 *.elc
+/pam/
