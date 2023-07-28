@@ -24,16 +24,16 @@
 
 ;;; Code:
 
-(require 'my-straight)
-
 (require 'cl-lib)
-(eval-when-compile (require 'fast-exec))
+(require 'pam)
 
+(eval-when-compile (require 'fast-exec))
+(declare-function straight-use-package "straight")
 
 (eval-and-compile
   ;; `eval-and-compile' really install the package in compile time,
   ;; it's important, because the rest config use `leaf' macro
-  (straight-use-package '(leaf :repo "conao3/leaf.el"))
+  (pam-use-package '(leaf :repo "conao3/leaf.el"))
   (require 'leaf)
 
   (defun my-leaf-keywords-init ()
@@ -207,9 +207,18 @@
             :straight
             `(,@(mapcar (lambda (elm)
 	        	  `(eval-and-compile
-	        	     (my-straight-load-package ',(if (eq elm t)
-                                                             leaf--name
-                                                           elm))))
+	        	     (straight-use-package ',(if (eq elm t)
+                                                         leaf--name
+                                                       elm))))
+                        leaf--value)
+	      ,@leaf--body)
+
+            :pam
+            `(,@(mapcar (lambda (elm)
+	        	  `(eval-and-compile
+	        	     (pam-use-package ',(if (eq elm t)
+                                                    leaf--name
+                                                  elm))))
                         leaf--value)
 	      ,@leaf--body)
             :pie
@@ -771,8 +780,9 @@
             `((eval-after-load ',leaf--name
                 '(progn ,@leaf--value))
               ,@leaf--body)))
-    (setq leaf-alias-keyword-alist '(;; `straight' over package.el
-                                     (:ensure . :straight)
+    (setq leaf-alias-keyword-alist '(;; use my small PAckage Manager called
+                                     ;; `pam' which is built over `straight'
+                                     (:ensure . :pam)
                                      ;; I prefer use `setq' over `custom-set'
                                      ;;
                                      ;; the main reason is speed, it speed up my

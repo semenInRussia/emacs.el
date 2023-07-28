@@ -116,7 +116,21 @@ This is function for `command-line-functions'."
 		(locate-user-emacs-file "lisp/my-build-config.el"))
        (my-build-config))))
  ;; --install
- (defun my-install-cli-handle-arg (arg)
+ (defun my-install-cli-handle-arg ()
+   "Handle --install command-line argument.
+
+It should tells to Emacs that every package should be installed, the default
+behaviour (without --install flag) expects that all packages are installed.
+
+Suggest visit `pm' documentation inside pm.el"
    (when (string-equal argi "--install")
      (prog1 t
-       (setq my-straight-packages-already-installed-p nil)))))
+       ;; see `pm' (my small package manager)
+       (setq my-straight-packages-already-installed-p nil))))
+ ;; --show-bench
+ (defun my-show-bench-cli-handle-arg ()
+   "Handle --install command-line argument."
+   (when (string-equal argi "--show-bench")
+     (prog1 t
+       ;; `my-require-times' is defined in init.el
+       (add-hook 'after-init-hook 'my-require-times)))))

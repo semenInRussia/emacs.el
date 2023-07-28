@@ -4,9 +4,6 @@
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 ;;; Commentary:
 
 ;; Initialize Elisp code for my Emacs.
@@ -24,22 +21,27 @@
 (add-to-list 'load-path "~/.emacs.d/lisp/package-management/")
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
-;;; add to `load-path' all installed packages
-;; if packages was already installed, then every package was loaded from the
-;; telpa directory, it's more faster than load packages from package specific directories
-;; because in 2nd case `load-path' will contain about 200+(*) directories and to load one package
-;; with `require' Emacs will checks all these dirs.  When all packages files located inside the telpa dir
-;; Emacs checks only telpa dir (instead of 200 other dirs)
-;;
-;; NOTE: amount of the dirs depends on amount of the packages and their dependencies
-(defvar my-straight-packages-already-installed-p t)
-(add-to-list 'load-path "~/.emacs.d/telpa/")
-(load "~/.emacs.d/telpa/my-package-autoloads.el")
-
-;;; local-projects
+;;; Local Projects
 ;; It is my own small "packages" which aren't so big to create real packages
 (add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects"))
 (load "~/.emacs.d/lisp/local-projects/my-autoload")
+
+;;; add to `load-path' all installed packages
+;;
+;; I'm use `pam' which is built over straight.
+;;
+;; if packages was already installed, then every package was loaded from the
+;; `pam' directory, it's more faster than load packages from package specific directories
+;; because in 2nd case `load-path' will contain about 200+(*) directories and to load one package
+;; with `require' Emacs will checks all these dirs.  When all packages files located inside the `pam' dir
+;; Emacs checks only `pam' dir (instead of 200 other dirs)
+;;
+;;
+;; NOTE: amount of the directories in the `load-path' depends on amount of the
+;;   packages and their dependencies
+(defvar my-straight-packages-already-installed-p t)
+(require 'pam)
+(pam-activate)
 
 ;; don't use .emacs.d for custom.el which I don't use
 ;;
@@ -58,7 +60,9 @@
 LOAD-DURATION is the time taken in milliseconds to load FEATURE.")
 
 (defun my-require-times-wrapper (orig feature &rest args)
-  "Note in `my-require-times' the time taken to require each feature."
+  "Note in `my-require-times' the time taken to require each feature.
+
+Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
   (let* ((already-loaded (memq feature features))
          (require-start-time (and (not already-loaded) (current-time))))
     (prog1
@@ -109,8 +113,6 @@ LOAD-DURATION is the time taken in milliseconds to load FEATURE.")
     (my-require-times-mode)
     (tabulated-list-revert)
     (display-buffer (current-buffer))))
-
-(add-hook 'after-init-hook 'my-require-times)
 
 ;;; Load all config files
 

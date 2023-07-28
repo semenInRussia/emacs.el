@@ -31,7 +31,6 @@
   ;; `eval-and-compile' really install the package in compile time,
   ;; it's important, because `my-leaf' needs in `straight-use-package' to install
   ;; itself and `leaf' needed in the rest config, because `leaf' macro
-  (defvar my-straight-packages-already-installed-p (not (member "--install" command-line-args)))
   (defvar bootstrap-version)
   (setq straight-find-executable "C:\\tools\\find.exe")
   (setq straight-check-for-modifications nil)
@@ -55,47 +54,13 @@
   (declare-function straight--compute-dependencies "straight.el")
 
   ;; don't build packages, think that they're already installed
-  (unless my-straight-packages-already-installed-p
-    (advice-add 'straight--package-might-be-modified-p :override 'ignore))
+  (advice-add 'straight--package-might-be-modified-p :override 'ignore)
 
   ;; but after init, new packages can be installed, so packages can be
   ;; (re)builded
   (add-hook 'after-init-hook
             (lambda ()
-              (advice-remove 'straight--package-might-be-modified-p 'ignore)))
-
-  (defun my-straight-load-package (melpa-style-recipe)
-    "Load a package with a given MELPA-STYLE-RECIPE.
-
-Loading a package means load autoloads (if they exists) and add a package source
-root into `load-path'.  It doesn't install package and doesn't generate
-autoloads file, if one of them wasn't installed/genrated, then nothing happened,
-you should ensure that it was installed with `straight-use-package'.  Also it
-doesn't load source code, only autoloads.  Also it tries add TeXinfo
-documentation into info load path, if provided of course.
-
-To load whole package (not only autoloads) use `require', after call this
-function that add package to the load path `load-path'.
-
-MELPA-STYLE-RECIPE specifies a package, suggest you check offical straight
-documentation.
-
-If called interactively, then choose a package from the installed packages, that
-placed at the straight build directory"
-    (interactive
-     ;; this interactive statement copied from `straight-use-package' impl
-     (list
-      (intern
-       (completing-read
-        "Which recipe? "
-        (cddr ;; it skips "." and ".." dirs
-         (directory-files (straight--file
-                           straight-base-dir
-                           "straight"
-                           straight-build-dir)))))))
-    (unless my-straight-packages-already-installed-p
-      (setq straight-find-executable "C:\\tools\\find.exe")
-      (straight-use-package melpa-style-recipe))))
+              (advice-remove 'straight--package-might-be-modified-p 'ignore))))
 
 (provide 'my-straight)
 ;;; my-straight.el ends here
