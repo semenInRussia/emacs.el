@@ -58,7 +58,6 @@
     (my-join-modules-into-modules.el)
     (byte-compile-file my-modules-el-file)
     (native-compile-async (list my-modules-el-file))
-    (byte-compile-file custom-file)
     (byte-compile-file "~/.emacs.d/lisp/local-projects/my-autoload.el")))
 
 (defun my-file-igored-as-module-p (filename)
