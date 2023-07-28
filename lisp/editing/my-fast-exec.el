@@ -30,14 +30,14 @@
 (require 'my-leaf)
 (require 'dash)
 
-(eval-when-compile (require 'fast-exec))
-
 (leaf fast-exec
   :load-path "~/projects/fast-exec.el/"
   :defun fast-exec-use
   :bind ("M-=" . fast-exec-exec)
   :commands fast-exec-exec
   :config (require 'my-fast-exec-misc))
+
+(eval-when-compile (require 'fast-exec))
 
 (provide 'my-fast-exec)
 ;;; my-fast-exec.el ends here
