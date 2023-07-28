@@ -146,20 +146,11 @@ instead.  In any case, if NO-BUILD is non-nil, then processing halts here.
 Otherwise, the package is built and activated.  Note that if the package recipe
 has a nil `:build' entry, then NO-BUILD is ignored and processing always stops
 before building and activation occurs."
+  (interactive (read (read-string "Which recipe: ")))
   (if (not pam-need-to-install-pkgs-p)
       t
     (pam--with-straight-hooks
       (straight-use-package melpa-style-recipe no-clone no-build))))
-
-(defun pam-activate ()
-  "Activate all installed `pam' packages.
-
-After that you can load any installed package with `require', `M-x' will show
-all commands of these packages, TeXinfo will be included in the manual."
-  (interactive)
-  (add-to-list 'load-path (pam--build-dir))
-  (add-to-list 'Info-default-directory-list (pam--build-dir))
-  (load (pam--autoloads-file)))
 
 (defun pam-rebuild-package (melpa-style-recipe &optional recursive)
   "Rebuild the package.
@@ -173,8 +164,19 @@ be passed to `straight-rebuild-package'
 Notice that while `pam-use-package' check the mode (install or only activate a
 package), but `pam-rebuild-package' don't it, because rebuild is a more concrete
 command."
+  (interactive (read (read-string "Which recipe to rebuild: ")))
   (pam--with-straight-hooks
     (straight-rebuild-package melpa-style-recipe recursive)))
+
+(defun pam-activate ()
+  "Activate all installed `pam' packages.
+
+After that you can load any installed package with `require', `M-x' will show
+all commands of these packages, TeXinfo will be included in the manual."
+  (interactive)
+  (add-to-list 'load-path (pam--build-dir))
+  (add-to-list 'Info-default-directory-list (pam--build-dir))
+  (load (pam--autoloads-file)))
 
 (defun pam-sync-with-straight ()
   "Copy all `straight' packages files into the `pam' dir, make autoloads file.
