@@ -51,9 +51,7 @@
            ;; by default to run `corfu' you should press `C-M-i'
            (corfu-auto . t)
            ;; I don't like 0sec, because it bad for yasnippets
-           (corfu-auto-delay . 0.4)
-           ;; the default value (15) is really small
-           (corfu-min-width . 40))
+           (corfu-auto-delay . 0.4))
   :config
   ;; `completion-in-region-function' was already changed, but
   ;; `global-corfu-mode' enable auto complete, if `corfu-auto' is non-nil
@@ -65,6 +63,7 @@
            :package corfu
            ("M-i" . 'corfu-popupinfo-toggle)))
 
+  ;; show icons inside auto-completion popup
   (leaf kind-icon
     :ensure (kind-icon :repo "emacs-straight/kind-icon"
                        :host github)
