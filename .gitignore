@@ -17,3 +17,8 @@ var/
 xenops/
 *.elc
 /pam/
+/tree-sitter/
+/forge-database.sqlite
+/bookmarks
+/.cache/
+/.org-id-locations
