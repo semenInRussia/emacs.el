@@ -38,17 +38,20 @@
   :ensure t
   :defun ((aas-set-snippets . aas)
           (meow-insert . meow-command))
-  :custom ((org-refile-use-outline-path . nil)
-           (org-refile-targets   . '((org-agenda-files :maxlevel . 2)))
-           (org-fold-core-style  . 'overlays)
-           (org-startup-folded   . t)
+  :custom ((org-file-apps
+            . '(("\\.\\'" . default)
+                ("\\.pdf\\'" . "start %s")
+                ("\\.png\\'" . "start %s")
+                ("\\.jpg\\'" . "start %s")))
+           ;; `org-refile'
+           (org-refile-use-outline-path . 'file)
+           (org-outline-path-complete-in-steps . nil)
+           (org-refile-targets . '((nil :maxlevel . 9)))
+           ;; `org' startup
+           (org-fold-core-style . 'overlays)
+           (org-startup-folded . t)
            (org-startup-indented . t)
-           (org-startup-with-inline-images . t)
-           (org-file-apps .
-                          '(("\\.\\'" . default)
-                            ("\\.pdf\\'" . "start %s")
-                            ("\\.png\\'" . "start %s")
-                            ("\\.jpg\\'" . "start %s"))))
+           (org-startup-with-inline-images . t))
   :bind (;; NOTE: `org-capture' and `org-agenda' in the my-organization.el file
          ;; ("C-c z c" . org-capture)
          (:org-mode-map
@@ -158,6 +161,7 @@
            :package org
            ("C-c C-x C-x" . rorg-splice-subtree)
            ("C-c C-0" . rorg-wrap-region-or-current-heading)
+           ("C-c M-(" . rorg-wrap-region-or-current-heading)
            ("C-c C-{" . rorg-forward-slurp-subtree)
            ("C-c C-}" . rorg-backward-barf-subtree)
            ("C-c {" . rorg-backward-slurp-subtree)
