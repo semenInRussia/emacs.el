@@ -13,11 +13,12 @@
 ;; When use a package instead of `straight-use-package' just add to the load
 ;; path only ONE directory, load autoloads.  `straight' here add about 190~
 ;; paths to the load path and load the same amount of autoloads files.  The
-;; current version is more simple and lightweight, but to install packages
-;; (don't activate) it still uses straight, if your packages didn't installed,
-;; then just add the --install option when run Emacs in your terminal, it
-;; replaces the default behaviour with the
-;; default `straight' way.
+;; `pam' version is more simple and lightweight, but the cons is that to install
+;; packages (don't activate) it still uses straight, if your packages didn't
+;; installed, you should add the --install option when run Emacs in your
+;; terminal, it replaces the default behaviour with the default `straight' way.
+;; Also if you need change the `pam' behaviour inside of a running Emacs session
+;; you can use the `pam-install-everything-mode' minor mode.
 
 ;; The main function which you should use in 90% of cases when you use `pam' is
 ;; `pam-use' it's like `straight-use-package', but don't add any path to the
@@ -55,7 +56,7 @@
   "My simple package manager which is built over `straight'."
   :group 'emacs)
 
-(defcustom pam-need-to-install-pkgs-p nil
+(defcustom pam-need-to-install-pkgs-p (member "--install" command-line-args)
   "It is a non-nil value if `pam' should install packages."
   :group 'pam
   :type 'hook)
@@ -167,6 +168,17 @@ command."
   (interactive (read (read-string "Which recipe to rebuild: ")))
   (pam--with-straight-hooks
     (straight-rebuild-package melpa-style-recipe recursive)))
+
+(define-minor-mode pam-install-everything-mode
+  "Toggle should or shouldn't `pam' install new packages.
+
+With enabled this minor mode, `pam-use-package' will use `straight-use-package'
+to install a package while the default behaviour is do nothing because already
+all is installed"
+  :global t
+  :init-value nil
+  :variable pam-need-to-install-pkgs-p
+  :group 'pam)
 
 (defun pam-activate ()
   "Activate all installed `pam' packages.
