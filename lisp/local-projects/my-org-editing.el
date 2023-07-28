@@ -99,8 +99,8 @@ If the user insert any caption, return its, otherwise return nil."
   :type 'string
   :group 'my)
 
-(defun my-org-insert-img-at-url     ;nofmt
-    (url &optional new-file-name images-dir caption)
+;;;###autoload
+(defun my-org-insert-img-at-url (url &optional new-file-name images-dir caption)
   "Insert org image at URL, download it into IMAGES-DIR with name NEW-FILE-NAME.
 
 If the region is active return it, otherwise read URL from the minibuffer.
@@ -134,14 +134,25 @@ If caption isn't empty string, then insert image with the caption CAPTION."
   (make-directory (f-dirname new-filename) t)
   (url-copy-file url new-filename t))
 
+;;;###autoload
 (defun my-org-toggle-checkbox ()
   "My version of `org-toggle-checkbox'.
 
-The difference is that after this function you can hit the last hitted
-keystroke and it calls function again."
+The difference is that after this function you can hit the last hitted keystroke
+and it calls function again."
   (interactive)
-  (org-toggle-checkbox)
-  (one-shot-keybinding " " this-command))
+  (call-interactively #'org-toggle-checkbox)
+  (repeat-at-last-keystroke))
+
+;;;###autoload
+(defun my-org-todo ()
+  "My version of `org-todo'.
+
+The difference is that after this function you can hit the last hitted keystroke
+and it calls function again."
+  (interactive)
+  (call-interactively #'org-todo)
+  (repeat-at-last-keystroke))
 
 (provide 'my-org-editing)
 ;;; my-org-editing.el ends here
