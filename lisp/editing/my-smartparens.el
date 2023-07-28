@@ -36,7 +36,6 @@
   :require smartparens-config
   :defun (sp-clone-sexp sp-use-paredit-bindings)
   :bind (:smartparens-mode-map
-         ("C-c C-w" . 'sp-splice-sexp-killing-backward)
          ("C-x C-y" . 'my-sp-clone)
          ("C-c DEL" . 'sp-change-enclosing))
   :config

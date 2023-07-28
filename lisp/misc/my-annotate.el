@@ -25,16 +25,17 @@
 ;;; Code:
 (require 'my-leaf)
 
+
 (leaf annotate
   :ensure t
-  :hook org-mode-hook
   :custom ((annotate-use-echo-area . t)
            (annotate-print-annotation-under-cursor . t)
            (annotate-print-annotation-under-cursor-prefix . "[ann] "))
   :bind (:org-mode-map
          :package org
          ("C-c M-a" . 'annotate-annotate)
-         ("C-c C-u M-a" . 'annotate-delete-annotation)))
+         ("C-c C-u M-a" . 'annotate-delete-annotation))
+  :config (annotate-mode))
 
 (provide 'my-annotate)
 ;;; my-annotate.el ends here

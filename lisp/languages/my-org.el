@@ -36,16 +36,8 @@
 
 (leaf org
   :ensure t
-  :defun ((my-autoformat-bind-for-major-mode . my-autoformat)
-          (my-org-heading-p . my-org)
-          (my-org-properties-end-p . my-org)
-          (my-org-list-item-p . my-org)
-          (aas-set-snippets . aas)
-          (meow-insert . meow-command)
-          (my-org-keywords . my-org)
-          (my-org-skip-backward-keyword . my-org)
-          (embrace-org-mode-hook . my-org)
-          org-current-level)
+  :defun ((aas-set-snippets . aas)
+          (meow-insert . meow-command))
   :custom ((org-refile-use-outline-path . nil)
            (org-refile-targets   . '((org-agenda-files :maxlevel . 2)))
            (org-fold-core-style  . 'overlays)
@@ -57,19 +49,10 @@
                             ("\\.pdf\\'" . "start %s")
                             ("\\.png\\'" . "start %s")
                             ("\\.jpg\\'" . "start %s"))))
-  :defvar (my-org-list-item-prefix-regexp
-           my-org-keywords)
-  :bind (("C-c c" . org-capture)
+  :bind (;; NOTE: `org-capture' and `org-agenda' in the my-organization.el file
+         ;; ("C-c z c" . org-capture)
          (:org-mode-map
-          ;; Insert anything
-          ("C-c M-i"   . my-org-insert-image)
-          ("C-c M-u"   . my-org-insert-img-at-url)
-
-          ;; Manipulations with a subtree
-          ("C-c C-w"   . my-org-cut)
-          ("C-c C-M-w" . my-org-clear-subtree)
           ("C-c tab"   . org-refile)
-          ("C-c C-t"   . my-org-todo)
           ("C-c C-j"   . org-id-get-create)))
   ;; the following code should add some auto activating snippets, for example,
   ;; if I type "exthe", then it should be extended to the "Explore the"
@@ -85,108 +68,22 @@
   (add-hook 'org-mode-hook 'aas-activate-for-major-mode)
 
   (leaf my-org-editing
-    :commands (my-org-clear-subtree
-               my-org-clear-subtree
-               my-org-cut
-               my-org-indent-subtree
-               my-org-indent-subtree
-               my-org-insert-image
-               my-org-schedule-to-today
-               my-org-todo
-               my-org-todo))
+    :bind (("C-c M-i"   . my-org-insert-image)
+           ("C-c M-u"   . my-org-insert-img-at-url)
+           ("C-c C-w"   . my-org-cut)
+           ("C-c C-M-w" . my-org-clear-subtree)
+           ("C-c C-t"   . my-org-todo)))
 
-  (leaf cdlatex
-    :ensure (cdlatex :repo "cdominik/cdlatex" :host github)
-    :hook (org-mode-hook . org-cdlatex-mode))
-
-  (defun doom-docs-org-mode () (interactive))
-
+  ;; format `org-mode' code after every key hit
   (leaf my-org-autoformat
     :hook (org-mode-hook . my-autoformat-mode))
-
-  ;; it disabled, sorry,,,
-  (leaf org-keys
-    :require t
-    :disabled t
-    :custom ((org-use-speed-commands . t)
-             (org-speed-commands
-              .
-              '(("k" . org-forward-heading-same-level)
-                ("i" . org-backward-heading-same-level)
-                ("j" . org-previous-visible-heading)
-                ("l" . org-next-visible-heading)
-                ("h" . my-org-goto-parent)
-                ("z" . org-toggle-comment)
-                ("x" . org-cut-subtree)
-                ("d" . org-deadline)
-                ("s" . org-schedule)
-                ("w" . my-org-schedule-to-today)
-                (" " . my-add-org-subtree-to-targets-on-day)
-                ("'" . org-toggle-narrow-to-subtree)
-                ("f" .
-                 (progn
-                   (skip-chars-forward "*")
-                   (forward-char)
-                   (meow-insert 0)))
-                ("B" . org-previous-block)
-                ("F" . org-next-block)
-                ("g" . (org-refile t))
-                ("c" . org-cycle)
-                ("=" . org-columns)
-                ("I" . org-metaup)
-                ("K" . org-metadown)
-                ("o" . org-metaright)
-                ("u" . org-metaleft)
-                ("O" . org-shiftmetaright)
-                ("U" . org-shiftmetaleft)
-                ("n"
-                 .
-                 (progn
-                   (forward-char 1)
-                   (call-interactively 'org-insert-heading-respect-content)))
-                ("a" . org-archive-subtree-default-with-confirmation)
-                ("6" . org-mark-subtree)
-                ("t" . org-todo)
-                ("," . (org-priority))
-                ("0" . (org-priority 32))
-                ("1" . (org-priority 65))
-                ("2" . (org-priority 66))
-                ("3" . (org-priority 67))
-                (":" . org-set-tags-command)
-                ("e" . org-set-effort)
-                ("E" . org-inc-effort)
-                ("/" . org-sparse-tree)
-                ("?" . org-speed-command-help))))
-    :bind (:org-mode-map
-           :package org
-           ("C-c M-{" . my-org-to-heading-start))
-    :config                             ;nofmt
-    (defun my-org-to-heading-start ()
-      "Go to the beginning of the heading after activate insert mode."
-      (interactive)
-      (end-of-line)
-      (search-backward-regexp "^\*" nil t)
-      (meow-insert)
-      (unless (eq current-input-method nil) (toggle-input-method)))
-
-    (defun my-org-goto-parent ()
-      "Go to the parent of the `org-mode' heading at the cursor."
-      (interactive)
-      (->>
-       (->
-        (org-current-level)
-        (1-)
-        (s-repeat "*")
-        (regexp-quote))
-       (s-prepend "^")
-       (s-append " ")
-       (re-search-backward))))
 
   (leaf consult
     :bind (:org-mode-map
            :package org
            ([remap consult-imenu] . consult-outline)))
 
+  ;; `org-mode' exporter
   (leaf ox
     :custom ((org-export-coding-system . 'utf-8)
              (org-export-with-smart-quotes . t)
@@ -199,49 +96,57 @@
                                          ("" "cmap" nil ("pdflatex"))
                                          ("" "float" nil
                                           ("pdflatex" "xelatex")))))
-    :defer-config
-    (leaf latex-extra
-      :ensure (latex-extra :repo "Malabarba/latex-extra" :host github)
-      :defun latex/compile-commands-until-done
-      :config                           ;nofmt
-      (defun my-org-latex-compile (filename &optional snippet)
-        "My version of the `ox-latex' way to compile a TeX file.
-
-Using `latex/compile-commands-until-done'
-
-TEXFILE is the name of the file being compiled.  Processing is
-done through the command specified in `org-latex-pdf-process',
-which see.  Output is redirected to \"*Org PDF LaTeX Output*\"
-buffer.
-
-When optional argument SNIPPET is non-nil, TEXFILE is a temporary
-file used to preview a LaTeX snippet.  In this case, do not
-create a log buffer and do not remove log files.
-
-Return PDF file name or raise an error if it couldn't be
-produced."
-        (find-file filename)
-        ;; if snippet - t, then not clean
-        (latex/compile-commands-until-done (not snippet)))
-
-      (defalias 'org-latex-compile 'my-org-latex-compile))
-
-    (leaf json-snatcher
-      :ensure t)
-
+    :config
     (leaf ox-json
       :ensure (ox-json :repo "jlumpe/ox-json" :host github)
-      :require t))
+      :commands (ox-json-export-to-buffer ox-json-export-to-file)
+      :after ox
+      :init
+      (org-export-define-backend 'json
+                                 ;; Transcoders
+                                 (ox-json--merge-alists
+                                  '(
+                                    (template . ox-json-transcode-template)
+                                    (plain-text . ox-json-transcode-plain-text)
+                                    (headline . ox-json-transcode-headline)
+                                    (link . ox-json-transcode-link)
+                                    (timestamp . ox-json-transcode-timestamp))
+                                  (cl-loop for type in (append org-element-all-elements org-element-all-objects)
+                                           collect (cons type #'ox-json-transcode-base)))
+                                 ;; Filters
+                                 :filters-alist '()
+                                 ;; Options
+                                 :options-alist
+                                 '((:json-data-type-property nil "json-data-type-property" "$$data_type")
+                                   (:json-exporters nil nil nil)
+                                   (:json-property-types nil nil nil)
+                                   (:json-strict nil nil nil)
+                                   (:json-include-extra-properties nil nil t))
+                                 ;; Menu
+                                 :menu-entry
+                                 '(?j "Export to JSON" ((?J "As JSON buffer" ox-json-export-to-buffer)
+                                                        (?j "To JSON file" ox-json-export-to-file))))))
 
+  ;; remove some useless things from the current `org-mode' buffer
   (leaf my-org-do-tidy
     :bind (:org-mode-map
            :package org
            ("C-c M-q" . my-org-tidy)))
 
+  ;; transient to change values of #+OPTIONS and other #+<THINGS>
+  ;;
+  ;; (Info-goto-node "(org)Export Settings")
   (leaf my-org-options
     :bind (:org-mode-map
            :package org
            ("C-c C-." . my-org-options-transient)))
+
+  ;; very beautifull `org'
+  ;;
+  ;; for example, it show [1/3] like a pie progress. :o
+  (leaf org-modern
+    :ensure t
+    :hook org-mode-hook)
 
   (leaf org-autolist
     :ensure t
@@ -258,23 +163,7 @@ produced."
            ("C-c {" . rorg-backward-slurp-subtree)
            ("C-c [" . rorg-forward-barf-subtree)))
 
-  ;; it disabled with me
-  (leaf my-org-drag
-    :disabled t
-    :defun ((add-right-dragger
-             add-left-dragger
-             add-down-dragger
-             add-up-dragger)
-            . my-drag)
-    :commands (my-drag-org-right
-               my-drag-org-left
-               my-drag-org-down
-               my-drag-org-up)
-    :init
-    (add-right-dragger 'my-drag-org-right)
-    (add-left-dragger 'my-drag-org-left)
-    (add-down-dragger 'my-drag-org-down)
-    (add-up-dragger 'my-drag-org-up)))
+  (defun doom-docs-org-mode () (interactive)))
 
 (leaf org-download
   :ensure (org-download :repo "abo-abo/org-download" :host github)
