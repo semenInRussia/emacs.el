@@ -81,7 +81,7 @@
                                           :radius 0
                                           :height 0.5
                                           :scale 1)))
-    :config (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)))
+    :init (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)))
 
 (leaf cape
   :ensure (cape :repo "minad/cape" :host github)
