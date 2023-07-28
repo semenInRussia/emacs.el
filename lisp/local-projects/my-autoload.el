@@ -388,6 +388,23 @@ In the interactive, If the region is active, the FILENAME will be text
 in the region.
 
 (fn FILENAME &optional CAPTION)" t)
+(autoload 'my-org-insert-img-at-url "my-org-editing" "\
+Insert org image at URL, download it into IMAGES-DIR with name NEW-FILE-NAME.
+
+If the region is active return it, otherwise read URL from the minibuffer.
+If caption isn't empty string, then insert image with the caption CAPTION.
+
+(fn URL &optional NEW-FILE-NAME IMAGES-DIR CAPTION)" t)
+(autoload 'my-org-toggle-checkbox "my-org-editing" "\
+My version of `org-toggle-checkbox'.
+
+The difference is that after this function you can hit the last hitted keystroke
+and it calls function again." t)
+(autoload 'my-org-todo "my-org-editing" "\
+My version of `org-todo'.
+
+The difference is that after this function you can hit the last hitted keystroke
+and it calls function again." t)
 (register-definition-prefixes "my-org-editing" '("my-"))
 
 
@@ -413,6 +430,7 @@ in the region.
 (autoload 'my-build-config "my-build-config" "\
 Build my config." t)
 (register-definition-prefixes "my-build-config" '("my-"))
+
 
 ;;; Generated autoloads from my-dired-commands.el
 
