@@ -72,8 +72,14 @@
     :commands kind-icon-margin-formatter
     :defvar corfu-margin-formatters
     :custom ((kind-icon-use-icons . t)
+             ;; show the icons with the white or other theme background color
              (kind-icon-default-face . 'corfu-default)
              (kind-icon-blend-background . nil)
+             ;; when an icons isn't known show the completion without icon
+             ;;
+             ;; (default is to show ??? with the red background)
+             (kind-icon--unknown . " ")
+             ;; use the same as a symbol size for icons
              (kind-icon-default-style . `(
                                           :padding 0
                                           :stroke 0
