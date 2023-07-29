@@ -28,6 +28,7 @@
 ;;; Code:
 
 (require 'my-leaf)
+(require 'f)   ; for `f-full'
 
 
 (leaf compat
@@ -44,8 +45,8 @@
   ;; but with `my-use-afk' it's still cool
   :commands corfu--in-region
   :init (setq-default completion-in-region-function 'corfu--in-region)
-  ;; make border of auto-completion minibuffer white, it looks like nice
-  :custom-face ((corfu-border . '((t :background "white"))))
+  ;; make border of auto-completion minibuffer white/black, it looks like nice
+  ;; :custom-face ((corfu-border . '((t :background "black"))))
   :custom (;; by default 2 but 1 one is better
            (corfu-auto-prefix . 1)
            ;; by default to run `corfu' you should press `C-M-i'
@@ -85,20 +86,45 @@
 (leaf cape
   :ensure (cape :repo "minad/cape" :host github)
   :require t
-  :commands (cape-symbol
-             cape-dabbrev cape-file cape-elisp-block cape-history
-             cape-keyword cape-sgml cape-tex cape-abbrev cape-symbol)
+  ;; I'm using the file from the following GitHub repository
+  ;; https://github.com/dwyl/english-words/
+  :custom `(cape-dict-file . ,(f-full "~/.emacs.d/dict/english.txt"))
+  :defun (cape-symbol
+          cape-dabbrev cape-file cape-elisp-block cape-history
+          cape-keyword cape-sgml cape-tex cape-abbrev cape-symbol)
+  :hook (corfu-mode-hook . my-capf-local-setup)
   :config
-  ;; (add-to-list 'completion-at-point-functions #'cape-tex)
-  ;; (add-to-list 'completion-at-point-functions #'cape-symbol)
-  ;; (add-to-list 'completion-at-point-functions #'cape-line)
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-elisp-block)
-  (add-to-list 'completion-at-point-functions #'cape-history)
-  (add-to-list 'completion-at-point-functions #'cape-keyword)
-  (add-to-list 'completion-at-point-functions #'cape-sgml)
-  (add-to-list 'completion-at-point-functions #'cape-abbrev))
+  ;; make that `completion-at-point-functions' will be the different for every buffer
+  (make-local-variable 'completion-at-point-functions)
+
+  ;; don't use the following
+  ;; LaTeX commands, I prefer built-in AuCTex capfs
+  ;;   (add-hook 'completion-at-point-functions #'cape-tex)
+  ;; I prefer built-in `elisp-completion-at-point'
+  ;;   (add-hook 'completion-at-point-functions #'cape-symbol)
+  ;; really strange thing, IDK what is it (know but it hard)
+  ;;   (add-hook 'completion-at-point-functions #'cape-sgml)
+  ;;   (add-hook 'completion-at-point-functions #'cape-rfc1345)
+  ;; enrage!!
+  ;;   (add-hook 'completion-at-point-functions #'cape-line)
+
+  (defun my-capf-local-setup ()
+    "Change the `completion-at-point-functions' for current buffer."
+    ;; Here the numbers is the depth of the respective hooks, the default depth is
+    ;; 0, so if `major-mode' provides a capf function, then its depth is 0 (in
+    ;; 100% cases which I saw)
+    ;;
+    ;; If i want that one thing will be prefer over another, than set to more
+    ;; important one the number with the LESSER number, so if the depth it will
+    ;; be the first function which was checked, here I use the depth from 0 to
+    ;; the amount of hooks
+    (add-hook 'completion-at-point-functions #'cape-history     1 'local)
+    (add-hook 'completion-at-point-functions #'cape-elisp-block 2 'local)
+    (add-hook 'completion-at-point-functions #'cape-file        3 'local)
+    (add-hook 'completion-at-point-functions #'cape-keyword     4 'local)
+    (add-hook 'completion-at-point-functions #'cape-dabbrev     5 'local)
+    (add-hook 'completion-at-point-functions #'cape-abbrev      6 'local)
+    (add-hook 'completion-at-point-functions #'cape-dict        7 'local)))
 
 (provide 'my-corfu)
 ;;; my-corfu.el ends here
