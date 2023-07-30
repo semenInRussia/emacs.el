@@ -125,6 +125,92 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
 
 (add-to-list 'load-path (file-name-directory my-modules-el-file))
 
+;; some useful macros
+(defmacro remove-from-list! (list-var &rest elements)
+  "Add ELEMENTS to LIST-VAR.
+
+If element is already inside LIST-VAR, then don't add.  NOTE that LIST-VAR
+should be quoted."
+  (cons
+   'progn
+   (mapcar
+    (lambda (el)
+      `(setq ,list-var (delete ,el ,list-var)))
+    elements)))
+
+(defmacro add-to-list! (list-var &rest elements)
+  "Add ELEMENTS to LIST-VAR.
+
+If element is already inside LIST-VAR, then don't add.  NOTE that LIST-VAR
+should be quoted."
+  (cons
+   'progn
+   (mapcar
+    (lambda (el)
+      `(add-to-list ,list-var ,el))
+    elements)))
+
+(declare-function nano-agenda "nano-agenda")
+(declare-function my-require-times "init")
+(declare-function org-roam-node-find "org-roam")
+
+;; handle some Command Line Arguments
+(add-to-list!
+ 'command-line-functions
+ ;; --modules
+ (defun my-modules-cli-handle-arg ()
+   "Handle --modules command-line argument.
+
+Argument was named --modules, because it build my-modules.el file (or
+`my-modules-el-file').  So when this argument is specified, then build
+my-modules.el file with the `my-build-config' function
+
+This is function for `command-line-functions'."
+   (when (string-equal argi "--modules")
+     (prog1 t
+       (message "Start build my-modules.el...")
+       (my-build-config))))
+
+ ;; --install
+ (defun my-install-cli-handle-arg ()
+   "Handle --install command-line argument.
+
+It should tells to Emacs that every package should be installed, the default
+behaviour (without --install flag) expects that all packages are installed.
+
+Suggest visit `pm' documentation inside pm.el"
+   (when (string-equal argi "--install")
+     ;; this argument is handled inside `pam'
+     t))
+
+ ;; --show-bench
+ (defun my-show-bench-cli-handle-arg ()
+   "Handle --install command-line argument."
+   (when (string-equal argi "--show-bench")
+     (prog1 t
+       ;; `my-require-times' is defined in init.el
+       (my-require-times))))
+
+ ;; --zettel
+ (defun my-handle-cli-zettel ()
+   "Handle --zettel command line ARG.
+
+When you apply this command line argument after init Emacs open one of the
+Zettelkasten node"
+   (when (string-equal argi "--zettel")
+     (prog1 t
+       (message "zettel")
+       (org-roam-node-find))))
+
+ ;; --agenda
+ (defun my-handle-cli-agenda ()
+   "Handle --agenda command line ARG.
+
+When you apply this command line argument after init Emacs open the my agenda"
+   (when (string-equal argi "--agenda")
+     (prog1 t
+       (nano-agenda)))))
+
 (let ((file-name-handler-alist nil))
   (require 'my-modules))
 
