@@ -30,7 +30,6 @@
 (require 'my-leaf)
 (require 'f)   ; for `f-full'
 
-
 (leaf compat
   :ensure (compat :repo "emacs-straight/compat" :host github))
 
@@ -52,7 +51,9 @@
            ;; by default to run `corfu' you should press `C-M-i'
            (corfu-auto . t)
            ;; I don't like 0sec, because it bad for yasnippets
-           (corfu-auto-delay . 0.4))
+           (corfu-auto-delay . 0.4)
+           ;; when `line-spacing' changed, the default `corfu-count' (10) is bad
+           (corfu-count . 5))
   :config
   ;; `completion-in-region-function' was already changed, but
   ;; `global-corfu-mode' enable auto complete, if `corfu-auto' is non-nil
@@ -78,7 +79,7 @@
              ;; when an icons isn't known show the completion without icon
              ;;
              ;; (default is to show ??? with the red background)
-             (kind-icon--unknown . " ")
+             (kind-icon--unknown . "  ")
              ;; use the same as a symbol size for icons
              (kind-icon-default-style . `(
                                           :padding 0
@@ -91,8 +92,7 @@
 
 (leaf cape
   :ensure (cape :repo "minad/cape" :host github)
-  :require t
-  ;; I'm using the file from the following GitHub repository
+  ;; I'm using the file from the following GitHub repository:
   ;; https://github.com/dwyl/english-words/
   :custom `(cape-dict-file . ,(f-full "~/.emacs.d/dict/english.txt"))
   :defun (cape-symbol

@@ -16,6 +16,7 @@
                    :repo "minad/vertico"
                    :files ("*.el" "extensions/*.el"))
   :commands vertico--advice
+  :custom (vertico-count . 6)
   ;; it's part of `vertico-mode'
   :init
   (advice-add 'completing-read-default :around #'vertico--advice)

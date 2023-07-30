@@ -50,23 +50,20 @@
 (leaf modus-themes
   :custom ((modus-themes-bold-constructs . t)
            (modus-themes-italic-constructs . t))
-  :config
-  (load-theme 'modus-operandi t)
-  (global-hl-line-mode))
+  :config (global-hl-line-mode))
 
 (leaf ef-themes
   :require t
-  :config
-  (load-theme 'ef-cyprus t)
-  (global-hl-line-mode))
+  :config (global-hl-line-mode))
 
 ;; (load-theme 'doom-1337 t)
 
-;; (custom-set-faces
-;;  `(region
-;;    ((t (:background "white")))))
+;; I load `modus-operandi' before, because it redefines some nice faces, for
+;; example border for modelie
+(load-theme 'modus-operandi t)
+(load-theme 'ef-cyprus t)
 
-(setq line-spacing 0.2)
+(setq-default line-spacing 0.1)
 
 (provide 'my-load-theme)
 ;;; my-load-theme.el ends here
