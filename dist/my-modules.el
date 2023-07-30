@@ -24,21 +24,43 @@
 
 ;;; Code:
 
-(defvar bootstrap-version)
+(declare-function straight-use-package "straight.el")
 
-(let ((bootstrap-file
-       (expand-file-name
-        "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 6))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer (url-retrieve-synchronously
-                          "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-                          'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
 
-(straight-use-package 'org)
+(eval-and-compile
+  ;; `eval-and-compile' really install the package in compile time,
+  ;; it's important, because `my-leaf' needs in `straight-use-package' to install
+  ;; itself and `leaf' needed in the rest config, because `leaf' macro
+  (defvar bootstrap-version)
+  (setq straight-find-executable "C:\\tools\\find.exe")
+  (setq straight-check-for-modifications nil)
+  (let ((bootstrap-file
+         (expand-file-name
+          "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 6))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer (url-retrieve-synchronously
+                            "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+                            'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+
+  (declare-function straight--convert-recipe "straight.el")
+  (declare-function straight--add-package-to-load-path "straight.el")
+  (declare-function straight--add-package-to-info-path "straight.el")
+  (declare-function straight--file "straight.el")
+  (declare-function straight--load-package-autoloads "straight.el")
+  (declare-function straight--compute-dependencies "straight.el")
+
+  ;; don't build packages, think that they're already installed
+  (advice-add 'straight--package-might-be-modified-p :override 'ignore)
+
+  ;; but after init, new packages can be installed, so packages can be
+  ;; (re)builded
+  (add-hook 'after-init-hook
+            (lambda ()
+              (advice-remove 'straight--package-might-be-modified-p 'ignore))))
 
 
 
@@ -69,38 +91,20 @@
 
 ;;; Code:
 
-(declare-function 'straight-use-package "straight")
-
 (require 'cl-lib)
+(require 'pam)
 
-
-(straight-use-package 'leaf)
-(require 'leaf)
+(eval-when-compile (require 'fast-exec))
+(declare-function straight-use-package "straight")
 
 (eval-and-compile
-  (defun my-plist-get (plst key &optional def)
-    "Return the value at KEY in PLST, if key isn't provided return DEF."
-    (let (prev-key
-          prev-val
-          (result def))
-      (unless (keywordp (car plst))
-        (setq plst (cdr plst)))
-      (while plst
-        (when (eq prev-key key)
-          (setq result prev-val)
-          ;; stop loop
-          (setq plst nil))
-        (setq prev-key (car plst))
-        (setq prev-val (cadr plst))
-        ;; skip both: value and key
-        (setq plst (cddr plst)))
-      (when (eq prev-key key)
-        (setq result prev-val))
-      result))
+  ;; `eval-and-compile' really install the package in compile time,
+  ;; it's important, because the rest config use `leaf' macro
+  (pam-use-package '(leaf :repo "conao3/leaf.el"))
+  (require 'leaf)
 
   (defun my-leaf-keywords-init ()
     "Initialize keywords for macro `leaf'."
-    (setq leaf-alias-keyword-alist '((:ensure . :straight)))
     (setq leaf-keywords
           '(:disabled
             (unless
@@ -185,43 +189,6 @@
               ,@leaf--body)
             :preface
             `(,@leaf--value ,@leaf--body)
-            :major-mode-map
-            (let*
-                ((arguments
-                  (car leaf--value))
-                 name major-modes parent)
-              (cond
-               ((eq arguments t)
-                (setq name leaf--name)
-                (setq major-modes
-                      (list name)))
-               ((symbolp arguments)
-                (setq name arguments)
-                (setq major-modes
-                      (list leaf--name)))
-               ((listp arguments)
-                (setq name
-                      (my-plist-get arguments :name
-                                    (cl-find-if
-                                     (lambda
-                                       (x)
-                                       (and
-                                        (symbolp x)
-                                        (not
-                                         (keywordp x))))
-                                     arguments)))
-                (setq major-modes
-                      (my-plist-get arguments :major-modes
-                                    (or
-                                     (cl-find-if 'listp arguments)
-                                     (list name))))
-                (setq parent
-                      (my-plist-get arguments :parent)))
-               (t
-                (leaf-error "Expected eiter `symbol', t or `list'")))
-              `((eval-after-load 'xah-fly-keys
-                  '(my-define-local-major-mode-map ',name ',major-modes ',parent))
-                ,@leaf--body))
             :when
             (when leaf--body
               `((when ,@(if
@@ -289,8 +256,9 @@
             `(,@(mapcar
                  (lambda
                    (elm)
-                   `(leaf-handler-package ,leaf--name ,(car elm)
-                                          ,(cdr elm)))
+                   `(eval-and-compile
+                      (leaf-handler-package ,leaf--name ,(car elm)
+                                            ,(cdr elm))))
                  leaf--value)
               ,@leaf--body)
             :feather
@@ -304,10 +272,30 @@
                                                        (last leaf--value))
                                                      ,@leaf--body))
             :straight
-            `(,@(mapcar (lambda (elm) `(straight-use-package ',(if (eq elm t)
-                                                                   leaf--name
-                                                                 elm)))
-                        leaf--value) ,@leaf--body)
+            `(,@(mapcar (lambda (elm)
+	        	  `(eval-and-compile
+	        	     (straight-use-package ',(if (eq elm t)
+                                                         leaf--name
+                                                       elm))))
+                        leaf--value)
+	      ,@leaf--body)
+
+            :pam
+            `(,@(mapcar (lambda (elm)
+	        	  `(eval-and-compile
+	        	     (pam-use-package ',(if (eq elm t)
+                                                    leaf--name
+                                                  elm))))
+                        leaf--value)
+	      ,@leaf--body)
+            :pie
+            `(,@(mapcar (lambda (elm)
+                          `(eval-and-compile
+                             (my-pie-recipe ',(if (eq elm t)
+                                                  leaf--name
+                                                elm))))
+                        leaf--value)
+              ,@leaf--body)
             :el-get
             `(,@(mapcar
                  (lambda
@@ -738,10 +726,12 @@
                   (leaf-register-autoload
                    (-second-item it)
                    leaf--name)))
-              `((progn
+              `((with-eval-after-load 'fast-exec
+                  ;; `require' macros needed in `eval-and-compile'
+                  (eval-and-compile (require 'fast-exec))
                   (fast-exec-bind ',name
-                    (fast-exec-make-some-commands ,@bindings))
-                  ,@leaf--body)))
+                    (fast-exec-make-some-commands ,@bindings)))
+                ,@leaf--body))
             :leaf-defer
             (let*
                 ((eval-after-p
@@ -856,15 +846,17 @@
             :defer-config
             `((eval-after-load ',leaf--name
                 '(progn ,@leaf--value))
-              ,@leaf--body))))
+              ,@leaf--body)))
+    (setq leaf-alias-keyword-alist '(;; use my small PAckage Manager called
+                                     ;; `pam' which is built over `straight'
+                                     (:ensure . :pam)
+                                     ;; I prefer use `setq' over `custom-set'
+                                     ;;
+                                     ;; the main reason is speed, it speed up my
+                                     ;; config in 2.4 times!!! (17secs => 7secs)
+                                     (:custom . :pre-setq))))
 
-  (my-leaf-keywords-init)
-
-  (defun my-flatten-list (lst)
-    "LST of the lists of the lists ... to list of the atom elements.
-
-This is a version of `flatten-list', but it isn't change \\=' to \\='quote."
-    (delete 'quote (flatten-list lst))))
+  (my-leaf-keywords-init))
 
 
 
@@ -898,50 +890,305 @@ This is a version of `flatten-list', but it isn't change \\=' to \\='quote."
 
 ;;; Code:
 
-(add-to-list 'load-path "~/projects/fast-exec.el")
-(add-to-list 'load-path "~/projects/simple-indention.el")
-
-(add-to-list 'load-path (locate-user-emacs-file "site-lisp"))
+(eval-and-compile
+  (add-to-list 'load-path "~/.emacs.d/local-projects")
+  (add-to-list 'load-path "~/projects/fast-exec.el")
+  (add-to-list 'load-path "~/projects/simple-indention.el")
+  (add-to-list 'load-path (locate-user-emacs-file "site-lisp")))
 
 
 
 ;;; my-projects.el ends here
-;;; my-gcmh.el --- My configuration of `gcmh' -*- lexical-binding: t; -*-
+;;; pam.el --- A fast Emacs package manager which is built over `straight' -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2023 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; Homepage: https://github.com/semeninrussia/emacs.el
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+;; Version: 0.0.1
+;; Package-Requires: ((dash "2.18.0") (s "1.12.0") straight)
 
 ;;; Commentary:
 
-;; My configuration of `gcmh'.
+;; A fast Emacs package manager which is built over `straight'.
+
+;; When use a package instead of `straight-use-package' just add to the load
+;; path only ONE directory, load autoloads.  `straight' here add about 190~
+;; paths to the load path and load the same amount of autoloads files.  The
+;; `pam' version is more simple and lightweight, but the cons is that to install
+;; packages (don't activate) it still uses straight, if your packages didn't
+;; installed, you should add the --install option when run Emacs in your
+;; terminal, it replaces the default behaviour with the default `straight' way.
+;; Also if you need change the `pam' behaviour inside of a running Emacs session
+;; you can use the `pam-install-everything-mode' minor mode.
+
+;; The main function which you should use in 90% of cases when you use `pam' is
+;; `pam-use' it's like `straight-use-package', but don't add any path to the
+;; `load-path', don't explore TeXinfo documents, don't check if the package must
+;; be byte-compiled.  All these things you can do once when call
+;; `pam-load-packages', it have the complexity O(1) (don't depend on the amount
+;; of packages) and looks like one call of `straight-use-package'.  Instead
+;; `pam-use' just install package if you enabled the respective mode (or used
+;; --install flag when call Emacs) or do NOTHING.  In real cases you install the
+;; config on other computer, run "emacs --install" and all packages will be
+;; installed with `straight' and `pam', so you can use Emacs in other session
+;; with just call "emacs" without flags and forgot about `straight' ever.
+
+;; The most the package functions are aliases to their `straight' alternatives,
+;; the idea is forgot about the fact that `pam' is built over `straight' and just
+;; use pam-<one>, pam-<anotherone> and other package manager functions and don't
+;; think where function is define in `straight' or `pam'.  The "real" code in
+;; this package placed in little doses.
 
 ;;; Code:
 
+;;; autoload `straight' variables and functions.
+;;
+;; NOTE: here I don't wrote (require \\='straight), because in the most of Emacs
+;;   sessions `straight' is extra dependency of `pam', `straight' will be loaded
+;;   only when it's really imported.  It saves a little bit of time
+(autoload 'straight-use-package "straight")
+(autoload 'straight--build-dir "straight")
+(autoload 'straight-rebuild-package "straight")
+(eval-and-compile
+  (defvar straight-use-package-post-build-functions))
 
 
+(defgroup pam nil
+  "My simple package manager which is built over `straight'."
+  :group 'emacs)
 
+(defcustom pam-need-to-install-pkgs-p (member "--install" command-line-args)
+  "It is a non-nil value if `pam' should install packages."
+  :group 'pam
+  :type 'hook)
 
-(leaf gcmh
-  :ensure t
-  :global-minor-mode gcmh-mode)
+(defcustom pam-build-dir "~/.emacs.d/pam/"
+  "Path where all package files (and autoloads) are saved.
 
-;;; my-gcmh.el ends here
+Note that if you need in access the autoloads packages file use
+`pam--build-dir' function instead of this variable."
+  :group 'pam
+  :type 'string)
+
+(defcustom pam-autoloads-filename "my-packages-autoloads.el"
+  "Name of the file in which located all packages autoloads.
+
+Note that if you need in access the autoloads packages file use
+`pam--autoloads-file' function instead of this variable, the function return the
+full path, instead of filename.
+
+By default, file with this name is located inside inside `pam-build-dir', but
+you can redefine `pam--autoloads-file' with `advice'"
+  :group 'pam
+  :type 'string)
+
+;; TODO: ability to choose copy or move `straight' files
+(defcustom pam-post-build-functions
+  '(pam--copy-straight-files
+    pam--save-pkg-autoloads)
+  "Abnormal hook run after building a package with `pam-use-package'.
+
+Each hook function is called with the name of the package as a
+string.  For forward compatibility, it should accept and ignore
+additional arguments.
+
+Defaults to 2 functions:
+1. that copies `straight' files into the `pam' build directory.
+2. that append autoloads into the `pam' autloads file"
+  :group 'pam
+  :type 'hook)
+
+;;; Macros
+
+;; (macros defined before the public part, because they affect on byte-compiler)
+
+(defmacro pam--with-straight-hooks (&rest body)
+  "Evaluate the BODY with changed hooks for `straight'."
+  (declare (indent 0))
+  `(let ((straight-use-package-post-build-functions
+          (append
+           straight-use-package-post-build-functions
+           ;; add specific functions which will be runned after build.  Here I
+           ;; don't use `add-hook' to the `straight' hooks, because the user
+           ;; should can to choose `straight-use-package' or `pam-use-package'
+           ;; and they should have the different behaviours.
+           pam-post-build-functions)))
+     ,@body))
+
+;;; Public
+
+(define-minor-mode pam-install-everything-mode
+  "Toggle should or shouldn't `pam' install new packages.
+
+With enabled this minor mode, `pam-use-package' will use `straight-use-package'
+to install a package while the default behaviour is do nothing because already
+all is installed"
+  :global t
+  :init-value nil
+  :variable pam-need-to-install-pkgs-p
+  :group 'pam)
+
+(defun pam-use-package (melpa-style-recipe &optional no-clone no-build)
+  "Activate the package and MAYBE install it.
+
+The package is defined with MELPA-STYLE-RECIPE (see the `straight'
+documentation).  The behaviour depends on the value of the
+`pam-need-to-install-pkgs-p' variable.  If packages must be installed then this
+function install them using `straight' with passing NO-CLONE and NO-BUILD to
+`straight-use-package' (see below details), otherwise (packages already
+installed) do nothing, notice that here activation is extra, because in `pam'
+you activate all packages only once.
+
+The result value of this function is either nil, that tells package wasn't
+installed or activated or non-nil value otherwise.
+
+The paragraphs below tells about arguments which are used if package should be
+installed:
+
+First, the package recipe is registered with straight.el.  If NO-CLONE is a
+function, then it is called with two arguments: the package name as a string,
+and a boolean value indicating whether the local repository for the package is
+available.  In that case, the return value of the function is used as the value
+of NO-CLONE instead.  In any case, if NO-CLONE is non-nil, then processing stops
+here.
+
+Otherwise, the repository is cloned, if it is missing.  If NO-BUILD is a
+function, then it is called with one argument: the package name as a string.  In
+that case, the return value of the function is used as the value of NO-BUILD
+instead.  In any case, if NO-BUILD is non-nil, then processing halts here.
+Otherwise, the package is built and activated.  Note that if the package recipe
+has a nil `:build' entry, then NO-BUILD is ignored and processing always stops
+before building and activation occurs."
+  (interactive (read (read-string "Which recipe: ")))
+  (if (not pam-need-to-install-pkgs-p)
+      t
+    (pam--with-straight-hooks
+      (straight-use-package melpa-style-recipe no-clone no-build))))
+
+(defun pam-rebuild-package (melpa-style-recipe &optional recursive)
+  "Rebuild the package.
+
+The package is defined with MELPA-STYLE-RECIPE (see the `straight'
+documentation).  The difference with `straight-rebuild-package' is that after
+build files will be copied into the `pam' directory and autoloads file will be
+updated.  In other it is the same function MELPA-STYLE-RECIPE and RECURSIVE will
+be passed to `straight-rebuild-package'
+
+Notice that while `pam-use-package' check the mode (install or only activate a
+package), but `pam-rebuild-package' don't it, because rebuild is a more concrete
+command."
+  (interactive (read (read-string "Which recipe to rebuild: ")))
+  (pam--with-straight-hooks
+    (straight-rebuild-package melpa-style-recipe recursive)))
+
+(defun pam-activate ()
+  "Activate all installed `pam' packages.
+
+After that you can load any installed package with `require', `M-x' will show
+all commands of these packages, TeXinfo will be included in the manual."
+  (interactive)
+  (add-to-list 'load-path (pam--build-dir))
+  (add-to-list 'Info-default-directory-list (pam--build-dir))
+  (load (pam--autoloads-file)))
+
+(defun pam-sync-with-straight ()
+  "Copy all `straight' packages files into the `pam' dir, make autoloads file.
+
+Notice that it can take a long time."
+  (interactive)
+  (delete-file (pam--autoloads-file))
+  (dolist (pkg (pam--straight-packages))
+    (pam--sync-straight-package pkg)))
+
+(defun pam-create-files ()
+  "Make the `pam' build directory and touch the autoloads file."
+  (make-directory (pam--build-dir)))
+
+;;; Internal
+
+(defun pam--build-dir ()
+  "Return the path to the directory where `pam' store all packages files."
+  ;; Yes, here I just return the value of a variable.
+  ;; It's better than a variable, because `straight' use variables to get paths
+  ;; and `pam' must use function `pam--autoloads-file' that return the path,
+  ;; user shouldn't guess: Is it function or variable?  Choice already happened:
+  ;; everywhere - function
+  pam-build-dir)
+
+(defun pam--autoloads-file ()
+  "Return the path to the directory where `pam' store all packages files."
+  (file-name-concat pam-build-dir
+                    pam-autoloads-filename))
+
+(defun pam--straight-packages ()
+  "Get the list of the packages names that were installed with `straight'."
+  (cddr  ;; here `cddr' skips "." and ".." from the front list
+   (directory-files (straight--build-dir))))
+
+(defun pam--sync-straight-package (pkg &rest _ignore)
+  "Sync with `pam' PKG which have already installed and built with `straight'.
+
+It can be hook to `straight-use-package-post-build-functions' instead of other
+`pam' functions"
+  (run-hook-with-args pam-post-build-functions
+                      pkg))
+
+(defun pam--copy-straight-files (pkg &optional _ignore)
+  "Copy the files of `straight' PKG into the `pam-build-dir'.
+
+Notice that this function expect that PKG was already built, otherwise this
+function can do really strange things.
+
+This is a hook for `straight-use-package-post-build-functions', but it still can
+be useful in other cases"
+  (pam--copy-files
+   (straight--build-dir pkg)
+   (pam--build-dir)))
+
+(defun pam--copy-files (src dst)
+  "Copy all files and directories inside SRC to the DST directory.
+
+The difference with just copy directory, is that it tries to merge conflicted
+directories, instead of just replacing one with other"
+  (let ((default-directory src))
+    (dolist (file (cddr (directory-files src)))
+      ;; copy files: SRC -> DST
+      (cond
+       ((file-directory-p file)
+        ;; make a directory in DST and move all SRC files into it
+        (unless (file-exists-p (file-name-concat dst file))
+          (make-directory (file-name-concat dst file)))
+        (pam--copy-files (expand-file-name file)
+                         (file-name-concat dst file)))
+       (t
+        ;; delete a file from DST and copy from SRC
+        (ignore-errors
+          (delete-file (file-name-concat dst file)))
+        (copy-file file (file-name-concat dst file) 'ok-if-already-exists))))))
+
+(defun pam--save-pkg-autoloads (pkg &optional _ignore)
+  "Save all autoloads of `straight' built PKG into `pam' autoloads file.
+
+Notice that this function expect that PKG was already built, otherwise this
+function can do really strange things.
+
+Also this function doesn't GENERATE autoloads for PKG, expected that `straight'
+already done it, here just save them.
+
+This is a hook for `straight-use-package-post-build-functions', but it still can
+be useful in other cases."
+  (with-temp-buffer
+    ;; insert all autoloads files contents
+    (dolist (file (cddr (directory-files (straight--build-dir pkg) 'full)))
+      (when (string-suffix-p "-autoloads.el" file)
+        (insert-file-contents file)))
+    ;; write it to the end of autoloads file
+    (write-region (point-min) (point-max)
+                  (pam--autoloads-file)
+                  'append)))
+
+(provide 'pam)
+;;; pam.el ends here
 ;;; my-libs.el --- Some libraries
 
 ;; Copyright (C) 2022 Semen Khramtsov
@@ -973,21 +1220,57 @@ This is a version of `flatten-list', but it isn't change \\=' to \\='quote."
 
 
 
-(leaf s :ensure t :require t)
 
-(leaf f :ensure t :require t)
 
-(leaf dash :ensure t :global-minor-mode global-dash-fontify-mode :require t)
+(eval-and-compile
+  ;; `eval-and-compile' installs all libraries in compile-time
+  ;; , so "(require \\='dash)" compiles successufelly
+  
+  (leaf dash
+    :ensure (dash :repo "magnars/dash.el" :host github)
+    :global-minor-mode global-dash-fontify-mode
+    :require t)
 
-(leaf just                              ;nofmt
-  :ensure (just :host github :repo "semenInRussia/just.el")
-  :require t)
+  (leaf s
+    :ensure t
+    :require t)
 
-(leaf queue :ensure t)
+  (leaf f
+    :ensure t
+    :require t)
 
-(leaf request :ensure t)
+  ;; (straight-use-package '(just :host github :repo "semenInRussia/just.el"))
+  (leaf just                              ;nofmt
+    :ensure (just :host github :repo "semenInRussia/just.el")
+    :require t)
 
-(leaf async :ensure t)
+  (leaf queue
+    :ensure t)
+
+  (leaf request
+    :ensure t)
+
+  (leaf async
+    :ensure t)
+
+  (leaf alert
+    :ensure t)
+
+  (leaf fringe-helper
+    :ensure t)
+
+  (leaf ht
+    :ensure t)
+
+  (leaf ov
+    :ensure t)
+
+  (leaf indicators
+    :ensure t)
+
+  (leaf svg-lib
+    :ensure t
+    :require t))
 
 
 
@@ -1029,6 +1312,27 @@ This is a version of `flatten-list', but it isn't change \\=' to \\='quote."
 (require 's)
 (require 'f)
 (require 'just)
+
+
+(defun my-plist-get (plst key &optional def)
+  "Return the value at KEY in PLST, if key isn't provided return DEF."
+  (let (prev-key
+        prev-val
+        (result def))
+    (unless (keywordp (car plst))
+      (setq plst (cdr plst)))
+    (while plst
+      (when (eq prev-key key)
+        (setq result prev-val)
+        ;; stop loop
+        (setq plst nil))
+      (setq prev-key (car plst))
+      (setq prev-val (cadr plst))
+      ;; skip both: value and key
+      (setq plst (cddr plst)))
+    (when (eq prev-key key)
+      (setq result prev-val))
+    result))
 
 (defun my-alist-p (obj)
   "Return t, when OBJ is `alist'."
@@ -1314,7 +1618,9 @@ which should be evaluated"
 
 
 
-(leaf aas :ensure t :global-minor-mode aas-global-mode)
+(leaf aas
+  :ensure t
+  :global-minor-mode aas-global-mode)
 
 
 
@@ -1349,9 +1655,10 @@ which should be evaluated"
 
 
 
-(leaf aggressive-indent-mode
+
+(leaf aggressive-indent
   :ensure t
-  :global-minor-mode aggressive-indent-global-mode
+  :hook emacs-lisp-mode-hook
   :config
   (advice-add 'indent-region-line-by-line
               :around
@@ -1408,21 +1715,96 @@ which should be evaluated"
 
 (defvar uncrustify-cfg-file (f-full "~/uncrustify.cfg"))
 
+
 (leaf apheleia
-  :ensure t
+  :ensure (apheleia :repo "radian-software/apheleia"
+                    :host github)
   :defvar (apheleia-formatters apheleia-mode-alist)
-  :global-minor-mode apheleia-global-mode
-  :defer-config
-  (push '(uncrustify
-          . ("uncrustify" "-f" filepath "-c" uncrustify-cfg-file "-o"))
-        ;; a formatter for C++
-        apheleia-formatters)
-  (setf (alist-get 'rustfmt apheleia-formatters)
-        '("rustfmt" "--edition" "2021" "--quiet" "--emit" "stdout"))
-  (setf (alist-get 'c++-mode apheleia-mode-alist)
-        'uncrustify)
-  (setf (alist-get 'python-mode apheleia-mode-alist)
-        '(yapf isort)))
+  :hook (;; I construct a hook list from the `apheleia-mode-alist' variable ;;
+         ;; it's better than a `apheleia-global-mode', because it will be loaded after the
+         ;; major mode is entered
+         ;;
+         ;; php-mode has to come before cc-mode
+         (php-mode-hook . apheleia-mode)
+         ;; json-mode has to come before javascript-mode (aka-hook js-mode)
+         (json-mode-hook . apheleia-mode)
+         (json-ts-mode-hook . apheleia-mode)
+         ;; rest are alphabetical
+         (asm-mode-hook . apheleia-mode)
+         (awk-mode-hook . apheleia-mode)
+         (bash-ts-mode-hook . apheleia-mode)
+         (bazel-mode-hook . apheleia-mode)
+         (beancount-mode-hook . apheleia-mode)
+         (c++-ts-mode-hook . apheleia-mode)
+         (caddyfile-mode-hook . apheleia-mode)
+         (cc-mode-hook . apheleia-mode)
+         (c-mode-hook . apheleia-mode)
+         (c-ts-mode-hook . apheleia-mode)
+         (c++-mode-hook . apheleia-mode)
+         (caml-mode-hook . apheleia-mode)
+         (cmake-mode-hook . apheleia-mode)
+         (cmake-ts-mode-hook . apheleia-mode)
+         (common-lisp-mode-hook . apheleia-mode)
+         (crystal-mode-hook . apheleia-mode)
+         (css-mode-hook . apheleia-mode)
+         (css-ts-mode-hook . apheleia-mode)
+         (dart-mode-hook . apheleia-mode)
+         (dart-ts-mode-hook . apheleia-mode)
+         (elixir-mode-hook . apheleia-mode)
+         (elixir-ts-mode-hook . apheleia-mode)
+         (elm-mode-hook . apheleia-mode)
+         (fish-mode-hook . apheleia-mode)
+         (go-mode-hook . apheleia-mode)
+         (go-mod-ts-mode-hook . apheleia-mode)
+         (go-ts-mode-hook . apheleia-mode)
+         (graphql-mode-hook . apheleia-mode)
+         (haskell-mode-hook . apheleia-mode)
+         (html-mode-hook . apheleia-mode)
+         (html-ts-mode-hook . apheleia-mode)
+         (java-mode-hook . apheleia-mode)
+         (java-ts-mode-hook . apheleia-mode)
+         (js3-mode-hook . apheleia-mode)
+         (js-mode-hook . apheleia-mode)
+         (js-ts-mode-hook . apheleia-mode)
+         (kotlin-mode-hook . apheleia-mode)
+         (latex-mode-hook . apheleia-mode)
+         (LaTeX-mode-hook . apheleia-mode)
+         (lua-mode-hook . apheleia-mode)
+         (lisp-mode-hook . apheleia-mode)
+         (nasm-mode-hook . apheleia-mode)
+         (nix-mode-hook . apheleia-mode)
+         (perl-mode-hook . apheleia-mode)
+         (purescript-mode-hook . apheleia-mode)
+         (python-mode-hook . apheleia-mode)
+         (python-ts-mode-hook . apheleia-mode)
+         (ruby-mode-hook . apheleia-mode)
+         (ruby-ts-mode-hook . apheleia-mode)
+         (rustic-mode-hook . apheleia-mode)
+         (rust-mode-hook . apheleia-mode)
+         (rust-ts-mode-hook . apheleia-mode)
+         (scss-mode-hook . apheleia-mode)
+         (svelte-mode-hook . apheleia-mode)
+         (terraform-mode-hook . apheleia-mode)
+         (TeX-latex-mode-hook . apheleia-mode)
+         (TeX-mode-hook . apheleia-mode)
+         (tsx-ts-mode-hook . apheleia-mode)
+         (tuareg-mode-hook . apheleia-mode)
+         (typescript-mode-hook . apheleia-mode)
+         (typescript-ts-mode-hook . apheleia-mode)
+         (web-mode-hook . apheleia-mode)
+         (yaml-mode-hook . apheleia-mode)
+         (yaml-ts-mode-hook . apheleia-mode))
+  :setf (;; a formatter for C++
+         ((alist-get 'c++-mode apheleia-mode-alist)
+          . 'uncrustify)
+         ((alist-get 'uncrustify apheleia-formatters)
+          . '("uncrustify" "-f" filepath "-c" uncrustify-cfg-file "-o"))
+         ;; find the --edition of "rustfmt"
+         ((alist-get 'rustfmt apheleia-formatters)
+          . '("rustfmt" "--edition" "2021" "--quiet" "--emit" "stdout"))
+         ;; use yapf+isort instead of black for python
+         ((alist-get 'python-mode apheleia-mode-alist)
+          . '(yapf isort))))
 
 
 
@@ -1461,8 +1843,13 @@ which should be evaluated"
 (require 'dash)
 (require 's)
 
+
+(leaf avy
+  :ensure (avy :repo "abo-abo/avy" :host github))
+
 (leaf ace-window
-  :ensure t
+  :ensure (ace-window :repo "abo-abo/ace-window"
+                      :host github)
   :bind ("M-o" . ace-window))
 
 (defun my-visit-last-opened-buffer ()
@@ -1486,12 +1873,44 @@ which should be evaluated"
   (kill-buffer (current-buffer)))
 
 (leaf-keys
- ("C-TAB" . 'my-visit-last-opened-buffer)
- ("C-x k" . 'my-kill-current-buffer))
+ ("C-TAB" . 'my-visit-last-opened-buffer))
 
 
 
 ;;; my-buffer-navigation.el ends here
+;;; my-citre.el --- Support of citre: the full ide which is built over `ctags' -*- lexical-bindings: t -*-
+
+;; Copyright (C) 2023
+
+;;; Commentary:
+
+;; Support of citre: the full ide which is built over `ctags'.
+;;
+;; It provides auto-completion, find definition and other features like the
+;; modern LSPs
+
+;;; Code:
+
+
+
+
+
+(leaf citre
+  :ensure t
+  :hook c++-mode-hook
+  :custom (citre-tag-reference-mark . "")
+  :bind (;; C-c u is the `citre' prefix
+         ("C-c u u" . 'citre-update-this-tags-file)
+         ("C-c u n" . 'citre-create-tags-file)
+         ;; `citre-peek' is the useful command that show the definition of the
+         ;; command/variable in the small popup window below the cursor
+         ;;
+         ;; bound to "C-c u d"
+         ("C-c u d" . 'citre-peek))
+  :config (require 'citre-common-tag))
+
+(provide 'my-citre.el)
+;;; my-citre.el ends here
 ;;; my-comment-dwim-2.el --- My configuration for the `comment-dwim-2'
 
 ;; Copyright (C) 2022 Semen Khramtsov
@@ -1524,7 +1943,8 @@ which should be evaluated"
 
 
 (leaf comment-dwim-2
-  :ensure t
+  :ensure (comment-dwim-2 :repo "remyferre/comment-dwim-2"
+                          :host github)
   :bind ("M-;" . comment-dwim-2))
 
 (provide 'my-comment-dwim-2)
@@ -1554,227 +1974,124 @@ which should be evaluated"
 
 ;; My configuration of `corfu'.  I choose `corfu' over `company' because
 ;; `company' have a big load time (about 9 secs on my computer) while `corfu'
-;; 3 secs
+;; 3secs
 
 ;;; Code:
 
 
 
+(require 'f)   ; for `f-full'
 
+
+(leaf compat
+  :ensure (compat :repo "emacs-straight/compat" :host github))
 
 (leaf corfu
-  :ensure t
-  :global-minor-mode global-corfu-mode
+  :ensure (corfu
+           :repo "minad/corfu"
+           :files ("*.el" "extensions/*"))
+  ;; so when auto-completion is provided, load `corfu'
+  ;;
+  ;; I load `corfu' only when it really needed.  It's awesome idea, until
+  ;; `corfu' don't take some seconds before load, it make Emacs a little worth,
+  ;; but with `my-use-afk' it's still cool
+  :commands corfu--in-region
+  :init (setq-default completion-in-region-function 'corfu--in-region)
+  ;; make border of auto-completion minibuffer white/black, it looks like nice
+  ;; :custom-face ((corfu-border . '((t :background "black"))))
   :custom (;; by default 2 but 1 one is better
            (corfu-auto-prefix . 1)
-           ;; by default to run `corfu' you should press `C-M-kp-begin'
+           ;; by default to run `corfu' you should press `C-M-i'
            (corfu-auto . t)
-           ;; I don't like 0sec, because it worth for yasnippets
-           (corfu-auto-delay . 0.4)))
+           ;; I don't like 0sec, because it bad for yasnippets
+           (corfu-auto-delay . 0.4))
+  :config
+  ;; `completion-in-region-function' was already changed, but
+  ;; `global-corfu-mode' enable auto complete, if `corfu-auto' is non-nil
+  (global-corfu-mode t)
+
+  ;; show documentation of every auto-completion item
+  (leaf corfu-popupinfo
+    :bind (:corfu-map
+           :package corfu
+           ("M-i" . 'corfu-popupinfo-toggle)))
+
+  ;; show icons inside auto-completion popup
+  (leaf kind-icon
+    :ensure (kind-icon :repo "emacs-straight/kind-icon"
+                       :host github)
+    :after corfu
+    :commands kind-icon-margin-formatter
+    :defvar corfu-margin-formatters
+    :custom ((kind-icon-use-icons . t)
+             ;; don't show the extra space between icon and text
+             (kind-icon-extra-space . nil)
+             ;; show the icons with the white or other theme background color
+             (kind-icon-default-face . 'corfu-default)
+             (kind-icon-blend-background . nil)
+             ;; when an icons isn't known show the completion without icon
+             ;;
+             ;; (default is to show ??? with the red background)
+             (kind-icon--unknown . " ")
+             ;; use the same as a symbol size for icons
+             (kind-icon-default-style . `(
+                                          :padding 0
+                                          :stroke 0
+                                          :margin 0
+                                          :radius 0
+                                          :height 0.5
+                                          :width 0.1
+                                          :scale 1)))
+    :init (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)))
+
+;; misc
 
 (leaf cape
-  :ensure t
+  :ensure (cape :repo "minad/cape" :host github)
   :require t
+  ;; I'm using the file from the following GitHub repository
+  ;; https://github.com/dwyl/english-words/
+  :custom `(cape-dict-file . ,(f-full "~/.emacs.d/dict/english.txt"))
   :defun (cape-symbol
-          cape-dabbrev
-          cape-file
-          cape-elisp-block
-          cape-history
-          cape-keyword
-          cape-sgml
-          cape-tex
-          cape-abbrev
-          cape-symbol)
+          cape-dabbrev cape-file cape-elisp-block cape-history
+          cape-keyword cape-sgml cape-tex cape-abbrev cape-symbol)
+  :hook (corfu-mode-hook . my-capf-local-setup)
   :config
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-elisp-block)
-  (add-to-list 'completion-at-point-functions #'cape-history)
-  (add-to-list 'completion-at-point-functions #'cape-keyword)
-  (add-to-list 'completion-at-point-functions #'cape-sgml)
-  ;; (add-to-list 'completion-at-point-functions #'cape-tex)
-  (add-to-list 'completion-at-point-functions #'cape-abbrev)
-  (add-to-list 'completion-at-point-functions #'cape-symbol)
-  (add-to-list 'completion-at-point-functions #'cape-symbol)
-  ;; (add-to-list 'completion-at-point-functions #'cape-line)
-  )
+  ;; make that `completion-at-point-functions' will be the different for every buffer
+  (make-local-variable 'completion-at-point-functions)
+
+  ;; don't use the following
+  ;; LaTeX commands, I prefer built-in AuCTex capfs
+  ;;   (add-hook 'completion-at-point-functions #'cape-tex)
+  ;; I prefer built-in `elisp-completion-at-point'
+  ;;   (add-hook 'completion-at-point-functions #'cape-symbol)
+  ;; really strange thing, IDK what is it (know but it hard)
+  ;;   (add-hook 'completion-at-point-functions #'cape-sgml)
+  ;;   (add-hook 'completion-at-point-functions #'cape-rfc1345)
+  ;; enrage!!
+  ;;   (add-hook 'completion-at-point-functions #'cape-line)
+
+  (defun my-capf-local-setup ()
+    "Change the `completion-at-point-functions' for current buffer."
+    ;; Here the numbers is the depth of the respective hooks, the default depth is
+    ;; 0, so if `major-mode' provides a capf function, then its depth is 0 (in
+    ;; 100% cases which I saw)
+    ;;
+    ;; If i want that one thing will be prefer over another, than set to more
+    ;; important one the number with the LESSER number, so if the depth it will
+    ;; be the first function which was checked, here I use the depth from 0 to
+    ;; the amount of hooks
+    (add-hook 'completion-at-point-functions #'cape-history     1 'local)
+    (add-hook 'completion-at-point-functions #'cape-elisp-block 2 'local)
+    (add-hook 'completion-at-point-functions #'cape-file        3 'local)
+    (add-hook 'completion-at-point-functions #'cape-keyword     4 'local)
+    (add-hook 'completion-at-point-functions #'cape-dabbrev     5 'local)
+    (add-hook 'completion-at-point-functions #'cape-abbrev      6 'local)
+    (add-hook 'completion-at-point-functions #'cape-dict        7 'local)))
+
+
 
 ;;; my-corfu.el ends here
-;;; my-drag.el --- My config for the things dragging
-
-;; Copyright (C) 2022 Semen Khramtsov
-
-;; Author: Semen Khramtsov <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
-
-;; This file is not part of GNU Emacs.
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-;;; Commentary:
-
-;; My config for the things dragging
-
-;;; Code:
-
-
-
-(require 'dash)
-(require 'just)
-
-
-(defcustom my-drag-map
-  (make-sparse-keymap)
-  "Keymap for my own small drag system."
-  :type 'keymap
-  :group 'my)
-
-(define-prefix-command 'my-drag 'my-drag-map)
-
-(defcustom my-left-draggers nil
-  "Functions, which drag stuff to left, or return nil.
-
-It is used in `my-drag-stuff-left'."
-  :type '(repeat symbol)
-  :group 'my)
-
-(defvar my-last-command-is-drag-stuff nil
-  "When is non-nil indicates, then last command was dragged any stuff.")
-
-(defun my-drag-p ()
-  "Return non-nil, when last command is drag-command."
-  (memq last-command
-        '(my-drag-stuff-right
-          my-drag-stuff-left
-          my-drag-stuff-up
-          my-drag-stuff-down)))
-
-(defun my-drag-stuff-left ()
-  "My more general and functional version of `drag-stuff-left'."
-  (interactive)
-  (my-drag-anything my-left-draggers))
-
-(defcustom my-right-draggers nil
-  "Functions, which drag stuff to right, or return nil.
-
- It is used in `my-drag-stuff-right'."
-  :type '(repeat symbol)
-  :group 'my)
-
-(defun my-drag-stuff-right ()
-  "My more general and functional version of `drag-stuff-right'."
-  (interactive)
-  (my-drag-anything my-right-draggers))
-
-(defcustom my-up-draggers nil
-  "Functions, which drag stuff to up, or return nil.
-
-Is used in `my-drag-stuff-up'."
-  :type '(repeat symbol)
-  :group 'my)
-
-(defun my-drag-stuff-up ()
-  "My more general and functional version of `drag-stuff-up'."
-  (interactive)
-  (my-drag-anything my-up-draggers))
-
-(defcustom my-down-draggers nil
-  "Functions, which drag stuff to up, or return nil.
-
-It is used in `my-drag-stuff-down'."
-  :type '(repeat symbol)
-  :group 'my)
-
-(defun my-drag-stuff-down ()
-  "My more general and functional version of `drag-stuff-down'."
-  (interactive)
-  (my-drag-anything my-down-draggers))
-
-(defun my-drag-anything (draggers)
-  "Find and call first found true dragger from the DRAGGERS list.
-
-After a call of the this command, current map will be setted to `my-drag-map'
-for return the current map back, press either RET or a key which isn't bound in
-`my-drag-map'.
-
-True dragger mean that its function return non-nil when called interactively."
-  (--find (call-interactively it) draggers)
-  (message "Start dragging, use keys u, i, o, k. Type RET for exit...")
-  (set-transient-map my-drag-map))
-
-(defun add-left-dragger (f)
-  "Add F to list draggers for `my-drag-stuff-left'."
-  (add-to-list 'my-left-draggers f))
-
-(defun add-right-dragger (f)
-  "Add F to list draggers for `my-drag-stuff-right'."
-  (add-to-list 'my-right-draggers f))
-
-(defun add-up-dragger (f)
-  "Add F to list draggers for `my-drag-stuff-up'."
-  (add-to-list 'my-up-draggers f))
-
-(defun add-down-dragger (f)
-  "Add F to list draggers for `my-drag-stuff-down'."
-  (add-to-list 'my-down-draggers f))
-
-(defun stop-drag ()
-  "Stop drag, just something print, and nothing do, set to nil something."
-  (interactive)
-  (setq my-last-command-is-drag-stuff nil)
-  (message "Turn `drag' to normal!"))
-
-(leaf-keys
- (my-drag-map
-  ("RET" . stop-drag)
-  ("i"   . my-drag-stuff-up)
-  ("k"   . my-drag-stuff-down)
-  ("o"   . my-drag-stuff-right)
-  ("u"   . my-drag-stuff-left)))
-
-(leaf drag-stuff
-  :ensure t
-  :global-minor-mode drag-stuff-global-mode
-  :bind ("C-]" . 'my-drag)
-  :bind (:my-drag-map
-         ("j"       . my-drag-stuff-left-char)
-         ("."       . transpose-sexps)
-         ("m"       . transpose-sexps)
-         ("n"       . avy-transpose-lines-in-region)
-         ("l"       . my-drag-stuff-right-char)
-         ("t"       . transpose-regions))
-  :config
-
-  (defun my-drag-stuff-left-char ()
-    "Drag char to left."
-    (interactive)
-    (transpose-chars -1))
-
-  (defun my-drag-stuff-right-char ()
-    "Drag char to right."
-    (interactive)
-    (transpose-chars 1))
-
-  (add-left-dragger  'drag-stuff-left)
-  (add-right-dragger 'drag-stuff-right)
-  (add-up-dragger    'drag-stuff-up)
-  (add-down-dragger  'drag-stuff-down))
-
-
-
-;;; my-drag.el ends here
 ;;; my-dumb-jump.el --- My configuration of the `dumb-jump'
 
 ;; Copyright (C) 2022 Semen Khramtsov
@@ -1808,10 +2125,11 @@ True dragger mean that its function return non-nil when called interactively."
 
 
 (leaf rg
-  :ensure t)
+  :ensure (rg :repo "dajva/rg.el"
+              :host github))
 
 (leaf dumb-jump
-  :ensure t
+  :ensure (dumb-jump :repo "jacktasia/dumb-jump" :host github)
   :custom ((dumb-jump-prefer-searcher dumb-jump-force-searcher)
            . 'rg)
   :bind (("M-," . xref-go-back)
@@ -1938,47 +2256,45 @@ With prefix arg don't indent."
 
 
 
-
-(require 'fast-exec)
-
 (require 'dash)
 
 (declare-function turn-off-flycheck "my-flycheck.el")
 
 
-(defcustom my-eglot-major-modes
-  '(rust-mode python-mode haskell-mode)
-  "List of the major modes in which should work `eglot'."
-  :group 'my
-  :type '(repeat major-mode))
-
-;; `eglot' use `flymake' instead of `flycheck', so i disable `flycheck'
-(add-hook 'eglot-connect-hook #'turn-off-flycheck)
-
-
 (leaf eglot
   :custom `((eglot-send-changes-idle-time . 1) ; in seconds
-            )
+            (eglot--executable-find . "C:\\tools\\find.exe"))
   :custom-face (eglot-highlight-symbol-face . '((t (:inherit lazy-highlight))))
-  :bind (("C-c lr" . 'eglot-rename)
+  :defun eglot-inlay-hints-mode
+  :bind (:eglot-mode-map
+         ("C-c lr" . 'eglot-rename)
          ("<f6>"   . 'eglot-rename)
          ("C-c la"  . 'eglot-code-actions)
-         (:eglot-mode-map
-          ([remap my-format-expression] . 'eglot-format)))
+         ("C-c ll"  . 'eglot-code-actions)
+         ([remap my-format-expression] . 'eglot-format))
   :fast-exec (("Start a LSP Server for Current Buffer" 'eglot)
               ("Reconnect the LSP Server" 'eglot-reconnect)
               ("Disable the LSP Server" 'eglot-shutdown))
-  :config                               ;nofmt
+  :config
+  ;; `eglot' use `flymake' instead of `flycheck', so i disable `flycheck'
+  (add-hook 'eglot-managed-mode-hook #'turn-off-flycheck)
+
+  ;; don't use inlay hints, because they're a bit useless for me
+  ;;
+  ;; I'm "True Emacs user"!!!
+  (add-hook 'eglot-managed-mode-hook #'eglot-inlay-hints-mode)
+
   (leaf flymake
-    :require t
     :bind (:flymake-mode-map
            ("C-c fd" . 'flymake-show-project-diagnostics)
            ([remap next-error] . 'flymake-goto-next-error)
            ([remap prev-error] . 'flymake-goto-prev-error)))
 
-  (leaf eldoc-box
-    :after my-eldoc
-    :hook (eglot-managed-mode-hook . eldoc-box-hover-mode)))
+  ;; set default LSP servers for all supported languages
+  (defvar eglot-server-programs)  ; make compiler happier
+  ;; python (pyright)
+  (setf (alist-get '(python-mode python-ts-mode) eglot-server-programs)
+        '("pyright-langserver" "--stdio")))
 
 
 
@@ -2015,19 +2331,100 @@ With prefix arg don't indent."
 
 
 
+;; use `eldoc' with `flycheck' instead of echo area
+(defvar flycheck-mode)
+(defvar flycheck-display-errors-function)
+(defvar flycheck-help-echo-function)
 
-(leaf eldoc                             ;elfmt
-  :ensure t
-  :custom (eldoc-idle-delay . 0.2)
-  :config (leaf eldoc-box
-            :ensure t
-            :defun eldoc-box-hover-mode
-            :defvar global-eldoc-box-hover-mode
-            :bind ("C-h C-k" . 'eldoc-box-quit-frame)
-            :init (define-global-minor-mode global-eldoc-box-hover-mode
-                    eldoc-box-hover-mode
-                    (lambda () (eldoc-box-hover-mode 1)))
-            :global-minor-mode global-eldoc-box-hover-mode))
+(declare-function flycheck-error-group "flycheck.el")
+(declare-function flycheck-error-id "flycheck.el")
+(declare-function flycheck-error-message "flycheck.el")
+(declare-function flycheck-error-level "flycheck.el")
+(declare-function flycheck-overlay-errors-at "flycheck.el")
+
+
+(defun my-flycheck-eldoc (callback &rest _ignored)
+  "Print flycheck messages at point by calling CALLBACK."
+  (when-let ((flycheck-errors (and flycheck-mode (flycheck-overlay-errors-at (point)))))
+    (mapc
+     (lambda (err)
+       (let ((level (flycheck-error-level err)))
+         (funcall callback
+                  (format "%s:  %s"
+                          (propertize
+                           (pcase level
+                             ('info
+                              "I"
+                              ;; (nerd-icons-codicon "nf-cod-info")
+                              )
+                             ('error
+                              "E"
+                              ;; (nerd-icons-codicon "nf-cod-error")
+                              )
+                             ('warning
+                              "W"
+                              ;; (nerd-icons-codicon "nf-cod-warning")
+                              )
+                             (_ level))
+                           'face (pcase level
+                                   ('info
+                                    'flycheck-error-list-info)
+                                   ('error
+                                    'flycheck-error-list-error)
+                                   ('warning
+                                    'flycheck-error-list-warning)
+                                   (_ 'font-lock-doc-face)))
+                          (flycheck-error-message err))
+
+                  :thing (or (flycheck-error-id err)
+                             (flycheck-error-group err)))))
+     flycheck-errors)))
+
+(defun my-flycheck-prefer-eldoc ()
+  "Prefer `eldoc' over the echo area for `flycheck'."
+  (interactive)
+  (add-hook 'eldoc-documentation-functions #'my-flycheck-eldoc nil t)
+  (setq eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
+  (setq flycheck-display-errors-function nil)
+  (setq flycheck-help-echo-function nil))
+
+(with-eval-after-load 'flycheck
+  (add-hook 'flycheck-mode-hook #'my-flycheck-prefer-eldoc)
+  (when flycheck-mode
+    (my-flycheck-prefer-eldoc)))
+
+;;; use beautifull documentation popup
+(eval-and-compile
+  (leaf eldoc
+    :require t
+    :custom ((eldoc-box-clear-with-C-g . t)
+             (eldoc-idle-delay . 1.0)))
+
+  (leaf eldoc-box
+    :ensure (eldoc-box :repo "casouri/eldoc-box" :host github)
+    :require t
+    :custom (eldoc-box-fringe-use-same-bg . t)
+    :bind ("C-h C-k" . 'eldoc-box-quit-frame)))
+
+(setq eldoc-box-position-function
+      #'my-eldoc-box--bottom-corner-position-function)
+
+(defun my-eldoc-box--bottom-corner-position-function (width _)
+  "The default function to set childframe position.
+Used by `eldoc-box-position-function'.
+Position is calculated base on WIDTH and HEIGHT of childframe text window"
+  (pcase-let ((`(,_offset-l ,offset-r ,offset-t) eldoc-box-offset))
+    (cons (- (frame-outer-width (selected-frame)) width offset-r)
+          ;; y position + v-offset
+          offset-t)))
+
+(define-global-minor-mode global-eldoc-box-hover-mode
+  eldoc-box-hover-mode
+  eldoc-box-hover-mode)
+
+(global-eldoc-box-hover-mode)
+
+;;; use `eldoc' with `eglot'
 
 
 
@@ -2064,7 +2461,7 @@ With prefix arg don't indent."
 
 
 (leaf embrace
-  :ensure t
+  :ensure (embrace :repo "cute-jumper/embrace.el" :host github)
   :defvar embrace-semantic-units-alist
   :setq-default (embrace-show-help-p . nil)
   :bind ("C-."       . embrace-commander)
@@ -2119,7 +2516,7 @@ With prefix arg don't indent."
 
 
 (leaf expand-region
-  :ensure t
+  :ensure (expand-region :repo "magnars/expand-region.el" :host github)
   :bind ("C-x C-<SPC>" . er/expand-region))
 
 
@@ -2156,19 +2553,16 @@ With prefix arg don't indent."
 
 
 
-
 (require 'dash)
-
-(declare-function visual-fill "my-lang-utils")
 
 (leaf fast-exec
   :load-path "~/projects/fast-exec.el/"
   :defun fast-exec-use
-  :require t
   :bind ("M-=" . fast-exec-exec)
   :commands fast-exec-exec
-  :config (add-hook 'fast-exec-hint-buffer-mode-hook #'visual-fill)
-  (require 'my-fast-exec-misc))
+  :config (require 'my-fast-exec-misc))
+
+(eval-when-compile (require 'fast-exec))
 
 
 
@@ -2204,8 +2598,10 @@ With prefix arg don't indent."
 
 
 
-(leaf flycheck                          ;nofmt
-  :ensure t
+
+
+(leaf flycheck
+  :ensure (flycheck :repo "flycheck/flycheck" :host github)
   :bind (:flycheck-mode-map
          ([remap next-error] . 'flycheck-next-error)
          ([remap previous-error] . 'flycheck-previous-error))
@@ -2250,51 +2646,14 @@ With prefix arg don't indent."
 
 
 
+
 (leaf goto-last-change
-  :ensure t
+  :ensure (goto-last-change :repo "camdez/goto-last-change.el" :host github)
   :bind ("C-_" . 'goto-last-change))
 
 
 
 ;;; my-goto-last-change.el ends here
-;;; my-imenu.el --- My configuration of the `imenu'
-
-;; Copyright (C) 2022 Semen Khramtsov
-
-;; Author: Semen Khramtsov <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
-
-;; This file is not part of GNU Emacs.
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-;;; Commentary:
-
-;; My configuration of the `imenu'
-
-;;; Code:
-
-
-
-
-(leaf consult-imenu
-  :custom (imenu-auto-rescan . t))
-
-
-
-;;; my-imenu.el ends here
 ;;; my-indent.el --- My configuration for the indentation
 
 ;; Copyright (C) 2022 Semen Khramtsov
@@ -2328,24 +2687,11 @@ With prefix arg don't indent."
 
 
 
-;; disable tabs
+;; disable tabs, sorry Richard
 (setq-default indent-tabs-mode nil)
-
-(defun my-indent-line-or-region ()
-  "If text selected, then indent it, otherwise indent current line."
-  (interactive)
-  (save-excursion
-    (if (use-region-p)
-        (indent-region (region-beginning) (region-end))
-      (funcall indent-line-function))))
 
 (leaf-keys
  (prog-mode-map ("RET" . newline-and-indent)))
-
-(leaf-keys
- ("RET"   . newline-and-indent)
- ("q"     . my-indent-line-or-region)
- ("SPC q" . join-line))
 
 
 
@@ -2383,10 +2729,9 @@ With prefix arg don't indent."
 (require 'dash)
 (require 'corfu)
 
-(require 'fast-exec)
 
-
-(leaf posframe :ensure t)
+(leaf posframe
+  :ensure (posframe :repo "tumashu/posframe" :host github))
 
 (leaf lsp-bridge
   :load-path* "lisp/site-lisp/lsp-bridge"
@@ -2412,6 +2757,7 @@ With prefix arg don't indent."
          ("C-c C-d" . 'lsp-bridge-popup-documentation)
          ("<f6>"    . 'lsp-bridge-rename)
          ("C-c ll"  . 'lsp-bridge-code-action)
+         ("C-c la"  . 'lsp-bridge-code-action)
          ("M-,"     . 'lsp-bridge-find-references)
          ([remap xref-pop-marker-stack] . 'lsp-bridge-pop)
          ([remap xref-find-definitions] . 'lsp-bridge-find-def)
@@ -2499,6 +2845,7 @@ With prefix arg don't indent."
 ;; i think that use `forward-sexp', `backward-sexp' and `mark-sexp' is the better choice.  So
 ;; i try to move on `boon': also modal editing mode for Emacs that was created 9 years
 ;; ago, while `meow' only 3 and has by 3 times lesser stars on GitHub.
+;; I try to fight with it using my own structural state (see `my-structural')
 
 ;;; Code:
 
@@ -2507,9 +2854,12 @@ With prefix arg don't indent."
 
 
 (leaf meow
-  :ensure t
+  :ensure (meow :repo "meow-edit/meow" :host github)
   :require t
-  :defvar (meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+  :require my-meow-structural
+  :defvar (meow-cheatsheet-layout
+           meow-cheatsheet-layout-qwerty
+           meow-replace-state-name-list)
   :defun (my-meow-setup . my-meow)
   :defun (meow-global-mode
           meow-motion-overwrite-define-key
@@ -2519,7 +2869,6 @@ With prefix arg don't indent."
           meow-leader-define-keys
           meow-leader-define-state)
   :custom (meow-use-clipboard . t)
-  :bind ("M-." . xref-find-definitions)
   :config
   (defun my-meow-setup ()
     (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
@@ -2559,6 +2908,8 @@ With prefix arg don't indent."
      '(";" . meow-reverse)
      '("," . meow-inner-of-thing)
      '("." . meow-bounds-of-thing)
+     '("<" . previous-error)
+     '(">" . next-error)
      '("[" . meow-beginning-of-thing)
      '("]" . meow-end-of-thing)
      '("a" . meow-append)
@@ -2585,7 +2936,7 @@ With prefix arg don't indent."
      '("L" . meow-right-expand)
      '("m" . meow-join)
      '("n" . meow-search)
-     '("o" . meow-to-block)
+     '("O" . meow-to-block)
      '("o" . embark-act)
      '("p" . meow-yank)
      '("P" . meow-yank-pop)
@@ -2610,10 +2961,21 @@ With prefix arg don't indent."
      '("%" . meow-query-replace-regexp)
      '("<escape>" . ignore)))
   (my-meow-setup)
-  (meow-global-mode t))
+  (meow-global-mode t)
 
-
-
+  ;; settings show of `meow' state in modeline
+  ;;
+  ;; I prefer more short names of states
+  ;; , so NORMAL => N
+  ;;      BEACON => B
+  ;;      and etc
+  (setq meow-replace-state-name-list
+        '((structural . "S") ;; structural is my own state
+          (normal . "N")
+          (motion . "M")
+          (keypad . "K")
+          (insert . "I")
+          (beacon . "B"))))
 
 
 
@@ -2649,55 +3011,12 @@ With prefix arg don't indent."
 
 
 
-(declare-function consult-buffer "consult")
 
 (leaf multiple-cursors
-  :ensure t
-  :defun (mc/vertical-align-with-space
-          mc/edit-lines
-          mc/mark-all-words-like-this)
-  :defvar multiple-cursors-mode
-  :custom (my-mc-cmds-to-run-once .
-                                  '(my-mark-all
-                                    my-bob-or-mc-align
-                                    my-eob-or-align-with-spaces
-                                    my-mc-mark-like-this-or-edit-lines
-                                    my-mc-mark-like-this-or-edit-lines
-                                    toggle-input-method))
+  :ensure (multiple-cursors :repo "magnars/multiple-cursors.el" :host github)
   :bind (("M-i"       . 'mc/edit-lines)
          ("C-,"       . 'mc/mark-next-like-this-word)
-         ("C-<"       . mc/mark-previous-like-this-word)
-         ;; ("SPC TAB 7" . mc/reverse-regions)
-         ;; ("SPC d 7"   . mc/unmark-next-like-this)
-         ("M-<"     . my-bob-or-mc-align)
-         ("M->"     . my-eob-or-mc-align-with-space)
-         ("C-x C-," . my-mark-all))
-  :config
-
-  (defun my-mark-all ()
-    "Mark all words like this for `multiple-cursors', otherwise mark buffer."
-    (interactive)
-    (if multiple-cursors-mode
-        (mc/mark-all-words-like-this)
-      (call-interactively 'mark-whole-buffer)))
-
-  (defun my-bob-or-mc-align ()
-    "If enabled `multiple-cursors', then mark then align by regexp, other bob.
-
-BOB - is `beginning-of-buffer'"
-    (interactive)
-    (if multiple-cursors-mode
-        (call-interactively 'mc/vertical-align)
-      (call-interactively 'beginning-of-buffer)))
-
-  (defun my-eob-or-mc-align-with-space ()
-    "If enabled `multiple-cursors', then align by spaces, other eob.
-
-EOB - is `end-of-buffer'"
-    (interactive)
-    (if multiple-cursors-mode
-        (mc/vertical-align-with-space)
-      (goto-char (point-max)))))
+         ("C-<"       . mc/mark-previous-like-this-word)))
 
 
 
@@ -2768,16 +3087,20 @@ EOB - is `end-of-buffer'"
 
 
 
+
 (leaf ctrlf
-  :ensure t
+  :ensure (ctrlf :repo "radian-software/ctrlf" :host github)
   :bind ("C-s" . ctrlf-forward-default))
 
 (leaf visual-regexp
-  :ensure t
+  :ensure (visual-regexp :repo "benma/visual-regexp.el" :host github)
   :bind ("M-%" . vr/query-replace))
 
+(leaf spinner
+  :ensure t)
+
 (leaf deadgrep
-  :ensure t
+  :ensure (deadgrep :repo "Wilfred/deadgrep" :host github)
   :bind ("C-c S" . deadgrep))
 
 
@@ -2818,12 +3141,11 @@ EOB - is `end-of-buffer'"
 
 
 (leaf smartparens
-  :ensure t
+  :ensure (smartparens :repo "Fuco1/smartparens" :host github)
   :global-minor-mode smartparens-global-mode
   :require smartparens-config
   :defun (sp-clone-sexp sp-use-paredit-bindings)
   :bind (:smartparens-mode-map
-         ("C-c C-w" . 'sp-splice-sexp-killing-backward)
          ("C-x C-y" . 'my-sp-clone)
          ("C-c DEL" . 'sp-change-enclosing))
   :config
@@ -2873,8 +3195,7 @@ EOB - is `end-of-buffer'"
 
 
 (leaf whitespace-cleanup-mode
-  :ensure t
-  :require t
+  :ensure (whitespace-cleanup-mode :repo "purcell/whitespace-cleanup-mode" :host github)
   :global-minor-mode global-whitespace-cleanup-mode)
 
 
@@ -2911,10 +3232,12 @@ EOB - is `end-of-buffer'"
 
 
 
+
 (require 's)
 
+
 (leaf yasnippet
-  :ensure t
+  :ensure (yasnippet :repo "joaotavora/yasnippet")
   :defun (yas--table-hash
           yas--filter-templates-by-condition
           yas--namehash-templates-alist)
@@ -2923,22 +3246,6 @@ EOB - is `end-of-buffer'"
                               ',(list
                                  (locate-user-emacs-file "snippets")))
             (yas-wrap-around-region . t)))
-
-(leaf yasnippet
-  :doc "Load `fast-exec' keymaps for `yasnippet'."
-  :after fast-exec
-  :config                               ;nofmt
-  (defun yas--fetch (table key)
-    "Fetch templates in TABLE by KEY.
-
-Return a list of cons (NAME . TEMPLATE) where NAME is a
-string and TEMPLATE is a `yas--template' structure."
-    (let* ((key (s-downcase key))
-	   (keyhash (yas--table-hash table))
-	   (namehash (and keyhash (gethash key keyhash))))
-      (when namehash
-	(yas--filter-templates-by-condition
-	 (yas--namehash-templates-alist namehash))))))
 
 
 
@@ -2972,11 +3279,11 @@ string and TEMPLATE is a `yas--template' structure."
 
 
 
-
-(declare-function meow-insert "meow-commands.el")
-
 (require 'dash)
 
+
+
+(declare-function meow-insert "meow-commands.el")
 
 
 (defun my-lisp-sexp-whole-line-p ()
@@ -3000,7 +3307,7 @@ string and TEMPLATE is a `yas--template' structure."
   (repeat-at-last-keystroke))
 
 (leaf paxedit
-  :ensure t
+  :ensure (paxedit :repo "promethial/paxedit" :host github)
   :defun (paxedit-delete
           paxedit-sexp-region
           paxedit-transpose-backward
@@ -3042,159 +3349,12 @@ string and TEMPLATE is a `yas--template' structure."
       (goto-char end)
       (insert sep sexp))))
 
-(leaf lisp-mode :custom (lisp-body-indent . 2))
+(leaf lisp-mode
+  :custom (lisp-body-indent . 2))
 
 
 
 ;;; my-lisp.el ends here
-;;; my-autoformat.el --- My function for `autoformat'
-
-;; Copyright (C) 2022-2023 Semen Khramtsov
-
-;; Author: Semen Khramtsov <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
-
-;; This file is not part of GNU Emacs.
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-;;; Commentary:
-
-;; My function for `autoformat'
-
-;;; Code:
-
-
-
-(require 'just)
-(require 'dash)
-
-(defgroup my-autoformat nil
-  "Automatically format of source code (add spaces, capitalze and etc)."
-  :group 'editing)
-
-(defcustom my-autoformat-sentence-end "[.?!]  "
-  "Regexp that indicates the end of a sentence for `autoformat'."
-  :group 'my-autoformat
-  :type 'regexp)
-
-(defvar my-autoformat-local-functions nil
-  "Autoformat functions that will be called to format a code.
-
-This variable is local to each buffer, so every buffer can has own special
-formatting functions.")
-
-(make-local-variable 'my-autoformat-local-functions)
-
-(defcustom my-autoformat-global-functions
-  nil
-  "Autoformat functions that working everywhere.
-
-This be like on `my-autoformat-local-functions', but works globally"
-  :group 'my-autoformat
-  :type '(repeat function))
-
-(defun my-autoformat-sentence-capitalization (&optional prev-line-can-be-text)
-  "Auto-capitalize the first letter of a sentence.
-
-Either at the beginning of a line, or after a sentence end, if
-PREV-LINE-CAN-BE-TEXT is nil (by default), then capitalize only when
-previous line is empty."
-  (interactive)
-  (just-call-on-backward-char*
-   (and
-    (looking-at-p "[[:alpha:]]")
-    (or prev-line-can-be-text
-        (just-call-on-prev-line 'just-line-is-whitespaces-p)
-        (equal (line-beginning-position) (point-min)))
-    (or
-     (just-beginning-of-line-text-p)
-     (bobp)
-     (looking-back my-autoformat-sentence-end nil))
-    (upcase-char 1))))
-
-(defun my-previous-line-is-empty ()
-  "Return non-nil value, if the previous line is empty.
-
-See `just-line-is-whitespaces-p' to understand what \"empty\" is mean"
-  (just-call-on-prev-line 'just-line-is-whitespaces-p))
-
-(defun my-autoformat-do ()
-  "Funcall each of autoformat functions.
-
-See variable `my-autoformat-local-functions' to know about autoformat
-functions working locally in the buffer and `my-autoformat-global-functions'
-to know about autoformat functions working everywhere"
-  (interactive)
-  (-each my-autoformat-local-functions 'funcall)
-  (-each my-autoformat-global-functions 'funcall))
-
-(define-minor-mode my-autoformat-mode
-  "Toggle `my-autoformat-mode'.
-
-If the ARG is non-nil, then enable the mode, otherwise disable it.
-
-In this mode each keyboard press calls functions to format a code.  These
-functions can be defined either locally (see `my-autoformat-local-functions')
-or everywhere (see `my-autoformat-global-functions')."
-  :init-value nil
-  (if my-autoformat-mode
-      (progn
-        (my-autoformat-activate-for-major-mode)
-        (add-hook 'post-self-insert-hook #'my-autoformat-do nil t))
-    (my-autoformat-activate-for-major-mode)
-    (remove-hook 'post-self-insert-hook #'my-autoformat-do t)))
-
-(define-globalized-minor-mode
-  my-autoformat-global-mode
-  my-autoformat-mode
-  my-autoformat-turn-on-mode)
-
-(defun my-autoformat-turn-on-mode ()
-  "Enable `my-autoformat-mode' locally."
-  (my-autoformat-mode t))
-
-(defvar my-autoformat-functions-of-major-modes nil
-  "Alist from keys `major-mode' s and values their autoformat functions.")
-
-(defun my-autoformat-activate-for-major-mode (&optional mm)
-  "Change the autoformat local functions depends on major mode (MM).
-
-MM defaults to value of the `major-mode'"
-  (interactive)
-  (or mm (setq mm major-mode))
-  (setq-local my-autoformat-local-functions
-              (alist-get mm
-                         my-autoformat-functions-of-major-modes
-                         '(ignore)
-                         nil
-                         'eq)))
-
-(defun my-autoformat-bind-for-major-mode (mode &rest functions)
-  "Bind autoformat FUNCTIONS as local to major-mode MODE."
-  (->>
-   my-autoformat-functions-of-major-modes
-   (assq-delete-all mode)
-   (cons (cons mode functions))
-   (setq my-autoformat-functions-of-major-modes)))
-
-(my-autoformat-global-mode t)
-
-
-
-;;; my-autoformat.el ends here
 ;;; my-elisp.el --- My configuration of the elisp
 
 ;; Copyright (C) 2022 Semen Khramtsov
@@ -3232,21 +3392,34 @@ MM defaults to value of the `major-mode'"
 (require 's)
 (require 'dash)
 
+
 (leaf elisp-mode
-  :config (add-hook 'emacs-lisp-mode 'paxedit-mode)
+  :config
+  (add-hook 'emacs-lisp-mode 'paxedit-mode)
+
   (leaf inspector
-    :ensure t
+    :ensure (inspector :repo "emacs-straight/inspector" :host github)
     :bind (:emacs-lisp-mode-map
            :package elisp-mode
            ("C-c C-i" . inspector-inspect-last-sexp)))
 
   (leaf paredit
-    :ensure t
-    :hook emacs-lisp-mode-hook))
+    :ensure (paredit :repo "https://mumble.net/~campbell/git/paredit.git" :host nil)
+    :hook emacs-lisp-mode-hook)
 
-(leaf suggest :ensure t)
+  (leaf eros
+    :ensure (eros :repo "xiongtx/eros" :host github)
+    :hook emacs-lisp-mode-hook)
 
-(leaf mocker :ensure t :doc "A library for testing `elisp' with mocks")
+  (leaf elisp-refs
+    :ensure t))
+
+(leaf suggest
+  :ensure (suggest :repo "Wilfred/suggest.el" :host github))
+
+(leaf mocker
+  :ensure (mocker :repo "sigma/mocker.el" :host github)
+  :doc "A library for testing `elisp' with mocks")
 
 (leaf my-elisp-embrace
   :hook (emacs-lisp-mode-hook . my-embrace-emacs-lisp-mode-hook))
@@ -3279,33 +3452,39 @@ MM defaults to value of the `major-mode'"
 
 ;;; Commentary:
 
-;; My Configuration For The Lanugage `racket'
+;; My Configuration for the Lanugage `racket'
 
 ;;; Code:
 
+
+
+
+
+(require 'dash)
+(require 'smartparens)
+
+(declare-function my-autoformat-bind-for-major-mode "my-autoformat")
+
+
 (leaf racket-mode
-  :ensure t
-  :major-mode-map (racket               ;nofmt
-                   :modes (racket-mode racket-repl-mode)
-                   :parent my-lisp-map)
+  :ensure (racket-mode :repo "greghendershott/racket-mode" :host github)
   :defvar (my-racket-meta-return-functions
+           racket-xp-mode-hook
            my-racket-meta-return-cond-clauses-expression-names)
   :defun ((my-racket-meta-return-contracted .
                                             (my-racket
                                              my-racket-meta-return-test-case
                                              my-racket-meta-return-let)))
-  :bind ((:racket-mode-map               ;nofmt
-          ("M-RET" . 'my-racket-meta-return))
-         (:my-racket-local-map
-          ("i"     . 'racket-add-require-for-identifier)))
+  :bind (:racket-mode-map
+         ("M-RET" . 'my-racket-meta-return))
   :hook ((racket-mode-hook . racket-xp-mode)
-         ;; `flycheck' is very slow plus `racket-xp-mode' highlight
+         ;; `flycheck' is enough slow plus `racket-xp-mode' highlight
          ;; errors too, so i disable `flycheck' for Racket
          (racket-mode-hook . turn-off-flycheck)
          ;; enable structured editing for the `racket-mode'
          (racket-mode-hook . paxedit-mode))
   :custom (racket-xp-mode-hook . nil)
-  :config                               ;nofmt
+  :config                                      ;nofmt
   (remove-hook 'racket-mode-hook 'racket-mode) ;fix a bug
 
   (defcustom my-racket-meta-return-functions nil
@@ -3384,9 +3563,8 @@ List of racket expressions in which this function should work:
       (forward-char -1)
       t))
 
-  (add-to-list
-   'my-racket-meta-return-functions
-   'my-racket-meta-return-cond-clauses)
+  (add-to-list 'my-racket-meta-return-functions
+               'my-racket-meta-return-cond-clauses)
 
   (defun my-racket-meta-return-contracted ()
     "Add new argument form to the expression of the Racket `contracted'."
@@ -3408,40 +3586,34 @@ List of racket expressions in which this function should work:
                #'my-racket-meta-return-contracted))
 
 (leaf scribble-mode
-  :ensure t
-  :config                               ;nofmt
-  (my-autoformat-bind-for-major-mode 'scribble-mode
-                                     'my-autoformat-sentence-capitalization))
+  :ensure (scribble-mode :repo "emacs-pe/scribble-mode" :host github)
+  :config
+  (add-hook
+   'scribble-mode-hook
+   (defun my-autoformat-scribble ()
+     "Define `my-autoformat' things for `scribble-mode'."
+     (require 'my-autoformat)
+     (my-autoformat-bind-for-major-mode 'scribble-mode
+                                        'my-autoformat-sentence-capitalization))))
 
 
 
 ;;; my-racket.el ends here
-;;; my-bib.el --- My configuration of `bib' -*- lexical-binding: t; -*-
+;;; my-bib.el --- My configuration for bibliography management -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022 semenInRussia
+;; Copyright (C) 2022-2023 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; Homepage: https://github.com/semeninrussia/emacs.el
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
-;; My configuration of `bib'.
+;; My configuration for bibliography management.
 
 ;;; Code:
+
 
 
 
@@ -3457,22 +3629,63 @@ List of racket expressions in which this function should work:
   :bind ((:bibtex-mode-map
           ([remap my-format-expression] . 'bibtex-reformat)))
   :config                               ;nofmt
-  (leaf bibtex-utils :ensure t))
+  (leaf bibtex-utils
+    :ensure (bibtex-utils :repo "plantarum/bibtex-utils" :host github)))
 
-;; (leaf company-bibtex
-;; :ensure (company-bibtex :repo "semenInRussia/company-bibtex")
-;;   :defvar company-backends
-;;   :hook (org-mode-hook . company-bibtex-org-mode-hook)
-;;   :custom (company-bibtex-org-citation-regex . "\\(ebib:\\|cite:@\\)")
-;;   :config (add-to-list 'company-backends 'company-bibtex)
-;;   (defun company-bibtex-org-mode-hook ()
-;;     "Hook for `org-mode' enabling `comapany-bibtex' for current buffer."
-;;     (interactive "P")
-;;     (->>
-;;      company-backends
-;;      (--remove
-;;       (and (listp it) (eq (car it) 'company-bbdb)))
-;;      (setq-local company-backends))))
+;; load `citar', but for `embark'
+(leaf citar
+  :ensure t
+  :hook (org-mode-hook . citar-capf-setup)
+  :bind (:org-mode-map
+         :package org
+         ("C-c C-S-b" . 'org-cite-insert))
+  :custom ((org-cite-global-bibliography . '("~/bib.bib"))
+           (org-cite-insert-processor   . 'citar)
+           (org-cite-follow-processor   . 'citar)
+           (org-cite-activate-processor . 'citar)
+           (citar-bibliography . org-cite-global-bibliography))
+  :defvar (org-cite-global-bibliography
+           citar-indicators
+           citar-bibliography
+           org-roam-directory)
+  :config
+  ;; `citar' have integration with `all-the-icons',
+  ;; but not with `nerd-icons'
+
+  ;; TODO: `nerd-icons' + `citar'
+
+  ;; (defvar my-citar-indicator-notes-nerd-icons
+  ;;   (citar-indicator-create
+  ;;    :symbol (nerd-icons-codicon "nf-cod-notebook")
+  ;;    :function #'citar-has-notes
+  ;;    :padding "  "
+  ;;    :tag "has:notes"))
+
+  ;; (setq citar-indicators
+  ;;       (list
+  ;;        ;; plain text
+  ;;        citar-indicator-files
+  ;;        my-citar-indicator-notes-nerd-icons))
+
+  ;; `citar' + `embark'
+  (leaf citar-embark
+    :ensure t
+    :after (citar embark)
+    :global-minor-mode citar-embark-mode)
+
+  ;; `org-roam' + `citar':
+  (leaf parsebib :ensure t)
+
+  (leaf citar-org-roam
+    :ensure t
+    :after org-roam
+    :global-minor-mode citar-org-roam-mode
+    :config
+    ;; `org-roam' has your own the bibliography.bib file
+    ;; -- (in my config)
+    (with-eval-after-load 'org-roam
+      (add-to-list 'org-cite-global-bibliography (f-join org-roam-directory "bibliography.bib"))
+      (add-to-list 'citar-bibliography (f-join org-roam-directory "bibliography.bib")))))
 
 
 
@@ -3506,13 +3719,15 @@ List of racket expressions in which this function should work:
 
 
 
-(leaf cc-mode
-  :ensure t
-  :config                               ;nofmt
 
-  (leaf google-c-style
-    :ensure t
-    :hook (c++-mode-hook . google-set-c-style)))
+(leaf cc-mode
+  :setq-default (;; enable auto insert newline after ";"
+                 (c-auto-newline . t)
+                 (c-electric-flag . t)
+                 (c-hungry-delete-key . t))
+  :config (leaf google-c-style
+            :ensure (google-c-style :repo "google/styleguide" :host github)
+            :hook (c++-mode-hook . google-set-c-style)))
 
 
 
@@ -3551,13 +3766,6 @@ List of racket expressions in which this function should work:
 (require 'dash)
 (require 's)
 
-(defvar my-calc-operations
-  '(calcDigit-start
-    calc-convert-units
-    calc-algebraic-entry
-    calc-solve-for
-    calc-store)
-  "List of the function after which will be actived insert mode.")
 
 (leaf calc
   :defun (calc-yank-internal calc-pack calc-vector-mean)
@@ -3568,7 +3776,7 @@ List of racket expressions in which this function should work:
          (:calc-edit-mode-map
           :package calc-yank
           ([remap save-buffer] . calc-edit-finish)))
-  :config                               ;nofmt
+  :config
   (defun my-calc-mean-yank (vec)
     "Yank to calculator vector of numbers VEC as string and compute mean.
 
@@ -3620,7 +3828,7 @@ mechanism use `calc-yank'"
 
 
 (require 'dash)
-(require 'fast-exec)
+
 
 (leaf facemenu
   :fast-exec ("Display All Colors" #'list-colors-display))
@@ -3628,7 +3836,7 @@ mechanism use `calc-yank'"
 (leaf css-mode
   :config                               ;nofmt
   (leaf css-eldoc
-    :ensure t
+    :ensure (css-eldoc :repo "zenozeng/css-eldoc" :host github)
     :hook (((css-mode-hook web-mode-hook)
             . css-eldoc-enable))))
 
@@ -3664,8 +3872,9 @@ mechanism use `calc-yank'"
 
 
 
-(leaf dockerfile-mode :ensure t)
-;; (leaf docker :ensure t)
+(leaf dockerfile-mode
+  :ensure (dockerfile-mode :repo "spotify/dockerfile-mode" :host github)
+  )
 
 
 
@@ -3701,7 +3910,7 @@ mechanism use `calc-yank'"
 
 
 (leaf elm-mode
-  :ensure t
+  :ensure (elm-mode :repo "jcollard/elm-mode" :host github)
   :hook (elm-mode-hook . my-lsp-ensure)
   :bind (:elm-mode-map
          ([remap my-format-expression] . elm-format)))
@@ -3739,15 +3948,16 @@ mechanism use `calc-yank'"
 
 
 
-;; NOTE that I support only `ecukes' now
+
+;; NOTE that here support only `ecukes' now.
+;; `ecukes' is cucumber for `emacs-lisp-mode'
 (leaf feature-mode
-  :ensure t
-  :major-mode-map feature
+  :ensure (feature-mode :repo "michaelklishin/cucumber.el" :host github)
   :hook (feature-mode-hook . my-feature-mode-hook)
   :bind (:feature-mode-map
          ("RET" . newline-and-indent)
          ("M-RET" . my-feature-add-and-statement))
-  :config                               ;nofmt
+  :config
   (defun my-feature-mode-hook ()
     "My hook of the `feature-mode'."
     (setq-local outline-regexp "\\( *Feature:\\| *Scenario:\\)"))
@@ -3755,7 +3965,8 @@ mechanism use `calc-yank'"
   (defun my-feature-add-and-statement ()
     "Add a \"And\" feature statement, like to statement at the current line."
     (interactive)
-    (duplicate-current-line 1)
+    (end-of-line)
+    (insert "\n" (buffer-substring-no-properties (pos-bol) (pos-eol)))
     (forward-line 1)))
 
 
@@ -3792,11 +4003,12 @@ mechanism use `calc-yank'"
 
 
 
+
 (declare-function my-lsp-ensure "my-lsp")
 
+
 (leaf go-mode
-  :ensure t
-  :major-mode-map go
+  :ensure (go-mode :repo "dominikh/go-mode.el" :host github)
   :hook (go-mode-hook . my-lsp-ensure))
 
 
@@ -3834,8 +4046,9 @@ mechanism use `calc-yank'"
 
 
 
+
 (leaf haskell-mode
-  :ensure t
+  :ensure (haskell-mode :repo "haskell/haskell-mode" :host github)
   ;; :ensure-system-package (("hoogle" . "cabal install hoogle"))
   :hook ((haskell-mode-hook . haskell-indent-mode)
          (haskell-mode-hook . interactive-haskell-mode)
@@ -3879,47 +4092,46 @@ mechanism use `calc-yank'"
 (require 'custom)
 
 
-(defvar my-html-suported-modes
+(defvar my-html-supported-modes
   '(web-mode mhtml-mode)
   "List of `html` major modes."
   ;; :group 'my
   ;; :type '(repeat symbol)
   )
 
-(defun my-html-suported-modes-hooks ()
-  "Return list from the hooks for each of `my-html-suported-modes'."
-  (-map 'my-major-mode-to-hook my-html-suported-modes))
+(defun my-html-supported-modes-hooks ()
+  "Return list from the hooks for each of `my-html-supported-modes'."
+  (-map 'my-major-mode-to-hook my-html-supported-modes))
 
-(defun my-html-suported-modes-maps ()
-  "Return list from the maps for each of `my-html-suported-modes'."
-  (-map 'my-major-mode-to-map my-html-suported-modes))
+(defun my-html-supported-modes-maps ()
+  "Return list from the maps for each of `my-html-supported-modes'."
+  (-map 'my-major-mode-to-map my-html-supported-modes))
 
 (leaf mhtml-mode
-  :ensure t
   :mode "\\.html$"
   :hook (mhtml-mode-hook . my-lsp-ensure)
   :config                               ;nofmt
   (leaf auto-rename-tag
-    :ensure t
-    :hook `(,(my-html-suported-modes-hooks)
-            . auto-rename-tag-mode))
+    :ensure (auto-rename-tag :repo "jcs-elpa/auto-rename-tag" :host github))
 
   (leaf tagedit
-    :ensure t
-    :bind `(,(--map
-              `(,it
-                :package ,(my-map-to-major-mode it)
-                ([remap sp-kill-hybrid-sexp] . tagedit-kill)
-                ([remap sp-join-sexp]        . tagedit-join-tags)
-                ([remap sp-raise-sexp]       . tagedit-raise-tag)
-                ([remap sp-splice-sexp]      . tagedit-splice-tag)
-                ([remap sp-change-enclosing]  . tagedit-kill-attribute))
-              (my-html-suported-modes-maps))))
-
-  (leaf emmet-mode :ensure t :hook mhtml-mode-hook)
+    :ensure (tagedit :repo "magnars/tagedit" :host github)
+    ;;    :bind `(,(--map
+    ;; `(,it
+    ;;   :package ,(my-map-to-major-mode it)
+    ;;   ([remap sp-kill-hybrid-sexp] . tagedit-kill)
+    ;;   ([remap sp-join-sexp]        . tagedit-join-tags)
+    ;;   ([remap sp-raise-sexp]       . tagedit-raise-tag)
+    ;;   ([remap sp-splice-sexp]      . tagedit-splice-tag)
+    ;;   ([remap sp-change-enclosing]  . tagedit-kill-attribute))
+    ;; (my-html-supported-modes-maps))))
+    )
+  (leaf emmet-mode
+    :ensure (emmet-mode :repo "smihica/emmet-mode" :host github)
+    :hook mhtml-mode-hook)
 
   (leaf impatient-mode
-    :ensure t
+    :ensure (impatient-mode :repo "skeeto/impatient-mode" :host github)
     :defun (imp-visit-buffer impatient-mode)
     :bind (:html-mode-map
            :package mhtml-mode
@@ -3967,7 +4179,6 @@ mechanism use `calc-yank'"
 
 
 (leaf js
-  :ensure t
   :defvar lsp-bridge-single-lang-server-mode-list
   :hook (js-mode-hook . my-lsp-ensure)
   :defvar lsp-bridge-multi-lang-server-mode-list
@@ -3977,10 +4188,11 @@ mechanism use `calc-yank'"
   (add-to-list 'lsp-bridge-multi-lang-server-mode-list
                '((typescript-mode js-mode)
                  . "typescript_rome"))
-  (leaf js-comint :ensure t))
+  (leaf js-comint
+    :ensure (js-comint :repo "redguardtoo/js-comint" :host github)))
 
 (leaf typescript-mode
-  :ensure t
+  :ensure (typescript-mode :repo "emacs-typescript/typescript.el" :host github)
   :hook (typescript-mode-hook . my-lsp-ensure)
   :custom (typescript-indent-level . 2)
   :config                               ;nofmt
@@ -4025,13 +4237,13 @@ mechanism use `calc-yank'"
 
 
 (leaf json-mode
-  :ensure t
+  :ensure (json-mode :repo "joshwnj/json-mode" :host github)
   :bind (:json-mode-map
          ([:remap my-format-expression] . json-pretty-print-buffer))
   :hook (json-mode-hook . my-json-fix-indent-funcs)
   :config                               ;nofmt
   (leaf json-snatcher
-    :ensure t
+    :ensure (json-snatcher :repo "Sterlingg/json-snatcher" :host github)
     :bind (:json-mode-map
            :package json-mode
            ("C-c M-w" . jsons-print-path)))
@@ -4076,24 +4288,6 @@ mechanism use `calc-yank'"
 
 (require 'face-remap)
 
-(leaf visual-fill-column
-  :ensure t
-  :commands ()
-  :defun visual-fill-column-mode)
-
-(add-hook 'prog-mode-hook #'visual-fill)
-
-(defun visual-fill (&optional width)
-  "Make text buffer more pretty with centering it at horizontal.
-
-WIDTH is the amount of characters that will be located within display"
-  (interactive)
-  (or width (setq width 70))
-  (setq-default visual-fill-column-width width
-                visual-fill-column-center-text t)
-  (text-scale-mode 0)
-  (visual-fill-column-mode 1))
-
 (add-hook 'prog-mode-hook
           (lambda () (interactive) (toggle-truncate-lines 1)))
 
@@ -4132,24 +4326,17 @@ WIDTH is the amount of characters that will be located within display"
 
 
 (require 'f)
-(require 'yasnippet)
 (require 'dash)
-
-
 (require 'smartparens)
 
-(declare-function aas-set-snippets "aas.el")
 
-(defvar autoformat-latex-enumerate-list-items-triggers)
-(defvar autoformat-latex-itemized-list-items-triggers)
+(declare-function aas-set-snippets "aas.el")
 
 (declare-function my-embrace-add-paren-of-cdlatex-math "my-latex.el")
 (declare-function my-embrace-add-paren-latex-command "my-latex.el")
 (declare-function my-embrace-add-paren-latex-style-command "my-latex.el")
 (declare-function my-latex-style-command-left-paren-regexp "my-latex.el")
 (declare-function my-latex-style-command-left-paren "my-latex.el")
-
-(declare-function autoformat-latex-expand-to-enumerate-list-item-p "my-latex.el")
 
 (declare-function TeX-master-file-ask "tex.el")
 (declare-function cdlatex-wrap-environment "cdlatex.el")
@@ -4159,6 +4346,7 @@ WIDTH is the amount of characters that will be located within display"
 (defvar cdlatex-command-alist-comb)
 (defvar cdlatex-math-modify-alist)
 (defvar cdlatex-math-modify-alist-default)
+
 
 (defcustom my-latex-master-files-alist
   '(("~/zms/*/solutions/*.tex" . "../Solution.tex"))
@@ -4204,7 +4392,6 @@ WIDTH is the amount of characters that will be located within display"
     "beamer")
   "List of the names for built-in LaTeX documentclasses.")
 
-(add-hook 'LaTeX-mode-hook 'visual-fill)
 (add-hook 'LaTeX-mode-hook 'turn-off-flycheck)
 
 (add-hook 'LaTeX-mode-hook 'my-latex-find-master-file)
@@ -4213,7 +4400,7 @@ WIDTH is the amount of characters that will be located within display"
 
 
 (leaf auctex
-  :ensure auctex
+  :ensure (auctex :repo "emacs-straight/auctex" :host github)
   :mode ("\\.tex$" . latex-mode))
 
 
@@ -4236,9 +4423,9 @@ WIDTH is the amount of characters that will be located within display"
          ("C-c C-w"  . my-latex-kill-section))
   :config                               ;nofmt
   (leaf xenops
+    :ensure (xenops :repo "dandavison/xenops")
     :hook LaTeX-mode-hook
     :after tex-mode
-    :ensure t
     :custom (xenops-math-image-scale-factor . 2))
 
   (leaf my-latex-insert
@@ -4290,7 +4477,7 @@ WIDTH is the amount of characters that will be located within display"
       (er/mark-LaTeX-inside-environment)))
 
   (leaf laas
-    :ensure t
+    :ensure (laas :repo "tecosaur/LaTeX-auto-activating-snippets" :host github)
     :hook LaTeX-mode-hook
     :aas (laas-mode
           :cond #'texmathp
@@ -4309,7 +4496,7 @@ WIDTH is the amount of characters that will be located within display"
           "grd" "^\\circ"))
 
   (leaf cdlatex
-    :ensure t
+    :ensure (cdlatex :repo "cdominik/cdlatex" :host github)
     :hook (LaTeX-mode-hook  . turn-on-cdlatex)
     :bind (:cdlatex-mode-map
            ("<tab>" . cdlatex-tab)
@@ -4358,7 +4545,7 @@ WIDTH is the amount of characters that will be located within display"
     :require t)
 
   (leaf latex-extra
-    :ensure t
+    :ensure (latex-extra :repo "Malabarba/latex-extra" :host github)
     :hook ((LaTeX-mode-hook . latex-extra-mode)
            (LaTeX-mode-hook . visual-line-mode))
     :bind (:latex-mode-map
@@ -4383,9 +4570,11 @@ WIDTH is the amount of characters that will be located within display"
     (auto-fill-mode 0))
 
   (leaf my-latex-drag
+    :after my-drag
     :defun ((add-up-dragger add-down-dragger) . my-drag)
     :commands (my-latex-try-drag-left-list-item
                my-latex-try-drag-right-list-item)
+    ;; eval after `my-drag' is loaded
     :init
     (add-up-dragger 'my-latex-try-drag-left-list-item)
     (add-down-dragger 'my-latex-try-drag-right-list-item)))
@@ -4483,7 +4672,6 @@ instead of intro can be other word"
     (setq-local comment-start "#")
     (setq-local indent-line-function 'my-lyrics-indent-line)
     (setq-local indent-region-function 'indent-region-line-by-line)
-    (visual-fill)
     (setq-local font-lock-defaults '(my-lyrics-highlights))))
 
 
@@ -4561,15 +4749,19 @@ See `imenu-generic-expression'"
                               (setq-local
                                imenu-generic-expression
                                my-markdown-imenu-generic-expression)))
-  :config                               ;nofmt
-  (add-hook 'markdown-mode-hook 'visual-fill)
+  :config
+  (add-hook 'markdown-mode-hook 'visual-line-mode)
+
   (leaf markdown-toc
-    :ensure t
+    :ensure (markdown-mode :repo "jrblevin/markdown-mode" :host github)
     :bind (:markdown-mode-map
            :package markdown-mode
            ("C-T" . markdown-toc-generate-or-refresh-toc)))
 
-  (leaf edit-indirect :ensure t)
+  (leaf edit-indirect
+    :ensure (edit-indirect :repo "Fanael/edit-indirect" :host github))
+
+  (require 'my-autoformat)
 
   (my-autoformat-bind-for-major-mode
    'markdown-mode
@@ -4660,54 +4852,28 @@ See `imenu-generic-expression'"
 (require 'dash)
 
 
-
-(defvar org-mode-hook)
-
-(add-hook 'org-mode-hook 'visual-fill)
-(add-hook 'org-mode-hook 'visual-line-mode)
-(add-hook 'org-mode-hook 'aas-activate-for-major-mode)
-
-
 (leaf org
   :ensure t
-  :defun ((transient-define-prefix . transient)
-          (my-autoformat-bind-for-major-mode . my-autoformat)
-          (my-org-heading-p . my-org)
-          (my-org-properties-end-p . my-org)
-          (my-org-list-item-p . my-org)
-          (aas-set-snippets . aas)
-          (meow-insert . meow-command)
-          (my-org-keywords . my-org)
-          (my-org-skip-backward-keyword . my-org)
-          (embrace-org-mode-hook . my-org)
-          org-current-level)
-  :custom ((org-refile-use-outline-path . nil)
-           (org-fold-core-style  . 'overlays)
-           (org-refile-targets   . '((org-agenda-files :maxlevel . 2)))
-           (org-startup-folded   . t)
+  :defun ((aas-set-snippets . aas)
+          (meow-insert . meow-command))
+  :custom ((org-file-apps
+            . '(("\\.\\'" . default)
+                ("\\.pdf\\'" . "start %s")
+                ("\\.png\\'" . "start %s")
+                ("\\.jpg\\'" . "start %s")))
+           ;; `org-refile'
+           (org-refile-use-outline-path . 'file)
+           (org-outline-path-complete-in-steps . nil)
+           (org-refile-targets . '((nil :maxlevel . 9)))
+           ;; `org' startup
+           (org-fold-core-style . 'overlays)
+           (org-startup-folded . t)
            (org-startup-indented . t)
-           (org-startup-with-inline-images . t)
-           (org-file-apps .
-                          '(("\\.\\'" . default)
-                            ("\\.pdf\\'" . "start %s")
-                            ("\\.png\\'" . "start %s")
-                            ("\\.jpg\\'" . "start %s"))))
-  :defvar (my-org-list-item-prefix-regexp
-           my-org-keywords)
-  :hook ((org-mode-hook . org-cdlatex-mode))
-  :bind (("C-c c" . org-capture)
+           (org-startup-with-inline-images . t))
+  :bind (;; NOTE: `org-capture' and `org-agenda' in the my-organization.el file
+         ;; ("C-c z c" . org-capture)
          (:org-mode-map
-          ;; Insert anything
-          ("C-c M-i"   . my-org-insert-image)
-          ("C-c M-u"   . my-org-insert-img-at-url)
-
-          ;; Manipulations with a subtree
-          ("C-c C-w"   . my-org-cut)
-          ;; heading => plain text
-          ;; 8 is * without shift
-          ("C-c C-M-w"   . my-org-clear-subtree)
-          ("C-c tab" . org-refile)
-          ("C-c C-t"   . my-org-todo)
+          ("C-c tab"   . org-refile)
           ("C-c C-j"   . org-id-get-create)))
   ;; the following code should add some auto activating snippets, for example,
   ;; if I type "exthe", then it should be extended to the "Explore the"
@@ -4719,245 +4885,26 @@ See `imenu-generic-expression'"
         "Misc " "Miscellaneous"
         "iau" "I am use")
   :config
+  (add-hook 'org-mode-hook 'visual-line-mode)
+  (add-hook 'org-mode-hook 'aas-activate-for-major-mode)
+
   (leaf my-org-editing
-    :commands (my-org-clear-subtree
-               my-org-clear-subtree
-               my-org-cut
-               my-org-indent-subtree
-               my-org-indent-subtree
-               my-org-insert-image
-               my-org-schedule-to-today
-               my-org-todo
-               my-org-todo))
+    :bind (("C-c M-i"   . my-org-insert-image)
+           ("C-c M-u"   . my-org-insert-img-at-url)
+           ("C-c C-w"   . my-org-cut)
+           ("C-c C-M-w" . my-org-clear-subtree)
+           ("C-c C-t"   . my-org-todo)))
 
-  (leaf xenops
-    :ensure t
-    :after org
-    :hook org-mode-hook)
-
-  (leaf cdlatex
-    :ensure t
-    :require t)
-
-  (defun doom-docs-org-mode () (interactive))
-
+  ;; format `org-mode' code after every key hit
   (leaf my-org-autoformat
-    :config                             ;nofmt
-    (defcustom my-org-list-labels-regexps
-      '("\\+" "-" "[0-9]+\\.")
-      "List of the regexp prefixes indicates a label of a `org-mode' list item.
-
-Label is thing which just decorates a list, but it's not item content, for
-example in the following list
-
-- a
-- b
-- c
-
-Label is \"-\""
-      :group 'my
-      :type '(repeat string))
-
-    (defcustom my-org-keywords
-      '("TODO" "DONE")
-      "List of the `org-mode' keywords sush as TODO or DONE."
-      :group 'my
-      :type '(repeat string))
-
-    (defcustom my-org-list-label-regexp
-      (my-regexp-opt-of-regexp my-org-list-labels-regexps)
-      "Regexp indicates a item of a `org-mode' list.
-
-Label is thing which just decorates a list, but it's not item content, for
-example in the following list
-
-- a
-- b
-- c
-
-Label is \"-\", you should consider that spaces before label shouldn't be in the
-regexp"
-      :group 'my
-      :type '(repeat string))
-
-    (defcustom my-org-list-item-checkbox-regexp
-      "\\[.\\]"
-      "Regexp indicates a `org-mode' checkbox."
-      :group 'my
-      :type 'regexp)
-
-    (defcustom my-org-list-item-prefix-regexp
-      (rx line-start
-          (0+ " ")
-          (regexp my-org-list-label-regexp)
-          (? (1+ " ") (regexp my-org-list-item-checkbox-regexp))
-          (0+ " "))
-      "Regexp indicates a list item."
-      :group 'my
-      :type 'regexp)
-
-    (my-autoformat-bind-for-major-mode
-     'org-mode
-     'my-org-sentence-capitalization
-     'my-org-list-item-capitalization
-     'my-org-heading-capitalization)
-
-    (defun my-org-sentence-capitalization ()
-      "Capitalize first letter of a sentence in the `org-mode'."
-      (interactive)
-      (cond
-       ((just-call-on-prev-line*
-         (or
-          (just-line-is-whitespaces-p)
-          (my-org-heading-p)
-          (my-org-properties-end-p)
-          (my-org-list-item-p)))
-        (my-autoformat-sentence-capitalization t))
-       ((just-call-on-prev-line* (equal (pos-bol) (point-min)))
-        (my-autoformat-sentence-capitalization))
-       (t
-        (just-call-on-backward-char*
-         (and
-          (looking-back my-autoformat-sentence-end nil)
-          (looking-at-p "[[:alpha:]]")
-          (upcase-char 1))))))
-
-    (defun my-org-heading-p ()
-      "Return t, when the cursor located at a `org-mode' heading text."
-      ;; NOTE: don't handle cases when bold word located at the beginning of the
-      ;; line.  For example:
-      ;;
-      ;; *bold word*
-      ;;
-      ;; this function in the above case return t, but excepted nil
-      (just-line-prefix-p "*"))
-
-    (defun my-org-list-item-capitalization ()
-      "Capitalize first letter of a itemized list item."
-      (interactive)
-      (just-call-on-backward-char*
-       (and
-        (looking-at-p "[[:alpha:]]")
-        (my-org-list-item-p)
-        (looking-back my-org-list-item-prefix-regexp nil)
-        (upcase-char 1))))
-
-    (defun my-org-list-item-p ()
-      "Return t, when the cursor located at an item of a `org-mode' list."
-      (just-line-regexp-prefix-p my-org-list-item-prefix-regexp))
-
-    (defun my-org-properties-end-p ()
-      "Get t, if the point placed at the end of `org-mode' subtree properties."
-      (string-equal (just-text-at-line nil t) ":END:"))
-
-    (defun my-org-heading-capitalization ()
-      "Capitalize first letter of a `org-mode' heading.
-
-When `org-mode' heading has any keyword (like to TODO or DONE) first letter
-demotes a first letter after keyword word."
-      (interactive "d")
-      (when (just-call-on-backward-char*
-             (and
-              (my-org-heading-p)
-              (looking-at-p "[[:alpha:]]")
-              (progn
-                (skip-chars-backward " ")
-                (my-org-skip-backward-keyword)
-                (skip-chars-backward " *")
-                (bolp))))
-        (upcase-char -1)))
-
-    (defun my-org-skip-backward-keyword ()
-      "If right at the cursor placed `org-mode' keyword, then skipt it."
-      (when (member (thing-at-point 'symbol) my-org-keywords)
-        (backward-sexp))))
-
-  (leaf org-download
-    :ensure t
-    :hook (dired-mode-hook . org-download-enable))
-
-  (leaf org-keys
-    :require t
-    :custom ((org-use-speed-commands . t)
-             (org-speed-commands
-              .
-              '(("k" . org-forward-heading-same-level)
-                ("i" . org-backward-heading-same-level)
-                ("j" . org-previous-visible-heading)
-                ("l" . org-next-visible-heading)
-                ("h" . my-org-goto-parent)
-                ("z" . org-toggle-comment)
-                ("x" . org-cut-subtree)
-                ("d" . org-deadline)
-                ("s" . org-schedule)
-                ("w" . my-org-schedule-to-today)
-                (" " . my-add-org-subtree-to-targets-on-day)
-                ("'" . org-toggle-narrow-to-subtree)
-                ("f" .
-                 (progn
-                   (skip-chars-forward "*")
-                   (forward-char)
-                   (meow-insert 0)))
-                ("B" . org-previous-block)
-                ("F" . org-next-block)
-                ("g" . (org-refile t))
-                ("c" . org-cycle)
-                ("=" . org-columns)
-                ("I" . org-metaup)
-                ("K" . org-metadown)
-                ("o" . org-metaright)
-                ("u" . org-metaleft)
-                ("O" . org-shiftmetaright)
-                ("U" . org-shiftmetaleft)
-                ("n"
-                 .
-                 (progn
-                   (forward-char 1)
-                   (call-interactively 'org-insert-heading-respect-content)))
-                ("a" . org-archive-subtree-default-with-confirmation)
-                ("6" . org-mark-subtree)
-                ("t" . org-todo)
-                ("," . (org-priority))
-                ("0" . (org-priority 32))
-                ("1" . (org-priority 65))
-                ("2" . (org-priority 66))
-                ("3" . (org-priority 67))
-                (":" . org-set-tags-command)
-                ("e" . org-set-effort)
-                ("E" . org-inc-effort)
-                ("/" . org-sparse-tree)
-                ("?" . org-speed-command-help))))
-    :bind (:org-mode-map
-           :package org
-           ("C-c M-{" . my-org-to-heading-start))
-    :config                             ;nofmt
-    (defun my-org-to-heading-start ()
-      "Go to the beginning of the heading after activate insert mode."
-      (interactive)
-      (end-of-line)
-      (search-backward-regexp "^\*" nil t)
-      (meow-insert)
-      (unless (eq current-input-method nil) (toggle-input-method)))
-
-    (defun my-org-goto-parent ()
-      "Go to the parent of the `org-mode' heading at the cursor."
-      (interactive)
-      (->>
-       (->
-        (org-current-level)
-        (1-)
-        (s-repeat "*")
-        (regexp-quote))
-       (s-prepend "^")
-       (s-append " ")
-       (re-search-backward))))
+    :hook (org-mode-hook . my-autoformat-mode))
 
   (leaf consult
     :bind (:org-mode-map
            :package org
            ([remap consult-imenu] . consult-outline)))
 
-  ;; I am bind the command `org-export' with \"SPC l e\" in the root `leaf'
+  ;; `org-mode' exporter
   (leaf ox
     :custom ((org-export-coding-system . 'utf-8)
              (org-export-with-smart-quotes . t)
@@ -4970,57 +4917,57 @@ demotes a first letter after keyword word."
                                          ("" "cmap" nil ("pdflatex"))
                                          ("" "float" nil
                                           ("pdflatex" "xelatex")))))
-    :defer-config                       ;nofmt
-    (leaf latex-extra
-      :ensure t
-      :defun latex/compile-commands-until-done
-      :config                           ;nofmt
-      (defun my-org-latex-compile (filename &optional snippet)
-        "My version of the `ox-latex' way to compile a TeX file.
+    :config
+    (leaf ox-json
+      :ensure (ox-json :repo "jlumpe/ox-json" :host github)
+      :commands (ox-json-export-to-buffer
+                 ox-json-export-to-file
+                 ox-json--merge-alists)
+      :after ox
+      :init
+      (org-export-define-backend 'json
+        ;; Transcoders
+        (ox-json--merge-alists
+         '(
+           (template . ox-json-transcode-template)
+           (plain-text . ox-json-transcode-plain-text)
+           (headline . ox-json-transcode-headline)
+           (link . ox-json-transcode-link)
+           (timestamp . ox-json-transcode-timestamp))
+         (cl-loop for type in (append org-element-all-elements org-element-all-objects)
+                  collect (cons type #'ox-json-transcode-base)))
+        ;; Filters
+        :filters-alist '()
+        ;; Options
+        :options-alist
+        '((:json-data-type-property nil "json-data-type-property" "$$data_type")
+          (:json-exporters nil nil nil)
+          (:json-property-types nil nil nil)
+          (:json-strict nil nil nil)
+          (:json-include-extra-properties nil nil t))
+        ;; Menu
+        :menu-entry
+        '(?j "Export to JSON" ((?J "As JSON buffer" ox-json-export-to-buffer)
+                               (?j "To JSON file" ox-json-export-to-file))))))
 
-Using `latex/compile-commands-until-done'
-
-TEXFILE is the name of the file being compiled.  Processing is
-done through the command specified in `org-latex-pdf-process',
-which see.  Output is redirected to \"*Org PDF LaTeX Output*\"
-buffer.
-
-When optional argument SNIPPET is non-nil, TEXFILE is a temporary
-file used to preview a LaTeX snippet.  In this case, do not
-create a log buffer and do not remove log files.
-
-Return PDF file name or raise an error if it couldn't be
-produced."
-        (find-file filename)
-        ;; if snippet - t, then not clean
-        (latex/compile-commands-until-done (not snippet)))
-
-      (defalias 'org-latex-compile 'my-org-latex-compile))
-
-    (leaf ox-json :ensure t :require t)
-
-    (leaf ox-beamer :require t))
-
+  ;; remove some useless things from the current `org-mode' buffer
   (leaf my-org-do-tidy
     :bind (:org-mode-map
            :package org
            ("C-c M-q" . my-org-tidy)))
 
+  ;; transient to change values of #+OPTIONS and other #+<THINGS>
+  ;;
+  ;; (Info-goto-node "(org)Export Settings")
   (leaf my-org-options
     :bind (:org-mode-map
            :package org
            ("C-c C-." . my-org-options-transient)))
 
-  (leaf embrace
-    :ensure t
-    :hook (org-mode-hook . my-embrace-org-mode-hook)
-    :config                             ;nofmt
-    (defun my-embrace-org-mode-hook ()
-      "Enable `embrace' specially for `org-mode'."
-      (embrace-org-mode-hook)
-      (setq-local embrace-show-help-p nil)))
-
-  (leaf org-table-sticky-header
+  ;; very beautifull `org'
+  ;;
+  ;; for example, it show [1/3] like a pie progress. :o
+  (leaf org-modern
     :ensure t
     :hook org-mode-hook)
 
@@ -5034,26 +4981,17 @@ produced."
            :package org
            ("C-c C-x C-x" . rorg-splice-subtree)
            ("C-c C-0" . rorg-wrap-region-or-current-heading)
+           ("C-c M-(" . rorg-wrap-region-or-current-heading)
            ("C-c C-{" . rorg-forward-slurp-subtree)
            ("C-c C-}" . rorg-backward-barf-subtree)
-           ("{" . rorg-backward-slurp-subtree)
-           ("[" . rorg-forward-barf-subtree)))
+           ("C-c {" . rorg-backward-slurp-subtree)
+           ("C-c [" . rorg-forward-barf-subtree)))
 
-  (leaf my-org-drag
-    :defun ((add-right-dragger
-             add-left-dragger
-             add-down-dragger
-             add-up-dragger)
-            . my-drag)
-    :commands (my-drag-org-right
-               my-drag-org-left
-               my-drag-org-down
-               my-drag-org-up)
-    :init
-    (add-right-dragger 'my-drag-org-right)
-    (add-left-dragger 'my-drag-org-left)
-    (add-down-dragger 'my-drag-org-down)
-    (add-up-dragger 'my-drag-org-up)))
+  (defun doom-docs-org-mode () (interactive)))
+
+(leaf org-download
+  :ensure (org-download :repo "abo-abo/org-download" :host github)
+  :hook (dired-mode-hook . org-download-enable))
 
 
 
@@ -5088,10 +5026,12 @@ produced."
 ;;; Code:
 
 
+
 (require 'dash)
 (require 's)
 (require 'just)
 (require 'smartparens)
+
 
 (leaf python-mode
   :ensure t
@@ -5131,11 +5071,10 @@ produced."
 
 Active region is region from BEG to END"
     (interactive "r")
-    (let ((init-pos (point)))
-      (goto-char end)
-      (insert "]")
-      (goto-char beg)
-      (insert "Optional[")))
+    (goto-char end)
+    (insert "]")
+    (goto-char beg)
+    (insert "Optional["))
 
   (defun my-python-fix-whitespaces-mode ()
     "Fix `whitespace-mode' for `python-mode'."
@@ -5317,8 +5256,8 @@ Active region is region from BEG to END"
 
 
 
+
 (leaf sql
-  :ensure t
   :fast-exec ("Open SQL Lite Connection" 'sql-sqlite))
 
 
@@ -5354,12 +5293,9 @@ Active region is region from BEG to END"
 
 
 
-(declare-function visual-fill "my-lang-utils.el")
-
 (leaf typst-mode
   :ensure t
-  :commands typst-mode
-  :config (add-hook 'typst-mode-hook #'visual-fill))
+  :commands typst-mode)
 
 
 
@@ -5395,71 +5331,70 @@ Active region is region from BEG to END"
 
 
 
-
-(defvar dired-filter-map)
-(defvar my-dired-commands-using-minibuffer)
-
-;; the most heavy functions placed at the `my-dired-commands'
-;; and will be evaluated when really needed
-(declare-function my-dired-save-excursion "my-dired-commands.el")
-(declare-function visual-fill "my-lang-utils.el")
-
 (require 's)
 (require 'dash)
 (require 'just)
 (require 'f)
 
-(leaf dired
-  :hook ((dired-mode-hook . dired-hide-details-mode))
-  :defun ((dired-mark
-           dired-do-rename
-           dired-current-directory
-           dired-jump
-           dired-get-file-for-visit)
-          (org-link-open-from-string . ol))
-  :bind (:dired-mode-map
-         (";"       . dired-avy)
-         ("A"       . agnifize-dwim)
-         ("~"       . my-dired-jump-to-home)
-         ("a"       . execute-extended-command)
-         (","       . ace-window))
 
+(defvar dired-filter-map)
+
+;; the most heavy functions placed at the `my-dired-commands'
+;; and will be evaluated when really needed (autoloading)
+(declare-function my-dired-save-excursion "my-dired-commands.el")
+(declare-function embark-open-externally "embark")
+
+
+(leaf dired
+  ;; don't show extra info about files like:
+  ;; - owner
+  ;; - group
+  ;; - last modified time
+  :hook (dired-mode-hook . dired-hide-details-mode)
+  :defun dired-get-file-for-visit
+  :bind (:dired-mode-map
+         ;; i'm the user of `meow' with hjkl, where "h" is right, so i press
+         ;; right to go the "back" directory
+         ("h" . dired-up-directory)
+         ("A" . agnifize-dwim))
   :config
+  ;; some my commands for `dired'
+  (leaf my-dired-commands
+    :bind (:dired-mode-map
+           :package dired
+           ("~" . my-dired-jump-to-home)
+           ("C-x h"   . my-dired-mark-all-files)
+           ("C-y"     . my-dired-duplicate)
+           ("C-o"     . my-dired-new-file)))
+
   (leaf dired-async
     :ensure async
     :defun dired-async-mode
     :global-minor-mode dired-async-mode)
 
-  (leaf my-dired-commands
-    :bind (:dired-mode-map
-           :package dired
-           ;; Mark anything
-           ("C-x h"   . my-dired-mark-all-files)
-           ;; Manipulation with file(s)
-           ;; copy/move/paste also defines in the section "Dired Hacks: Ranger"
-           ("k"       . my-dired-delete)
-           ("C-c C-x" . my-dired-delete-all-files)
-           ("C-y"     . my-dired-duplicate)
-           ("R"       . my-dired-rename)
-           ("TAB"     . my-dired-move)
-           ("o"       . my-dired-new-file)
-           ("b"       . my-dired-goto-parent-dir)))
+  (leaf dired-hacks-utils
+    :ensure t)
 
+  ;; filter files from the buffre
   (leaf dired-filter
-    :ensure t
-    :require t
+    :ensure (dired-filter
+             :repo "Fuco1/dired-hacks"
+             :host github)
+    :disabled t
+    :defvar dired-filter-map
     :bind-keymap (:dired-mode-map
                   :package dired
-                  ("." . 'dired-filter-map)))
+                  ("." . dired-filter-map)))
 
+  ;; open PDF and other not in Emacs
   (leaf dired-open
     :ensure t
     :bind (:dired-mode-map
            :package dired
            ("RET" . 'dired-open-file))
-    :push ((dired-open-functions . 'my-dired-open-function-pdf))
     :defvar dired-open-functions
-    :defun (my-dired . (my-pdf-file my-try-open-pdf-file))
+    :push ((dired-open-functions . 'my-dired-open-function-pdf))
+    :defun (my-dired . (my-pdf-file-p my-try-open-pdf-file))
     :config                             ;nofmt
     (defun my-dired-open-function-pdf ()
       "Open function for `dired-open-functions'."
@@ -5467,24 +5402,16 @@ Active region is region from BEG to END"
 
     (defun my-try-open-pdf-file (filename)
       "If file at FILENAME is a pdf file, then open as pdf, other return nil."
-      (when (my-pdf-file filename)
-        (org-link-open-from-string filename)
+      (when (my-pdf-file-p filename)
+        (embark-open-externally filename)
         t))
 
-    (defun my-pdf-file (filename)
+    (defun my-pdf-file-p (filename)
       "Return t, when FILENAME is path to a PDF file."
       (s-suffix-p ".pdf" filename)))
 
-  (leaf dired-ranger
-    :ensure t
-    :bind (:dired-mode-map
-           :package dired
-           ("m" . 'dired-ranger-move)
-           ("v" . 'dired-ranger-paste)
-           ("c" . 'dired-ranger-copy)))
-
   (leaf dired-subtree
-    :ensure t
+    :ensure (dired-subtree :repo "Fuco1/dired-hacks" :host github)
     :defun dired-subtree-beginning
     :bind (:dired-mode-map
            :package dired
@@ -5499,30 +5426,28 @@ Active region is region from BEG to END"
        (forward-line -1)
        (dired (thing-at-point 'filename)))))
 
+  ;; show directories with 1 file
+  ;;
+  ;; it be like "a/b.txt", instead of just "a"
   (leaf dired-collapse
-    :ensure t
-    :hook (dired-mode-hook . dired-collapse-mode))
+    :ensure (dired-collapse :repo "Fuco1/dired-hacks" :host github)
+    :hook dired-mode-hook)
 
-  (defcustom my-dired-commands-using-minibuffer
-    '(dired-filter-by-file
-      dired-filter-by-extension
-      my-dired-new-file
-      dired-byte-compile
-      dired-do-delete
-      dired-create-directory
-      dired-isearch-filenames)
-    "List of the `dired' commands using the minubuffer."
-    :type '(repeat symbol)
-    :group 'my)
+  ;; icons inside `dired'
+  (leaf nerd-icons-dired
+    :ensure (nerd-icons-dired :repo "rainstormstudio/nerd-icons-dired" :host github)
+    :hook dired-mode-hook)
 
   ;; Command for printing file
-  (with-eval-after-load 'lpr (setq lpr-command "PDFToPrinter"))
+  (with-eval-after-load 'lpr
+    (setq lpr-command "PDFToPrinter"))
 
+  ;; ???
   (remove-hook 'dired-mode-hook 'dired-mode))
 
-
-
 ;;; my-dired.el ends here
+
+
 ;;; my-dwim-shell-command.el --- My configuration of `dwim-shell-command' -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022 semenInRussia
@@ -5554,7 +5479,7 @@ Active region is region from BEG to END"
 
 
 (leaf dwim-shell-command
-  :ensure t
+  :ensure (dwim-shell-command :repo "xenodium/dwim-shell-command" :host github)
   :bind ("M-!" . dwim-shell-command))
 
 
@@ -5591,39 +5516,45 @@ Active region is region from BEG to END"
 
 
 
-
-(require 'fast-exec)
-
 (require 'dash)
 
 
+(leaf magit-section :ensure t)
+(leaf with-editor :ensure t)
+(leaf git-commit :ensure t)
+
 (leaf magit
-  :ensure t
-  :hook (magit-mode-hook . visual-fill)
+  :ensure (magit :repo "magit/magit"
+                 :host github)
+  :bind (:magit-mode-map
+         ("D" . magit-file-delete))
   :custom ((magit-refresh-status-buffer . nil)
            (magit-disabled-section-inserters
             . '(magit-insert-push-branch-header
                 magit-insert-tags-header
                 magit-insert-unpushed-to-upstream-or-recent
-                magit-insert-unpulled-from-upstream))))
+                magit-insert-unpulled-from-upstream)))
+  :config
+  (add-hook 'magit-mode-hook #'hl-line-mode)
+  (magit-auto-revert-mode 0))
 
 (leaf git-timemachine
-  :ensure (git-timemachine :host gitlab :repo "pidu/git-timemachine")
+  :ensure (git-timemachine :repo "pidu/git-timemachine" :host gitlab)
   :fast-exec ("Git Timemachine" 'git-timemachine))
 
-(leaf git-modes :ensure t)
+(leaf git-modes
+  :ensure (git-modes :repo "magit/git-modes" :host github))
 
 (leaf gitignore-templates
   :fast-exec ("Insert Git Ignore" 'gitignore-templates-insert))
 
 (leaf github-clone
-  :ensure t
+  :ensure (github-clone :repo "dgtized/github-clone.el" :host github)
   :custom (github-clone-directory . "~/projects")
   :fast-exec ("Clone a GitHub Project" 'github-clone))
 
 (leaf line-reminder
-  :ensure t
-  :hook prog-mode-hook
+  :ensure (line-reminder :repo "emacs-vs/line-reminder" :host github)
   :custom ((line-reminder-bitmap . 'filled-rectangle)
            (line-reminder-show-option . 'indicators)))
 
@@ -5661,8 +5592,8 @@ Active region is region from BEG to END"
 
 
 
-(leaf hl-todo                           ;nofmt
-  :ensure t
+(leaf hl-todo
+  :ensure (hl-todo :repo "tarsius/hl-todo" :host github)
   :global-minor-mode global-hl-todo-mode)
 
 
@@ -5779,59 +5710,30 @@ Active region is region from BEG to END"
 (require 'dash)
 
 
-
 (declare-function org-schedule "org.el")
 (declare-function org-mark-subtree "org.el")
-(declare-function my-open-main-agenda-file "my-organization-commands.el")
 
+(declare-function my-open-main-agenda-file "my-organization-commands.el")
 (declare-function my-goto-targets-on-day "my-organization.el")
 (declare-function my-delete-and-get-text-of-org-subtree "my-organization.el")
 
-(leaf org-agenda                        ;nofmt
+
+(leaf org-agenda
   :custom ((org-agenda-files .
                              '("~/agenda.org"
                                "~/tasks-archive/task-archive.org"))
            (org-agenda-span . 14))
-  :bind ("C-c aa"      . org-agenda))
+  :bind ("C-c a" . org-agenda))
 
-(require 'fast-exec)
-
-(leaf org-agenda
-  :after org
-  :fast-exec ("Plane New Day" 'my-agenda-plan-new-day)
-  :config                               ;nofmt
-
-  (defun my-goto-targets-on-day ()
-    "Visit `org-mode' subtree of the targets on day."
-    (my-open-main-agenda-file)
-    (goto-char (point-min))
-    (search-forward "* Targets on Day")
-    (forward-char))
-
-  (defun my-delete-and-get-text-of-org-subtree (&optional pt)
-    "Parse a `org-mode' subtree at the PT, delete it and return text of subtree."
-    (or pt (setq pt (point)))
-    (org-mark-subtree)
-    (prog1
-        (just-text-in-region)
-      (delete-region (region-beginning) (region-end))))
-
-  (defun my-add-org-subtree-to-targets-on-day ()
-    "Add an `org-mode' subtree at the point to the targets on day."
-    (interactive)
-    (save-excursion
-      (let ((subtree-text (my-delete-and-get-text-of-org-subtree)))
-        (my-goto-targets-on-day)
-        (newline)
-        (insert subtree-text)
-        (delete-char -1)
-        (org-schedule t (format-time-string "%Y-%m-%d"))))))
-
-(leaf-keys
- ("C-c at" . my-add-org-subtree-to-targets-on-day))
+(leaf nano-agenda
+  :ensure t
+  :after org-agenda
+  :bind (:org-agenda-keymap
+         :package org-agenda
+         ("a" . nano-agenda)))
 
 (leaf org-capture
-  :commands org-capture
+  :bind ("C-c z c" . org-capture)
   :custom ((org-capture-templates
             .
             '(("d"
@@ -5889,7 +5791,6 @@ Active region is region from BEG to END"
 
 
 (leaf project
-  :ensure t
   :bind-keymap ("C-c p" . project-prefix-map))
 
 
@@ -5930,7 +5831,6 @@ Active region is region from BEG to END"
 
 (leaf run-command
   :ensure (run-command
-           :type git
            :host github
            :repo "bard/emacs-run-command"
            :branch "develop")
@@ -6002,7 +5902,6 @@ Active region is region from BEG to END"
 
 
 
-(require 'fast-exec)
 
 
 (defgroup my-zms nil
@@ -6299,535 +6198,6 @@ See `my-zms-compile-command'"
 
 
 ;;; my-zms.el ends here
-;;; my-doom-themes.el --- My file loading `doom-themes'
-
-;; Copyright (C) 2022 Semen Khramtsov
-
-;; Author: Semen Khramtsov <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
-
-;; This file is not part of GNU Emacs.
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-;;; Commentary:
-
-;; My file loading `doom-themes'
-
-;;; Code:
-
-
-
-(leaf doom-themes :ensure t)
-
-
-
-;;; my-doom-themes.el ends here
-;;; my-gruber-darker-theme.el --- My file loading `gruber-darker-theme'
-
-;; Copyright (C) 2022 Semen Khramtsov
-
-;; Author: Semen Khramtsov <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
-
-;; This file is not part of GNU Emacs.
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-;;; Commentary:
-
-;; My file loading `gruber-darker-theme'
-
-;;; Code:
-
-
-
-(leaf gruber-darker-theme :ensure t :require t)
-
-
-
-;;; my-gruber-darker-theme.el ends here
-;;; my-load-theme --- Load the current theme
-
-;; Copyright (C) 2022 Semen Khramtsov
-
-;; Author: Semen Khramtsov <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
-
-;; This file is not part of GNU Emacs.
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-;;; Commentary:
-
-;;; Code:
-;; See `doom-themes' (list of themes at starting comments)
-
-;; List of my favorite themes:
-;; - `gruber-darker'
-;; - `doom-monokai-classic'
-;; - `solarized'
-;; - `flatland-theme'
-
-(setq font-lock-maximum-decoration t
-      truncate-partial-width-windows nil)
-
-(require 'doom-themes-autoloads)
-(load-theme 'doom-1337 t)
-
-(custom-set-faces
- `(region
-   ((t (:background "white" :foreground "black" :inherit t)))))
-
-
-
-;;; my-load-theme.el ends here
-;;; my-monokai.el --- Install the `monokai-theme' (clone of the sublime theme) ' -*- lexical-binding: t; -*-
-
-;; Copyright (C) 2022 semenInRussia
-
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; Homepage: https://github.com/semeninrussia/emacs.el
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-;;; Commentary:
-
-;; My configuration of `monokai'.
-
-;;; Code:
-
-
-
-(leaf monokai-theme :ensure t)
-
-
-
-;;; my-monokai.el ends here
-;;; my-default.el --- My some default config
-
-;; Copyright (C) 2022 Semen Khramtsov
-
-;; Author: Semen Khramtsov <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
-
-;; This file is not part of GNU Emacs.
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-;;; Commentary:
-
-;; My some default config
-
-;;; Code:
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
-
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
-(add-hook 'emacs-startup-hook 'toggle-frame-fullscreen)
-
-
-
-;;; my-default.el ends here
-;;; my-focus.el --- My configuration of `focus' -*- lexical-binding: t; -*-
-
-;; Copyright (C) 2022 semenInRussia
-
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; Homepage: https://github.com/semeninrussia/emacs.el
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-;;; Commentary:
-
-;; My configuration of `focus'.
-
-;;; Code:
-
-
-
-(leaf focus
-  :ensure t
-  :custom-face (focus-unfocused . '((t :inherit shadow))))
-
-
-
-;;; my-focus.el ends here
-;;; my-fonts.el --- My configuration for fonts
-
-;; Copyright (C) 2022, 2023 Semen Khramtsov
-
-;; Author: Semen Khramtsov <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
-
-;; This file is not part of GNU Emacs.
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-;;; Commentary:
-
-;; My configuration for fonts
-
-;;; Code:
-
-
-(require 'dash)
-
-;; you can install this font, usin `nerd-fonts' (search in the `github')
-(defcustom my-fonts-main
-  "Hack Nerd Font Mono"
-  "Name of the main font to display all."
-  :group 'my
-  :type 'string)
-
-(set-face-attribute 'default nil :font my-fonts-main :height 210)
-
-;; (leaf unicode-fonts
-;;   :ensure t
-;;   :defun (unicode-fonts-setup unicode-fonts--instructions)
-;;   :defvar (unicode-fonts
-;;            unicode-fonts--instructions
-;;            ...)
-;;   :require t
-;;   :init (defvar ... nil)
-;;   :config (setq unicode-fonts--instructions
-;;                 (-remove-item '... unicode-fonts--instructions))
-;;   (unicode-fonts-setup))
-
-(prefer-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8)
-(set-language-environment 'utf-8)
-(set-selection-coding-system 'utf-8)
-
-
-
-;;; my-fonts.el ends here
-;;; my-modeline.el --- My configuration for modeline
-
-;; Copyright (C) 2022 Semen Khramtsov
-
-;; Author: Semen Khramtsov <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
-
-;; This file is not part of GNU Emacs.
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-;;; Commentary:
-
-;; My configuration for `modeline'
-
-;;; Code:
-
-(defvar flycheck-mode-line)
-
-
-
-(require 'dash)
-
-
-(leaf moody
-  :ensure t
-  :require t
-  :custom (flycheck-mode-line-prefix . "")
-  :defun (moody-replace-vc-mode
-          moody-replace-mode-line-buffer-identification)
-  :config
-  (setq x-underline-at-descent-line t)
-  (setq-default mode-line-format
-                '(" " (:eval (meow-indicator))
-                  mode-line-modified
-                  mode-line-client
-                  mode-line-frame-identification
-                  mode-line-buffer-identification
-                  " " (:eval (my-modeline-pomidor))
-                  " " (:eval (my-display-time-string))
-                  " " (vc-mode vc-mode)
-                  (multiple-cursors-mode mc/mode-line)
-                  (lsp-bridge-mode mc/mode-line)
-                  flycheck-mode-line
-                  mode-line-end-spaces))
-  (moody-replace-mode-line-buffer-identification)
-  (moody-replace-vc-mode))
-
-
-(declare-function pomidor--overwork-duration "pomidor.el")
-(declare-function pomidor--work-duration "pomidor.el")
-(declare-function pomidor-overwork-p "pomidor.el")
-(declare-function pomidor--break-duration "pomidor.el")
-(declare-function pomidor--current-state "pomidor.el")
-
-
-(defcustom my-modeline-time-segment-format-string " [%H-%M]"
-  "By this format string will draw time in modeline.
-
-See `format-time-string' for see what format string"
-  :type 'string
-  :group 'my)
-
-(defface my-modeline-time-morning-face
-  '((t (:foreground "#ff4500" :weight bold)))
-  "Face for view of the time in modeline in the morning."
-  :group 'my)
-
-(defface my-modeline-time-evening-face
-  '((t (:foreground "#dcdcdc" :weight bold)))
-  "Face for view of the time in modeline in the evening."
-  :group 'my)
-
-(defun my-display-time-string ()
-  "Return the string that tell current time in the modeline."
-  (let* ((hour (string-to-number (format-time-string "%H"))))
-    (propertize
-     (format-time-string my-modeline-time-segment-format-string)
-     'face
-     (if (< 4 hour 19)
-         'my-modeline-time-morning-face 'my-modeline-time-evening-face))))
-
-(defun my-modeline-pomidor ()
-  "Return format string for `pomidor', view remainders minuts for break/work."
-  (and
-   (featurep 'pomidor)
-   (--some (equal (buffer-name it) "*pomidor*") (buffer-list))
-   (my-pomidor-format-remaining-time)))
-
-(defun my-pomidor-kind ()
-  "Return kind of curent `pomidor' state, either break, work or overwork."
-  (cond
-   ((plist-get (pomidor--current-state) :break)
-    'break)
-   ((pomidor-overwork-p)
-    'overwork)
-   ((plist-get (pomidor--current-state) :started)
-    'work)))
-
-(defface my-modeline-pomidor-break-face
-  '((t :foreground "#ff4500" :underline t :weight bold))
-  "Face showing in the mode line at time when `pomidor' has status break."
-  :group 'my)
-
-(defface my-modeline-pomidor-overwork-face
-  '((t :foreground "#Ffa500" :underline t :weight bold))
-  "Face showing in the mode line at time when `pomidor' has status overwork."
-  :group 'my)
-
-(defface my-modeline-pomidor-work-face
-  '((t :foreground "#7cfc00" :underline t :weight bold))
-  "Face showing in the mode line at time when `pomidor' has work status."
-  :group 'my)
-
-(defun my-pomidor-face ()
-  "Return face for the current status of the current `pomidor' state."
-  (cl-case
-      (my-pomidor-kind)
-    ((break)
-     'my-modeline-pomidor-break-face)
-    ((work)
-     'my-modeline-pomidor-work-face)
-    ((overwork)
-     'my-modeline-pomidor-overwork-face)))
-
-(defun my-pomidor-remaining-time ()
-  "Return remaining time to the end of the pomidor work or break period.
-
-Format of time is the list form the hours, minutes, seconds and zero?"
-  (cl-case
-      (my-pomidor-kind)
-    ((work)
-     (pomidor--work-duration (pomidor--current-state)))
-    ((overwork)
-     (pomidor--overwork-duration (pomidor--current-state)))
-    ((break)
-     (pomidor--break-duration (pomidor--current-state)))))
-
-(defcustom my-pomidor-modeline-time-format "%M min"
-  "String defining format of string viewing pomodoro time at the modeline."
-  :group 'my
-  :type 'string)
-
-(defun my-pomidor-format-remaining-time ()
-  "Format remaining time to the end of the pomidor work or break period."
-  (propertize
-   (format-time-string my-pomidor-modeline-time-format
-                       (my-pomidor-remaining-time))
-   'face
-   (my-pomidor-face)))
-
-
-
-;;; my-modeline.el ends here
-;;; my-page-break-lines.el --- My config for `page-break-lines'
-
-;; Copyright (C) 2022 Semen Khramtsov
-
-;; Author: Semen Khramtsov <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
-
-;; This file is not part of GNU Emacs.
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-;;; Commentary:
-
-;; My config for `page-break-lines'
-
-;;; Code:
-
-
-
-(leaf page-break-lines
-  :ensure t
-  :global-minor-mode global-page-break-lines-mode)
-
-
-
-;;; my-page-break-lines.el ends here
-;;; my-prettify-mode.el --- My config for `prettify-mode'
-
-;; Copyright (C) 2022 Semen Khramtsov
-
-;; Author: Semen Khramtsov <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
-
-;; This file is not part of GNU Emacs.
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-;;; Commentary:
-
-;; My config for `prettify-mode'
-
-;;; Code:
-
-
-
-
-(leaf prog-mode :hook (LaTeX-mode-hook . prettify-symbols-mode))
-
-
-
-;;; my-prettify-mode.el ends here
 ;;; my-annotate.el --- My configuration of `annotate' -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022 semenInRussia
@@ -6856,16 +6226,17 @@ Format of time is the list form the hours, minutes, seconds and zero?"
 
 
 
+
 (leaf annotate
   :ensure t
-  :hook org-mode-hook
   :custom ((annotate-use-echo-area . t)
            (annotate-print-annotation-under-cursor . t)
            (annotate-print-annotation-under-cursor-prefix . "[ann] "))
   :bind (:org-mode-map
          :package org
          ("C-c M-a" . 'annotate-annotate)
-         ("C-c C-u M-a" . 'annotate-delete-annotation)))
+         ("C-c C-u M-a" . 'annotate-delete-annotation))
+  :config (annotate-mode))
 
 
 
@@ -6928,27 +6299,35 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
 
 ;;; my-auto-compile.el ends here
 ;;; my-autoinsert.el --- My configuration of `autoinsert': automatically insert any initial text into empty files -*- lexical-binding: t; -*-
+
 ;; Copyright (C) 2023 semenInRussia
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
 ;; Homepage: https://github.com/semeninrussia/emacs.el
+
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
 ;; (at your option) any later version.
+
 ;; This program is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 ;;; Commentary:
+
 ;; My configuration of `autoinsert'.
+
 ;;; Code:
 
 
+
+
+
 (leaf autoinsert
-  :ensure t
   :custom ((auto-insert-alist .
                               '((c++-mode .
                                           (nil
@@ -6990,7 +6369,6 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
 
 
 (leaf calendar
-  :ensure t
   :defvar calendar-holidays
   :bind ("C-c C" . calendar)
   :config                               ;nofmt
@@ -7061,24 +6439,18 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
 (require 'dash)
 
 
-(leaf vertico
-  :ensure (vertico :host github
-                   :repo "minad/vertico"
-                   :files ("*.el" "extensions/*.el"))
-  :global-minor-mode vertico-mode
-  :init
-  (leaf vertico-directory
-    :bind (:vertico-map
-           :package vertico
-           ("RET" . vertico-directory-enter)
-           ("DEL" . vertico-directory-delete-char)
-           ("M-DEL" . vertico-directory-delete-word))))
-
+;; some useful things:
+;;
+;; - `ripgrep' in the project
+;; - choose one from `kill-ring' with preview
+;; - `imenu' with preview
+;; - switch to buffer one of the project buffers, recent opened files and other
 (leaf consult
   :ensure t
-  :defun (consult-register-format
-          consult-register-window
-          consult-xref)
+  :commands (consult-register-format
+             consult-register-window
+             consult-xref)
+  :init (autoload 'consult-xref "consult-xref")
   :defvar (consult-narrow-key consult-project-function)
   :bind (:minibuffer-local-map
          ("M-s" . consult-history) ;; orig. next-matching-history-element
@@ -7086,9 +6458,14 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
   :bind (("C-x C-b" . consult-buffer)
          ("C-c i" . consult-imenu)
          ("C-c n" . consult-imenu-multi))
-  :bind (;; C-c bindings in `mode-specific-map'
-         ("C-c M-x" . consult-mode-command)
+  :bind ((:project-prefix-map
+          ;; instead of built-in `projectile-find-regexp'
+          ;; sometimes use command from `projectile-prefix-map' more useful
+          ;; , than "C-c s" for example, when you swithch to project and need to find regexp
+          ("g" . consult-ripgrep))
+         ;; C-c bindings in `mode-specific-map'
          ("C-c s" . consult-ripgrep)
+         ("C-c M-x" . consult-mode-command)
          ("C-c k" . consult-kmacro)
          ("C-c m" . consult-man)
          ([remap Info-search] . consult-info)
@@ -7097,24 +6474,13 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
          ;; Other custom bindings
          ;; M-g bindings in `goto-map'
          ("M-g e" . consult-compile-error)
-         ("M-g I" . consult-imenu-multi)
-         ;; M-s bindings in `search-map'
-         ("M-s d" . consult-find)
-         ("M-s D" . consult-locate)
-         ("M-s g" . consult-grep)
-         ("M-s G" . consult-git-grep)
-         ("M-s l" . consult-line)
-         ("M-s L" . consult-line-multi)
-         ("M-s k" . consult-keep-lines)
-         ("M-s u" . consult-focus-lines)
-         ;; Isearch integration
-         ("M-s e" . consult-isearch-history))
+         ("M-g I" . consult-imenu-multi))
   :custom ((register-preview-delay  . 0.5)
            (register-preview-function . #'consult-register-format))
-  :hook ((completion-list-mode-hook . consult-preview-at-point-mode))
 
-  ;; The :init configuration is always executed (Not lazy)
-  :init
+  ;; i don't know what does the next line
+  :hook ((completion-list-mode-hook . consult-preview-at-point-mode))
+  :config
 
   ;; This adds thin lines, sorting and hides the mode line of the window.
   (advice-add #'register-preview :override #'consult-register-window)
@@ -7126,21 +6492,19 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
     :custom ((xref-show-xrefs-function . #'consult-xref)
              (xref-show-definitions-function . #'consult-xref)))
 
-  ;; more fast way to search things inside `completing-read'
-  (leaf orderless
+  ;; `embark' like to flexible keymap that changes depending on
+  ;; when I call `embark-act'
+  ;;
+  ;; here only the integration of `embark' with `vertico', the configuration of
+  ;; `vertico' inside `my-embark'
+  (leaf embark-consult
     :ensure t
-    :require t
-    :custom (completion-styles . '(orderless)))
+    :hook (embark-collect-mode-hook . consult-preview-at-point-mode))
 
-  (leaf marginalia
-    :ensure t
-    :global-minor-mode marginalia-mode)
-
-  (leaf embark-consult :ensure t)
-
+  ;; the following lines fix some things which are wrong in my emacs@29
   (defvar string-width 0)
 
-  (defun compat-call (&rest b)
+  (defun compat-call (&rest _)
     0))
 
 
@@ -7173,7 +6537,6 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
 
 
 
-(require 'fast-exec)
 (require 'dash)
 
 (leaf cowsay
@@ -7230,7 +6593,7 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
 
 
 (require 'dash)
-(require 'fast-exec)
+
 
 (leaf devdocs
   :ensure t
@@ -7309,17 +6672,24 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
 
 
 (leaf embark
+  :defvar (embark-keymap-alist marginalia-prompt-categories)
+  :defun (magit-status-setup-buffer . magit)
   :ensure t
   :bind (("C-." . embark-act)
-         ("C-M-." . embark-act-dwim)
+         ("C-M-." . embark-dwim)
          (:minibuffer-mode-map
           :package minibuffer           ; built-in
           ("C-," . my-embark-act-noexit)
           ("C-<" . my-embark-act-all-noexit)
           ("C->" . embark-act-all)
-          ([remap write-file] . embark-export)
-          ([remap save-buffer] . embark-collect)))
+          ("C-S-m" . embark-export)
+          ("C-M-m" . embark-collect))
+         (:embark-general-map
+          ("G" . my-embark-google-search))
+         (:embark-file-map
+          ("G" . my-embark-magit-status)))
 
+  ;; eval after `embark' was loaded
   :config
 
   (defun my-embark-act-noexit ()
@@ -7332,7 +6702,66 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
     "Do `embark-act-all' without exit from the minibuffer."
     (interactive)
     (let ((embark-quit-after-action nil))
-      (call-interactively #'embark-act-all))))
+      (call-interactively #'embark-act-all)))
+
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none))))
+
+  ;;; SOME ADDITIONAL ACTIONS
+
+  ;; googling a thing
+  ;;
+  ;; was grabbed from the offical wiki
+  (defun my-embark-google-search (term)
+    "Open google.com to search a given TERM."
+    (interactive "sSearch Term: ")
+    (browse-url
+     (format "http://google.com/search?q=%s" term)))
+
+  ;; support of `magit'
+  ;;
+  ;; was grabbed from the offical wiki
+  (defun my-embark-magit-status (file)
+    "Run `magit-status` on repo containing the embark target."
+    (interactive "GFile: ")
+    (magit-status-setup-buffer (locate-dominating-file file ".git")))
+
+  ;; support of `straight'
+  ;;
+  ;; was grabbed from the offical wiki
+  (with-eval-after-load 'straight
+    (defvar-keymap embark-straight-map
+      :parent embark-general-map
+      "u" #'straight-visit-package-website
+      "r" #'straight-get-recipe
+      "i" #'straight-use-package
+      "c" #'straight-check-package
+      "F" #'straight-pull-package
+      "f" #'straight-fetch-package
+      "p" #'straight-push-package
+      "n" #'straight-normalize-package
+      "m" #'straight-merge-package)
+
+    (add-to-list 'embark-keymap-alist '(straight . embark-straight-map))
+
+    (with-eval-after-load 'marginalia
+      (add-to-list 'marginalia-prompt-categories '("recipe\\|package" . straight)))))
+
+;; support of agnifize.el: my small Emacs package
+;; to make a regular Python code into bad code (my sister agnia write bad code)
+(leaf agnifize
+  :bind ((:embark-file-map
+          :package embark
+          ("Q" . 'agnifize-file))
+         (:embark-buffer-map
+          :package embark
+          ("Q" . 'agnifize-buffer))
+         (:embark-region-map
+          :package embark
+          ("Q" . 'agnifize-region))))
 
 
 
@@ -7374,7 +6803,6 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
   :group 'my)
 
 (leaf eshell
-  :ensure t
   :bind (:eshell-mode-map
          :package esh-mode
          ([remap beginning-of-line] . 'eshell-begin-on-new-line)
@@ -7772,21 +7200,29 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
 
 
 
-(require 'fast-exec)
 (require 'dash)
+
 
 (leaf go-translate
   :ensure t
   :custom (gts-translate-list . '(("en" "ru")))
+  :bind (;; so I can just hit C-. or o with T following to translate a thing
+         ;; at point
+         (:embark-region-map
+          :package embark
+          ("T" . gts-do-translate)))
   :defvar gts-default-translator
   :defun (gts-buffer-render gts-translator gts-prompt-picker gts-google-engine)
   :fast-exec ("Translate a String" 'gts-do-translate)
-  :defer-config (setq gts-default-translator
-                      (gts-translator :picker
-                                      (gts-prompt-picker)
-                                      :engines  ;nofmt
-                                      (list (gts-google-engine))
-                                      :render (gts-buffer-render))))
+  :defer-config
+  ;; I use Google Translate with the output in the separate buffer
+  (setq gts-default-translator
+        (gts-translator :picker
+                        (gts-prompt-picker)
+                        :engines
+                        (list (gts-google-engine))
+                        :render (gts-buffer-render))))
+
 
 
 ;;; my-go-translate.el ends here
@@ -7894,17 +7330,17 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
 (setq default-keyboard-coding-system 'utf-8)
 (setq buffer-file-coding-system 'utf-8)
 
-;;; just do PPTX (powerpoint) file that can't be read
+;;; just make PPTX (powerpoint) file that can't be read
 (defun my-new-fake-pptx-file ()
   "Make this buffer, fake presentation with format (.pptx)."
   (interactive)
   (->> "~/broken.pptx" (f-read) (insert))
   (text-mode))
 
-(require 'fast-exec)
-(fast-exec-bind 'pptx
-  (fast-exec-make-some-commands
-   ("New Fake PPTX File" 'my-new-fake-pptx-file)))
+(with-eval-after-load 'fast-exec
+ (fast-exec-bind 'pptx
+                 (fast-exec-make-some-commands
+                  ("New Fake PPTX File" 'my-new-fake-pptx-file))))
 
 ;;; I try to decrease the Emacs startup time
 (defun my-display-startup-time ()
@@ -7945,17 +7381,43 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
 
 ;;; Commentary:
 
-;; My config for open-junk-file
+;; My config for `open-junk-file'.
 
 ;;; Code:
 
 
 
-(leaf open-junk-file :ensure t :bind ("C-t" . 'open-junk-file))
+
+
+(leaf open-junk-file
+  :ensure t
+  :bind ("C-c t" . 'open-junk-file))
 
 
 
 ;;; my-open-junk-file.el ends here
+;;; my-orderless.el --- Settings of `orderless': the match the completion with only some symbols -*- lexical-binding: t -*-
+;;; Copyright (c) 2023 semenInRussia
+
+;;; Commentary:
+;; Settings of `orderless': the match the completion with only some symbols.
+
+;;; Code:
+
+
+
+
+
+(leaf orderless
+  :ensure (orderless :host github
+                     :repo "minad/orderless"
+                     :files ("*.el" "extensions/*.el"))
+  :commands orderless
+  :init (setq completion-styles '(orderless)))
+
+
+
+;;; my-orderless.el ends here
 ;;; my-org-roam.el --- My configuration of `org-roam' -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022 semenInRussia
@@ -7986,6 +7448,9 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
 
 (require 'f)
 
+(leaf emacsql
+  :ensure t)
+
 (leaf org-roam
   :ensure t
   :init (f-mkdir "~/org-roam")
@@ -8004,13 +7469,17 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
   :config                               ;nofmt
   (org-roam-db-autosync-mode t)
 
-  (add-to-list 'Info-directory-list
-               (f-full "~/.emacs.d/straight/repos/org-roam/doc"))
+  (with-eval-after-load 'Info
+    (add-to-list 'Info-directory-list
+                 (f-full "~/.emacs.d/straight/repos/org-roam/doc")))
 
-  (require 'org-roam-export)
-  (require 'org-roam-protocol)
+  ;; (require 'org-roam-export)
+  ;; (require 'org-roam-protocol)
 
-  (leaf org-roam-ui                     ;nofmt
+  (leaf simple-httpd
+    :ensure t)
+
+  (leaf org-roam-ui
     :ensure t
     :defun org-roam-ui-mode
     :config (org-roam-ui-mode t)))
@@ -8051,7 +7520,6 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
 
 
 (leaf outline
-  :ensure t
   :bind (:outline-minor-mode-map
          ("S-TAB" . outline-cycle)))
 
@@ -8087,9 +7555,6 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
 
 ;;; Code:
 
-
-
-(require 'fast-exec)
 
 (require 'dash)
 (require 'f)
@@ -8148,16 +7613,93 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
 
 
 
+(require 'dash)
+
 
 (leaf pomidor
   :ensure t
-  :hook (emacs-startup-hook . pomidor)
   :bind (("<f12>" . pomidor)
-         (:pomidor-mode-map ("Q" . kill-buffer)))
-  :custom `((pomidor-sound-tack    . nil)
-            (pomidor-seconds       . 1800) ; 30min
-            (pomidor-sound-tick    . nil)
-            (pomidor-confirm-end-break . nil)))
+         (:pomidor-mode-map
+          ("Q" . kill-buffer)))
+  :custom ((pomidor-sound-tack    . nil)
+           (pomidor-seconds       . 1800) ; 30min
+           (pomidor-sound-tick    . nil)
+           (pomidor-confirm-end-break . nil)))
+
+(declare-function pomidor--break-duration "pomidor.el")
+(declare-function pomidor--current-state "pomidor.el")
+(declare-function pomidor--overwork-duration "pomidor.el")
+(declare-function pomidor--work-duration "pomidor.el")
+(declare-function pomidor-overwork-p "pomidor.el")
+
+(defun my-modeline-pomidor ()
+  "Return format string for `pomidor', view remainders minuts for break/work."
+  (and
+   (featurep 'pomidor)
+   (--some (equal (buffer-name it) "*pomidor*") (buffer-list))
+   (my-pomidor-format-remaining-time)))
+
+(defun my-pomidor-kind ()
+  "Return kind of curent `pomidor' state, either break, work or overwork."
+  (cond
+   ((plist-get (pomidor--current-state) :break)
+    'break)
+   ((pomidor-overwork-p)
+    'overwork)
+   ((plist-get (pomidor--current-state) :started)
+    'work)))
+
+(defface my-modeline-pomidor-break-face
+  '((t :foreground "#ff4500" :underline t :weight bold))
+  "Face showing in the mode line at time when `pomidor' has status break."
+  :group 'my)
+
+(defface my-modeline-pomidor-overwork-face
+  '((t :foreground "#Ffa500" :underline t :weight bold))
+  "Face showing in the mode line at time when `pomidor' has status overwork."
+  :group 'my)
+
+(defface my-modeline-pomidor-work-face
+  '((t :foreground "#7cfc00" :underline t :weight bold))
+  "Face showing in the mode line at time when `pomidor' has work status."
+  :group 'my)
+
+(defun my-pomidor-face ()
+  "Return face for the current status of the current `pomidor' state."
+  (cl-case
+      (my-pomidor-kind)
+    ((break)
+     'my-modeline-pomidor-break-face)
+    ((work)
+     'my-modeline-pomidor-work-face)
+    ((overwork)
+     'my-modeline-pomidor-overwork-face)))
+
+(defun my-pomidor-remaining-time ()
+  "Return remaining time to the end of the pomidor work or break period.
+
+Format of time is the list form the hours, minutes, seconds and zero?"
+  (cl-case
+      (my-pomidor-kind)
+    ((work)
+     (pomidor--work-duration (pomidor--current-state)))
+    ((overwork)
+     (pomidor--overwork-duration (pomidor--current-state)))
+    ((break)
+     (pomidor--break-duration (pomidor--current-state)))))
+
+(defcustom my-pomidor-modeline-time-format "%M min"
+  "String defining format of string viewing pomodoro time at the modeline."
+  :group 'my
+  :type 'string)
+
+(defun my-pomidor-format-remaining-time ()
+  "Format remaining time to the end of the pomidor work or break period."
+  (propertize
+   (format-time-string my-pomidor-modeline-time-format
+                       (my-pomidor-remaining-time))
+   'face
+   (my-pomidor-face)))
 
 
 
@@ -8190,8 +7732,9 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
 
 
 
+
+
 (leaf recentf
-  :ensure t
   :global-minor-mode recentf-mode)
 
 
@@ -8332,6 +7875,260 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
 
 
 ;;; my-supersave.el ends here
+;;; my-afk.el --- Load some heavy packages after some seconds of AFK -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2023 semenInRussia
+
+;; Author: semenInRussia <hrams205@gmail.com>
+;; Version: 0.1
+;; Homepage: https://github.com/semeninrussia/emacs.el
+
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; When you in afk, load some frequently used things to don't load them after
+;; (idea grabbed from the Doomemacs, but I didn't find the implementation, so
+;; create my own)
+
+;;; Code:
+
+(defcustom my-use-afk-modules
+  '(;; `consult' command `consult-buffer', really frequently useful by me,
+    ;; I use it in 99% of Emacs sessions, load it when in AFK
+    consult
+    ;; auto-completion (`corfu')
+    corfu
+    ;; my configuration really tied with `embark'.
+    ;; I use it for: change reGisTeR of the region, kill the sexp at point,
+    ;; do things on the minibuffer items, browse the URL at the cursor
+    ffap  ; a dependency
+    embark
+    ;; I frequently use `dired', but it have a bad start up time, load it in AFK
+    dired
+    ;; I use `ace-window' (alternative to C-x o) in 100% of cases.
+    ;; I don't need to wait 1-2secs before it.
+    avy        ; dep
+    ace-window
+    ;; lsp server (`eglot')
+    imenu
+    ert
+    flymake
+    external-completion
+    jsonrpc
+    xref
+    eglot
+    ;; `magit' is really big, so I load it in AFK
+    magit-section
+    with-editor
+    transient
+    magit-base
+    magit-git
+    add-log
+    pcvs-util
+    gmm-utils
+    mail-utils
+    mm-util
+    mailabbrev
+    mail-parse
+    mm-util
+    mm-bodies
+    mml
+    puny
+    rmc
+    yank-media
+    mailcap
+    sendmail
+    message
+    log-edit
+    git-commit
+    ;; org-mode
+    org-compat
+    calendar
+    find-func
+    format-spec
+    org-keys
+    ol
+    oc
+    org-table
+    org-fold
+    org-cycle
+    ;; fast-exec
+    fast-exec
+    ;; my translator
+    gts-core
+    gts-implements
+    gts-engine-bing
+    go-translate
+    ;; run-command
+    run-command)
+  "This is the list of modules which should be loaded after some seconds of AFK.
+
+Emacs will load them when I am not doing anything, so I won't wait loading of
+them when they really needed"
+  :group 'my
+  :type '(repeat (repeat symbol)))
+
+(defcustom my-use-afk-timeout 2
+  "Secs in AFK to load next heavy thind from the `my-use-afk-modules'."
+  :group 'my
+  :type 'number)
+
+(defcustom my-use-afk-timeout-between-loads
+  1
+  "Secs between loadidng heavy modules."
+  :group 'my
+  :type 'number)
+
+(defvar my-use-afk-counter 0
+  "The counter that tell about the progress of loading heavy things in an AFK time.
+
+Don't set it manually, `my-use-afk-next' will load the heavy next thing and
+change the value of this variable")
+
+(defvar my-use-afk-timer nil
+  "Timer for load heavy things in AFK.")
+
+(defun my-use-afk-next ()
+  "Setup timer to load the rest heavy things after some secs of AFK.
+
+It load the respective Emacs package from the `my-use-afk-modules' list after
+`my-use-afk-timeout' seconds depends on `my-use-afk-counter', change the value
+of this counter and run timer to load itself after the seconds of AFK"
+  (interactive)
+  (let ((module (nth my-use-afk-counter my-use-afk-modules)))
+    (cond
+     ((null module)                     ; all things already loaded -> stop
+      (message "All heavy things have already loaded")
+      (my-use-afk-stop)
+      t)
+     ((featurep module)      ; the current thing already loaded -> load the next
+      (message "The module have already loaded: %s" module)
+      (cl-incf my-use-afk-counter)
+      (my-use-afk-next))
+     (t                                 ; just load the current module
+      (message "Load the module, because u in AFK: %s..." module)
+      (unless (ignore-errors (require module))  ; can't load module
+        (message "Can't load the module in afk: %s" module))
+      (cl-incf my-use-afk-counter)
+      (run-with-timer
+       my-use-afk-timeout-between-loads
+       nil
+       (lambda ()
+         ;; this code will runned after `my-use-afk-timeout-between-loads'
+         ;; seconds after loading a heavy thing.
+         ;;
+         ;; here check that all time before load a heavy thing, the user wasn't
+         ;; doing anything, in this case users still in AFK, so load the next
+         ;; heavy thing
+         (when (time-less-p
+                (time-add
+                 my-use-afk-timeout
+                 my-use-afk-timeout-between-loads)
+                (current-idle-time))
+           (my-use-afk-next))))))))
+
+(defun my-use-afk-stop ()
+  "Don't using AFK time to load heavy things anymore."
+  (interactive)
+  (cancel-timer my-use-afk-timer))
+
+(defun my-use-afk-first-start ()
+  "Load all heavy things in AFK starting from the first one.
+
+It useful when an error in AFK loading was occured and you need to try fix it."
+  (interactive)
+  (setq my-use-afk-counter 0)
+  (my-use-afk-setup-timer))
+
+(defun my-use-afk-setup-timer ()
+  "Load the next heavy thing after some seconds in AFK."
+  (setq my-use-afk-timer
+        (run-with-idle-timer my-use-afk-timeout t 'my-use-afk-next)))
+
+(define-minor-mode my-use-afk-mode
+  "Use time when user do nothing (AFK time) to load heavy things.
+
+It's useful, because when this mode is enabled and user doing nothing Emacs do a
+hard work to don't do it when user type a text."
+  :global t
+  :group 'misc
+  :init-value nil
+  (if my-use-afk-mode
+      (my-use-afk-first-start)
+    (my-use-afk-stop)))
+
+;; when Emacs is started start using AFK
+(add-hook 'after-init-hook 'my-use-afk-mode)
+
+
+
+;;; my-use-afk.el ends here
+;;; my-vertico.el --- Settings of `vertico': the modern completion -*- lexical-binding: t -*-
+
+;;; Copyright (c) 2023
+
+;;; Commentary:
+
+;; Settings of `vertico': the modern completion.
+
+;;; Code:
+
+
+
+
+
+(leaf vertico
+  :ensure (vertico :host github
+                   :repo "minad/vertico"
+                   :files ("*.el" "extensions/*.el"))
+  :commands vertico--advice
+  ;; it's part of `vertico-mode'
+  :init
+  (advice-add 'completing-read-default :around #'vertico--advice)
+  (advice-add 'completing-read-multiple :around #'vertico--advice)
+  :config (vertico-mode t)
+  :config
+  ;; I press `M-delete' to go the up directory inside of `vertico'
+  ;; and TAB to enter into the directory.
+  (leaf vertico-directory
+    :bind (:vertico-map
+           :package vertico
+           ;; instead I press TAB
+           ;; ("RET" . vertico-directory-enter)
+           ("DEL" . vertico-directory-delete-char)
+           ("M-DEL" . vertico-directory-delete-word)))
+
+  ;; beautifull icons inside `vertico'
+  (leaf nerd-icons
+    :ensure t)
+
+  (leaf nerd-icons-completion
+    :ensure t
+    :commands nerd-icons-completion-mode
+    ;; `marginalia' and this both use the same way to display info inside `vertico',
+    ;; if i load it before `marginalia', then it wasn't working
+    :hook marginalia-mode-hook)
+
+  ;; show a bit of additional info inside the `vertico' `minibuffer'
+  (leaf marginalia
+    :ensure t
+    :global-minor-mode marginalia-mode))
+
+
+
+;;; my-vertico.el ends here
 ;;; my-which-key.el --- My config for `which-key'
 
 ;; Copyright (C) 2022 Semen Khramtsov
@@ -8402,8 +8199,6 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
 
 
 
-(require 'fast-exec)
-
 (require 'dash)
 (require 's)
 
@@ -8461,9 +8256,11 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
      (format-time-string "%Y"))))
   (search-backward "(leaf "))
 
-(fast-exec-bind 'writing-config
-  (fast-exec-make-some-commands
-   ("New Config Module" 'my-new-config-module)))
+(with-eval-after-load 'fast-exec
+  (fast-exec-bind
+   'writing-config
+   (fast-exec-make-some-commands
+    ("New Config Module" 'my-new-config-module))))
 
 (leaf ecukes
   :ensure t
@@ -8510,16 +8307,52 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
 
 (add-hook 'after-save-hook 'my-do-autoload-for-local-projects-files)
 
+(eval-when-compile
+  (require 'dash)
+  (require 's)
+  (require 'f))
+
+(defun my-move-all-straight-packages-files-into-dir (dest)
+  "Move all files of all installed and packages built with `straight' into DEST."
+  (interactive (list "~/.emacs.d/telpa"))
+  (f-mkdir-full-path dest)
+  (my-copy-files
+   (file-expand-wildcards (concat "~/.emacs.d/straight/build/" "*/*"))
+   dest)
+  (my-create-package-autoloads dest))
+
+(defun my-create-package-autoloads (dest)
+  "Create one file of package autoloads in the DEST from other autoloads files."
+  (let ((default-directory dest))
+    (with-temp-buffer
+      (->>
+       dest
+       directory-files
+       (--filter (s-suffix-p "-autoloads.el" it))
+       (mapc #'insert-file-contents))
+      (write-region (point-min) (point-max) (f-join dest "my-package-autoloads.el")))))
+
+(defun my-copy-files (files dest)
+  "Copy all FILES into the directory DEST."
+  (--each files
+    (if (f-dir-p it)
+        (ignore-errors
+          (copy-directory it
+                          (f-join dest (f-filename it))))
+      (copy-file it
+                 (f-join dest (f-filename it))
+                 'ok-if-exists))))
 
 
 
 ;;; my-writing-config.el ends here
-;;; build-config.el --- Join all my config files into one init.el -*- lexical-binding: t; -*-
+;;; my-focus.el --- My configuration of `focus' -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023 semenInRussia
+;; Copyright (C) 2022 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.0.1
+;; Version: 0.1
+;; Homepage: https://github.com/semeninrussia/emacs.el
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -8536,130 +8369,392 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
 
 ;;; Commentary:
 
-;; Join all my config files into one init.el.  I use this script to make one
-;; big init.el file which has more fast startup time.
-
-;; `build-config' command joins all modules files from the .emacs.d/lisp into one
-;; dist/my-modules.el and compile it.  When i start Emacs init.el files just
-;; require my-modules.el, my-autoloads.el and custom.el which have already
-;; byte-compiled (or even better NATIVE-compiled).  One big file instead of a lot
-;; of small is better in load time, because every `require` statement also take
-;; a bit of time.
+;; My configuration of `focus'.
 
 ;;; Code:
 
-;; NOTE that here i don't use external libraries like `dash' or `s', because I sometimes
-;; need to build configuration when old configuration was broken and `dash'/`s' haven't been loaded
-(require 'cl-lib)
 
-(defvar my-modules-el-file "~/.emacs.d/dist/my-modules.el")
-(defvar my-config-modules-prefix "~/.emacs.d/lisp/")
 
-(defvar my-modules-order
-  (list
-   "package-management/my-straight.el"
-   "package-management/my-leaf.el"
-   "package-management"
-   "misc/my-gcmh.el"
-   "my-libs.el"
-   "my-lib.el"
-   "editing"
-   "languages/lisps/my-lisp.el"
-   "languages/my-autoformat.el"
-   "languages"
-   "env"
-   "ui")
-  "Names of the directories and files that define an order to load.")
+(leaf focus
+  :ensure t
+  :custom-face (focus-unfocused . '((t :inherit shadow))))
 
-(defvar my-modules-files-ignore-regexps
-  '("/local-projects/" "/test/" "/features/" ".*-step\\.el" "/site-lisp/")
-  "List of the regexps that indicates that a file to load shouldn't be loaded.")
 
-(defun my-build-config ()
-  "Build my config."
-  (interactive)
-  (let ((default-directory (file-name-directory my-modules-el-file))
-        (compiled-file (concat my-modules-el-file "c")))
-    (message "Join config files...")
-    (my-join-modules-into-modules.el)
-    (print " done")
 
-    (when (file-exists-p compiled-file)
-      (delete-file compiled-file))
+;;; my-focus.el ends here
+;;; my-fonts.el --- My configuration for fonts
 
-    (message "Byte-compile my-modules.el...")
-    (byte-compile-file my-modules-el-file)
-    (print "done and start native-compile")
+;; Copyright (C) 2022, 2023 Semen Khramtsov
 
-    (native-compile-async (list my-modules-el-file))))
+;; Author: Semen Khramtsov <hrams205@gmail.com>
+;; Version: 0.1
+;; URL: https://github.com/semenInRussia/emacs.el
 
-(defun my-file-igored-as-module-p (filename)
-  "Return non-nil if a module at FILENAME can't be a configuration module."
-  (or
-   (not (string-suffix-p ".el" filename))
-   (cl-some
-    (lambda (regexp) (string-match-p regexp filename))
-    my-modules-files-ignore-regexps)))
+;; This file is not part of GNU Emacs.
 
-(defmacro my-remove-from (var elt)
-  "Remove an ELT from the list at VAR.
-The same to
-\(setq var (remove elt var))"
-  `(setq ,var (remove ,elt ,var)))
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
 
-(defun my-all-modules-files ()
-  "Return list of all modules filenames using `my-modules-order'."
-  (let ((order (mapcar
-                (lambda (it) (concat my-config-modules-prefix it))
-                my-modules-order))
-        order-item
-        (files (cl-remove-if
-                #'my-file-igored-as-module-p
-                (directory-files-recursively "~/.emacs.d/lisp" ".el$" nil)))
-        f
-        sorted)
-    (while order
-      (setq order-item (car order))
-      (setq order (cdr order))
-      (cond
-       ((file-directory-p order-item)
-        (setq sorted
-              (append sorted (cl-remove-if
-                              (lambda (f) (or (my-file-igored-as-module-p f)
-                                              (member f sorted)))
-                              (directory-files-recursively order-item ".el$")))))
-       (t
-        (setq sorted (append sorted (list order-item))))))
-    (while files
-      (setq f (car files))
-      (setq files (cdr files))
-      (unless (member f sorted)
-        (setq sorted (append sorted (list f)))))
-    sorted))
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
 
-(defvar my-config-modules-prefix "~/.emacs.d/lisp/")
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(defun my-join-modules-into-modules.el ()
-  "Join all configuration modules into one my-modules.el file."
-  (my-join-modules my-modules-el-file))
+;;; Commentary:
 
-(defun my-join-modules (dest)
-  "Join all configuration modules into one file with DEST filename."
-  (with-temp-buffer
-    (mapc #'insert-file-contents-literally (nreverse (my-all-modules-files)))
-    (goto-char (point-max))
-    (replace-regexp-in-region "^(provide 'my-[a-zA-Z-]*?)" "\n"
-                              (point-min)
-                              (point-max))
-    (replace-regexp-in-region "^(require 'my-[a-zA-Z-]*?)" "\n"
-                              (point-min)
-                              (point-max))
-    (insert "\n(provide 'my-modules)")
-    (delete-file dest)
-    (write-region (point-min) (point-max) dest)))
+;; My configuration for fonts
 
-(provide 'build-config)
-;;; build-config.el ends here
+;;; Code:
+
+
+(require 'dash)
+
+;; you can install this font, from the GitHub repo `nerd-fonts'
+(defcustom my-fonts-main
+  "JetBrains Mono"
+  "Name of the main font to display all."
+  :group 'my
+  :type 'string)
+
+(defcustom my-font-size
+  20
+  "Name of the main font to display all."
+  :group 'my
+  :type 'number)
+
+(set-face-attribute 'default nil
+                    :height (* my-font-size 10)
+                    :family my-fonts-main)
+
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-language-environment 'utf-8)
+(set-selection-coding-system 'utf-8)
+
+
+
+;;; my-fonts.el ends here
+;;; my-layout.el --- My settings to layout: paddings -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2023 semenInRussia
+
+;; Author: semenInRussia <hrams205@gmail.com>
+;; Version: 0.1
+;; Homepage: https://github.com/semeninrussia/emacs.el
+
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; My settings to layout: paddings
+
+;;; Code:
+
+(require 'disp-table)
+
+;; (setq default-frame-alist
+;;       (append (list
+;;                '(min-height . 1)
+;;                '(height     . 45)
+;;                '(min-width  . 1)
+;;                '(width      . 81)
+;;                '(vertical-scroll-bars . nil)
+;;                '(internal-border-width . 24)
+;;                '(left-fringe    . 1)
+;;                '(right-fringe   . 1)
+;;                '(tool-bar-lines . 0)
+;;                '(menu-bar-lines . 0))))
+
+;; on OSX, type the line below (in terminal) to get a 1 pixel border
+;; defaults write com.apple.universalaccess increaseContrast -bool YES
+
+;; To control anti-aliasing on OSX:
+;; defaults write org.gnu.Emacs AppleFontSmoothing -int 0 (none)
+;; defaults write org.gnu.Emacs AppleFontSmoothing -int 1 (light)
+;; defaults write org.gnu.Emacs AppleFontSmoothing -int 2 (medium)
+;; defaults write org.gnu.Emacs AppleFontSmoothing -int 3 (strong)
+
+;; Fall back font for glyph missing in Roboto
+(defface fallback '((t :family "Fira Code"
+                       :inherit 'nano-face-faded)) "Fallback")
+(set-display-table-slot standard-display-table 'truncation
+                        (make-glyph-code ?… 'fallback))
+(set-display-table-slot standard-display-table 'wrap
+                        (make-glyph-code ?? 'fallback))
+
+;; (set-fontset-font t nil "Fira Code" nil 'append)
+
+;; Fix bug on OSX in term mode & zsh (spurious % after each command)
+(add-hook 'term-mode-hook
+          (lambda () (setq buffer-display-table (make-display-table))))
+
+(setq inhibit-startup-screen t
+      inhibit-startup-message t
+      inhibit-startup-echo-area-message t
+      initial-scratch-message nil)
+
+;; (global-hl-line-mode 0)
+(setq x-underline-at-descent-line t)
+
+;; Vertical window divider
+(setq window-divider-default-right-width 24)
+(setq window-divider-default-places 'right-only)
+(window-divider-mode 1)
+
+;; No ugly button for checkboxes
+(setq widget-image-enable nil)
+
+;; Hide org markup for README
+(setq org-hide-emphasis-markers t)
+
+;; paddings
+(leaf spacious-padding
+  :ensure t
+  :global-minor-mode spacious-padding-mode)
+
+;;; my-layout.el ends here
+;;; my-load-theme --- Load the current theme
+
+;; Copyright (C) 2022 Semen Khramtsov
+
+;; Author: Semen Khramtsov <hrams205@gmail.com>
+;; Version: 0.1
+;; URL: https://github.com/semenInRussia/emacs.el
+
+;; This file is not part of GNU Emacs.
+
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;;; Code:
+;; See `doom-themes' (list of themes at starting comments)
+
+;; List of my favorite themes:
+;; - `doom-1337'.  The best one, I think
+;; - `gruber-darker'.  Cool, but `org-mode' and `vertico' are bad
+;; - `doom-monokai-classic'.  Cool
+;; - `solarized'
+;; - `flatland-theme'
+
+
+
+
+(setq font-lock-maximum-decoration t
+      truncate-partial-width-windows nil)
+
+(leaf doom-themes
+  :ensure t)
+
+(leaf gruber-darker-theme
+  :ensure t)
+
+(leaf monokai-theme
+  :ensure t)
+
+(leaf modus-themes
+  :custom ((modus-themes-bold-constructs . t)
+           (modus-themes-italic-constructs . t))
+  :config
+  (load-theme 'modus-operandi t)
+  (global-hl-line-mode))
+
+(leaf ef-themes
+  :require t
+  :config
+  (load-theme 'ef-cyprus t)
+  (global-hl-line-mode))
+
+;; (load-theme 'doom-1337 t)
+
+;; (custom-set-faces
+;;  `(region
+;;    ((t (:background "white")))))
+
+(setq line-spacing 0.2)
+
+
+
+;;; my-load-theme.el ends here
+;;; my-modeline.el --- My configuration for modeline
+
+;; Copyright (C) 2022 Semen Khramtsov
+
+;; Author: Semen Khramtsov <hrams205@gmail.com>
+;; Version: 0.1
+;; URL: https://github.com/semenInRussia/emacs.el
+
+;; This file is not part of GNU Emacs.
+
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; My configuration for modeline
+
+;;; Code:
+
+
+
+
+
+(leaf nerd-icons :ensure t)
+(leaf shrink-path :ensure t)
+
+(leaf doom-modeline
+  :ensure t
+  :ensure t
+  :custom (;; it looks like more nice
+           (doom-modeline-height . 48)
+           ;; enconding not useful I think.
+           (doom-modeline-buffer-encoding . nil)
+           ;; don't show directory names in `doom-modeline'
+           (doom-modeline-project-detection . 'project)
+           (doom-modeline-buffer-file-name-style . 'buffer-name))
+  :hook after-init-hook
+  :config
+  ;; I use Emacs in fullscreen mode, so I don't see time that provided
+  ;; by OS, so I need time in modeline.  EMACS IS MY OS!!!
+  ;; I need only to time (not date) in 24hour format
+  (defvar display-time-format) ;; make compile happy
+  (setq display-time-format "%H:%M")
+  (display-time-mode 1)
+
+  ;; disable show line and column numbers in modeline, because it only
+  ;; take off extra place
+  (column-number-mode 0)
+  (line-number-mode 0)
+
+  ;; show size of the file.  My Emacs don't show line numbers, but know about
+  ;; amount of text in the file is important
+  (size-indication-mode t))
+
+(define-minor-mode my-modeline-at-top-mode
+  "Place mode-line at the top of the screen."
+  :value nil
+  (if my-modeline-at-top-mode
+      (progn
+        (setq-default header-line-format mode-line-format)
+        (setq-default mode-line-format nil))
+    (setq-default mode-line-format header-line-format)
+    (setq header-line-format nil)))
+
+
+
+;;; my-modeline.el ends here
+;;; my-page-break-lines.el --- My config for `page-break-lines'
+
+;; Copyright (C) 2022 Semen Khramtsov
+
+;; Author: Semen Khramtsov <hrams205@gmail.com>
+;; Version: 0.1
+;; URL: https://github.com/semenInRussia/emacs.el
+
+;; This file is not part of GNU Emacs.
+
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; My config for `page-break-lines'
+
+;;; Code:
+
+
+
+(leaf page-break-lines
+  :ensure t
+  :global-minor-mode global-page-break-lines-mode)
+
+
+
+;;; my-page-break-lines.el ends here
+;;; my-prettify-mode.el --- My config for `prettify-mode'
+
+;; Copyright (C) 2022 Semen Khramtsov
+
+;; Author: Semen Khramtsov <hrams205@gmail.com>
+;; Version: 0.1
+;; URL: https://github.com/semenInRussia/emacs.el
+
+;; This file is not part of GNU Emacs.
+
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; My config for `prettify-mode'
+
+;;; Code:
+
+
+
+
+(leaf prog-mode :hook (LaTeX-mode-hook . prettify-symbols-mode))
+
+
+
+;;; my-prettify-mode.el ends here
 ;;; my-emacsclient.el --- My configuration of `emacsclient' -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022 semenInRussia
@@ -8687,7 +8782,15 @@ The same to
 
 ;;; Code:
 
-(add-hook 'emacs-startup-hook 'server-start)
+(declare-function server-running-p "server")
+
+(add-hook
+ 'emacs-startup-hook
+ (defun my-maybe-server-start ()
+   "Run the Emacs server if servers haven't been started."
+   (require 'server)
+   (unless (server-running-p)
+     (server-start))))
 
 
 
@@ -8727,59 +8830,5 @@ The same to
 
 
 ;;; my-info.el ends here
-;;; my-treesit.el --- My configuration of `treesit' -*- lexical-binding: t; -*-
-
-;; Copyright (C) 2022, 2023 semenInRussia
-
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; Homepage: https://github.com/semeninrussia/emacs.el
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-;;; Commentary:
-
-;; My configuration of `treesit'.
-
-;;; Code:
-
-
-
-(require 'fast-exec)
-
-
-(require 'dash)
-
-;; (leaf ts-fold
-;;   :ensure (ts-fold :type git :host github :repo "emacs-treesit/ts-fold")
-;;   :global-minor-mode global-ts-fold-mode
-;;   :defun ts-fold-toggle
-;;   :bind (:tree-sitter-mode-map
-;;          :package treesit
-;;          ([remap outline-hide-entry]      . 'ts-fold-close)
-;;          ([remap outline-show-entry]      . 'ts-fold-open)
-;;          ([remap my-outline-cycle-buffer] . 'ts-fold-close-all)
-;;          ([remap my-outline-cycle]        . 'my-ts-fold-toggle))
-;;   :config (defun my-ts-fold-toggle
-;;               ()
-;;             "Like on `ts-fold-toggle', but repeat at last keystrokes."
-;;             (interactive)
-;;             (ts-fold-toggle)
-;;             (repeat-at-last-keystroke)))
-
-
-
-;;; my-treesit.el ends here
 
 (provide 'my-modules)
