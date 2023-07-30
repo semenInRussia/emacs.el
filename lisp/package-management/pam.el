@@ -46,10 +46,12 @@
 ;;   sessions `straight' is extra dependency of `pam', `straight' will be loaded
 ;;   only when it's really imported.  It saves a little bit of time
 (autoload 'straight-use-package "straight")
+(autoload 'straight-get-recipe "straight")
 (autoload 'straight--build-dir "straight")
 (autoload 'straight-rebuild-package "straight")
 (eval-and-compile
   (defvar straight-use-package-post-build-functions)
+  (defvar straight--repo-cache)
   (require 'subr-x))
 
 
@@ -159,7 +161,18 @@ instead.  In any case, if NO-BUILD is non-nil, then processing halts here.
 Otherwise, the package is built and activated.  Note that if the package recipe
 has a nil `:build' entry, then NO-BUILD is ignored and processing always stops
 before building and activation occurs."
-  (interactive (read (read-string "Which recipe: ")))
+  (interactive (list
+                (completing-read
+                 "Which recipe? "
+                 (if pam-need-to-install-pkgs-p
+                     nil
+                   (straight-get-recipe
+                    (when current-prefix-arg 'interactive) nil
+                    (let ((installed nil))
+                      ;; Cache keys are :local-repo. We want to compare :package.
+                      (maphash (lambda (_ v) (push (plist-get v :package) installed))
+                               straight--repo-cache)
+                      (lambda (pkg) (not (member pkg installed)))))))))
   (if (not pam-need-to-install-pkgs-p)
       t
     (pam--with-straight-hooks
@@ -177,7 +190,9 @@ be passed to `straight-rebuild-package'
 Notice that while `pam-use-package' check the mode (install or only activate a
 package), but `pam-rebuild-package' don't it, because rebuild is a more concrete
 command."
-  (interactive (read (read-string "Which recipe to rebuild: ")))
+  (interactive (list
+                (completing-read "Which recipe to rebuild: "
+                                 (pam--straight-packages))))
   (pam--with-straight-hooks
     (straight-rebuild-package melpa-style-recipe recursive)))
 
