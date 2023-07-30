@@ -68,7 +68,9 @@ See `imenu-generic-expression'"
                               (setq-local
                                imenu-generic-expression
                                my-markdown-imenu-generic-expression)))
-  :config                               ;nofmt
+  :config
+  (add-hook 'markdown-mode-hook 'visual-line-mode)
+
   (leaf markdown-toc
     :ensure (markdown-mode :repo "jrblevin/markdown-mode" :host github)
     :bind (:markdown-mode-map
@@ -77,6 +79,8 @@ See `imenu-generic-expression'"
 
   (leaf edit-indirect
     :ensure (edit-indirect :repo "Fanael/edit-indirect" :host github))
+
+  (require 'my-autoformat)
 
   (my-autoformat-bind-for-major-mode
    'markdown-mode
