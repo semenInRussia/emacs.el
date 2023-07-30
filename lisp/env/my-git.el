@@ -67,7 +67,6 @@
 
 (leaf line-reminder
   :ensure (line-reminder :repo "emacs-vs/line-reminder" :host github)
-  :hook prog-mode-hook
   :custom ((line-reminder-bitmap . 'filled-rectangle)
            (line-reminder-show-option . 'indicators)))
 
