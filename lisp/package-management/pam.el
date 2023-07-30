@@ -49,7 +49,8 @@
 (autoload 'straight--build-dir "straight")
 (autoload 'straight-rebuild-package "straight")
 (eval-and-compile
-  (defvar straight-use-package-post-build-functions))
+  (defvar straight-use-package-post-build-functions)
+  (require 'subr-x))
 
 
 (defgroup pam nil
@@ -190,6 +191,30 @@ all commands of these packages, TeXinfo will be included in the manual."
   (add-to-list 'Info-default-directory-list (pam--build-dir))
   (load (pam--autoloads-file)))
 
+(defun pam-delete-package (pkg &optional update-autoloads)
+  "Remove the PKG from the `pam' directory.
+
+If UPDATE-AUTOLOADS is non-nil, then update my-packages-autoloads.el, NOTE that
+is a heavy function which can take a time, because it update autoloads for EVERY
+package"
+  (interactive
+   (list
+    (completing-read "Which package? " (pam--straight-packages))
+    'interactive))
+  (let ((default-directory (pam--build-dir)))
+    (thread-last
+      pkg
+      (straight--build-dir)
+      (directory-files)
+      (cddr)
+      (mapc #'delete-file))
+    ;; update the autoloads file for EVERY package, because delete only the part
+    ;; of my-package-autoloads is hard, if you should delete some `pam'
+    ;; packages, call `pam-delete-package' some times and only after manually
+    ;; call `pam-update-all-packages-autoloads'
+    (when update-autoloads
+      (pam-update-all-packages-autoloads))))
+
 (defun pam-sync-with-straight ()
   "Copy all `straight' packages files into the `pam' dir, make autoloads file.
 
@@ -198,6 +223,12 @@ Notice that it can take a long time."
   (delete-file (pam--autoloads-file))
   (dolist (pkg (pam--straight-packages))
     (pam--sync-straight-package pkg)))
+
+(defun pam-update-all-packages-autoloads ()
+  "Add autoloads of every package to my-packages-autoloads.el."
+  (delete-file (pam--autoloads-file))
+  (mapc #'pam--save-pkg-autoloads
+        (pam--straight-packages)))
 
 (defun pam-create-files ()
   "Make the `pam' build directory and touch the autoloads file."
