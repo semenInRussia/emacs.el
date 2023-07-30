@@ -891,9 +891,9 @@
 ;;; Code:
 
 (eval-and-compile
-  (add-to-list 'load-path "~/.emacs.d/local-projects")
   (add-to-list 'load-path "~/projects/fast-exec.el")
   (add-to-list 'load-path "~/projects/simple-indention.el")
+  (add-to-list 'load-path (locate-user-emacs-file "local-projects"))
   (add-to-list 'load-path (locate-user-emacs-file "site-lisp")))
 
 
@@ -947,10 +947,14 @@
 ;;   sessions `straight' is extra dependency of `pam', `straight' will be loaded
 ;;   only when it's really imported.  It saves a little bit of time
 (autoload 'straight-use-package "straight")
-(autoload 'straight--build-dir "straight")
+(autoload 'straight-get-recipe "straight")
 (autoload 'straight-rebuild-package "straight")
+(autoload 'straight-rebuild-all "straight")
+(autoload 'straight--build-dir "straight")
 (eval-and-compile
-  (defvar straight-use-package-post-build-functions))
+  (defvar straight-use-package-post-build-functions)
+  (defvar straight--repo-cache)
+  (require 'subr-x))
 
 
 (defgroup pam nil
@@ -962,7 +966,7 @@
   :group 'pam
   :type 'hook)
 
-(defcustom pam-build-dir "~/.emacs.d/pam/"
+(defcustom pam-build-dir (locate-user-emacs-file "pam/")
   "Path where all package files (and autoloads) are saved.
 
 Note that if you need in access the autoloads packages file use
@@ -1059,7 +1063,18 @@ instead.  In any case, if NO-BUILD is non-nil, then processing halts here.
 Otherwise, the package is built and activated.  Note that if the package recipe
 has a nil `:build' entry, then NO-BUILD is ignored and processing always stops
 before building and activation occurs."
-  (interactive (read (read-string "Which recipe: ")))
+  (interactive (list
+                (completing-read
+                 "Which recipe? "
+                 (if pam-need-to-install-pkgs-p
+                     nil
+                   (straight-get-recipe
+                    (when current-prefix-arg 'interactive) nil
+                    (let ((installed nil))
+                      ;; Cache keys are :local-repo. We want to compare :package.
+                      (maphash (lambda (_ v) (push (plist-get v :package) installed))
+                               straight--repo-cache)
+                      (lambda (pkg) (not (member pkg installed)))))))))
   (if (not pam-need-to-install-pkgs-p)
       t
     (pam--with-straight-hooks
@@ -1077,9 +1092,21 @@ be passed to `straight-rebuild-package'
 Notice that while `pam-use-package' check the mode (install or only activate a
 package), but `pam-rebuild-package' don't it, because rebuild is a more concrete
 command."
-  (interactive (read (read-string "Which recipe to rebuild: ")))
+  (interactive (list
+                (completing-read "Which recipe to rebuild: "
+                                 (pam--straight-packages))))
   (pam--with-straight-hooks
     (straight-rebuild-package melpa-style-recipe recursive)))
+
+(defun pam-rebuild-all ()
+  "Rebuild all installed packages.
+
+Notice that while `pam-use-package' check the mode (install or only activate a
+package), but `pam-rebuild-all' don't it, because rebuild is a more concrete
+command."
+  (interactive)
+  (pam--with-straight-hooks
+    (straight-rebuild-all)))
 
 (defun pam-activate ()
   "Activate all installed `pam' packages.
@@ -1091,6 +1118,30 @@ all commands of these packages, TeXinfo will be included in the manual."
   (add-to-list 'Info-default-directory-list (pam--build-dir))
   (load (pam--autoloads-file)))
 
+(defun pam-delete-package (pkg &optional update-autoloads)
+  "Remove the PKG from the `pam' directory.
+
+If UPDATE-AUTOLOADS is non-nil, then update my-packages-autoloads.el, NOTE that
+is a heavy function which can take a time, because it update autoloads for EVERY
+package"
+  (interactive
+   (list
+    (completing-read "Which package? " (pam--straight-packages))
+    'interactive))
+  (let ((default-directory (pam--build-dir)))
+    (thread-last
+      pkg
+      (straight--build-dir)
+      (directory-files)
+      (cddr)
+      (mapc #'delete-file))
+    ;; update the autoloads file for EVERY package, because delete only the part
+    ;; of my-package-autoloads is hard, if you should delete some `pam'
+    ;; packages, call `pam-delete-package' some times and only after manually
+    ;; call `pam-update-all-packages-autoloads'
+    (when update-autoloads
+      (pam-update-all-packages-autoloads))))
+
 (defun pam-sync-with-straight ()
   "Copy all `straight' packages files into the `pam' dir, make autoloads file.
 
@@ -1099,6 +1150,12 @@ Notice that it can take a long time."
   (delete-file (pam--autoloads-file))
   (dolist (pkg (pam--straight-packages))
     (pam--sync-straight-package pkg)))
+
+(defun pam-update-all-packages-autoloads ()
+  "Add autoloads of every package to my-packages-autoloads.el."
+  (delete-file (pam--autoloads-file))
+  (mapc #'pam--save-pkg-autoloads
+        (pam--straight-packages)))
 
 (defun pam-create-files ()
   "Make the `pam' build directory and touch the autoloads file."
@@ -1720,7 +1777,7 @@ which should be evaluated"
   :ensure (apheleia :repo "radian-software/apheleia"
                     :host github)
   :defvar (apheleia-formatters apheleia-mode-alist)
-  :hook (;; I construct a hook list from the `apheleia-mode-alist' variable ;;
+  :hook (;; I construct a hook list from the `apheleia-mode-alist' variable
          ;; it's better than a `apheleia-global-mode', because it will be loaded after the
          ;; major mode is entered
          ;;
@@ -1982,7 +2039,6 @@ which should be evaluated"
 
 (require 'f)   ; for `f-full'
 
-
 (leaf compat
   :ensure (compat :repo "emacs-straight/compat" :host github))
 
@@ -2004,7 +2060,9 @@ which should be evaluated"
            ;; by default to run `corfu' you should press `C-M-i'
            (corfu-auto . t)
            ;; I don't like 0sec, because it bad for yasnippets
-           (corfu-auto-delay . 0.4))
+           (corfu-auto-delay . 0.4)
+           ;; when `line-spacing' changed, the default `corfu-count' (10) is bad
+           (corfu-count . 5))
   :config
   ;; `completion-in-region-function' was already changed, but
   ;; `global-corfu-mode' enable auto complete, if `corfu-auto' is non-nil
@@ -2024,15 +2082,13 @@ which should be evaluated"
     :commands kind-icon-margin-formatter
     :defvar corfu-margin-formatters
     :custom ((kind-icon-use-icons . t)
-             ;; don't show the extra space between icon and text
-             (kind-icon-extra-space . nil)
              ;; show the icons with the white or other theme background color
              (kind-icon-default-face . 'corfu-default)
              (kind-icon-blend-background . nil)
              ;; when an icons isn't known show the completion without icon
              ;;
              ;; (default is to show ??? with the red background)
-             (kind-icon--unknown . " ")
+             (kind-icon--unknown . "  ")
              ;; use the same as a symbol size for icons
              (kind-icon-default-style . `(
                                           :padding 0
@@ -2040,18 +2096,14 @@ which should be evaluated"
                                           :margin 0
                                           :radius 0
                                           :height 0.5
-                                          :width 0.1
                                           :scale 1)))
     :init (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)))
 
-;; misc
-
 (leaf cape
   :ensure (cape :repo "minad/cape" :host github)
-  :require t
-  ;; I'm using the file from the following GitHub repository
+  ;; I'm using the file from the following GitHub repository:
   ;; https://github.com/dwyl/english-words/
-  :custom `(cape-dict-file . ,(f-full "~/.emacs.d/dict/english.txt"))
+  :custom `(cape-dict-file . ,(f-full (locate-user-emacs-file "dict/english.txt")))
   :defun (cape-symbol
           cape-dabbrev cape-file cape-elisp-block cape-history
           cape-keyword cape-sgml cape-tex cape-abbrev cape-symbol)
@@ -3635,6 +3687,7 @@ List of racket expressions in which this function should work:
 ;; load `citar', but for `embark'
 (leaf citar
   :ensure t
+  :init (add-to-list 'completion-at-point-functions 'citar-capf)
   :hook (org-mode-hook . citar-capf-setup)
   :bind (:org-mode-map
          :package org
@@ -4889,7 +4942,9 @@ See `imenu-generic-expression'"
   (add-hook 'org-mode-hook 'aas-activate-for-major-mode)
 
   (leaf my-org-editing
-    :bind (("C-c M-i"   . my-org-insert-image)
+    :bind (:org-mode-map
+           :package org
+           ("C-c M-i"   . my-org-insert-image)
            ("C-c M-u"   . my-org-insert-img-at-url)
            ("C-c C-w"   . my-org-cut)
            ("C-c C-M-w" . my-org-clear-subtree)
@@ -4921,34 +4976,33 @@ See `imenu-generic-expression'"
     (leaf ox-json
       :ensure (ox-json :repo "jlumpe/ox-json" :host github)
       :commands (ox-json-export-to-buffer
-                 ox-json-export-to-file
-                 ox-json--merge-alists)
+                 ox-json-export-to-file)
       :after ox
+      ;; load after `ox' (`org-export')
       :init
       (org-export-define-backend 'json
-        ;; Transcoders
-        (ox-json--merge-alists
-         '(
-           (template . ox-json-transcode-template)
-           (plain-text . ox-json-transcode-plain-text)
-           (headline . ox-json-transcode-headline)
-           (link . ox-json-transcode-link)
-           (timestamp . ox-json-transcode-timestamp))
-         (cl-loop for type in (append org-element-all-elements org-element-all-objects)
-                  collect (cons type #'ox-json-transcode-base)))
-        ;; Filters
-        :filters-alist '()
-        ;; Options
-        :options-alist
-        '((:json-data-type-property nil "json-data-type-property" "$$data_type")
-          (:json-exporters nil nil nil)
-          (:json-property-types nil nil nil)
-          (:json-strict nil nil nil)
-          (:json-include-extra-properties nil nil t))
-        ;; Menu
-        :menu-entry
-        '(?j "Export to JSON" ((?J "As JSON buffer" ox-json-export-to-buffer)
-                               (?j "To JSON file" ox-json-export-to-file))))))
+                                 ;; Transcoders
+                                 (append
+                                  '((template . ox-json-transcode-template)
+                                    (plain-text . ox-json-transcode-plain-text)
+                                    (headline . ox-json-transcode-headline)
+                                    (link . ox-json-transcode-link)
+                                    (timestamp . ox-json-transcode-timestamp))
+                                  (cl-loop for type in (append org-element-all-elements org-element-all-objects)
+                                           collect (cons type #'ox-json-transcode-base)))
+                                 ;; Filters
+                                 :filters-alist '()
+                                 ;; Options
+                                 :options-alist
+                                 '((:json-data-type-property nil "json-data-type-property" "$$data_type")
+                                   (:json-exporters nil nil nil)
+                                   (:json-property-types nil nil nil)
+                                   (:json-strict nil nil nil)
+                                   (:json-include-extra-properties nil nil t))
+                                 ;; Menu
+                                 :menu-entry
+                                 '(?j "Export to JSON" ((?J "As JSON buffer" ox-json-export-to-buffer)
+                                                        (?j "To JSON file" ox-json-export-to-file))))))
 
   ;; remove some useless things from the current `org-mode' buffer
   (leaf my-org-do-tidy
@@ -6438,6 +6492,8 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
 
 (require 'dash)
 
+(eval-and-compile
+  (require 'my-macros))
 
 ;; some useful things:
 ;;
@@ -6501,6 +6557,10 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
     :ensure t
     :hook (embark-collect-mode-hook . consult-preview-at-point-mode))
 
+  ;; don't suggest `recentf' files in `consult-buffer'
+  (remove-from-list! consult-buffer-sources
+                     'consult--source-recent-file)
+
   ;; the following lines fix some things which are wrong in my emacs@29
   (defvar string-width 0)
 
@@ -6543,7 +6603,7 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
   :ensure t
   :defun cowsay--get-default-cow
   :defvar cowsay-cows
-  :custom (cowsay-directories . '("~/.emacs.d/cows"))
+  :custom `(cowsay-directories . (list (locate-user-emacs-file "cows")))
   :defer-config (cowsay-load-cows)
   :fast-exec (("Cow Say String..."  'cowsay-string)
               ("Cow Say Region..."  'cowsay-region)
@@ -7469,10 +7529,6 @@ If the ARG is non-nil, then enable the mode, otherwise disable it."
   :config                               ;nofmt
   (org-roam-db-autosync-mode t)
 
-  (with-eval-after-load 'Info
-    (add-to-list 'Info-directory-list
-                 (f-full "~/.emacs.d/straight/repos/org-roam/doc")))
-
   ;; (require 'org-roam-export)
   ;; (require 'org-roam-protocol)
 
@@ -7735,69 +7791,12 @@ Format of time is the list form the hours, minutes, seconds and zero?"
 
 
 (leaf recentf
-  :global-minor-mode recentf-mode)
+  :global-minor-mode recentf-mode
+  :bind ("C-c r" . recentf))
 
 
 
 ;;; my-recentf.el ends here
-;;; my-smartkeys.el --- Some key bindings which depends on context -*- lexical-binding: t; -*-
-
-;; Copyright (C) 2022 semenInRussia
-
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.0.1
-;; Package-Requires: ((dash "2.18.0") (s "1.12.0"))
-;; Homepage: https://github.el/semenInRussia/emacs.el
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-;;; Commentary:
-
-;; Some key bindings which depends on context.
-
-;;; Code:
-
-
-
-(declare-function sp-kill-whole-line "smartparens.el")
-(declare-function sp-splice-sexp "smartparens.el")
-
-
-
-
-(eval-after-load 'smartparens
-  '(progn
-     (require 'smartparens)
-     (defun my-kill-line-or-region ()
-       "Call `kill-region' if region is active, otherwise `sp-kill-whole-line'"
-       (interactive)
-       (if (use-region-p)
-           (kill-region (region-beginning) (region-end))
-         (sp-kill-whole-line)))
-
-     (defun my-exchange-point-and-mark-or-splice-sexp ()
-       "Call `exchange-point-and-mark' if active region else `sp-splice-sexp'."
-       (interactive)
-       (if (use-region-p) (exchange-point-and-mark) (sp-splice-sexp)))
-
-     (leaf-keys
-      ("C-x C-x" . my-exchange-point-and-mark-or-splice-sexp)
-      ("C-w" . my-kill-line-or-region))))
-
-
-
-;;; my-smartkeys.el ends here
 ;;; my-speed-type.el --- My configuration of `speed-type' -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022 semenInRussia
@@ -8094,6 +8093,7 @@ hard work to don't do it when user type a text."
                    :repo "minad/vertico"
                    :files ("*.el" "extensions/*.el"))
   :commands vertico--advice
+  :custom (vertico-count . 6)
   ;; it's part of `vertico-mode'
   :init
   (advice-add 'completing-read-default :around #'vertico--advice)
@@ -8290,8 +8290,8 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
 (defun my-do-autoload-for-local-projects-files ()
   "If the opened file is a \"local projects\", make the directory autoloads."
   (interactive)
-  (let ((dir (f-full "~/.emacs.d/lisp/local-projects/"))
-        (out (f-full "~/.emacs.d/lisp/local-projects/my-autoload.el"))
+  (let ((dir (f-full (locate-user-emacs-file "lisp/local-projects/")))
+        (out (f-full (locate-user-emacs-file "lisp/local-projects/my-autoload.el")))
         flycheck-files)
     (when (string-prefix-p dir (f-full (buffer-file-name)))
       (->>
@@ -8311,26 +8311,6 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
   (require 'dash)
   (require 's)
   (require 'f))
-
-(defun my-move-all-straight-packages-files-into-dir (dest)
-  "Move all files of all installed and packages built with `straight' into DEST."
-  (interactive (list "~/.emacs.d/telpa"))
-  (f-mkdir-full-path dest)
-  (my-copy-files
-   (file-expand-wildcards (concat "~/.emacs.d/straight/build/" "*/*"))
-   dest)
-  (my-create-package-autoloads dest))
-
-(defun my-create-package-autoloads (dest)
-  "Create one file of package autoloads in the DEST from other autoloads files."
-  (let ((default-directory dest))
-    (with-temp-buffer
-      (->>
-       dest
-       directory-files
-       (--filter (s-suffix-p "-autoloads.el" it))
-       (mapc #'insert-file-contents))
-      (write-region (point-min) (point-max) (f-join dest "my-package-autoloads.el")))))
 
 (defun my-copy-files (files dest)
   "Copy all FILES into the directory DEST."
@@ -8582,23 +8562,21 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
 (leaf modus-themes
   :custom ((modus-themes-bold-constructs . t)
            (modus-themes-italic-constructs . t))
-  :config
-  (load-theme 'modus-operandi t)
-  (global-hl-line-mode))
+  :config (global-hl-line-mode))
 
 (leaf ef-themes
+  :ensure t
   :require t
-  :config
-  (load-theme 'ef-cyprus t)
-  (global-hl-line-mode))
+  :config (global-hl-line-mode))
 
 ;; (load-theme 'doom-1337 t)
 
-;; (custom-set-faces
-;;  `(region
-;;    ((t (:background "white")))))
+;; I load `modus-operandi' before, because it redefines some nice faces, for
+;; example border for modelie
+(load-theme 'modus-operandi t)
+(load-theme 'ef-cyprus t)
 
-(setq line-spacing 0.2)
+(setq-default line-spacing 0.1)
 
 
 
@@ -8830,5 +8808,44 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
 
 
 ;;; my-info.el ends here
+;;; my-macros.el --- Some useful macros which was inspide with Doomemacs -*- lexical-binding: t -*-
+;; Copyright (C) 2023 semenInRussia
+
+;;; Commentary:
+
+;; Define some useful macros, each of them ends with ! (inspired with Doomemacs).
+;;
+;; NOTE that here I don't use the libraries like `dash' or `s', because the
+;; macros must can be used in init.el
+
+;;; Code:
+
+(defmacro remove-from-list! (list-var &rest elements)
+  "Add ELEMENTS to LIST-VAR.
+
+If element is already inside LIST-VAR, then don't add.  NOTE that LIST-VAR
+should be quoted."
+  (cons
+   'progn
+   (mapcar
+    (lambda (el)
+      `(setq ,list-var (delete ,el ,list-var)))
+    elements)))
+
+(defmacro add-to-list! (list-var &rest elements)
+  "Add ELEMENTS to LIST-VAR.
+
+If element is already inside LIST-VAR, then don't add.  NOTE that LIST-VAR
+should be quoted."
+  (cons
+   'progn
+   (mapcar
+    (lambda (el)
+      `(add-to-list ,list-var ,el))
+    elements)))
+
+
+
+;;; my-macros.el ends here
 
 (provide 'my-modules)

@@ -53,6 +53,7 @@
   :config (global-hl-line-mode))
 
 (leaf ef-themes
+  :ensure t
   :require t
   :config (global-hl-line-mode))
 

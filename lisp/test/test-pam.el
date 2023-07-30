@@ -15,8 +15,7 @@
 (defvar test-pam-path
   (file-name-concat
    (directory-file-name
-    (file-name-directory (or load-file-name
-                             "~/.emacs.d/lisp/package-management/pam.el")))
+    (file-name-directory (or load-file-name (buffer-file-name))))
    "sandbox")
   "Path to tests directory.")
 

@@ -26,9 +26,8 @@
 ;; `dash'/`s' haven't been loaded
 (require 'cl-lib)
 
-;; TODO: don't depend on the place of config (here ~/.emacs.d/)
-(defvar my-modules-el-file "~/.emacs.d/dist/my-modules.el")
-(defvar my-config-modules-prefix "~/.emacs.d/lisp/")
+(defvar my-modules-el-file (locate-user-emacs-file "dist/my-modules.el"))
+(defvar my-config-modules-prefix (locate-user-emacs-file "lisp/"))
 
 
 (defvar my-modules-order
@@ -47,7 +46,7 @@
   "Names of the directories and files that define an order to load.")
 
 (defvar my-modules-files-ignore-regexps
-  '("/local-projects/" "/test/" "/features/" ".*-step\\.el" "/site-lisp/")
+  '("/local-projects/" "/test/" "/features/" ".*-step\\.el" "/site-lisp/" "/sandbox/")
   "List of the regexps that indicates that a file to load shouldn't be loaded.")
 
 ;;;###autoload
@@ -58,7 +57,7 @@
     (my-join-modules-into-modules.el)
     (byte-compile-file my-modules-el-file)
     (native-compile-async (list my-modules-el-file))
-    (byte-compile-file "~/.emacs.d/lisp/local-projects/my-autoload.el")))
+    (byte-compile-file (locate-user-emacs-file "lisp/local-projects/my-autoload.el"))))
 
 (defun my-file-igored-as-module-p (filename)
   "Return non-nil if a module at FILENAME can't be a configuration module."
@@ -88,7 +87,7 @@ The same to
         order-item
         (files (cl-remove-if
                 #'my-file-igored-as-module-p
-                (directory-files-recursively "~/.emacs.d/lisp" "my-.*\\.el$" nil)))
+                (directory-files-recursively (locate-user-emacs-file "lisp") "my-.*\\.el$" nil)))
         f
         sorted)
     (while order

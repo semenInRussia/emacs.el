@@ -33,6 +33,7 @@
 ;; load `citar', but for `embark'
 (leaf citar
   :ensure t
+  :init (add-to-list 'completion-at-point-functions 'citar-capf)
   :hook (org-mode-hook . citar-capf-setup)
   :bind (:org-mode-map
          :package org

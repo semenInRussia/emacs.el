@@ -117,8 +117,8 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
 (defun my-do-autoload-for-local-projects-files ()
   "If the opened file is a \"local projects\", make the directory autoloads."
   (interactive)
-  (let ((dir (f-full "~/.emacs.d/lisp/local-projects/"))
-        (out (f-full "~/.emacs.d/lisp/local-projects/my-autoload.el"))
+  (let ((dir (f-full (locate-user-emacs-file "lisp/local-projects/")))
+        (out (f-full (locate-user-emacs-file "lisp/local-projects/my-autoload.el")))
         flycheck-files)
     (when (string-prefix-p dir (f-full (buffer-file-name)))
       (->>
@@ -138,26 +138,6 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
   (require 'dash)
   (require 's)
   (require 'f))
-
-(defun my-move-all-straight-packages-files-into-dir (dest)
-  "Move all files of all installed and packages built with `straight' into DEST."
-  (interactive (list "~/.emacs.d/telpa"))
-  (f-mkdir-full-path dest)
-  (my-copy-files
-   (file-expand-wildcards (concat "~/.emacs.d/straight/build/" "*/*"))
-   dest)
-  (my-create-package-autoloads dest))
-
-(defun my-create-package-autoloads (dest)
-  "Create one file of package autoloads in the DEST from other autoloads files."
-  (let ((default-directory dest))
-    (with-temp-buffer
-      (->>
-       dest
-       directory-files
-       (--filter (s-suffix-p "-autoloads.el" it))
-       (mapc #'insert-file-contents))
-      (write-region (point-min) (point-max) (f-join dest "my-package-autoloads.el")))))
 
 (defun my-copy-files (files dest)
   "Copy all FILES into the directory DEST."

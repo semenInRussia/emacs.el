@@ -65,7 +65,7 @@
   :group 'pam
   :type 'hook)
 
-(defcustom pam-build-dir "~/.emacs.d/pam/"
+(defcustom pam-build-dir (locate-user-emacs-file "pam/")
   "Path where all package files (and autoloads) are saved.
 
 Note that if you need in access the autoloads packages file use

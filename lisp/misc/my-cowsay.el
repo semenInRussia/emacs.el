@@ -30,7 +30,7 @@
   :ensure t
   :defun cowsay--get-default-cow
   :defvar cowsay-cows
-  :custom (cowsay-directories . '("~/.emacs.d/cows"))
+  :custom `(cowsay-directories . (list (locate-user-emacs-file "cows")))
   :defer-config (cowsay-load-cows)
   :fast-exec (("Cow Say String..."  'cowsay-string)
               ("Cow Say Region..."  'cowsay-region)

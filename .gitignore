@@ -22,3 +22,4 @@ xenops/
 /bookmarks
 /.cache/
 /.org-id-locations
+/lisp/package-management/sandbox/

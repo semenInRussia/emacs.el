@@ -26,6 +26,7 @@
 
 (require 'org)
 
+
 ;;;###autoload
 (defun my-org-clear-subtree ()
   "Kill subtree at the position, and activate insertion mode."

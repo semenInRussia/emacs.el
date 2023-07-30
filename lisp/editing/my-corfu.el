@@ -94,7 +94,7 @@
   :ensure (cape :repo "minad/cape" :host github)
   ;; I'm using the file from the following GitHub repository:
   ;; https://github.com/dwyl/english-words/
-  :custom `(cape-dict-file . ,(f-full "~/.emacs.d/dict/english.txt"))
+  :custom `(cape-dict-file . ,(f-full (locate-user-emacs-file "dict/english.txt")))
   :defun (cape-symbol
           cape-dabbrev cape-file cape-elisp-block cape-history
           cape-keyword cape-sgml cape-tex cape-abbrev cape-symbol)

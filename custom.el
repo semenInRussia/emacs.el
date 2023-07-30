@@ -84,11 +84,17 @@
       (path-separator . ":")
       (null-device . "/dev/null"))))
  '(custom-safe-themes
-   '("f03004fbcff53479b80cd335851a92f1ea9e912b46c41ae6528227349ffe78b0" default)))
+   '("6b374f3c5f7bd457399af65bae738671205f4dbc54299817b8a94599dab386f6" "c0fe7e641d584b8d38e4d1b91c916530022d51e80f301c4d2387da67cfe7cef8" "6e584e8baa6fce967dcaf6ca6b3b19c924b30d634c384e599956c8c73582a0d9" "f03004fbcff53479b80cd335851a92f1ea9e912b46c41ae6528227349ffe78b0" default))
+ '(safe-local-variable-values '((git-commit-major-mode . git-commit-elisp-text-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(focus-unfocused ((t :inherit shadow)) nil "Customized with leaf in `focus' block at `c:/Users/hrams/AppData/Local/Temp/emacs-async-comp-my-focus-uNtIpz.el'")
- '(region ((t (:background "white" :foreground "black" :inherit t)))))
+ '(eglot-highlight-symbol-face ((t (:inherit lazy-highlight))) nil "Customized with leaf in `eglot' block")
+ '(eldoc-box-body ((t :background "#2E3440")) nil "Customized with leaf in `eldoc-box' block")
+ '(focus-unfocused ((t :inherit shadow)) nil "Customized with leaf in `focus' block")
+ '(fringe ((t :background "SystemWindow")))
+ '(window-divider ((t :background "SystemWindow" :foreground "SystemWindow")))
+ '(window-divider-first-pixel ((t :background "SystemWindow" :foreground "SystemWindow")))
+ '(window-divider-last-pixel ((t :background "SystemWindow" :foreground "SystemWindow"))))

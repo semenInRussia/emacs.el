@@ -47,6 +47,13 @@
            (org-agenda-span . 14))
   :bind ("C-c a" . org-agenda))
 
+(leaf nano-agenda
+  :ensure t
+  :after org-agenda
+  :bind (:org-agenda-keymap
+         :package org-agenda
+         ("a" . nano-agenda)))
+
 (leaf org-capture
   :bind ("C-c z c" . org-capture)
   :custom ((org-capture-templates

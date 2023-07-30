@@ -48,10 +48,6 @@
   :config                               ;nofmt
   (org-roam-db-autosync-mode t)
 
-  (with-eval-after-load 'Info
-    (add-to-list 'Info-directory-list
-                 (f-full "~/.emacs.d/straight/repos/org-roam/doc")))
-
   ;; (require 'org-roam-export)
   ;; (require 'org-roam-protocol)
 

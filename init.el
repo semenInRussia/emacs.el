@@ -18,13 +18,13 @@
 
 ;; add some files into the `load-path' that config files can require theme and
 ;; byte-compiler will be happy
-(add-to-list 'load-path "~/.emacs.d/lisp/package-management/")
-(add-to-list 'load-path "~/.emacs.d/lisp/")
+(add-to-list 'load-path (locate-user-emacs-file "lisp/package-management/"))
+(add-to-list 'load-path (locate-user-emacs-file "lisp/"))
 
 ;;; Local Projects
 ;; It is my own small "packages" which aren't so big to create real packages
 (add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects"))
-(load "~/.emacs.d/lisp/local-projects/my-autoload")
+(load (locate-user-emacs-file "lisp/local-projects/my-autoload"))
 
 ;;; add to `load-path' all installed packages
 ;;
@@ -43,7 +43,7 @@
 (require 'pam)
 (pam-activate)
 
-;; don't use .emacs.d for custom.el which I don't use
+;; don't use init.el for custom.el which I don't use
 ;;
 ;; in the most of configurations, after it Emacs load custom.el, but I fount it
 ;; a bit useless.  I prefer `setq' over `custom'
@@ -118,7 +118,7 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
 
 ;; the most part of the config located inside "~/.emacs.d/lisp" I join all .el
 ;; files into the my-modules file for fast start up
-(defvar my-modules-el-file "~/.emacs.d/dist/my-modules.el")
+(defvar my-modules-el-file (locate-user-emacs-file "dist/my-modules.el"))
 
 (unless (file-exists-p (file-name-directory my-modules-el-file))
   (user-error "File \"my-modules.el\" didn't created, suggest use --modules option"))
@@ -130,6 +130,7 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
 
 (declare-function nano-agenda "nano-agenda")
 (declare-function my-require-times "init")
+(declare-function my-build-config "my-build-config.el")
 (declare-function org-roam-node-find "org-roam")
 
 ;; handle some Command Line Arguments
