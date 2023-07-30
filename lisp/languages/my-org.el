@@ -102,33 +102,34 @@
     :config
     (leaf ox-json
       :ensure (ox-json :repo "jlumpe/ox-json" :host github)
-      :commands (ox-json-export-to-buffer ox-json-export-to-file)
+      :commands (ox-json-export-to-buffer
+                 ox-json-export-to-file)
       :after ox
+      ;; load after `ox' (`org-export')
       :init
       (org-export-define-backend 'json
-                                 ;; Transcoders
-                                 (ox-json--merge-alists
-                                  '(
-                                    (template . ox-json-transcode-template)
-                                    (plain-text . ox-json-transcode-plain-text)
-                                    (headline . ox-json-transcode-headline)
-                                    (link . ox-json-transcode-link)
-                                    (timestamp . ox-json-transcode-timestamp))
-                                  (cl-loop for type in (append org-element-all-elements org-element-all-objects)
-                                           collect (cons type #'ox-json-transcode-base)))
-                                 ;; Filters
-                                 :filters-alist '()
-                                 ;; Options
-                                 :options-alist
-                                 '((:json-data-type-property nil "json-data-type-property" "$$data_type")
-                                   (:json-exporters nil nil nil)
-                                   (:json-property-types nil nil nil)
-                                   (:json-strict nil nil nil)
-                                   (:json-include-extra-properties nil nil t))
-                                 ;; Menu
-                                 :menu-entry
-                                 '(?j "Export to JSON" ((?J "As JSON buffer" ox-json-export-to-buffer)
-                                                        (?j "To JSON file" ox-json-export-to-file))))))
+        ;; Transcoders
+        (append
+         '((template . ox-json-transcode-template)
+           (plain-text . ox-json-transcode-plain-text)
+           (headline . ox-json-transcode-headline)
+           (link . ox-json-transcode-link)
+           (timestamp . ox-json-transcode-timestamp))
+         (cl-loop for type in (append org-element-all-elements org-element-all-objects)
+                  collect (cons type #'ox-json-transcode-base)))
+        ;; Filters
+        :filters-alist '()
+        ;; Options
+        :options-alist
+        '((:json-data-type-property nil "json-data-type-property" "$$data_type")
+          (:json-exporters nil nil nil)
+          (:json-property-types nil nil nil)
+          (:json-strict nil nil nil)
+          (:json-include-extra-properties nil nil t))
+        ;; Menu
+        :menu-entry
+        '(?j "Export to JSON" ((?J "As JSON buffer" ox-json-export-to-buffer)
+                               (?j "To JSON file" ox-json-export-to-file))))))
 
   ;; remove some useless things from the current `org-mode' buffer
   (leaf my-org-do-tidy
