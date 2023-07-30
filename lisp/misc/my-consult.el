@@ -29,7 +29,8 @@
 (require 'my-leaf)
 (require 'dash)
 
-(declare-function remove-from-list! "init")
+(eval-and-compile
+  (require 'my-macros))
 
 ;; some useful things:
 ;;

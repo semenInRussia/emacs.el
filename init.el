@@ -126,29 +126,7 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
 (add-to-list 'load-path (file-name-directory my-modules-el-file))
 
 ;; some useful macros
-(defmacro remove-from-list! (list-var &rest elements)
-  "Add ELEMENTS to LIST-VAR.
-
-If element is already inside LIST-VAR, then don't add.  NOTE that LIST-VAR
-should be quoted."
-  (cons
-   'progn
-   (mapcar
-    (lambda (el)
-      `(setq ,list-var (delete ,el ,list-var)))
-    elements)))
-
-(defmacro add-to-list! (list-var &rest elements)
-  "Add ELEMENTS to LIST-VAR.
-
-If element is already inside LIST-VAR, then don't add.  NOTE that LIST-VAR
-should be quoted."
-  (cons
-   'progn
-   (mapcar
-    (lambda (el)
-      `(add-to-list ,list-var ,el))
-    elements)))
+(require 'my-macros)
 
 (declare-function nano-agenda "nano-agenda")
 (declare-function my-require-times "init")
