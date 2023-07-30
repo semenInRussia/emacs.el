@@ -29,6 +29,7 @@
 (require 'my-leaf)
 (require 'dash)
 
+(declare-function remove-from-list! "init")
 
 ;; some useful things:
 ;;
@@ -91,6 +92,10 @@
   (leaf embark-consult
     :ensure t
     :hook (embark-collect-mode-hook . consult-preview-at-point-mode))
+
+  ;; don't suggest `recentf' files in `consult-buffer'
+  (remove-from-list! consult-buffer-sources
+                     'consult--source-recent-file)
 
   ;; the following lines fix some things which are wrong in my emacs@29
   (defvar string-width 0)

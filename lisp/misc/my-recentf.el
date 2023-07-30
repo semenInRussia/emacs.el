@@ -28,7 +28,8 @@
 
 
 (leaf recentf
-  :global-minor-mode recentf-mode)
+  :global-minor-mode recentf-mode
+  :bind ("C-c r" . recentf))
 
 (provide 'my-recentf)
 ;;; my-recentf.el ends here
