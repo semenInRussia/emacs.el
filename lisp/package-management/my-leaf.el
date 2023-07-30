@@ -663,7 +663,7 @@
                   ;; `require' macros needed in `eval-and-compile'
                   (eval-and-compile (require 'fast-exec))
                   (fast-exec-bind ',name
-                                  (fast-exec-make-some-commands ,@bindings)))
+                    (fast-exec-make-some-commands ,@bindings)))
                 ,@leaf--body))
             :leaf-defer
             (let*
@@ -787,7 +787,7 @@
                                      ;;
                                      ;; the main reason is speed, it speed up my
                                      ;; config in 2.4 times!!! (17secs => 7secs)
-                                     (:custom . :setq))))
+                                     (:custom . :pre-setq))))
 
   (my-leaf-keywords-init))
 
