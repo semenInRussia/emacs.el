@@ -31,9 +31,20 @@ NOTE that it changes the `default-directory', you can don't use full paths."
            (pam-build-dir (file-name-concat test-pam-path "pam"))
            (pam-autoloads-filename "my-packages-autoloads.el")
            ;; setup `straight'
+           (straight-build-cache-fixed-name (make-hash-table :test 'equal))
+           (straight--recipe-cache (make-hash-table :test 'equal))
+           (straight--repo-cache (make-hash-table :test 'equal))
+           (straight--profile-cache (make-hash-table :test 'equal))
+           (straight--recipe-lookup-cache (make-hash-table :test 'equal))
+           (straight--profile-cache-valid (make-hash-table :test 'equal))
+           (straight-cache-autoloads (make-hash-table :test 'equal))
+           (straight--build-cache (make-hash-table :test 'equal))
+           (straight--autoloads-cache (make-hash-table :test 'equal))
+           (straight--cached-package-modifications (make-hash-table :test 'equal))
+           (straight--success-cache (make-hash-table :test 'equal))
            (straight-base-dir test-pam-path)
-           (straight--build-cache (make-hash-table))
-           (straight--autoloads-cache (make-hash-table)))
+           (straight--build-cache (make-hash-table :test 'equal))
+           (straight--autoloads-cache (make-hash-table :test 'equal)))
        (and
         (file-exists-p pam-build-dir)
         (delete-directory pam-build-dir t))
@@ -123,5 +134,19 @@ NOTE that it changes the `default-directory', you can don't use full paths."
     (pam-update-all-packages-autoloads)
     ;; and ensure: pam/my-package-autoloads.el is not exists, because there no autoloads
     (should-not (file-exists-p "pam/my-package-autoloads.el"))))
+
+(ert-deftest test-pam-rebuild-package ()
+  "Test `pam-rebuild-package'."
+  (pam--with-sandbox
+    ;; install `dash'
+    (pam-use-package 'dash)
+    ;; ensure: `dash' have byte-compiled file
+    (should (file-exists-p "pam/dash.elc"))
+    ;; delete it
+    (delete-file "pam/dash.elc")
+    ;; rebuild `dash'
+    (pam-rebuild-package "dash")
+    ;; ensure: byte-compiled file come back
+    (should (file-exists-p "pam/dash.elc"))))
 
 ;;; test-pam.el ends here

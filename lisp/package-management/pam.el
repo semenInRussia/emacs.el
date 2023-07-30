@@ -47,8 +47,9 @@
 ;;   only when it's really imported.  It saves a little bit of time
 (autoload 'straight-use-package "straight")
 (autoload 'straight-get-recipe "straight")
-(autoload 'straight--build-dir "straight")
 (autoload 'straight-rebuild-package "straight")
+(autoload 'straight-rebuild-all "straight")
+(autoload 'straight--build-dir "straight")
 (eval-and-compile
   (defvar straight-use-package-post-build-functions)
   (defvar straight--repo-cache)
@@ -195,6 +196,16 @@ command."
                                  (pam--straight-packages))))
   (pam--with-straight-hooks
     (straight-rebuild-package melpa-style-recipe recursive)))
+
+(defun pam-rebuild-all ()
+  "Rebuild all installed packages.
+
+Notice that while `pam-use-package' check the mode (install or only activate a
+package), but `pam-rebuild-all' don't it, because rebuild is a more concrete
+command."
+  (interactive)
+  (pam--with-straight-hooks
+    (straight-rebuild-all)))
 
 (defun pam-activate ()
   "Activate all installed `pam' packages.
