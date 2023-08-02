@@ -52,10 +52,15 @@
          ("C-c i" . consult-imenu)
          ("C-c n" . consult-imenu-multi))
   :bind ((:project-prefix-map
+          :package project
           ;; instead of built-in `projectile-find-regexp'
           ;; sometimes use command from `projectile-prefix-map' more useful
           ;; , than "C-c s" for example, when you swithch to project and need to find regexp
           ("g" . consult-ripgrep))
+         (:meow-normal-state-keymap
+          :package meow
+          ("X" . consult-line)
+          ("Q" . consult-goto-line))
          ;; C-c bindings in `mode-specific-map'
          ("C-c s" . consult-ripgrep)
          ("C-c M-x" . consult-mode-command)
