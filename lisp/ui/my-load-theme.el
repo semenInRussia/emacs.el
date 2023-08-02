@@ -49,20 +49,24 @@
 
 (leaf modus-themes
   :custom ((modus-themes-bold-constructs . t)
-           (modus-themes-italic-constructs . t))
-  :config (global-hl-line-mode))
+           (modus-themes-italic-constructs . t)))
 
 (leaf ef-themes
   :ensure t
-  :require t
   :config (global-hl-line-mode))
 
-;; (load-theme 'doom-1337 t)
+(leaf os1-theme
+  :ensure (os1-theme
+           :host github
+           :repo "sashimacs/os1-theme")
+  :custom ((os1-modeline-padding . 8)
+           (os1-use-variable-pitch . nil)
+           (os1-use-more-italic . t)))
 
 ;; I load `modus-operandi' before, because it redefines some nice faces, for
 ;; example border for modelie
-(load-theme 'modus-operandi t)
-(load-theme 'ef-cyprus t)
+;; (load-theme 'modus-operandi :no-config)
+(load-theme 'os1 :no-config)
 
 (setq-default line-spacing 0.1)
 
