@@ -35,6 +35,7 @@
          :package org
          ("C-c M-a" . 'annotate-annotate)
          ("C-c C-u M-a" . 'annotate-delete-annotation))
+  :commands annotate-mode
   :config (annotate-mode))
 
 (provide 'my-annotate)

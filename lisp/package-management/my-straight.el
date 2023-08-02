@@ -44,23 +44,7 @@
                             'silent 'inhibit-cookies)
         (goto-char (point-max))
         (eval-print-last-sexp)))
-    (load bootstrap-file nil 'nomessage))
-
-  (declare-function straight--convert-recipe "straight.el")
-  (declare-function straight--add-package-to-load-path "straight.el")
-  (declare-function straight--add-package-to-info-path "straight.el")
-  (declare-function straight--file "straight.el")
-  (declare-function straight--load-package-autoloads "straight.el")
-  (declare-function straight--compute-dependencies "straight.el")
-
-  ;; don't build packages, think that they're already installed
-  (advice-add 'straight--package-might-be-modified-p :override 'ignore)
-
-  ;; but after init, new packages can be installed, so packages can be
-  ;; (re)builded
-  (add-hook 'after-init-hook
-            (lambda ()
-              (advice-remove 'straight--package-might-be-modified-p 'ignore))))
+    (load bootstrap-file nil 'nomessage)))
 
 (provide 'my-straight)
 ;;; my-straight.el ends here
