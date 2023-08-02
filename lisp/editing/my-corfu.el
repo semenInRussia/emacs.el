@@ -42,8 +42,11 @@
   ;; I load `corfu' only when it really needed.  It's awesome idea, until
   ;; `corfu' don't take some seconds before load, it make Emacs a little worth,
   ;; but with `my-use-afk' it's still cool
-  :commands corfu--in-region
+  :commands (corfu--in-region global-corfu-mode)
   :init (setq-default completion-in-region-function 'corfu--in-region)
+  ;; `completion-in-region-function' was already changed, but
+  ;; `global-corfu-mode' enable auto complete, if `corfu-auto' is non-nil
+  :config (global-corfu-mode t)
   ;; make border of auto-completion minibuffer white/black, it looks like nice
   ;; :custom-face ((corfu-border . '((t :background "black"))))
   :custom (;; by default 2 but 1 one is better
@@ -55,15 +58,9 @@
            ;; when `line-spacing' changed, the default `corfu-count' (10) is bad
            (corfu-count . 5))
   :config
-  ;; `completion-in-region-function' was already changed, but
-  ;; `global-corfu-mode' enable auto complete, if `corfu-auto' is non-nil
-  (global-corfu-mode t)
-
   ;; show documentation of every auto-completion item
-  (leaf corfu-popupinfo
-    :bind (:corfu-map
-           :package corfu
-           ("M-i" . 'corfu-popupinfo-toggle)))
+  (leaf corfu-echo
+    :global-minor-mode corfu-echo-mode)
 
   ;; show icons inside auto-completion popup
   (leaf kind-icon
@@ -96,8 +93,9 @@
   ;; https://github.com/dwyl/english-words/
   :custom `(cape-dict-file . ,(f-full (locate-user-emacs-file "dict/english.txt")))
   :defun (cape-symbol
-          cape-dabbrev cape-file cape-elisp-block cape-history
-          cape-keyword cape-sgml cape-tex cape-abbrev cape-symbol)
+          cape-dabbrev cape-file cape-elisp-block cape-history cape-dict
+          cape-keyword cape-sgml cape-tex cape-abbrev cape-symbol
+          cape-wrap-silent)
   :hook (corfu-mode-hook . my-capf-local-setup)
   :config
   ;; make that `completion-at-point-functions' will be the different for every buffer
@@ -118,19 +116,37 @@
     "Change the `completion-at-point-functions' for current buffer."
     ;; Here the numbers is the depth of the respective hooks, the default depth is
     ;; 0, so if `major-mode' provides a capf function, then its depth is 0 (in
-    ;; 100% cases which I saw)
+    ;; 100% cases which I saw).
     ;;
-    ;; If i want that one thing will be prefer over another, than set to more
-    ;; important one the number with the LESSER number, so if the depth it will
-    ;; be the first function which was checked, here I use the depth from 0 to
-    ;; the amount of hooks
-    (add-hook 'completion-at-point-functions #'cape-history     1 'local)
-    (add-hook 'completion-at-point-functions #'cape-elisp-block 2 'local)
-    (add-hook 'completion-at-point-functions #'cape-file        3 'local)
-    (add-hook 'completion-at-point-functions #'cape-keyword     4 'local)
-    (add-hook 'completion-at-point-functions #'cape-dabbrev     5 'local)
-    (add-hook 'completion-at-point-functions #'cape-abbrev      6 'local)
-    (add-hook 'completion-at-point-functions #'cape-dict        7 'local)))
+    ;; For `cape' hooks I define the depth 20, because I need that the capf
+    ;; provided by major-mode (or lsp client) will be prefered over `cape'
+    ;; capfs.
+    ;;
+    ;; Notice that here order is important, first will checks the first added
+    ;; hooks, so it starts from `cape-history', then `cape-elisp-block' and the
+    ;; last is `cape-dict'.
+    ;;
+    ;; In `yasnippet' capf config (defined in `my-yas' file) I add capf for
+    ;; yasnippet I add to it depth 10, I prefer yasnippets over cape
+    (add-hook 'completion-at-point-functions #'cape-history     20 'local)
+    (add-hook 'completion-at-point-functions #'cape-elisp-block 20 'local)
+    (add-hook 'completion-at-point-functions #'cape-file        20 'local)
+    (add-hook 'completion-at-point-functions #'cape-keyword     20 'local)
+    (add-hook 'completion-at-point-functions #'cape-dabbrev     20 'local)
+    (add-hook 'completion-at-point-functions #'cape-abbrev      20 'local)
+    (add-hook 'completion-at-point-functions #'cape-dict        20 'local))
+
+  (advice-add #'cape-dict
+              :around #'cape-wrap-silent)
+
+  (advice-add #'cape-dict
+              :around
+              (defun my-eval-quietly (fn &rest args)
+                "Eval a FN with ARGS quitly.
+
+It's mean: without extra messages, without extra after save hooks"
+                (cl-letf (((symbol-function #'save-buffer) #'ignore))
+                  (apply fn args)))))
 
 (provide 'my-corfu)
 ;;; my-corfu.el ends here
