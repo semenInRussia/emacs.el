@@ -44,7 +44,7 @@
              consult-register-window
              consult-xref)
   :init (autoload 'consult-xref "consult-xref")
-  :defvar (consult-narrow-key consult-project-function)
+  :defvar (consult-narrow-key consult-project-function consult-buffer-sources)
   :bind (:minibuffer-local-map
          ("M-s" . consult-history) ;; orig. next-matching-history-element
          ("M-r" . consult-history))
@@ -104,10 +104,12 @@
                      'consult--source-recent-file)
 
   ;; the following lines fix some things which are wrong in my emacs@29
-  (defvar string-width 0)
+  ;; (defvar string-width 0)
+  ;; (defun compat-call (&rest _) 0)
+  )
 
-  (defun compat-call (&rest _)
-    0))
+(leaf consult-dir
+  :ensure t)
 
 (provide 'my-consult)
 ;;; my-consult.el ends here

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: declrare-function
+# key: declf
+# --
+(declare-function $0 "$1")
