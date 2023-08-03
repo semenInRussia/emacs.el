@@ -27,6 +27,7 @@
 ;; See `doom-themes' (list of themes at starting comments)
 
 ;; List of my favorite themes:
+;; - `ef-cyprus'
 ;; - `doom-1337'.  The best one, I think
 ;; - `gruber-darker'.  Cool, but `org-mode' and `vertico' are bad
 ;; - `doom-monokai-classic'.  Cool
@@ -34,6 +35,7 @@
 ;; - `flatland-theme'
 
 (require 'my-leaf)
+
 
 (setq font-lock-maximum-decoration t
       truncate-partial-width-windows nil)
@@ -65,7 +67,7 @@
            (os1-use-variable-pitch . nil)
            (os1-use-more-italic . t)))
 
-(load-theme 'ef-day :no-config)
+(load-theme 'ef-cyprus :no-confirm)
 
 (setq-default line-spacing 0.1)
 
