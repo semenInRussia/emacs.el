@@ -3,7 +3,7 @@ name: Build ZIP from built 3rd party packages and byte-compiled config
 on: [push]
 
 jubs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Emacs
