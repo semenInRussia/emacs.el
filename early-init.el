@@ -23,9 +23,6 @@
 
 (declare-function my-build-config "build-config.el")
 
-;; https://github.com/doomemacs/doomemacs/issues/2894
-(advice-add #'tty-run-terminal-initialization :override #'ignore)
-
 ;; PERF: A second, case-insensitive pass over `auto-mode-alist' is time wasted.
 (setq auto-mode-case-fold nil)
 
