@@ -79,6 +79,27 @@ With prefix arg don't indent."
   (interactive)
   (yank 1))
 
+(defvar w32-apps-modifier)
+(defvar w32-pass-lwindow-to-system)
+(defvar w32-lwindow-modifier)
+(defvar w32-pass-rwindow-to-system)
+(defvar w32-rwindow-modifier)
+(defvar w32-pass-apps-to-system)
+
+;; make PC keyboard's Win key or other to type Super or Hyper, for emacs running on Windows.
+(when (eq system-type 'windows-nt)
+  ;; Left Windows key
+  (setq w32-pass-lwindow-to-system nil)
+  (setq w32-lwindow-modifier 'super)
+
+  ;; Right Windows key
+  (setq w32-pass-rwindow-to-system nil)
+  (setq w32-rwindow-modifier 'super)
+
+  ;; Menu/App key
+  (setq w32-pass-apps-to-system nil)
+  (setq w32-apps-modifier 'hyper))
+
 (global-set-key (kbd "C-a") 'beginning-of-line-text)
 (global-set-key (kbd "C-o") 'open-line-saving-indent)
 (global-set-key (kbd "M-y") 'consult-yank-from-kill-ring)
