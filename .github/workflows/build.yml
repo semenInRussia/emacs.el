@@ -14,6 +14,6 @@ jobs:
       - run: tar -czf semacs.zip lisp pam cows dist init.el init.elc early-init.el early-init.elc small-init.el snippets .githignore .github
       - name: Create an Archive
         id: archive
-        uses: actions/create-release@1
+        uses: actions/create-release
         with:
           file: semacs.zip
