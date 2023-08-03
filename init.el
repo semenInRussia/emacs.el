@@ -133,6 +133,26 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
 (declare-function my-build-config "my-build-config.el")
 (declare-function org-roam-node-find "org-roam")
 
+;; byte-compile local-projects and generate autoloads
+(when (member "--local-projets" command-line-args)
+  ;; generate autoloads
+  (loaddefs-generate (locate-user-emacs-file "lisp/local-projects")
+                     (locate-user-emacs-file "lisp/local-projects/my-autoload.el"))
+  ;; byte-compile every file from the "local-projects" dir (including autoloads
+  ;; file)
+  (dolist (file (directory-files (locate-user-emacs-file "lisp/local-projects/")
+                                 'full
+                                 ".*\\.el$"))
+    (byte-compile-file file)))
+
+;; generate and byte-compile my-modules.el
+;;
+;; NOTE: I do it after local-projects, because `my-build-config' is a local
+;; project too
+(when (member "--modules" command-line-args)
+  (require 'my-build-config)
+  (my-build-config))
+
 ;; handle some Command Line Arguments
 (add-to-list!
  'command-line-functions
@@ -146,20 +166,16 @@ my-modules.el file with the `my-build-config' function
 
 This is function for `command-line-functions'."
    (when (string-equal argi "--modules")
-     (prog1 t
-       (message "Start build my-modules.el...")
-       (my-build-config))))
+     ;; it handled above
+     t))
 
- ;; --install
- (defun my-install-cli-handle-arg ()
-   "Handle --install command-line argument.
+ ;; --local-projets
+ (defun my-local-projects-cli-handle-arg ()
+   "Handle --local-projets command-line argument.
 
-It should tells to Emacs that every package should be installed, the default
-behaviour (without --install flag) expects that all packages are installed.
-
-Suggest visit `pm' documentation inside pm.el"
-   (when (string-equal argi "--install")
-     ;; this argument is handled inside `pam'
+Byte-compile every file of local-projects and generate autoloads file"
+   (when (string-equal argi "--local-projects")
+     ;; it handled above
      t))
 
  ;; --show-bench
