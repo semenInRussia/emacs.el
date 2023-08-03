@@ -14,6 +14,8 @@ jobs:
       - run: tar -czf semacs.zip lisp pam cows dist init.el init.elc early-init.el early-init.elc small-init.el snippets .githignore .github
       - name: Create an Archive
         id: archive
-        uses: actions/create-release
+        uses: elgohr/Github-Release-Action@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          file: semacs.zip
+          title: dok
