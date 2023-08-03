@@ -43,6 +43,7 @@
 (leaf org-agenda
   :custom ((org-agenda-files .
                              '("~/agenda.org"
+                               "~/projects.org"
                                "~/tasks-archive/task-archive.org"))
            (org-agenda-span . 14))
   :bind ("C-c a" . org-agenda))

@@ -75,7 +75,6 @@
            :package org
            ("C-c M-i"   . my-org-insert-image)
            ("C-c M-u"   . my-org-insert-img-at-url)
-           ("C-c C-w"   . my-org-cut)
            ("C-c C-M-w" . my-org-clear-subtree)
            ("C-c C-t"   . my-org-todo)))
 

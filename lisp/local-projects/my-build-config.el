@@ -10,14 +10,14 @@
 ;;; Commentary:
 
 ;; Join all my config files into one init.el.  I use this script to make one
-;; big init.el file which has more fast startup time.
+;; big init.el file which has more fast startup time than load 1+ files.
 
-;; `build-config' command joins all modules files from the .emacs.d/lisp into one
-;; dist/my-modules.el and compile it.  When I start Emacs init.el files just
-;; require my-modules.el, my-autoloads.el and custom.el which have already
-;; byte-compiled (or even better NATIVE-compiled).  One big file instead of a lot
-;; of small is better in load time, because every `require' statement also take
-;; a bit of time.
+;; `my-build-config' command joins all modules files from the ~/.emacs.d/lisp/
+;; into one dist/my-modules.el and compile it.  When I start Emacs init.el files
+;; just require my-modules.el, my-autoloads.el (from local projects) which are
+;; have already byte-compiled (or even NATIVE-compiled).  One big file instead
+;; of a lot of small is better in load time, because every `require' statement
+;; also take a bit of time.
 
 ;;; Code:
 

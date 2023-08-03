@@ -4,7 +4,7 @@
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.0.1
-;; Package-Requires: ((dash "2.18.0") (s "1.12.0") straight)
+;; Package-Requires: (straight)
 
 ;;; Commentary:
 
@@ -163,17 +163,15 @@ Otherwise, the package is built and activated.  Note that if the package recipe
 has a nil `:build' entry, then NO-BUILD is ignored and processing always stops
 before building and activation occurs."
   (interactive (list
-                (completing-read
-                 "Which recipe? "
-                 (if pam-need-to-install-pkgs-p
-                     nil
-                   (straight-get-recipe
-                    (when current-prefix-arg 'interactive) nil
-                    (let ((installed nil))
-                      ;; Cache keys are :local-repo. We want to compare :package.
-                      (maphash (lambda (_ v) (push (plist-get v :package) installed))
-                               straight--repo-cache)
-                      (lambda (pkg) (not (member pkg installed)))))))))
+                (if (not pam-need-to-install-pkgs-p)
+                    (user-error "Sorry, you can't install a pkg with `pam' when the `pam-install-everything-mode' is disabled")
+                  (straight-get-recipe
+                   (when current-prefix-arg 'interactive) nil
+                   (let ((installed nil))
+                     ;; Cache keys are :local-repo. We want to compare :package.
+                     (maphash (lambda (_ v) (push (plist-get v :package) installed))
+                              straight--repo-cache)
+                     (lambda (pkg) (not (member pkg installed))))))))
   (if (not pam-need-to-install-pkgs-p)
       t
     (pam--with-straight-hooks

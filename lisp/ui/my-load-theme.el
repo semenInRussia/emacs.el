@@ -39,7 +39,9 @@
       truncate-partial-width-windows nil)
 
 (leaf doom-themes
-  :ensure t)
+  :ensure t
+  :custom ((doom-themes-enable-italic . t)
+           (doom-themes-enable-bold . t)))
 
 (leaf gruber-darker-theme
   :ensure t)
@@ -63,10 +65,7 @@
            (os1-use-variable-pitch . nil)
            (os1-use-more-italic . t)))
 
-;; I load `modus-operandi' before, because it redefines some nice faces, for
-;; example border for modelie
-;; (load-theme 'modus-operandi :no-config)
-(load-theme 'os1 :no-config)
+(load-theme 'ef-day :no-config)
 
 (setq-default line-spacing 0.1)
 
