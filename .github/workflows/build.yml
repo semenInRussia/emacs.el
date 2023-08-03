@@ -2,7 +2,7 @@ name: Build ZIP from built 3rd party packages and byte-compiled config
 run-name: publish ZIP to releases
 on: [push]
 
-jubs:
+jobs:
   build:
     runs-on: ubuntu-latest
     steps:
