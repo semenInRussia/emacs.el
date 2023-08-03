@@ -134,7 +134,7 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
 (declare-function org-roam-node-find "org-roam")
 
 ;; byte-compile local-projects and generate autoloads
-(when (member "--local-projets" command-line-args)
+(when (member "--local-projects" command-line-args)
   ;; generate autoloads
   (loaddefs-generate (locate-user-emacs-file "lisp/local-projects")
                      (locate-user-emacs-file "lisp/local-projects/my-autoload.el"))
@@ -156,22 +156,35 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
 ;; handle some Command Line Arguments
 (add-to-list!
  'command-line-functions
- ;; --modules
- (defun my-modules-cli-handle-arg ()
-   "Handle --modules command-line argument.
+ ;; --kill
+ (defun my-kill-cli-handle-arg ()
+   "Handle --kill command-line argument.
+
+Argument was named --kill, because it kill Emacs after Emacs is load.  It
+useful, if you needed in only install packages, byte compile config and other
+these things.
+
+This is function for `command-line-functions'."
+   (when (string-equal argi "--kill")
+     ;; it handled above
+     (kill-emacs))
+
+   ;; --modules
+   (defun my-modules-cli-handle-arg ()
+     "Handle --modules command-line argument.
 
 Argument was named --modules, because it build my-modules.el file (or
 `my-modules-el-file').  So when this argument is specified, then build
 my-modules.el file with the `my-build-config' function
 
 This is function for `command-line-functions'."
-   (when (string-equal argi "--modules")
-     ;; it handled above
-     t))
+     (when (string-equal argi "--modules")
+       ;; it handled above
+       t)))
 
- ;; --local-projets
+ ;; --local-projects
  (defun my-local-projects-cli-handle-arg ()
-   "Handle --local-projets command-line argument.
+   "Handle --local-projects command-line argument.
 
 Byte-compile every file of local-projects and generate autoloads file"
    (when (string-equal argi "--local-projects")

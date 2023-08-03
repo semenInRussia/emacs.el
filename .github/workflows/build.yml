@@ -1,0 +1,19 @@
+name: Build ZIP from built 3rd party packages and byte-compiled config
+
+on: [push]
+
+jubs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Emacs
+        uses: purcell/setup-emacs@master
+        with:
+          version: 29.1
+
+      - name: Clone the source code
+        uses: actions/checkout@v3
+
+      - name: Install Emacs Packages and byte-compile the Config
+        run: |
+          emacs --install --local-projets --modules
