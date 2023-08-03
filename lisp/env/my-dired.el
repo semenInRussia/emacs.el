@@ -6,35 +6,19 @@
 ;; Version: 0.1
 ;; URL: https://github.com/semenInRussia/emacs.el
 
-;; This file is not part of GNU Emacs.
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 ;;; Commentary:
 
-;; My configuration of the `dired'
+;; My configuration of the `dired': the powerful directory explorer inside of
+;; the Emacs.
 
 ;;; Code:
 
 (require 'my-leaf)
-(require 's)
 (require 'dash)
+(require 's)
 (require 'just)
 (require 'f)
 
-
-(defvar dired-filter-map)
 
 ;; the most heavy functions placed at the `my-dired-commands'
 ;; and will be evaluated when really needed (autoloading)
@@ -47,8 +31,11 @@
   ;; - owner
   ;; - group
   ;; - last modified time
+  ;; but u can show it with ")"
   :hook (dired-mode-hook . dired-hide-details-mode)
-  :defun dired-get-file-for-visit
+  :defun ((my-dired-save-excursion . my-dired-commands.el)
+          (embark-open-externally . embark)
+          dired-get-file-for-visit)
   :bind (:dired-mode-map
          ;; i'm the user of `meow' with hjkl, where "h" is right, so i press
          ;; right to go the "back" directory
@@ -66,22 +53,10 @@
 
   (leaf dired-async
     :ensure async
-    :defun dired-async-mode
     :global-minor-mode dired-async-mode)
 
   (leaf dired-hacks-utils
     :ensure t)
-
-  ;; filter files from the buffre
-  (leaf dired-filter
-    :ensure (dired-filter
-             :repo "Fuco1/dired-hacks"
-             :host github)
-    :disabled t
-    :defvar dired-filter-map
-    :bind-keymap (:dired-mode-map
-                  :package dired
-                  ("." . dired-filter-map)))
 
   ;; open PDF and other not in Emacs
   (leaf dired-open
@@ -138,6 +113,10 @@
   ;; Command for printing file
   (with-eval-after-load 'lpr
     (setq lpr-command "PDFToPrinter"))
+
+  ;; some `dired' add-ons which are built-in Emacs
+  (leaf dired-x
+    :require t)
 
   ;; ???
   (remove-hook 'dired-mode-hook 'dired-mode))
