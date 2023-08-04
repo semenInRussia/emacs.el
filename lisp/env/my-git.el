@@ -47,8 +47,7 @@
                 magit-insert-unpushed-to-upstream-or-recent
                 magit-insert-unpulled-from-upstream)))
   :config
-  (add-hook 'magit-mode-hook #'hl-line-mode)
-  (magit-auto-revert-mode 0))
+  (add-hook 'magit-mode-hook #'hl-line-mode))
 
 (leaf git-timemachine
   :ensure (git-timemachine :repo "pidu/git-timemachine" :host gitlab)
