@@ -126,8 +126,12 @@ The same to
                               (point-min)
                               (point-max))
     (insert "\n(provide 'my-modules)")
+    ;; delete the old my-modules.el
     (when (file-exists-p dest)
       (delete-file dest))
+    ;; make directories in which my-modules.el placed
+    (unless (file-exists-p (file-name-directory dest))
+      (make-directory (file-name-directory dest)))
     (append-to-file (point-min) (point-max) dest)))
 
 (provide 'my-build-config)
