@@ -8,7 +8,7 @@ jobs:
       - name: Setup Emacs
         uses: purcell/setup-emacs@master
         with:
-          version: 29.1
+          version: snapshot
       - name: Clone the Config
         uses: actions/checkout@v3
       - name: Install All Emacs Packages and Build Config
