@@ -213,7 +213,7 @@ all commands of these packages, TeXinfo will be included in the manual."
   (interactive)
   (add-to-list 'load-path (pam--build-dir))
   (add-to-list 'Info-default-directory-list (pam--build-dir))
-  (load (pam--autoloads-file)))
+  (load (pam--autoloads-file) :noerror :nomessage))
 
 (defun pam-delete-package (pkg &optional update-autoloads)
   "Remove the PKG from the `pam' directory.
