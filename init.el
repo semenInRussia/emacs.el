@@ -16,6 +16,14 @@
 ;; every custom variable of my config have the following group
 (defgroup my nil "Group for all my config files." :group 'tools)
 
+;; change Emacs config directory depends on init file
+;;
+;; after this config you can easily run Emacs with "emacs -l init.el"
+;; not only when init.el inside ~/.emacs.d
+(setq user-emacs-directory
+      (file-name-base (or load-file-name
+                          (buffer-file-name))))
+
 ;; add some files into the `load-path' that config files can require theme and
 ;; byte-compiler will be happy
 (eval-and-compile
