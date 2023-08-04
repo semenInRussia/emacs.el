@@ -131,7 +131,7 @@ The same to
     (insert "\n(provide 'my-modules)")
     (when (file-exists-p dest)
       (delete-file dest))
-    (write-region (point-min) (point-max) dest)))
+    (write-region (point-min) (point-max) dest :append)))
 
 (provide 'my-build-config)
 ;;; my-build-config.el ends here
