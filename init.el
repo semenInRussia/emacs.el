@@ -84,6 +84,8 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
   (setq tabulated-list-sort-key (cons "Start time (ms)" nil))
   (setq tabulated-list-padding 2)
   (setq tabulated-list-entries #'my-require-times-tabulated-list-entries)
+  ;; it enable M-. to jump to Emacs packages
+  (setq-local xref-backend-functions '(elisp--xref-backend t))
   (tabulated-list-init-header)
   (when (fboundp 'tablist-minor-mode)
     (tablist-minor-mode)))
