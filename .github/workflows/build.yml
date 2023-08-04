@@ -13,6 +13,10 @@ jobs:
         uses: actions/checkout@v3
       - name: Install All Emacs Packages and Build Config
         run: emacs -batch -l init.el --install --local-projets --modules
+      - name: Byte-Compile init.el and early-init.el
+        run: |
+          emacs -Q --batch --eval '(progn (byte-compile-file "init.el") (byte-compile-file "early-init.el"))'
+
       - name: Create an Archive
         run: tar -czf semacs.zip lisp pam cows dist init.el init.elc early-init.el early-init.elc small-init.el snippets .githignore .github
       - name: Publish an Archive
