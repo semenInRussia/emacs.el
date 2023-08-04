@@ -53,12 +53,14 @@
 (defun my-build-config ()
   "Build my config."
   (interactive)
-  (let ((default-directory (file-name-directory my-modules-el-file)))
+  (let ((default-directory (file-name-directory my-modules-el-file))
+        (autoloads (locate-user-emacs-file "lisp/local-projects/my-autoload.el")))
+    (when (file-exists-p autoloads)
+      (byte-compile-file autoloads))
     (my-join-modules-into-modules.el)
     (byte-compile-file my-modules-el-file)
     (when (native-comp-available-p)
-      (native-compile-async (list my-modules-el-file)))
-    (byte-compile-file (locate-user-emacs-file "lisp/local-projects/my-autoload.el"))))
+      (native-compile-async (list my-modules-el-file)))))
 
 (defun my-file-igored-as-module-p (filename)
   "Return non-nil if a module at FILENAME can't be a configuration module."
