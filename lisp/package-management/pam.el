@@ -213,6 +213,7 @@ all commands of these packages, TeXinfo will be included in the manual."
   (interactive)
   (add-to-list 'load-path (pam--build-dir))
   (add-to-list 'Info-default-directory-list (pam--build-dir))
+  (pam-create-files)
   (load (pam--autoloads-file) :noerror :nomessage))
 
 (defun pam-delete-package (pkg &optional update-autoloads)
@@ -256,7 +257,8 @@ Notice that it can take a long time."
 
 (defun pam-create-files ()
   "Make the `pam' build directory and touch the autoloads file."
-  (make-directory (pam--build-dir)))
+  (unless (file-exists-p (pam--build-dir))
+    (make-directory (pam--build-dir))))
 
 ;;; Internal
 
