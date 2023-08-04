@@ -50,9 +50,7 @@
 ;; NOTE: amount of the directories in the `load-path' depends on amount of the
 ;;   packages and their dependencies
 (defvar my-straight-packages-already-installed-p t)
-(message "It fails here: %s" load-path)
 (require 'pam)
-(message "or after here?")
 (pam-activate)
 
 ;; don't use init.el for custom.el which I don't use
