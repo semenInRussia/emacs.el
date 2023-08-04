@@ -213,10 +213,6 @@ When you apply this command line argument after init Emacs open the my agenda"
      (prog1 t
        (nano-agenda)))))
 
-;; display files of pam
-(dolist (file (directory-files (locate-user-emacs-file "pam")))
-  (message "- %s" file))
-
 ;; generate and byte-compile my-modules.el
 ;;
 ;; NOTE: I do it after local-projects, because `my-build-config' is a local
