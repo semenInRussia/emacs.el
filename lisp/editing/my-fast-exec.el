@@ -31,7 +31,8 @@
 (require 'dash)
 
 (leaf fast-exec
-  :load-path "~/projects/fast-exec.el/"
+  :ensure (fast-exec :repo "semenInRussia/fast-exec.el"
+                     :host github)
   :defun fast-exec-use
   :bind ("M-=" . fast-exec-exec)
   :commands fast-exec-exec
