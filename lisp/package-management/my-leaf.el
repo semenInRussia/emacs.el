@@ -27,7 +27,6 @@
 (require 'cl-lib)
 (require 'pam)
 
-(eval-when-compile (require 'fast-exec))
 (declare-function straight-use-package "straight")
 
 (eval-and-compile
