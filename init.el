@@ -24,8 +24,9 @@
 
 ;;; Local Projects
 ;; It is my own small "packages" which aren't so big to create real packages
-(add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects"))
-(load (locate-user-emacs-file "lisp/local-projects/my-autoload") :noerror)
+(eval-and-compile
+  (add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects"))
+  (load (locate-user-emacs-file "lisp/local-projects/my-autoload") :noerror))
 
 ;;; add to `load-path' all installed packages
 ;;
@@ -41,7 +42,7 @@
 ;; NOTE: amount of the directories in the `load-path' depends on amount of the
 ;;   packages and their dependencies
 (defvar my-straight-packages-already-installed-p t)
-(message "It fails here?")
+(message "It fails here: %s" load-path)
 (require 'pam)
 (message "or after here?")
 (pam-activate)
