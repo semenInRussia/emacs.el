@@ -56,7 +56,8 @@
   (let ((default-directory (file-name-directory my-modules-el-file)))
     (my-join-modules-into-modules.el)
     (byte-compile-file my-modules-el-file)
-    (native-compile-async (list my-modules-el-file))
+    (when (native-comp-available-p)
+      (native-compile-async (list my-modules-el-file)))
     (byte-compile-file (locate-user-emacs-file "lisp/local-projects/my-autoload.el"))))
 
 (defun my-file-igored-as-module-p (filename)
