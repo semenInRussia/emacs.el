@@ -23,3 +23,5 @@ xenops/
 /.cache/
 /.org-id-locations
 /lisp/package-management/sandbox/
+/dist/
+/lisp/local-projects/my-autoload.el
