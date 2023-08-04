@@ -24,7 +24,7 @@
 ;;; Local Projects
 ;; It is my own small "packages" which aren't so big to create real packages
 (add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects"))
-(load (locate-user-emacs-file "lisp/local-projects/my-autoload"))
+(load (locate-user-emacs-file "lisp/local-projects/my-autoload") :noerror)
 
 ;;; add to `load-path' all installed packages
 ;;
