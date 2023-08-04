@@ -129,7 +129,8 @@ The same to
                               (point-min)
                               (point-max))
     (insert "\n(provide 'my-modules)")
-    (delete-file dest)
+    (when (file-exists-p dest)
+      (delete-file dest))
     (write-region (point-min) (point-max) dest)))
 
 (provide 'my-build-config)
