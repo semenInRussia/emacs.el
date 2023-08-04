@@ -46,9 +46,8 @@
 ;; with `require' Emacs will checks all these dirs.  When all packages files located inside the `pam' dir
 ;; Emacs checks only `pam' dir (instead of 200 other dirs)
 ;;
-;;
 ;; NOTE: amount of the directories in the `load-path' depends on amount of the
-;;   packages and their dependencies
+;;   packages and their dependencies (if you use straight)
 (defvar my-straight-packages-already-installed-p t)
 (require 'pam)
 (pam-activate)
@@ -126,25 +125,7 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
     (tabulated-list-revert)
     (display-buffer (current-buffer))))
 
-;;; Load all config files
-
-;; the most part of the config located inside "~/.emacs.d/lisp" I join all .el
-;; files into the my-modules file for fast start up
-(defvar my-modules-el-file (locate-user-emacs-file "dist/my-modules.el"))
-
-(unless (file-exists-p (file-name-directory my-modules-el-file))
-  (user-error "File \"my-modules.el\" didn't created, suggest use --modules option"))
-
-(add-to-list 'load-path (file-name-directory my-modules-el-file))
-
-;; some useful macros
-(require 'my-macros)
-
-(declare-function nano-agenda "nano-agenda")
-(declare-function my-require-times "init")
-(declare-function my-build-config "my-build-config.el")
-(declare-function org-roam-node-find "org-roam")
-
+;;; Handle some CLI options
 ;; byte-compile local-projects and generate autoloads
 (when (member "--local-projects" command-line-args)
   ;; generate autoloads
@@ -157,15 +138,16 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
                                  ".*\\.el$"))
     (byte-compile-file file)))
 
-;; generate and byte-compile my-modules.el
-;;
-;; NOTE: I do it after local-projects, because `my-build-config' is a local
-;; project too
-(when (member "--modules" command-line-args)
-  (require 'my-build-config)
-  (my-build-config))
 
-;; handle some Command Line Arguments
+
+;; some useful macros
+(require 'my-macros)
+
+(declare-function nano-agenda "nano-agenda")
+(declare-function my-require-times "init")
+(declare-function my-build-config "my-build-config.el")
+(declare-function org-roam-node-find "org-roam")
+
 (add-to-list!
  'command-line-functions
  ;; --kill
@@ -230,6 +212,25 @@ When you apply this command line argument after init Emacs open the my agenda"
    (when (string-equal argi "--agenda")
      (prog1 t
        (nano-agenda)))))
+
+;; generate and byte-compile my-modules.el
+;;
+;; NOTE: I do it after local-projects, because `my-build-config' is a local
+;; project too
+(when (member "--modules" command-line-args)
+  (require 'my-build-config)
+  (my-build-config))
+
+;;; Load all config files
+
+;; the most part of the config located inside "~/.emacs.d/lisp" I join all .el
+;; files into the my-modules file for fast start up
+(defvar my-modules-el-file (locate-user-emacs-file "dist/my-modules.el"))
+
+(unless (file-exists-p (file-name-directory my-modules-el-file))
+  (user-error "File \"my-modules.el\" didn't created, suggest use --modules option"))
+
+(add-to-list 'load-path (file-name-directory my-modules-el-file))
 
 (let ((file-name-handler-alist nil))
   (require 'my-modules))
