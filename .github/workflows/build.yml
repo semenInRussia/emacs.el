@@ -10,7 +10,7 @@ jobs:
         with:
           version: 29.1
       - uses: actions/checkout@v3
-      - run: emacs --install --local-projets --modules --kill
+      - run: emacs -batch --install --local-projets --modules
       - run: tar -czf semacs.zip lisp pam cows dist init.el init.elc early-init.el early-init.elc small-init.el snippets .githignore .github
       - name: Create an Archive
         id: archive
