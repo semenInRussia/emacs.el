@@ -18,7 +18,7 @@ jobs:
           emacs -Q --batch --eval '(progn (byte-compile-file "init.el") (byte-compile-file "early-init.el"))'
 
       - name: Create an Archive
-        run: tar -czf semacs.zip lisp pam cows dist init.el init.elc early-init.el early-init.elc small-init.el snippets .githignore .github
+        run: tar -czf semacs.zip lisp pam cows dist init.el early-init.el small-init.el snippets .gitignore .github
       - name: Publish an Archive
         id: archive
         uses: elgohr/Github-Release-Action@v4
