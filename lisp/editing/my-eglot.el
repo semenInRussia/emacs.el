@@ -33,7 +33,8 @@
 
 (leaf eglot
   :custom `((eglot-send-changes-idle-time . 1) ; in seconds
-            (eglot--executable-find . "C:\\tools\\find.exe"))
+            ;; (eglot--executable-find . "C:\\tools\\find.exe")
+            )
   :custom-face (eglot-highlight-symbol-face . '((t (:inherit lazy-highlight))))
   :defun eglot-inlay-hints-mode
   :bind (:eglot-mode-map

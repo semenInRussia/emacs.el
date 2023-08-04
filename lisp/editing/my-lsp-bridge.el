@@ -42,7 +42,7 @@
            (lsp-bridge-enable-hover-diagnostic . t)
            (acm-enable-tabnine . nil)
            (acm-enable-quick-access . t)
-           (lsp-bridge-python-command . "python.exe")
+           ;; (lsp-bridge-python-command . "python.exe")
            ;; choose LSP servers
            (lsp-bridge-tex-lsp-server . 'texlab)
            (lsp-bridge-multi-lang-server-extension-list . nil)
