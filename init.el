@@ -16,6 +16,14 @@
 ;; every custom variable of my config have the following group
 (defgroup my nil "Group for all my config files." :group 'tools)
 
+;; change Emacs config directory depends on init file
+;;
+;; after this config you can easily run Emacs with "emacs -l init.el"
+;; not only when init.el inside ~/.emacs.d
+(setq user-emacs-directory
+      (file-name-directory (or load-file-name
+                               (buffer-file-name))))
+
 ;; add some files into the `load-path' that config files can require theme and
 ;; byte-compiler will be happy
 (eval-and-compile
@@ -24,8 +32,9 @@
 
 ;;; Local Projects
 ;; It is my own small "packages" which aren't so big to create real packages
-(add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects"))
-(load (locate-user-emacs-file "lisp/local-projects/my-autoload") :noerror)
+(eval-and-compile
+  (add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects"))
+  (load (locate-user-emacs-file "lisp/local-projects/my-autoload") :noerror))
 
 ;;; add to `load-path' all installed packages
 ;;
@@ -41,7 +50,9 @@
 ;; NOTE: amount of the directories in the `load-path' depends on amount of the
 ;;   packages and their dependencies
 (defvar my-straight-packages-already-installed-p t)
+(message "It fails here: %s" load-path)
 (require 'pam)
+(message "or after here?")
 (pam-activate)
 
 ;; don't use init.el for custom.el which I don't use
