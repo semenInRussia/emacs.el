@@ -660,9 +660,9 @@
                    leaf--name)))
               `((with-eval-after-load 'fast-exec
                   ;; `require' macros needed in `eval-and-compile'
-                  (eval-and-compile (require 'fast-exec))
-                  (fast-exec-bind ',name
-                    (fast-exec-make-some-commands ,@bindings)))
+                  (eval
+                   '(fast-exec-bind ',name
+                      (fast-exec-make-some-commands ,@bindings))))
                 ,@leaf--body))
             :leaf-defer
             (let*
