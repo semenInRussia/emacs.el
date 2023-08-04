@@ -98,18 +98,15 @@ The same to
         (setq sorted
               (append sorted (cl-remove-if
                               (lambda (f)
-                                (message "= %s" f)
                                 (or (my-file-igored-as-module-p f)
                                     (member f sorted)))
                               (directory-files-recursively order-item ".el$")))))
        (t
-        (message "+ %s" order-item)
         (setq sorted (append sorted (list order-item))))))
     (while files
       (setq f (car files))
       (setq files (cdr files))
       (when (and (not (member f sorted)) (not (my-file-igored-as-module-p f)))
-        (message "! %s" f)
         (setq sorted (append sorted (list f)))))
     sorted))
 
