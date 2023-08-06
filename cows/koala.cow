@@ -4,9 +4,9 @@
 $the_cow = <<EOC;
   $thoughts
    $thoughts
-       ___
-     {~._.~}
+       ___  
+     {~$eye_$eye~}
       ( Y )
-     ()~*~()
-     (_)-(_)
+     ()~*~()   
+     (_)-(_)   
 EOC

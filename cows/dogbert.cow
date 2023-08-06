@@ -1,0 +1,53 @@
+# Dogbert (Dilbert)
+# by Scott Adams - http://www.iconarchive.com/show/dilbert-icons-by-bo.html
+# Generated with Charc0al's cowsay file converter http://charc0al.github.io/cowsay-files/converter
+
+$x = "\e[49m  ";          #reset color
+$t = "$thoughts ";
+$a = "\e[48;5;236m  ";
+$b = "\e[48;5;231m  ";
+$c = "\e[48;5;253m  ";
+$d = "\e[48;5;248m  ";
+$e = "\e[48;5;52m  ";
+$f = "\e[48;5;88m  ";
+$g = "\e[48;5;124m  ";
+$h = "\e[48;5;255m  ";
+
+$the_cow = <<EOC
+            $t
+              $t
+                $t
+                  $t
+                              $a        $x
+                          $a  $b      $c$a    $x
+                    $a      $b          $c  $d$a$x
+                  $a$b$a$b  $a$b          $c  $d$a$x
+                $a$b  $a$b    $a$b$a$b    $a$c  $d$a$x
+                $a$b  $a$b    $a    $b    $a$b$c  $d$a$x
+                $a$b  $a$b    $a$b$a$b      $a$b$c$d$a$x
+                $a      $b  $a$b  $a$b      $a$b$c  $d$a$x
+                  $a$b  $a  $b  $a$b          $a$b$c$d$a$x
+                  $a$b          $a$b          $a$b$c$d$a$x
+                $a    $b        $a$b          $a$b$c  $d$a$x
+              $a        $b      $a$b          $a$b  $c$d$a$x
+              $a        $b        $a          $b    $c$d$a$x
+                $a    $b              $a$b          $c$d$a$x
+                $a$b                  $a$b$a$b      $c$d$a$x
+                $a$b                $a  $b$a$b      $c$d$a$x
+                $a$b                $a$b    $a$b    $c$d$a$x
+                $a$b                $a$b    $a$b    $c$d$a$x
+                $a$b                  $a    $b      $c$d$a$x$a    $x
+                $a$b                              $c  $d$a  $b$a$x
+                $a$b                              $c$d$a$c  $a$x
+                $a$b                            $c  $d$a$c$a$x
+                $a$b  $a$b                    $c  $d$a    $x
+              $a$b  $a$b        $a                        $x
+              $a$b  $a$b      $a$e                        $a  $x
+            $a  $b$a  $b    $e  $f                      $e  $a    $x
+            $a$b  $a$b      $e  $f$g                  $f    $e  $a  $x
+          $a  $b  $a$b    $a$e$f  $g                        $f  $e$a  $x
+        $a$b    $a$b      $a$e$f$g                            $f  $e$a$x
+          $a              $e$f                                    $e$a$x
+        $a$e                                                        $a$x
+      $a                                                              $x
+EOC

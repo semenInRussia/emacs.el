@@ -1,12 +1,12 @@
 ##
 ## TuX
-## (c) pborys@p-soft.silesia.linux.org.pl
+## (c) pborys@p-soft.silesia.linux.org.pl 
 ##
 $the_cow = <<EOC;
    $thoughts
     $thoughts
         .--.
-       |o_o |
+       |$eye_$eye |
        |:_/ |
       //   \\ \\
      (|     | )

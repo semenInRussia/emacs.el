@@ -1,0 +1,70 @@
+# Michaelangelo (Teenage Mutant Ninja Turtles)
+# by Konami, original art from TMNT: Turtles in Time - https://www.spriters-resource.com/snes/tmnt4/
+# Generated with Charc0al's cowsay file converter http://charc0al.github.io/cowsay-files/converter
+
+$x = "\e[49m  ";          #reset color
+$t = "$thoughts ";
+$a = "\e[48;5;94m  ";
+$b = "\e[48;5;136m  ";
+$c = "\e[48;5;202m  ";
+$d = "\e[48;5;220m  ";
+$e = "\e[48;5;214m  ";
+$f = "\e[48;5;28m  ";
+$g = "\e[48;5;40m  ";
+$h = "\e[48;5;231m  ";
+$i = "\e[48;5;234m  ";
+$j = "\e[48;5;22m  ";
+$k = "\e[48;5;245m  ";
+$l = "\e[48;5;237m  ";
+$m = "\e[48;5;95m  ";
+
+$the_cow = <<EOC
+                                    $t
+  $a$b$a$x                            $t                  $c    $x
+  $b$d$b$a$x                            $t          $c  $x$c$e    $c$x
+    $b$d$b$a$x                            $t      $c$e      $c  $e  $c$x$f$g      $f$x
+      $b$d$b$a$x                            $t      $c$e        $c  $e$f$g        $c$e$x
+        $b$d$b$a$x                                    $c$e    $c$e$c$f  $g      $e$h$i$e$x
+          $b$d$b$a$x                                    $c  $e  $c$i$c$f  $g  $c$e$h$i$e$f$x
+            $b$d$b$a$x                                      $c    $i$c    $e        $f$g    $f$x
+              $b$d$b$a$x                                          $j$c  $e    $g              $f$x      $h$a$b$a$x
+                $b$d$b$a$x                                      $j$f  $g                      $f$x    $h$x$b$d$b$x
+                  $b$d$a$x                              $f  $j    $f$g      $f    $g          $f$x    $k$x$a$b$a$x
+                    $a$k$x                        $a$f$g      $f$i$j$f$g    $f$h    $f$g    $f$x    $h$x  $a$d$b$x
+                        $h$x                    $a$f$g          $j$f$j$f  $g  $f  $h    $f  $x    $h$x    $a$d$b$x
+                          $k$x                $a  $g            $f  $g$f$j$f$g        $f$x        $k$x    $a$d$b$x
+                            $h$x              $a$f$g              $f$j$g$f$j$f  $j$f$x        $b$h$x      $a$d$b$x
+                              $k  $x        $a$f  $g        $f$g$f$b    $f  $g$j$f$g$f$x    $b$d$a$x      $a$d$b$x
+                                $h  $x      $f$g$f$g  $f    $j$g$b$h$d  $b$f    $g    $f$x$b$d$b$a$x  $f  $j$g  $f$x
+                                $d$l$d$x  $f$g          $f$j  $a$d        $b$a$b    $g$j$f$d$b$a$x    $g  $f$g  $f$x
+                                $b$d$a$x$c$e  $g        $j$a$j$b$d        $b  $d  $b$a$g  $f$a$x      $f  $j$f$j  $x
+                                $b$a  $x$g    $c$g$f  $j      $b$d        $b$d      $b$g  $f$x      $e$f$j  $f$g$f$x
+                                $b  $a$j$g      $c$f  $a$f  $j$b$d        $b$d      $b$g  $f$x    $f$e$f$j    $f$j$x
+                              $f  $b$j$a$g      $c$j$a$f  $j  $a$b$d    $b  $d    $b$a$g    $f$g    $e$c$j$a    $x
+                              $g$f$j  $f  $g  $f$c$a$f    $j$a    $b    $a$b$d    $b$f$g  $e$g        $c  $b$d$b$x
+                              $f$g$j$g  $f$e$g$j$a$m$f  $j$a$b$d    $b$a  $b$d  $b$a$f  $e$g          $f$j$a$b$a$x
+                              $f$j        $e$f$a$m    $j  $b$d        $a$b    $a  $j$f$e  $g        $f$j$x
+                              $f    $j  $x$c$j$a$j$m      $b$d      $a$b$d    $b$x$j  $c  $f        $x
+                                $j      $x$a    $j$l  $m      $a  $l  $b$d  $b  $x  $j$c  $f    $j  $x
+                                $b$a$x    $a  $j  $f  $l  $m    $l$k$h$l$m  $a$x        $c  $f$j$x
+                                $b$a$x    $a  $j$f    $j$a$l$m$l  $k  $l$m$l$x
+                                          $a$j$f  $g$f$j$b$d$l$m  $l      $f$x
+                                          $j$f  $g  $f  $l$m    $l  $m$l$b$g$f$x
+                                          $j$f  $g    $f$a$l$m$l  $d$l$m  $l$g$f$x
+                                          $f  $g      $f$a$l    $d$b$a$l$m$l$g  $f$x
+                                          $f$g        $f$j$a$l$b  $a$f$l  $g      $f$x
+                                          $f$g        $f$j$x$a    $j$f$g            $f$x
+                                        $f  $g      $f$j  $x  $j    $f  $g            $f$x
+                                        $f$g        $f$j  $x    $j  $f  $g              $f$x
+                                        $f$g        $f$j$x          $j$f  $g    $f$g      $f$x
+                                        $f$g        $f$j$x          $j  $f  $g  $f  $g    $f$x
+                                        $f  $g    $f$j$x                $j  $f$g$f$e    $c  $x
+                                      $c  $f$g  $f  $x                      $f  $c$e      $c$x
+                                      $c$e    $g$f$c$x                        $c    $e  $c  $x
+                                    $f$c$e      $c  $x                        $f    $j$f$g$f$x
+                                  $f$g$f$g$e  $c  $x                        $f$g  $f  $g  $f$x
+                                  $f$g    $f$j  $x                        $f$g      $f$g$f$x
+                                $f$g    $f  $g$f$x                        $f$g        $f$j$x
+                                $f$g    $f      $x                        $f  $g$f$g  $f$x
+                                $f$g    $f$g$f$x                            $j$f  $g  $j$x
+EOC

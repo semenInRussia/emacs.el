@@ -1,0 +1,28 @@
+# Err, from the Mooninites
+# by Charc0al (original art)
+
+$r = "\e[45m  ";
+$b = "\e[44m  ";
+$x = "\e[49m  ";
+$t = "$thoughts ";
+
+$the_cow = <<EOC;
+   $t
+    $t                        $r   $x
+     $t                       $r   $x
+      $t     $r                    $x
+             $r$b$r            $b$r$x
+             $r  $b$r        $b$r  $x
+             $r    $b$r    $b$r        $x
+             $r      $b$r$b$r          $x
+           $b$r  $b $r      $b $r      $b$x
+         $b$x$r  $b $r      $b $r      $x$b$x
+       $b$x  $r                        $x  $b$x
+       $b$x  $r                        $x  $b$x
+             $r  $b            $r      $x
+             $r                        $x
+                    $b$x     $b$x
+                    $b$x     $b$x
+               $b     $x     $b     $x
+
+EOC

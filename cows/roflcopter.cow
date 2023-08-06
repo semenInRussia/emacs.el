@@ -1,12 +1,11 @@
-# ROFLCOPTER
 $the_cow = <<EOC;
    $thoughts
     $thoughts
-    ROFL:LOL:ROFL:ROFL
+ ROFL:ROFL:ROFL:ROFL
          _^___
- L    __/   [] \\
+ L    __/   $eyes \\    
 LOL===__        \\ 
- L      \________]
-         I   I
+ L      \\________]
+         I   I  $tongue
         --------/
 EOC

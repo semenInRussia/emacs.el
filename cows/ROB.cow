@@ -1,0 +1,72 @@
+# R.O.B - Robotic Operating Buddy (Nintendo Entertainment System)
+# by Unknown - https://knowyourmeme.com/photos/890541-super-smash-brothers
+# Generated with Charc0al's cowsay file converter http://charc0al.github.io/cowsay-files/converter
+
+$x = "\e[49m  ";          #reset color
+$t = "$thoughts ";
+$a = "\e[48;5;234m  ";
+$b = "\e[48;5;196m  ";
+$c = "\e[48;5;61m  ";
+$d = "\e[48;5;102m  ";
+$e = "\e[48;5;60m  ";
+$f = "\e[48;5;253m  ";
+$g = "\e[48;5;255m  ";
+$h = "\e[48;5;189m  ";
+$i = "\e[48;5;247m  ";
+$j = "\e[48;5;237m  ";
+$k = "\e[48;5;243m  ";
+$l = "\e[48;5;231m  ";
+$m = "\e[48;5;54m  ";
+$n = "\e[48;5;251m  ";
+$o = "\e[48;5;116m  ";
+$p = "\e[48;5;239m  ";
+$q = "\e[48;5;62m  ";
+$r = "\e[48;5;68m  ";
+$s = "\e[48;5;56m  ";
+$u = "\e[48;5;161m  ";
+$v = "\e[48;5;88m  ";
+$w = "\e[48;5;124m  ";
+$y = "\e[48;5;167m  ";
+$z = "\e[48;5;8m  ";
+
+$the_cow = <<EOC
+        $t
+          $t
+            $t                $a  $x
+                $a            $b  $a              $x
+              $a$c  $d                $e$f$g$h$i$e$a  $x
+            $a$c$j                    $d$c$g$i    $k  $a$x
+            $a$j  $l  $m        $l  $j  $c$g$i$n    $k  $a$x
+            $a$j$l$o  $l$m    $l$o  $l$j$c$h$i$g$i      $a$x
+            $a$p$l$a  $l$q    $l$a  $l$j$c$i  $g$k      $a$x
+            $a$p  $r  $s$q    $s$r  $p$j$c$h$i$n    $i$k$a$x
+            $a$c$p                  $j$c  $g$i    $e  $a$x
+              $a$c                      $h$g$h$i$e$a  $x
+                $a            $j        $a        $x$j$x
+                            $a$p        $a$x  $j$x    $j$x
+                            $a$i    $p  $a$x$j$x  $j  $x
+                  $a          $k    $p  $a                $x
+                $a$n  $f$n$i  $n      $g  $i$e$f  $g$k    $a$x
+              $a$f      $i    $n$f  $g  $i  $e$n  $g  $k$i$e$a$x
+              $a$f    $g                $i  $e$n  $g  $i    $a$x
+              $a$e$i              $e          $n  $g  $i    $a$x
+            $a  $f      $g              $i  $k$f  $g$n$i    $a$x
+          $a$u$v$e$f                $g  $i  $k    $w  $j$w$a$x
+        $a$u  $v$j$v$a      $p  $k  $p  $a        $w$u$y$j$a$x
+        $a$u  $v    $a$x    $a$z        $a$x$j$x$a$w$u$y$p$w$a$x
+          $a$u$v    $a$x    $a$z        $a$j$x  $a$w  $j$w$a$x
+            $a$j  $a$x      $a$i$n  $z$k$a$x$j$x  $a$j$w$a$x
+          $a$u$v  $a$x      $a$k    $p  $a$j$x  $j$a$w$u$p$a$x
+          $a$u$v  $a$x      $a$i$n  $z$k$a$x$a      $w$u$j$a$x
+        $a$u  $v  $a        $i    $n$z$k$a  $u    $j        $a$x
+      $a$u  $i  $n$f  $g        $f  $n  $i  $u$y  $u$w$u$p$j  $a$x
+      $a$i$k  $i$y                  $k      $u$y    $w$u$p$j  $a$x
+      $a$g        $e  $i  $p$g              $u$y    $w  $j$a  $x
+      $a$i        $e  $i  $p$i              $u$y  $w$v$w$j$a$x
+    $a$f    $i$f  $e  $i$p$n$i$f  $i$f  $g$i$w    $v$w$v$j$a$x
+    $a$g    $n$g  $e  $i$p$n$i$g  $n$g    $i$f    $i  $z  $a$x
+    $a$g    $f$g  $e  $i$n  $i$g  $f$g    $i$f    $i  $z  $a$x
+    $a$g          $e  $i$n  $e$g          $i$f    $i  $z  $a$x
+      $a$u$g    $u$v          $u$g    $u$v  $w        $v$a$x
+        $a                                              $x
+EOC

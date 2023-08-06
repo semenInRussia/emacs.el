@@ -1,0 +1,79 @@
+# Captain Falcon (F-Zero, Super Smash Bros)
+# by Charc0al (original art)
+# Generated with Charc0al's cowsay file converter http://charc0al.github.io/cowsay-files/converter
+
+$x = "\e[49m  ";          #reset color
+$t = "$thoughts ";
+$a = "\e[48;5;124m  ";
+$b = "\e[48;5;88m  ";
+$c = "\e[48;5;137m  ";
+$d = "\e[48;5;221m  ";
+$e = "\e[48;5;94m  ";
+$f = "\e[48;5;136m  ";
+$g = "\e[48;5;234m  ";
+$h = "\e[48;5;66m  ";
+$i = "\e[48;5;179m  ";
+$j = "\e[48;5;231m  ";
+$k = "\e[48;5;27m  ";
+$l = "\e[48;5;33m  ";
+$m = "\e[48;5;236m  ";
+$n = "\e[48;5;19m  ";
+$o = "\e[48;5;251m  ";
+$p = "\e[48;5;241m  ";
+$q = "\e[48;5;21m  ";
+$r = "\e[48;5;244m  ";
+$s = "\e[48;5;70m  ";
+$u = "\e[48;5;64m  ";
+
+$the_cow = <<EOC
+                          $t
+                            $t
+                              $t              $a$b  $x
+            $c$x                $t          $b  $a$d$a$x
+        $c$x$e$x                  $t      $d$b$a$d$f$a  $x
+        $c$e$c$x  $e$x                      $d$f  $a$f  $x
+      $c$e$c  $e  $c$x                      $a$d$a$g$e$f$x
+      $c    $e  $c  $x                      $g$h$g$h$c$a$x
+        $e$c$e$c  $x            $c$x        $e$c$e$c  $a$x                      $i  $x
+          $c    $i  $d$x    $e$c$b$e$j  $x$k$l$c    $e$m  $f$x          $i    $f  $x
+            $c  $i    $d  $x$g$n$b$c$j$o$j$m  $p$m  $p$f  $e$x        $i$f    $i$x
+              $c  $i    $d$k$l$k$c  $o    $e$g$p$i$f$e  $f  $k$x    $f$i  $f    $i  $x
+                $c    $i  $d$q  $g$e$o  $e$f$g$i$f$m  $e    $q$k$x$f  $i$x$i$f$i$f$i    $x
+                  $c  $i    $n    $g$e$i$f$e$k$q$i      $f    $i$f  $x
+                    $c  $i$r$n    $g  $e  $l$q    $i        $f$q$x
+                    $r$p$r$q  $k$g      $n      $q$n  $g  $n  $q$x
+                                    $n          $g            $q$x
+                                      $n    $k  $n  $q$g$n    $q$x    $c$d$x
+                                        $q  $g$n$q  $g    $n$g$q$x  $c  $d$x
+                                        $k$q$n  $g  $q$g$n$m    $x$p$e$c$x
+                                          $q$n        $g$q$m      $p$e$b$x
+                                  $n$g$x  $q$n$q  $g      $m      $e$p$x
+                                  $k$g$s$m          $r$p$m$p$r  $x
+                                    $u$s$g          $p  $g$m$p$x
+                                  $s$u  $m$s$u      $q$n$g  $x
+                                $s$u  $g$n    $q    $n    $g$x
+                              $g$u  $g  $q      $n            $q$x
+                              $g$u$g  $q  $n  $q  $n$q  $n  $q  $k  $x
+                                $g  $l$q  $n    $q$n$q$n  $q      $k$l$x
+                              $n    $q  $n$q$n    $q  $n  $q      $k  $l$x
+                            $l  $n  $q$n  $q$n  $x$q$n    $q    $k  $l    $x
+                            $l  $q      $n$q    $x    $n        $k$n$k$l  $x
+                            $l$q$l$q  $n  $q$x            $n            $l$x
+                            $q      $n$q$x                  $n            $x
+                          $d  $q  $n$q$x                      $n        $f$r$x
+                        $d$j  $o$n$q$x                        $d  $e$r$e$r$x
+                    $d    $j$o  $x                            $d$e$o$e  $x
+                  $d      $o  $x                              $e$o$e$f  $x
+                  $d  $f      $x                              $e$o$f$e  $x
+                $d  $f      $x                                $o$f$e  $x
+                $d$f      $x                                  $o$e  $x
+              $d  $f    $x                                    $o$e$f$x
+            $d    $f  $x                                      $o$f  $x
+            $d$f    $x                                        $o$f  $x
+          $f      $x                                        $f$j  $r$f$x
+        $j    $r$o$x                                        $f  $o  $j    $x
+        $j    $r$f$x                                        $e$f$o$e$r$j$r$e$f$x
+      $d    $r$p$f$x                                        $f$e$f  $e$o$d  $e$x
+    $d        $p$f$x
+    $c        $p$x
+EOC

@@ -1,0 +1,77 @@
+# Samus Aran (Metroid)
+# by Nintendo (Super Metroid)
+# Generated with Charc0al's cowsay file converter http://charc0al.github.io/cowsay-files/converter
+
+$x = "\e[49m  ";          #reset color
+$t = "$thoughts ";
+$a = "\e[48;5;88m  ";
+$b = "\e[48;5;124m  ";
+$c = "\e[48;5;196m  ";
+$d = "\e[48;5;220m  ";
+$e = "\e[48;5;235m  ";
+$f = "\e[48;5;231m  ";
+$g = "\e[48;5;172m  ";
+$h = "\e[48;5;47m  ";
+$i = "\e[48;5;138m  ";
+$j = "\e[48;5;249m  ";
+$k = "\e[48;5;22m  ";
+$l = "\e[48;5;23m  ";
+$m = "\e[48;5;72m  ";
+$n = "\e[48;5;116m  ";
+$o = "\e[48;5;152m  ";
+$p = "\e[48;5;130m  ";
+$q = "\e[48;5;58m  ";
+$r = "\e[48;5;148m  ";
+
+$the_cow = <<EOC
+                    $t
+                      $t
+                        $t
+                              $a$b    $a$x
+            $a$x    $a$x    $a$b$c$b$c$b$a$x    $a$x    $a$x
+            $d$a    $d$a$x$e$a  $b$f$b$a  $e$x$a$d$a    $d$x
+            $a  $g$d$g$a$e$c$a$h$b$c$b$h$a$c$e$a$g$d$g$a  $x
+          $a  $d$f$d  $g$e$b$a$h  $b$h  $a$b$e$g$d  $f$d$a  $x
+          $a$g$d$a    $g$e$a$i$a$h    $a$i$a$e$g$a    $d$g$a$x
+          $a    $g$d$g$a$e    $j$a$h$a$j$e    $a$g$d$g$a    $x
+          $a$g$a$d    $a  $e$a$e$a$k$a$e$a$e$a  $d    $a$g$a$x
+          $e      $g  $a$e$b$a    $e$a    $b$e$a$g  $e      $x
+          $l$m$n$e        $b$f$a$b$a$b$a$f$b$e        $n$m$l$x
+          $e  $l$o$n$m$l$e$a$b$c$a    $c$b$a$e$l$m$n$o$l$e  $x
+            $e            $a  $c  $a$c  $a  $e            $x
+            $d$f$d$g$p$e    $a  $b$a$b$a  $e    $a$g$d$f$d$x
+            $g$d  $g$p$x$e$q$e  $a    $e  $q$e$x$a$g$d  $g$x
+            $p$d  $g$p$x$e  $r$e        $r$e  $x$a$g$d  $a$x
+            $p$d  $g$p$x  $e  $q        $e  $x  $a$g$d  $a$x
+            $e              $q$r$q    $r$q$e            $g$x
+            $l$n$l$n$l$e$a$e$r$q$r    $q$r$e$a$e$a  $d  $g$x
+          $e$n  $l$m$e$a$g$e$q$r$q    $r$q$e$g$a$e$a$d  $g$x
+          $e$o$n$m  $e$g$d$a$e$q$r    $q$e$a$d$a$e$a$g$d$x
+          $e$n$o$m  $e$g$f$a  $e$q$r$q$e$a  $f$g$e$a$g  $x
+          $e$m$o$m  $e$g$d$a  $e$q$r$q$e$a  $d$g$e      $x
+            $e$o$n$m$e$g  $a  $q$e$q$e$q$a  $g  $e$p$d  $g$x
+            $m$o$n$m$e$g$a$d$a$r$e    $r$a$d$a$g$e$g$d  $g$x
+            $e        $a$g$d$a$r$e$x$e$r$a$d$g$a$e$d$e$d$g$x
+            $m$o$n$m$e$a$d$a$r$q$e$x$e$q$r$a$d$a$x$e$d  $a$x
+            $e        $a$g$a$r$e$x    $e$r$a$g$a$x  $a  $x
+            $l$o$n$l$e$a$e  $q$e$x    $e$q$e  $a$x
+            $e      $x$e$g$a$e  $x    $e  $a$g$e$x
+                      $a$f$g$e$x        $e$g$f$a$x
+                    $e$g$d$g$a$x        $a$g$d$g$e$x
+                    $e$a$g$a  $e$x    $e$a  $g$a$e$x
+                  $e$p$g$a$g$a  $e$x$e$a  $g$a$g$p$e$x
+                  $e$g$d$f$d$g$a$e$x$e$a$g$d$f$d$g$e$x
+                  $e$g$d    $g$a$e$x$e$a$g$d    $g$e$x
+                    $p$g$d$g$a$e$x    $e$a$g$d$g$p$x
+                    $e$g$d$g$a$e$x    $e$a$g$d$g$e$x
+                      $g$d$g$a$x        $a$g$d$g$x
+                      $g$d$g$a$x        $a$g$d$g$x
+                      $g  $a  $x        $a  $g  $x
+                      $p$g$a$e$x        $e$a$g$p$x
+                  $d$e  $a  $e$x        $e$a  $e  $d$x
+                  $g$d$e$a  $e$x        $e$a  $e$d$g$x
+                  $a$g  $e    $x        $e    $g  $a$x
+                  $e  $g$a$e$d$x        $d$e$a$g$e  $x
+                $a$d$g$e  $g  $x        $g  $e  $g$d$a$x
+            $a$g$d    $g$e$g$e$x        $e$g$e$g$d    $g$a$x
+EOC
