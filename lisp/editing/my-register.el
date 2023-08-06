@@ -18,9 +18,10 @@
 
 ;;; registers to jump to some config directories
 ;;
-;; also I have some bookmarks (also to these directories)
+;; also I have some bookmarks (also to these directories or files)
 (set-register ?L '(file . "~/.emacs.d/lisp/local-projects/"))
 (set-register ?l '(file . "~/.emacs.d/lisp/"))
+(set-register ?i '(file . "~/.emacs.d/init.el"))
 
 (provide 'my-register)
 ;;; my-register.el ends here
