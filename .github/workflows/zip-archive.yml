@@ -2,13 +2,14 @@ name: Do a first Emacs call and Create the zip-archive from generated files
 on: [push]
 
 jobs:
-  build:
+  zip:
     runs-on: ubuntu-latest
+
     steps:
       - name: Setup Emacs
         uses: purcell/setup-emacs@master
         with:
-          version: snapshot
+          version: 29.1
 
       - name: Clone the Config
         uses: actions/checkout@v3
@@ -21,8 +22,7 @@ jobs:
 
       - name: Upload the Archive
         id: archive
-        uses: elgohr/Github-Release-Action@v4
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        uses: actions/upload-artifact@v3
         with:
-          title: dok
+          name: semacs-$(git rev-parse --short "$GITHUB_SHA").zip
+          path: semacs.zip
