@@ -1,4 +1,4 @@
-name: Build ZIP from built 3rd party packages and byte-compiled config
+name: Do a first Emacs call and Create the zip-archive from generated files
 on: [push]
 
 jobs:
@@ -9,17 +9,17 @@ jobs:
         uses: purcell/setup-emacs@master
         with:
           version: snapshot
+
       - name: Clone the Config
         uses: actions/checkout@v3
-      - name: Install All Emacs Packages and Build Config
-        run: emacs -batch -l init.el --install --local-projets --modules
-      - name: Byte-Compile init.el and early-init.el
-        run: |
-          emacs -Q --batch --eval '(progn (byte-compile-file "init.el") (byte-compile-file "early-init.el"))'
 
-      - name: Create an Archive
+      - name: Do a First Emacs Call
+        run: emacs -batch -l init.el --install --local-projets --modules
+
+      - name: Create the Archive from Generated Files
         run: tar -czf semacs.zip lisp pam cows dist init.el early-init.el small-init.el snippets .gitignore .github
-      - name: Publish an Archive
+
+      - name: Upload the Archive
         id: archive
         uses: elgohr/Github-Release-Action@v4
         env:
