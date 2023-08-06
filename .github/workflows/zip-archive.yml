@@ -24,5 +24,5 @@ jobs:
         id: archive
         uses: actions/upload-artifact@v3
         with:
-          name: semacs.zip
+          name: semacs
           path: semacs.zip
