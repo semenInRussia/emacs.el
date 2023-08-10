@@ -132,21 +132,26 @@
     (add-hook 'completion-at-point-functions #'cape-elisp-block 20 'local)
     (add-hook 'completion-at-point-functions #'cape-file        20 'local)
     (add-hook 'completion-at-point-functions #'cape-keyword     20 'local)
-    (add-hook 'completion-at-point-functions #'cape-dabbrev     20 'local)
-    (add-hook 'completion-at-point-functions #'cape-abbrev      20 'local)
-    (add-hook 'completion-at-point-functions #'cape-dict        20 'local))
+    ;; `my-capf-word' is `cape-dict' + `cape-dabbrev'
+    (add-hook 'completion-at-point-functions #'my-capf-word     20 'local))
 
-  (advice-add #'cape-dict
-              :around #'cape-wrap-silent)
+  (defun my-capf-word (&optional interactive)
+    "Complete word from dictionary + some words in the opened buffers.
 
-  (advice-add #'cape-dict
-              :around
-              (defun my-eval-quietly (fn &rest args)
-                "Eval a FN with ARGS quitly.
+It compose two functions from `cape': `cape-dict' and `cape-dabbrev', but here I
+try to do complete without saving buffer and other extra messages.  Also it more
+useful, because usually if you need in a dictionary completion than you also can
+try `dabbrev' before.
 
-It's mean: without extra messages, without extra after save hooks"
-                (cl-letf (((symbol-function #'save-buffer) #'ignore))
-                  (apply fn args)))))
+If you call it interactively or INTERACTIVE is non-nil value, then it show
+auto-completion popup with this capf"
+    (interactive (list t))
+    (cl-letf (((symbol-function #'save-buffer) #'ignore)
+              ((symbol-function #'write-region) #'ignore))
+      (funcall ;; cape-wrap-silent
+       (cape-super-capf
+        #'cape-dict
+        #'cape-dabbrev)))))
 
 (provide 'my-corfu)
 ;;; my-corfu.el ends here
