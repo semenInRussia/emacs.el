@@ -55,8 +55,6 @@
   (interactive)
   (let ((default-directory (file-name-directory my-modules-el-file))
         (autoloads (locate-user-emacs-file "lisp/local-projects/my-autoload.el")))
-    (when (file-exists-p autoloads)
-      (byte-compile-file autoloads))
     (my-join-modules-into-modules.el)
     (byte-compile-file my-modules-el-file)
     (when (native-comp-available-p)
