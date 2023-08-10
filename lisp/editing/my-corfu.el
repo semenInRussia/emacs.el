@@ -92,10 +92,12 @@
   ;; I'm using the file from the following GitHub repository:
   ;; https://github.com/dwyl/english-words/
   :custom `(cape-dict-file . ,(f-full (locate-user-emacs-file "dict/english.txt")))
-  :defun (cape-symbol
+  :defun (;; some capfs provided by `cape'
+          cape-symbol
           cape-dabbrev cape-file cape-elisp-block cape-history cape-dict
           cape-keyword cape-sgml cape-tex cape-abbrev cape-symbol
-          cape-wrap-silent)
+          ;; some `cape' internals
+          cape-wrap-silent cape-super-capf)
   :hook (corfu-mode-hook . my-capf-local-setup)
   :config
   ;; make that `completion-at-point-functions' will be the different for every buffer
@@ -133,9 +135,12 @@
     (add-hook 'completion-at-point-functions #'cape-file        20 'local)
     (add-hook 'completion-at-point-functions #'cape-keyword     20 'local)
     ;; `my-capf-word' is `cape-dict' + `cape-dabbrev'
-    (add-hook 'completion-at-point-functions #'my-capf-word     20 'local))
+    (add-hook 'completion-at-point-functions 'my-capf-word     20 'local))
 
-  (defun my-capf-word (&optional interactive)
+  (defalias 'my-capf-word (cape-capf-silent
+                           (cape-super-capf
+                            #'cape-dict
+                            #'cape-dabbrev))
     "Complete word from dictionary + some words in the opened buffers.
 
 It compose two functions from `cape': `cape-dict' and `cape-dabbrev', but here I
@@ -144,14 +149,11 @@ useful, because usually if you need in a dictionary completion than you also can
 try `dabbrev' before.
 
 If you call it interactively or INTERACTIVE is non-nil value, then it show
-auto-completion popup with this capf"
-    (interactive (list t))
-    (cl-letf (((symbol-function #'save-buffer) #'ignore)
-              ((symbol-function #'write-region) #'ignore))
-      (funcall ;; cape-wrap-silent
-       (cape-super-capf
-        #'cape-dict
-        #'cape-dabbrev)))))
+auto-completion popup with this capf")
+
+  ;; Emacs have capf provided by `ispell' which is looks like `cape-dict', I
+  ;; prefer a `cape' one, so disable `ispell'
+  (advice-add 'ispell-complete-word :override 'ignore))
 
 (provide 'my-corfu)
 ;;; my-corfu.el ends here

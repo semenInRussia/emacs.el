@@ -33,6 +33,7 @@
     consult
     ;; auto-completion (`corfu')
     corfu
+    cape  ; it provides some backends for auto-completion (CAPFs)
     ;; my configuration really tied with `embark'.
     ;; I use it for: change reGisTeR of the region, kill the sexp at point,
     ;; do things on the minibuffer items, browse the URL at the cursor
