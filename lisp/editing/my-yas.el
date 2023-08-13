@@ -38,11 +38,15 @@
   :defun (yas--table-hash
           yas--filter-templates-by-condition
           yas--namehash-templates-alist)
-  :global-minor-mode yas-global-mode
+  ;; don't use `yas-global-mode', prefer local minor modes
+  ;; :global-minor-mode yas-global-mode
+  :hook ((prog-mode-hook . yas-minor-mode)
+         (text-mode-hook . yas-minor-mode))
   :custom `((yas-snippet-dirs .
                               ',(list
                                  (locate-user-emacs-file "snippets")))
-            (yas-wrap-around-region . t)))
+            (yas-wrap-around-region . t))
+  :config (yas-reload-all))
 
 (declare-function cape--table-with-properties "cape")
 (declare-function cape--bounds "cape")
@@ -93,11 +97,12 @@ manipulate with it to show helpful things"
      (eq status 'finished)
      (yas-expand)))
 
-  (add-hook
-   'corfu-mode-hook
-   (defun my-yas-capf-setup ()
-     "Add capf for `yasnippet'."
-     (add-hook 'completion-at-point-functions 'my-yas-capf 30 'local))))
+  (with-eval-after-load 'corfu
+    (add-hook
+     'corfu-mode-hook
+     (defun my-yas-capf-setup ()
+       "Add capf for `yasnippet'."
+       (add-hook 'completion-at-point-functions 'my-yas-capf 30 'local)))))
 
 (provide 'my-yas)
 ;;; my-yas.el ends here

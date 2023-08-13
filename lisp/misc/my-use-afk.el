@@ -33,7 +33,8 @@
     consult
     ;; auto-completion (`corfu')
     corfu
-    cape  ; it provides some backends for auto-completion (CAPFs)
+    cape      ; it provides some backends for auto-completion (CAPFs)
+    kind-icon ; icons
     ;; my configuration really tied with `embark'.
     ;; I use it for: change reGisTeR of the region, kill the sexp at point,
     ;; do things on the minibuffer items, browse the URL at the cursor
@@ -88,6 +89,8 @@
     org-table
     org-fold
     org-cycle
+    ;; snippets
+    yasnippet
     ;; fast-exec
     fast-exec
     ;; my translator

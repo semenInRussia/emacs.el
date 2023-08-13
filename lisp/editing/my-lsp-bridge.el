@@ -24,10 +24,12 @@
 ;; My configuration of `lsp-bridge'.  The fastest LSP client
 
 ;;; Code:
+
 (require 'my-leaf)
 (require 'my-flycheck)
 (require 'dash)
-(require 'corfu)
+
+(declare-function corfu-mode "corfu")
 
 
 (leaf posframe
@@ -37,7 +39,8 @@
   :load-path* "lisp/site-lisp/lsp-bridge"
   :hook ((lsp-bridge-user-multiserver-dir . "~/lsp/multi")
          (lsp-bridge-user-langserver-dir . "~/lsp/single/")
-         (lsp-bridge-mode-hook . (lambda () (corfu-mode 0))))
+         (lsp-bridge-mode-hook . (lambda ()
+                                   (and (fboundp 'corfu-mode) (corfu-mode 0)))))
   :custom (;; features
            (lsp-bridge-enable-hover-diagnostic . t)
            (acm-enable-tabnine . nil)

@@ -23,7 +23,7 @@
 
 ;; My configuration of `corfu'.  I choose `corfu' over `company' because
 ;; `company' have a big load time (about 9 secs on my computer) while `corfu'
-;; 3secs
+;; some milliseconds
 
 ;;; Code:
 
@@ -46,7 +46,7 @@
   :init (setq-default completion-in-region-function 'corfu--in-region)
   ;; `completion-in-region-function' was already changed, but
   ;; `global-corfu-mode' enable auto complete, if `corfu-auto' is non-nil
-  :config (global-corfu-mode t)
+  :config (global-corfu-mode t) (corfu-mode t)
   ;; make border of auto-completion minibuffer white/black, it looks like nice
   ;; :custom-face ((corfu-border . '((t :background "black"))))
   :custom (;; by default 2 but 1 one is better
