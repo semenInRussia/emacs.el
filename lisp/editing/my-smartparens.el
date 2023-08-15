@@ -37,6 +37,7 @@
   :defun (sp-clone-sexp sp-use-paredit-bindings)
   :bind (:smartparens-mode-map
          ("C-x C-y" . 'my-sp-clone)
+         ("C-k" . 'sp-kill-hybrid-sexp)
          ("C-c DEL" . 'sp-change-enclosing))
   :config
   (sp-use-paredit-bindings)
