@@ -11,7 +11,7 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'subr-x)  ;; for `string-remove-prefix'
+(require 'subr-x)  ; for `string-remove-prefix'
 
 ;; every custom variable of my config have the following group
 (defgroup my nil "Group for all my config files." :group 'tools)
@@ -137,8 +137,6 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
                                  'full
                                  ".*\\.el$"))
     (byte-compile-file file)))
-
-
 
 ;; some useful macros
 (require 'my-macros)

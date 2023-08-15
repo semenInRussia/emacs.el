@@ -2,24 +2,6 @@
 
 ;; Copyright (C) 2023 hrams205@gmail.com
 
-;; Author: semenInRussia <hrams@DESKTOP-CQH054L>
-;; Version: 0.0.1
-;; Package-Requires: ((dash "2.18.0") (s "1.12.0"))
-;; Homepage: https://github.com/semenInRussia
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 ;;; Commentary:
 
 ;; Configuration file to very small minimal Emacs.
@@ -36,9 +18,14 @@ If a compiled version is exists, load it."
 ;; add my own Emacs library and third party library to `load-path', so you can use it with `require' before
 (add-to-list 'load-path (locate-user-emacs-file "lisp/"))
 
+
 ;; about 21 files (it's a little amount, so start up is faster)
 ;; here required things (they're required for the rest of config)
-(my-load-file (locate-user-emacs-file "lisp/package-management/my-straight.el"))
+
+;; it add ability to load installed 3-rd party packages
+(declare-function pam-activate "pam")
+(my-load-file (locate-user-emacs-file "lisp/package-management/pam.el"))
+(pam-activate)
 (my-load-file (locate-user-emacs-file "lisp/package-management/my-leaf.el"))
 (my-load-file (locate-user-emacs-file "lisp/my-libs.el"))
 (my-load-file (locate-user-emacs-file "lisp/my-lib.el"))
@@ -64,6 +51,7 @@ If a compiled version is exists, load it."
 ;; completion in functions like `switch-to-buffer', `find-file'
 (my-load-file (locate-user-emacs-file "lisp/misc/my-vertico.el"))
 (my-load-file (locate-user-emacs-file "lisp/misc/my-orderless.el"))
+(my-load-file (locate-user-emacs-file "lisp/misc/my-embark.el"))
 (my-load-file (locate-user-emacs-file "lisp/misc/my-consult.el"))
 
 ;; start a server to fast opening files in the same session

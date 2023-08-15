@@ -28,7 +28,6 @@
 
 ;;; Code:
 (require 'my-leaf)
-(require 'my-latex)
 
 (require 'my-lib)
 (require 'smartparens)

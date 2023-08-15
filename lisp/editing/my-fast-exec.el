@@ -38,7 +38,5 @@
   :commands fast-exec-exec
   :config (require 'my-fast-exec-misc))
 
-(eval-when-compile (require 'fast-exec))
-
 (provide 'my-fast-exec)
 ;;; my-fast-exec.el ends here
