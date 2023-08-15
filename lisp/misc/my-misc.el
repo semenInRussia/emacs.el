@@ -51,9 +51,10 @@
   (text-mode))
 
 (with-eval-after-load 'fast-exec
- (fast-exec-bind 'pptx
-                 (fast-exec-make-some-commands
-                  ("New Fake PPTX File" 'my-new-fake-pptx-file))))
+  (eval
+   '(fast-exec-bind 'pptx
+      (fast-exec-make-some-commands
+       ("New Fake PPTX File" 'my-new-fake-pptx-file)))))
 
 ;;; I try to decrease the Emacs startup time
 (defun my-display-startup-time ()

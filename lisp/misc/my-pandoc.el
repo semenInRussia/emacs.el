@@ -43,12 +43,12 @@
       (s-lex-format
        "pandoc -t docx -f latex -o documents/${it}.docx ${it}.tex")))))
 
-(eval-after-load 'fast-exec
-  '(progn
-     (fast-exec-bind 'pandoc
-       (fast-exec-make-some-commands
-        ("Convert Tex Files and Move to Documents Dir"
-         'my-pandoc-tex-to-documents-dir)))))
+(with-eval-after-load 'fast-exec
+  (eval
+   '(fast-exec-bind 'pandoc
+      (fast-exec-make-some-commands
+       ("Convert Tex Files and Move to Documents Dir"
+        'my-pandoc-tex-to-documents-dir)))))
 
 (provide 'my-pandoc)
 ;;; my-pandoc.el ends here

@@ -279,11 +279,9 @@ Save it at filename Theory.pdf"
   "Return path to a pdf tasks file for a ZMS SECTION."
   (f-join (my-zms-section-path section) "Tasks.pdf"))
 
-(eval-after-load 'fast-exec
-  '(progn
-     (require 'fast-exec)
-     (fast-exec-bind
-      'zms
+(with-eval-after-load 'fast-exec
+  (eval
+   '(fast-exec-bind 'zms
       (fast-exec-make-some-commands
        ("New ZMS Task Solution"     'my-zms-new-solution)
        ("Forward ZMS Task Solution" 'my-zms-new-solution-in-current-section)

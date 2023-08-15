@@ -84,10 +84,10 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
   (search-backward "(leaf "))
 
 (with-eval-after-load 'fast-exec
-  (fast-exec-bind
-   'writing-config
-   (fast-exec-make-some-commands
-    ("New Config Module" 'my-new-config-module))))
+  (eval
+   '(fast-exec-bind 'writing-config
+      (fast-exec-make-some-commands
+       ("New Config Module" 'my-new-config-module)))))
 
 (leaf ecukes
   :ensure t

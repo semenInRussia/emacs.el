@@ -27,18 +27,20 @@
 ;;; Code:
 
 (require 'my-leaf)
-(require 'fast-exec-initial-keymaps)
+(eval-and-compile
+  (require 'fast-exec)
+  (require 'fast-exec-initial-keymaps))
 
-(fast-exec-use deadgrep
-               devdocs
-               flycheck
-               magit
-               package
-               skeletor
-               suggest
-               wikinforg
-               yasnippet
-               haskell-mode)
+;; (fast-exec-use deadgrep
+;;                devdocs
+;;                flycheck
+;;                magit
+;;                package
+;;                skeletor
+;;                suggest
+;;                wikinforg
+;;                yasnippet
+;;                haskell-mode)
 
 (leaf straight
   :fast-exec ("Use Package" 'straight-use-package))
