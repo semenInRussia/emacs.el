@@ -1,6 +1,6 @@
 ;;; my-rust.el --- My configuration for rust
 
-;; Copyright (C) 2022 Semen Khramtsov
+;; Copyright (C) 2022, 2023 Semen Khramtsov
 
 ;; Author: Semen Khramtsov <hrams205@gmail.com>
 ;; Version: 0.1
@@ -48,7 +48,6 @@
 
 (leaf rust-mode
   :ensure t
-  :hook (rust-mode-hook . my-rust-whitespace-mode)
   :bind (:rust-mode-map
          ("C-c M-p" . 'my-rust-toggle-pub)
          ("C-c C-t" . 'my-rust-visit-Cargo.toml)
@@ -117,12 +116,7 @@
                                     "Template to format string: "
                                     "\"{}\"")
                                    ", ")
-                                  ");"))))
-
-    (defun my-rust-whitespace-mode ()
-      "Change the `whitespace-mode' for `rust-mode'."
-      (interactive)
-      (whitespace-mode 0))))
+                                  ");"))))))
 
 (provide 'my-rust)
 ;;; my-rust.el ends here
