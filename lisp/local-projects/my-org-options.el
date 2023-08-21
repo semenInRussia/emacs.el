@@ -37,35 +37,35 @@
 (defvar my-org-options-transient)
 
 ;;;###autoload(autoload 'my-org-options-transient "my-org-options")
-(transient-define-prefix my-org-options-transient
-  "Transient for setting of the `org-mode' options."
-  [["Set Info"
-    ("a" "Set Author" my-org-options-author)
-    ("c" "Set Creator" my-org-options-creator)
-    ("e" "Set Email" my-org-options-email)
-    ("l" "Set Language" my-org-options-language)
-    ("t" "Set Title" my-org-options-title)
-    ]
-   ["Export With..."
-    ("'" "Export With Smart Quotes" my-org-options-smart-quotes)
-    ("A" "Export With Author" my-org-options-with-author)
-    ("DEL"
-     "Export With Archived Trees"
-     my-org-options-with-archived-trees)
-    ("C" "Export With Clock" my-org-options-with-clocks)
-    ("D" "Export With Drawers" my-org-options-with-drawers)
-    ("E" "Export With Email" my-org-options-with-email)
-    ("RET"
-     "Export With Preserve-Breaks"
-     my-org-options-with-preserve-breaks)
-    ("S" "Export With String" my-org-options-with-special-string)
-    ("T" "Export With Table of Contents" my-org-options-with-toc)
-    ("^"
-     "Export With Supersripts"
-     my-org-options-with-sub-supersripts)
-    ("*" "Export With Emphasize" my-org-options-with-emphasize)
-    ("n" "Export with Sections Numbers" my-org-options-with-emphasize)
-    ]])
+;; (transient-define-prefix my-org-options-transient
+;;   "Transient for setting of the `org-mode' options."
+;;   [["Set Info"
+;;     ("a" "Set Author" my-org-options-author)
+;;     ("c" "Set Creator" my-org-options-creator)
+;;     ("e" "Set Email" my-org-options-email)
+;;     ("l" "Set Language" my-org-options-language)
+;;     ("t" "Set Title" my-org-options-title)
+;;     ]
+;;    ["Export With..."
+;;     ("'" "Export With Smart Quotes" my-org-options-smart-quotes)
+;;     ("A" "Export With Author" my-org-options-with-author)
+;;     ("DEL"
+;;      "Export With Archived Trees"
+;;      my-org-options-with-archived-trees)
+;;     ("C" "Export With Clock" my-org-options-with-clocks)
+;;     ("D" "Export With Drawers" my-org-options-with-drawers)
+;;     ("E" "Export With Email" my-org-options-with-email)
+;;     ("RET"
+;;      "Export With Preserve-Breaks"
+;;      my-org-options-with-preserve-breaks)
+;;     ("S" "Export With String" my-org-options-with-special-string)
+;;     ("T" "Export With Table of Contents" my-org-options-with-toc)
+;;     ("^"
+;;      "Export With Supersripts"
+;;      my-org-options-with-sub-supersripts)
+;;     ("*" "Export With Emphasize" my-org-options-with-emphasize)
+;;     ("n" "Export with Sections Numbers" my-org-options-with-emphasize)
+;;     ]])
 
 (defun my-org-options-author (author)
   "Set #+AUTHOR option for the current `org-mode' option to AUTHOR."

@@ -125,6 +125,9 @@
          ("C-c C-\\" . my-latex-equation-to-split)
          ("C-c C-w"  . my-latex-kill-section))
   :config                               ;nofmt
+  (leaf aio
+    :ensure t)
+
   (leaf xenops
     :ensure (xenops :repo "dandavison/xenops")
     :hook LaTeX-mode-hook

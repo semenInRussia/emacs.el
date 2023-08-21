@@ -31,9 +31,14 @@
 (require 'dash)
 
 
-(leaf magit-section :ensure t)
-(leaf with-editor :ensure t)
-(leaf git-commit :ensure t)
+(leaf magit-section
+  :ensure t)
+
+(leaf with-editor
+  :ensure t)
+
+(leaf git-commit
+  :ensure t)
 
 (leaf magit
   :ensure (magit :repo "magit/magit"
@@ -57,6 +62,7 @@
   :ensure (git-modes :repo "magit/git-modes" :host github))
 
 (leaf gitignore-templates
+  :ensure t
   :fast-exec ("Insert Git Ignore" 'gitignore-templates-insert))
 
 (leaf github-clone
@@ -66,6 +72,7 @@
 
 (leaf line-reminder
   :ensure (line-reminder :repo "emacs-vs/line-reminder" :host github)
+  :commands line-reminder-mode
   :custom ((line-reminder-bitmap . 'filled-rectangle)
            (line-reminder-show-option . 'indicators)))
 

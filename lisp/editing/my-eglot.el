@@ -48,10 +48,15 @@
   ;; `eglot' use `flymake' instead of `flycheck', so i disable `flycheck'
   (add-hook 'eglot-managed-mode-hook #'turn-off-flycheck)
 
+  ;; a bit of cache for completion
+  (with-eval-after-load 'cape
+    (advice-add 'eglot-completion-at-point :around 'cape-wrap-buster))
+
   ;; don't use inlay hints, because they're a bit useless for me
   ;;
   ;; I'm "True Emacs user"!!!
-  (add-hook 'eglot-managed-mode-hook #'eglot-inlay-hints-mode)
+  ;; (add-hook 'eglot-managed-mode-hook #'eglot-inlay-hints-mode)
+  (setq-default eglot-inlay-hints-mode nil)
 
   (leaf flymake
     :bind (:flymake-mode-map

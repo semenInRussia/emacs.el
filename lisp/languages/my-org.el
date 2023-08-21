@@ -46,7 +46,6 @@
            ;; `org-refile'
            (org-refile-use-outline-path . 'file)
            (org-outline-path-complete-in-steps . nil)
-           (org-refile-targets . '((nil :maxlevel . 9)))
            ;; `org' startup
            (org-fold-core-style . 'overlays)
            (org-startup-folded . t)
@@ -161,7 +160,7 @@
     :load-path "~/projects/rorg/"
     :bind (:org-mode-map
            :package org
-           ("C-c C-x C-x" . rorg-splice-subtree)
+           ("C-c M-s" . rorg-splice-subtree)
            ("C-c C-0" . rorg-wrap-region-or-current-heading)
            ("C-c M-(" . rorg-wrap-region-or-current-heading)
            ("C-c C-{" . rorg-forward-slurp-subtree)

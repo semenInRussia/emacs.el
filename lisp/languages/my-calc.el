@@ -17,6 +17,7 @@
 
 (leaf calc
   :defun (calc-yank-internal calc-pack calc-vector-mean)
+  :custom (calc-left-label . "--- ")
   :bind ((:calc-mode-map
           :package calc
           ("v" . nil)
