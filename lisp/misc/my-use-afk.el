@@ -33,7 +33,6 @@
     consult
     ;; auto-completion (`corfu')
     corfu
-    cape      ; it provides some backends for auto-completion (CAPFs)
     kind-icon ; icons
     ;; my configuration really tied with `embark'.
     ;; I use it for: change reGisTeR of the region, kill the sexp at point,
@@ -67,13 +66,9 @@
     mm-util
     mailabbrev
     mail-parse
-    mm-util
     mm-bodies
     mml
-    puny
-    rmc
     yank-media
-    mailcap
     sendmail
     message
     log-edit
@@ -81,13 +76,9 @@
     ;; org-mode
     org-compat
     calendar
-    find-func
-    format-spec
     org-keys
     ol
-    oc
     org-table
-    org-fold
     org-cycle
     ;; snippets
     yasnippet
