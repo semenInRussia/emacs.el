@@ -47,9 +47,7 @@
           ("C-S-m" . embark-export)
           ("C-M-m" . embark-collect))
          (:embark-general-map
-          ("G" . my-embark-google-search))
-         (:embark-file-map
-          ("G" . my-embark-magit-status)))
+          ("." . my-embark-google-search)))
 
   ;; eval after `embark' was loaded
   :config
@@ -83,13 +81,6 @@
     (browse-url
      (format "http://google.com/search?q=%s" term)))
 
-  ;; support of `magit'
-  ;;
-  ;; was grabbed from the offical wiki
-  (defun my-embark-magit-status (file)
-    "Run `magit-status` on repo containing the embark target."
-    (interactive "GFile: ")
-    (magit-status-setup-buffer (locate-dominating-file file ".git")))
 
   ;; support of `straight'
   ;;
@@ -97,15 +88,15 @@
   (with-eval-after-load 'straight
     (defvar-keymap embark-straight-map
       :parent embark-general-map
-      "u" #'straight-visit-package-website
-      "r" #'straight-get-recipe
-      "i" #'straight-use-package
-      "c" #'straight-check-package
-      "F" #'straight-pull-package
-      "f" #'straight-fetch-package
-      "p" #'straight-push-package
-      "n" #'straight-normalize-package
-      "m" #'straight-merge-package)
+      "u" 'straight-visit-package-website
+      "r" 'straight-get-recipe
+      "i" 'straight-use-package
+      "c" 'straight-check-package
+      "F" 'straight-pull-package
+      "f" 'straight-fetch-package
+      "p" 'straight-push-package
+      "n" 'straight-normalize-package
+      "m" 'straight-merge-package)
 
     (add-to-list 'embark-keymap-alist '(straight . embark-straight-map))
 
