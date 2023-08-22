@@ -31,7 +31,8 @@
  'org-mode
  'my-org-sentence-capitalization
  'my-org-list-item-capitalization
- 'my-org-heading-capitalization)
+ 'my-org-heading-capitalization
+ 'my-org-attributes-capitalization)
 
 (defcustom my-org-list-labels-regexps
   '("\\+" "-" "[0-9]+\\.")
@@ -85,6 +86,13 @@ regexp"
   "Regexp indicates a list item."
   :group 'my
   :type 'regexp)
+
+(defcustom my-org-capitalize-attiributes '("author" "title")
+  "Names of `org-mode' attributes like #+AUTHOR after which word must be upper.
+
+Only names, without #, + and :"
+  :group 'my
+  :type '(repeat string))
 
 (defun my-org-sentence-capitalization ()
   "Capitalize first letter of a sentence in the `org-mode'."
@@ -150,6 +158,22 @@ demotes a first letter after keyword word."
             (skip-chars-backward " *")
             (bolp))))
     (upcase-char -1)))
+
+(defun my-org-attributes-capitalization ()
+  "Capitalize first letter after `org-mode' attributes like #+TITLE."
+  (interactive)
+  (and
+   (not (bobp))
+   ;; line starts with necessary `org-mode' attributes?
+   (-contains-p
+    ;; list of attributes after which uppercase letter should be placed
+    (--map (s-concat "#+" it ":")
+           my-org-capitalize-attiributes)
+    ;; string between line start and the cursor (ignoring the last letter)
+    (s-trim
+     (s-downcase
+      (buffer-substring-no-properties (pos-bol) (1- (point))))))
+   (upcase-char -1)))
 
 (defun my-org-skip-backward-keyword ()
   "If right at the cursor placed `org-mode' keyword, then skipt it."
