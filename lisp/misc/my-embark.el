@@ -35,7 +35,6 @@
 
 (leaf embark
   :defvar (embark-keymap-alist marginalia-prompt-categories)
-  :defun (magit-status-setup-buffer . magit)
   :ensure t
   :bind (("C-." . embark-act)
          ("C-M-." . embark-dwim)
@@ -80,7 +79,6 @@
     (interactive "sSearch Term: ")
     (browse-url
      (format "http://google.com/search?q=%s" term)))
-
 
   ;; support of `straight'
   ;;

@@ -1,24 +1,19 @@
 ;;; my-figlet.el --- My configuration of `figlet' -*- lexical-binding: t; -*-
+
 ;; Copyright (C) 2022 semenInRussia
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
 ;; Homepage: https://github.com/semeninrussia/emacs.el
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 ;;; Commentary:
+
 ;; My configuration of `figlet'.
+
 ;;; Code:
+
 (require 'my-leaf)
-(require 'my-fast-exec)
 (require 'dash)
+
 (leaf figlet
   :ensure t
   :custom ((figlet-default-font . "Star Wars")
@@ -314,5 +309,6 @@
                            "Wow")))
   :fast-exec (("View a Text" 'figlet)
               ("Insert a Text as Comment" 'figlet-comment)))
+
 (provide 'my-figlet)
 ;;; my-figlet.el ends here

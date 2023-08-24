@@ -1,10 +1,6 @@
 ;;; my-supersave.el --- My config for `supersave'
-
 ;; Copyright (C) 2022-2023 Semen Khramtsov
 
-;; Author: Semen Khramtsov <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
 
 ;;; Commentary:
 
