@@ -25,3 +25,5 @@ xenops/
 /lisp/package-management/sandbox/
 /dist/
 /lisp/local-projects/my-autoload.el
+/devdocs/
+/emacs-gc-stats.eld.gz
