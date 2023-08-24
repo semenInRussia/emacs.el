@@ -1,5 +1,4 @@
 ;;; my-vertico.el --- Settings of `vertico': the modern completion -*- lexical-binding: t -*-
-
 ;;; Copyright (c) 2023
 
 ;;; Commentary:
@@ -16,11 +15,13 @@
                    :repo "minad/vertico"
                    :files ("*.el" "extensions/*.el"))
   :commands vertico--advice
-  :custom (vertico-count . 6)
+  :custom ((vertico-count . 6)
+           (enable-recursive-minibuffers . t))
   ;; it's part of `vertico-mode'
   :init
   (advice-add 'completing-read-default :around #'vertico--advice)
   (advice-add 'completing-read-multiple :around #'vertico--advice)
+  :defun vertico-mode
   :config (vertico-mode t)
   :config
   ;; I press `M-delete' to go the up directory inside of `vertico'
