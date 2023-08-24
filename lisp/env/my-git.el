@@ -51,6 +51,10 @@
                 magit-insert-tags-header
                 magit-insert-unpushed-to-upstream-or-recent
                 magit-insert-unpulled-from-upstream)))
+  :init
+  (with-eval-after-load 'project
+    (add-to-list 'project-switch-commands '(magit-project-status "Magit") t)
+    (keymap-set project-prefix-map "m" 'magit-project-status))
   :config
   (add-hook 'magit-mode-hook #'hl-line-mode))
 

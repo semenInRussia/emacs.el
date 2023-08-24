@@ -5,24 +5,10 @@
 ;; Version: 0.1
 ;; URL: https://github.com/semenInRussia/emacs.el
 
-;; This file is not part of GNU Emacs.
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 ;;; Commentary:
 
-;; My config for `consult'.
+;; My config for `consult': find files, search string, switch to buffer and
+;; other useful things.
 
 ;;; Code:
 
@@ -43,7 +29,6 @@
   :commands (consult-register-format
              consult-register-window
              consult-xref)
-  :init (autoload 'consult-xref "consult-xref")
   :defvar (consult-narrow-key consult-project-function consult-buffer-sources)
   :bind (:minibuffer-local-map
          ("M-s" . consult-history) ;; orig. next-matching-history-element
@@ -51,13 +36,7 @@
   :bind (("C-x C-b" . consult-buffer)
          ("C-c i" . consult-imenu)
          ("C-c n" . consult-imenu-multi))
-  :bind ((:project-prefix-map
-          :package project
-          ;; instead of built-in `projectile-find-regexp'
-          ;; sometimes use command from `projectile-prefix-map' more useful
-          ;; , than "C-c s" for example, when you swithch to project and need to find regexp
-          ("g" . consult-ripgrep))
-         (:meow-normal-state-keymap
+  :bind ((:meow-normal-state-keymap
           :package meow
           ("X" . consult-line)
           ("Q" . consult-goto-line))
@@ -72,13 +51,30 @@
          ;; Other custom bindings
          ;; M-g bindings in `goto-map'
          ("M-g e" . consult-compile-error)
-         ("M-g I" . consult-imenu-multi))
+         ("M-g I" . consult-imenu-multi)
+         ("M-g i" . consult-imenu))
   :custom ((register-preview-delay  . 0.5)
            (register-preview-function . #'consult-register-format))
 
   ;; i don't know what does the next line
   :hook ((completion-list-mode-hook . consult-preview-at-point-mode))
   :config
+
+  (leaf project
+    :bind (:project-prefix-map
+           ;; instead of built-in `projectile-find-regexp' sometimes use command
+           ;; from `projectile-prefix-map' more useful , than "C-c s" for
+           ;; example, when you swithch to project and need to find regexp
+           ("g" . consult-ripgrep))
+    :config
+    ;; change "Find regrexp" with `consult-ripgrep' instead of
+    ;; `project-find-regexp'
+    (->>
+     project-switch-commands
+     (--replace-where
+      (equal (-second-item it) "Find regexp")
+      '(consult-ripgrep "Find regexp"))
+     (setq project-switch-commands )))
 
   ;; This adds thin lines, sorting and hides the mode line of the window.
   (advice-add #'register-preview :override #'consult-register-window)
@@ -93,20 +89,14 @@
   ;; `embark' like to flexible keymap that changes depending on
   ;; when I call `embark-act'
   ;;
-  ;; here only the integration of `embark' with `vertico', the configuration of
-  ;; `vertico' inside `my-embark'
+  ;; here (in this file) only the integration of `embark' with `vertico'
   (leaf embark-consult
     :ensure t
     :hook (embark-collect-mode-hook . consult-preview-at-point-mode))
 
   ;; don't suggest `recentf' files in `consult-buffer'
   (remove-from-list! consult-buffer-sources
-                     'consult--source-recent-file)
-
-  ;; the following lines fix some things which are wrong in my emacs@29
-  ;; (defvar string-width 0)
-  ;; (defun compat-call (&rest _) 0)
-  )
+                     'consult--source-recent-file))
 
 (leaf consult-dir
   :ensure t)
