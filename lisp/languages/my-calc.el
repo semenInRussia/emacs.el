@@ -17,14 +17,10 @@
 
 (leaf calc
   :defun (calc-yank-internal calc-pack calc-vector-mean)
-  :custom (calc-left-label . "--- ")
-  :bind ((:calc-mode-map
-          :package calc
-          ("v" . nil)
-          ("v y" . my-calc-mean-yank))
-         (:calc-edit-mode-map
-          :package calc-yank
-          ([remap save-buffer] . calc-edit-finish)))
+  :custom (calc-left-label . "  ")
+  :bind (:calc-edit-mode-map
+         :package calc-yank
+         ([remap save-buffer] . calc-edit-finish))
   :config
   (defun my-calc-mean-yank (vec)
     "Yank to calculator vector of numbers VEC as string and compute mean.
