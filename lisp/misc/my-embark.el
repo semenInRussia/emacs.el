@@ -55,13 +55,13 @@
     "Do `embark-act' without exit from the minibuffer."
     (interactive)
     (let ((embark-quit-after-action nil))
-      (call-interactively #'embark-act)))
+      (embark-act)))
 
   (defun my-embark-act-all-noexit ()
     "Do `embark-act-all' without exit from the minibuffer."
     (interactive)
     (let ((embark-quit-after-action nil))
-      (call-interactively #'embark-act-all)))
+      (embark-act-all)))
 
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
