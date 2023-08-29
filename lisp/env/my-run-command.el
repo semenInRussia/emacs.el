@@ -30,6 +30,7 @@
     :config (run-command-recipes-use-all)))
 
 (global-set-key (kbd "S-<f5>")  #'my-run-last-command)
+(global-set-key (kbd "M-!")     #'compile)
 
 (defvar run-command-last-recipe nil
   "Last runned recipe of `run-command'.")
