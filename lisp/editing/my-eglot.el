@@ -32,7 +32,12 @@
 
 
 (leaf eglot
-  :custom `(eglot-send-changes-idle-time . 1) ; in seconds
+  :custom `((eglot-send-changes-idle-time . 1)  ; in seconds
+            (eglot-ignored-server-capabilities
+             . '(;; disable code lens
+                 :codeLensProvider
+                 ;; disable inlay hints
+                 :inlayHintProvider)))
   :custom-face (eglot-highlight-symbol-face . '((t (:inherit lazy-highlight))))
   :defun eglot-inlay-hints-mode
   :bind (:eglot-mode-map
@@ -47,16 +52,6 @@
   :config
   ;; `eglot' use `flymake' instead of `flycheck', so i disable `flycheck'
   (add-hook 'eglot-managed-mode-hook #'turn-off-flycheck)
-
-  ;; a bit of cache for completion
-  (with-eval-after-load 'cape
-    (advice-add 'eglot-completion-at-point :around 'cape-wrap-buster))
-
-  ;; don't use inlay hints, because they're a bit useless for me
-  ;;
-  ;; I'm "True Emacs user"!!!
-  ;; (add-hook 'eglot-managed-mode-hook #'eglot-inlay-hints-mode)
-  (setq-default eglot-inlay-hints-mode nil)
 
   (leaf flymake
     :bind (:flymake-mode-map
