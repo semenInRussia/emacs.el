@@ -114,14 +114,16 @@
   :setf (;; a formatter for C++
          ((alist-get 'c++-mode apheleia-mode-alist)
           . 'uncrustify)
+         ((alist-get 'c-mode apheleia-mode-alist)
+          . 'uncrustify)
          ((alist-get 'uncrustify apheleia-formatters)
           . '("uncrustify" "-f" filepath "-c" uncrustify-cfg-file "-o"))
          ;; find the --edition of "rustfmt"
          ((alist-get 'rustfmt apheleia-formatters)
           . '("rustfmt" "--edition" "2021" "--quiet" "--emit" "stdout"))
-         ;; use yapf+isort instead of black for python
+         ;; use black+isort
          ((alist-get 'python-mode apheleia-mode-alist)
-          . '(yapf isort))))
+          . '(isort black))))
 
 (provide 'my-apheleia)
 ;;; my-apheleia.el ends here
