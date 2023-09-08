@@ -67,7 +67,7 @@
            (os1-use-variable-pitch . nil)
            (os1-use-more-italic . t)))
 
-(load-theme 'ef-cyprus :no-confirm)
+(load-theme 'ef-maris-light :no-confirm)
 
 (setq-default line-spacing 0.1)
 
