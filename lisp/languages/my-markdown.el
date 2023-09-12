@@ -61,6 +61,22 @@ See `imenu-generic-expression'"
    (my-markdown-first-letter-of-heading-p)
    (upcase-char -1)))
 
+(defun autoformat-markdown-capitalize-list-item ()
+  "Capitalize first letter of a list item line."
+  (interactive)
+  (and
+   ;; line starts with list item prefix
+   (or
+    (--any-p (just-line-prefix-p it nil 'trim)
+             '("-" "+" "*"))
+    (just-line-regexp-prefix-p
+     " *[0-9]+\\."))
+   ;; the cursor is after the first character
+   (just-call-on-backward-char*
+    (looking-back "^ *\\(-\\|\\+\\|\\*\\|[0-9]+\\.\\) +" nil))
+   ;; then upcase
+   (upcase-char -1)))
+
 (leaf markdown-mode
   :ensure t
   :hook (markdown-mode-hook .
@@ -85,6 +101,7 @@ See `imenu-generic-expression'"
   (my-autoformat-bind-for-major-mode
    'markdown-mode
    'autoformat-markdown-capitalize-heading-line
+   'autoformat-markdown-capitalize-list-item
    'my-autoformat-sentence-capitalization))
 
 (provide 'my-markdown)
