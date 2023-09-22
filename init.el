@@ -16,50 +16,6 @@
 ;; every custom variable of my config have the following group
 (defgroup my nil "Group for all my config files." :group 'tools)
 
-;; change Emacs config directory depends on init file
-;;
-;; after this config you can easily run Emacs with "emacs -l init.el"
-;; not only when init.el inside ~/.emacs.d
-(setq user-emacs-directory
-      (file-name-directory (or load-file-name
-                               (buffer-file-name))))
-
-;; add some files into the `load-path' that config files can require theme and
-;; byte-compiler will be happy
-(eval-and-compile
-  (add-to-list 'load-path (locate-user-emacs-file "lisp/package-management/"))
-  (add-to-list 'load-path (locate-user-emacs-file "lisp/")))
-
-;;; Local Projects
-;; It is my own small "packages" which aren't so big to create real packages
-(eval-and-compile
-  (add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects"))
-  (load (locate-user-emacs-file "lisp/local-projects/my-autoload") :noerror))
-
-;;; add to `load-path' all installed packages
-;;
-;; I'm use `pam' which is built over straight.
-;;
-;; if packages was already installed, then every package was loaded from the
-;; `pam' directory, it's more faster than load packages from package specific directories
-;; because in 2nd case `load-path' will contain about 200+(*) directories and to load one package
-;; with `require' Emacs will checks all these dirs.  When all packages files located inside the `pam' dir
-;; Emacs checks only `pam' dir (instead of 200 other dirs)
-;;
-;; NOTE: amount of the directories in the `load-path' depends on amount of the
-;;   packages and their dependencies (if you use straight)
-(defvar my-straight-packages-already-installed-p t)
-(require 'pam)
-(pam-activate)
-
-;; don't use init.el for custom.el which I don't use
-;;
-;; in the most of configurations, after it Emacs load custom.el, but I fount it
-;; a bit useless.  I prefer `setq' over `custom'
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-
-;;; Benchmarking
-
 (defun my-time-subtract-millis (b a)
   "Subtract two time structutres: A and B and return milliseconds."
   (* 1000.0 (float-time (time-subtract b a))))
@@ -137,6 +93,50 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
                                  'full
                                  ".*\\.el$"))
     (byte-compile-file file)))
+
+;; change Emacs config directory depends on init file
+;;
+;; after this config you can easily run Emacs with "emacs -l init.el"
+;; not only when init.el inside ~/.emacs.d
+(setq user-emacs-directory
+      (file-name-directory (or load-file-name
+                               (buffer-file-name))))
+
+;; add some files into the `load-path' that config files can require theme and
+;; byte-compiler will be happy
+(eval-and-compile
+  (add-to-list 'load-path (locate-user-emacs-file "lisp/package-management/"))
+  (add-to-list 'load-path (locate-user-emacs-file "lisp/")))
+
+;;; Local Projects
+;; It is my own small "packages" which aren't so big to create real packages
+(eval-and-compile
+  (let ((load-suffixes '("el" "elc")))
+    (add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects"))
+    (load (locate-user-emacs-file "lisp/local-projects/my-autoload") :noerror)))
+
+;;; add to `load-path' all installed packages
+;;
+;; I'm use `pam' which is built over straight.
+;;
+;; if packages was already installed, then every package was loaded from the
+;; `pam' directory, it's more faster than load packages from package specific directories
+;; because in 2nd case `load-path' will contain about 200+(*) directories and to load one package
+;; with `require' Emacs will checks all these dirs.  When all packages files located inside the `pam' dir
+;; Emacs checks only `pam' dir (instead of 200 other dirs)
+;;
+;; NOTE: amount of the directories in the `load-path' depends on amount of the
+;;   packages and their dependencies (if you use straight)
+(require 'pam)
+(pam-activate)
+
+;; don't use init.el for custom.el which I don't use
+;;
+;; in the most of configurations, after it Emacs load custom.el, but I fount it
+;; a bit useless.  I prefer `setq' over `custom'
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+
+;;; Benchmarking
 
 ;; some useful macros
 (require 'my-macros)

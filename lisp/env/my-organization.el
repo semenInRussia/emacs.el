@@ -137,7 +137,8 @@ See also `org-save-all-org-buffers'"
 (leaf tg-inbox
   :load-path "~/projects/tg-inbox/"
   :when (file-exists-p "~/projects/tg-inbox/")
-  :commands tg-inbox-sync)
+  :commands tg-inbox-sync
+  :config (add-hook 'tg-inbox-sync-post-hook #'tg-inbox-maybe-send-done-msg))
 
 (provide 'my-organization)
 ;;; my-organization.el ends here

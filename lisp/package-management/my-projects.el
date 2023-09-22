@@ -30,8 +30,7 @@
 (eval-and-compile
   ;; (add-to-list 'load-path "~/projects/fast-exec.el")
   ;; (add-to-list 'load-path "~/projects/simple-indention.el")
-  (add-to-list 'load-path (locate-user-emacs-file "local-projects"))
-  (add-to-list 'load-path (locate-user-emacs-file "site-lisp")))
+  (add-to-list 'load-path (locate-user-emacs-file "local-projects")))
 
 (provide 'my-projects)
 ;;; my-projects.el ends here

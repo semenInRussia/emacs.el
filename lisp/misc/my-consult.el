@@ -74,7 +74,7 @@
      (--replace-where
       (equal (-second-item it) "Find regexp")
       '(consult-ripgrep "Find regexp"))
-     (setq project-switch-commands )))
+     (setq project-switch-commands)))
 
   ;; This adds thin lines, sorting and hides the mode line of the window.
   (advice-add #'register-preview :override #'consult-register-window)

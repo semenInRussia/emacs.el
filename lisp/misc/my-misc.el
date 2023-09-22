@@ -38,10 +38,11 @@
 ;;; russian input method
 ;;; now I can press `C-\\' and language on which I am now
 ;; writting will be changed
-(setq default-input-method "russian-computer")
-(setq default-file-name-coding-system 'utf-8)
-(setq default-keyboard-coding-system 'utf-8)
-(setq buffer-file-coding-system 'utf-8)
+(with-eval-after-load 'my-modules
+  (setq-default default-input-method "russian-computer")
+  (setq default-file-name-coding-system 'utf-8)
+  (setq default-keyboard-coding-system 'utf-8)
+  (setq buffer-file-coding-system 'utf-8))
 
 ;;; just make PPTX (powerpoint) file that can't be read
 (defun my-new-fake-pptx-file ()

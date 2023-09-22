@@ -26,7 +26,7 @@
            (bibtex-dialect . 'biblatex))
   :bind ((:bibtex-mode-map
           ([remap my-format-expression] . 'bibtex-reformat)))
-  :config                               ;nofmt
+  :config
   (leaf bibtex-utils
     :ensure (bibtex-utils :repo "plantarum/bibtex-utils" :host github)))
 

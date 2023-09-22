@@ -21,8 +21,6 @@
 ;; I prefer `straight' over `packages.el'
 (setq package-enable-at-startup nil)
 
-(declare-function my-build-config "build-config.el")
-
 ;; PERF: A second, case-insensitive pass over `auto-mode-alist' is time wasted.
 (setq auto-mode-case-fold nil)
 

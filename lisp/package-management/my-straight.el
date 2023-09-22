@@ -27,10 +27,10 @@
 (declare-function straight-use-package "straight.el")
 
 
-(eval-and-compile
-  ;; `eval-and-compile' really install the package in compile time,
-  ;; it's important, because `my-leaf' needs in `straight-use-package' to install
-  ;; itself and `leaf' needed in the rest config, because `leaf' macro
+(eval-when-compile
+  ;; `eval-when-compile' really install the package in compile time, it's
+  ;; important, because `my-leaf' needs in `straight-use-package' to install
+  ;; itself and `leaf' needed in the rest config, because `leaf' macro.
   (defvar bootstrap-version)
   (setq straight-check-for-modifications nil)
   (let ((bootstrap-file
