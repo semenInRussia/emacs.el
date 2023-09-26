@@ -6,19 +6,6 @@
 ;; Version: 0.1
 ;; Homepage: https://github.com/semeninrussia/emacs.el
 
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 ;;; Commentary:
 
 ;; My configuration of `corfu'.  I choose `corfu' over `company' because
@@ -91,7 +78,12 @@
   :ensure (cape :repo "minad/cape" :host github)
   ;; I'm using the file from the following GitHub repository:
   ;; https://github.com/dwyl/english-words/
-  :custom `(cape-dict-file . ,(f-full (locate-user-emacs-file "dict/english.txt")))
+  ;;
+  ;; wget https://raw.githubusercontent.com/dwyl/english-words/master/words.txt
+  :custom `(cape-dict-file .
+                           ,(if (eq system-type 'windows-nt)
+                                (f-full (locate-user-emacs-file "dict/english.txt"))
+                              "/usr/share/dict/words.txt"))
   :defun (;; some capfs provided by `cape'
           cape-symbol
           cape-dabbrev cape-file cape-elisp-block cape-history cape-dict

@@ -26,12 +26,13 @@
 ;; My configuration for fonts
 
 ;;; Code:
+
 (require 'my-leaf)
 (require 'dash)
 
 ;; you can install this font, from the GitHub repo `nerd-fonts'
 (defcustom my-fonts-main
-  "JetBrains Mono"
+  "JetBrainsMonoNerdFont"
   "Name of the main font to display all."
   :group 'my
   :type 'string)

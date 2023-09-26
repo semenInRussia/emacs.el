@@ -34,11 +34,12 @@
   :hook (js-mode-hook . my-lsp-ensure)
   :defvar lsp-bridge-multi-lang-server-mode-list
   :mode "\\.js$"
-  :config                               ;nofmt
-  (require 'lsp-bridge)
-  (add-to-list 'lsp-bridge-multi-lang-server-mode-list
-               '((typescript-mode js-mode)
-                 . "typescript_rome"))
+  :config
+  (if (not (require 'lsp-bridge nil :noerror))
+      (user-error "`lsp-bridge' didn't installed!!!  LSPs for JS can't work")
+    (add-to-list 'lsp-bridge-multi-lang-server-mode-list
+                 '((typescript-mode js-mode)
+                   . "typescript_rome")))
   (leaf js-comint
     :ensure (js-comint :repo "redguardtoo/js-comint" :host github)))
 
@@ -46,11 +47,12 @@
   :ensure (typescript-mode :repo "emacs-typescript/typescript.el" :host github)
   :hook (typescript-mode-hook . my-lsp-ensure)
   :custom (typescript-indent-level . 2)
-  :config                               ;nofmt
-  (require 'lsp-bridge)
-  (add-to-list 'lsp-bridge-multi-lang-server-mode-list
-               '((typescript-mode js-mode)
-                 . "typescript_rome")))
+  :config
+  (if (not (require 'lsp-bridge nil :noerror))
+      (user-error "`lsp-bridge' didn't installed!!!  LSPs for JS can't work")
+    (add-to-list 'lsp-bridge-multi-lang-server-mode-list
+                 '((typescript-mode js-mode)
+                   . "typescript_rome"))))
 
 (provide 'my-js)
 ;;; my-js.el ends here

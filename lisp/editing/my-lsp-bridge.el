@@ -36,6 +36,7 @@
   :ensure (posframe :repo "tumashu/posframe" :host github))
 
 (leaf lsp-bridge
+  :when (file-exists-p (locate-user-emacs-file "lisp/site-lisp/lsp-bridge/lsp-bridge.el"))
   :load-path* "lisp/site-lisp/lsp-bridge"
   :hook ((lsp-bridge-user-multiserver-dir . "~/lsp/multi")
          (lsp-bridge-user-langserver-dir . "~/lsp/single/")
@@ -49,7 +50,7 @@
            (lsp-bridge-tex-lsp-server . 'texlab)
            (lsp-bridge-multi-lang-server-extension-list . nil)
            ;; misc
-           (lsp-bridge-python-command . "python.exe")
+           (lsp-bridge-python-command . "python")
            (lsp-bridge-diagnostic-display-errors-delay . 0.9)
            ;; use `consult' instead of popup for autofixes
            (lsp-bridge-code-action-enable-popup-menu . nil)

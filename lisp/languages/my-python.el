@@ -19,15 +19,15 @@
   :ensure t
   :mode "\\.py\\'"
   :custom (python-shell-interpreter . "python")
-  :hook ((python-mode-hook . my-python-fix-whitespaces-mode)
-         (python-mode-hook . lsp-bridge-mode))
+  :hook (python-mode-hook . my-python-fix-whitespaces-mode)
   :custom ((lsp-bridge-python-lsp-server . nil)
            (lsp-bridge-python-multi-lsp-server . "pyright_ruff"))
   :bind (:python-mode-map
          ("C-c C-i" . py-sort-imports)
          ("C-c C-o" . my-python-optional-type)
          ("C-c M-p" . my-python-split-params))
-  :config                               ;nofmt
+  :config
+
   (defun my-python-split-multi-imports-in-1-line ()
     "Find all lines importing more then 1 thing from module and split it."
     (interactive)
@@ -73,7 +73,11 @@ Active region is region from BEG to END"
       (sp-get
           (sp-get-sexp)
         (replace-string-in-region "," ",\n" :beg :end))
-      (sp-get (sp-get-sexp) (indent-region-line-by-line :beg :end)))))
+      (sp-get (sp-get-sexp) (indent-region-line-by-line :beg :end))))
+
+  (if (require 'lsp-bridge nil :noerror)
+      (add-hook 'python-mode-hook 'lsp-bridge-mode)
+    (add-hook 'python-mode-hook 'my-lsp-ensure)))
 
 (provide 'my-python)
 ;;; my-python.el ends here
