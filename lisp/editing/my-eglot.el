@@ -32,13 +32,11 @@
 
 
 (leaf eglot
-  :custom `((eglot-send-changes-idle-time . 1)  ; in seconds
-            (eglot-ignored-server-capabilities
+  :custom `((eglot-ignored-server-capabilities
              . '(;; disable code lens
                  :codeLensProvider
                  ;; disable inlay hints
                  :inlayHintProvider)))
-  :custom-face (eglot-highlight-symbol-face . '((t (:inherit lazy-highlight))))
   :defun eglot-inlay-hints-mode
   :bind (:eglot-mode-map
          ("C-c lr" . 'eglot-rename)
