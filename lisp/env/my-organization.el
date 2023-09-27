@@ -1,25 +1,10 @@
-;;; my-organization.el --- My configuration for the my organization
+;;; my-organization.el --- My configuration for my organization
 
-;; Copyright (C) 2022 Semen Khramtsov
+;; Copyright (C) 2022-2023 Semen Khramtsov
 
 ;; Author: Semen Khramtsov <hrams205@gmail.com>
 ;; Version: 0.1
 ;; URL: https://github.com/semenInRussia/emacs.el
-
-;; This file is not part of GNU Emacs.
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -38,10 +23,10 @@
 (leaf org-agenda
   :bind ("C-c a" . org-agenda)
   :custom ((org-agenda-files .
-                             '("~/agenda.org"
-                               "~/projects.org"
-                               "~/inbox.org"
-                               "~/tasks-archive/task-archive.org"))
+                             '("~/agenda/agenda.org"
+                               "~/agenda/projects.org"
+                               "~/agenda/inbox.org"
+                               "~/agenda/tasks-archive/task-archive.org"))
            (org-agenda-hide-tags-regexp . ".")
            (org-agenda-span . 14)
            (org-agenda-prefix-format
@@ -56,9 +41,9 @@
                                   ;; some headings from agenda.org
                                   ;;
                                   ;; it consists of Maybe, Films and Books to Read
-                                  ("~/agenda.org" :regexp . "\\(?:Maybe\\|Films\\|Books\\)")
+                                  ("~/agenda/agenda.org" :regexp . "\\(?:Maybe\\|Films\\|Books\\)")
                                   ;; GTD projects
-                                  ("~/projects.org" :level . 2)))
+                                  ("~/agenda/projects.org" :level . 2)))
   :config
   ;; save all agenda files, after I do refiling
   (defun my-gtd-save-org-buffers ()
@@ -135,6 +120,7 @@ See also `org-save-all-org-buffers'"
 
 ;; my project: sync inbox (see GTD terms) with messages from the Telegram chat
 (leaf tg-inbox
+  :ensure (tg-inbox :repo "semenInRussia/tg-inbox" :host github)
   :load-path "~/projects/tg-inbox/"
   :when (file-exists-p "~/projects/tg-inbox/")
   :commands tg-inbox-sync
