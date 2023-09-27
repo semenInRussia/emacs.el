@@ -50,6 +50,7 @@
 (autoload 'straight-rebuild-package "straight")
 (autoload 'straight-rebuild-all "straight")
 (autoload 'straight--build-dir "straight")
+
 (eval-and-compile
   (defvar straight-use-package-post-build-functions)
   (defvar straight--repo-cache)
@@ -108,15 +109,17 @@ Defaults to 2 functions:
 (defmacro pam--with-straight-hooks (&rest body)
   "Evaluate the BODY with changed hooks for `straight'."
   (declare (indent 0))
-  `(let ((straight-use-package-post-build-functions
-          (append
-           straight-use-package-post-build-functions
-           ;; add specific functions which will be runned after build.  Here I
-           ;; don't use `add-hook' to the `straight' hooks, because the user
-           ;; should can to choose `straight-use-package' or `pam-use-package'
-           ;; and they should have the different behaviours.
-           pam-post-build-functions)))
-     ,@body))
+  `(progn
+     (require 'straight)
+     (let ((straight-use-package-post-build-functions
+            (append
+             straight-use-package-post-build-functions
+             ;; add specific functions which will be runned after build.  Here I
+             ;; don't use `add-hook' to the `straight' hooks, because the user
+             ;; should can to choose `straight-use-package' or `pam-use-package'
+             ;; and they should have the different behaviours.
+             pam-post-build-functions)))
+       ,@body)))
 
 ;;; Public
 
@@ -226,13 +229,16 @@ package"
    (list
     (completing-read "Which package? " (pam--straight-packages))
     'interactive))
-  (let ((default-directory (pam--build-dir)))
+  (let* ((default-directory (pam--build-dir))
+         (build-dir (straight--build-dir pkg)))
     (thread-last
-      pkg
-      (straight--build-dir)
+      build-dir
       (directory-files)
+      ;; `cddr' skips "." and ".."
       (cddr)
       (mapc #'delete-file))
+    (when (file-exists-p build-dir)
+      (delete-directory build-dir :recursive))
     ;; update the autoloads file for EVERY package, because delete only the part
     ;; of my-package-autoloads is hard, if you should delete some `pam'
     ;; packages, call `pam-delete-package' some times and only after manually

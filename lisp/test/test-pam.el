@@ -37,13 +37,12 @@ NOTE that it changes the `default-directory', you can don't use full paths."
            (straight--recipe-lookup-cache (make-hash-table :test 'equal))
            (straight--profile-cache-valid (make-hash-table :test 'equal))
            (straight-cache-autoloads (make-hash-table :test 'equal))
-           (straight--build-cache (make-hash-table :test 'equal))
-           (straight--autoloads-cache (make-hash-table :test 'equal))
            (straight--cached-package-modifications (make-hash-table :test 'equal))
            (straight--success-cache (make-hash-table :test 'equal))
            (straight-base-dir test-pam-path)
            (straight--build-cache (make-hash-table :test 'equal))
-           (straight--autoloads-cache (make-hash-table :test 'equal)))
+           (straight--autoloads-cache (make-hash-table :test 'equal))
+           (straight-recipe-repositories '(melpa)))
        (and
         (file-exists-p pam-build-dir)
         (delete-directory pam-build-dir t))
@@ -101,6 +100,13 @@ NOTE that it changes the `default-directory', you can don't use full paths."
 (ert-deftest test-pam-sync-with-straight ()
   "Test `pam-sync-with-straight'."
   (pam--with-sandbox
+    (straight-pull-recipe-repositories
+     '(org-elpa
+       melpa
+       gnu-elpa-mirror
+       nongnu-elpa
+       el-get
+       emacsmirror-mirror))
     ;; install packages with `straight'
     (straight-use-package 'dash)
     (straight-use-package 's)
