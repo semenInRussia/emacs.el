@@ -37,6 +37,34 @@
 
   (defun my-leaf-keywords-init ()
     "Initialize keywords for macro `leaf'."
+    (add-to-list 'leaf-normalize
+                 '((memq leaf--key (list :remove-hook))
+                   ;; Accept: (sym . val), ((sym sym ...) . val), (sym sym ... . val)
+                   ;; Return: list of pair (sym . val)
+                   ;; Note  : atom ('t, 'nil, symbol) is just ignored
+                   ;;         remove duplicate configure
+                   (mapcar (lambda (elm)
+                             (cond
+                              ((leaf-pairp elm)
+                               (if (eq t (car elm)) `(,leaf--name . ,(cdr elm)) elm))
+                              ((memq leaf--key '(:package))
+                               (if (equal '(t) elm) `(,leaf--name . nil) `(,@elm . nil)))
+                              ((memq leaf--key '(:global-minor-mode))
+                               `(,(leaf-mode-sym (if (equal '(t) elm) leaf--name (car elm))) . ,leaf--name))
+                              ((memq leaf--key '(:hook :mode :interpreter :magic :magic-fallback))
+                               `(,@elm . ,(leaf-mode-sym leaf--name)))
+                              ((memq leaf--key '(:defun))
+                               `(,@elm . ,leaf--name))
+                              ((memq leaf--key (list :pl-custom :pl-pre-setq :pl-setq :pl-setq-default
+                                                     :auth-custom :auth-pre-setq :auth-setq :auth-setq-default))
+                               `(,@elm . leaf-default-plstore))
+                              ((memq leaf--key '(:setq :pre-setq :setq-default :custom :custom-face))
+                               elm)
+                              (t
+                               elm)))
+                           (mapcan
+                            (lambda (elm) (leaf-normalize-list-in-list elm 'dotlistp))
+                            leaf--value))))
     (setq leaf-keywords
           '(:disabled
             (unless
@@ -205,21 +233,21 @@
                                                      ,@leaf--body))
             :straight
             `(,@(mapcar (lambda (elm)
-	        	  `(eval-and-compile
-	        	     (straight-use-package ',(if (eq elm t)
+	        	              `(eval-and-compile
+	        	                 (straight-use-package ',(if (eq elm t)
                                                          leaf--name
                                                        elm))))
                         leaf--value)
-	      ,@leaf--body)
+	            ,@leaf--body)
 
             :pam
             `(,@(mapcar (lambda (elm)
-	        	  `(eval-and-compile
-	        	     (pam-use-package ',(if (eq elm t)
+	        	              `(eval-and-compile
+	        	                 (pam-use-package ',(if (eq elm t)
                                                     leaf--name
                                                   elm))))
                         leaf--value)
-	      ,@leaf--body)
+	            ,@leaf--body)
             :pie
             `(,@(mapcar (lambda (elm)
                           `(eval-and-compile
@@ -365,6 +393,18 @@
                      (elm)
                      `(add-hook ',(car elm)
                                 #',(cdr elm)))
+                   leaf--value)
+                ,@leaf--body))
+            :remove-hook
+            (progn
+              ;; (leaf-register-autoload
+              ;;  (mapcar #'cdr leaf--value)
+              ;;  leaf--name)
+              `(,@(mapcar
+                   (lambda
+                     (elm)
+                     `(remove-hook ',(car elm)
+                                   #',(cdr elm)))
                    leaf--value)
                 ,@leaf--body))
             :advice
