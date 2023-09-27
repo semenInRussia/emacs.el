@@ -157,7 +157,7 @@
     :hook org-mode-hook)
 
   (leaf rorg
-    :load-path "~/projects/rorg/"
+    :ensure (rorg :host github :repo "semenInRussia/rorg")
     :bind (:org-mode-map
            :package org
            ("C-c M-s" . rorg-splice-subtree)

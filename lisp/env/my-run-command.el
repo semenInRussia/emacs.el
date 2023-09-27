@@ -24,8 +24,7 @@
   (advice-add 'run-command-core-run :before #'my-run-command--run--set-last-recipe)
 
   (leaf run-command-recipes
-    :load-path "~/projects/emacs-run-command-recipes"
-    :require t
+    :ensure t
     :defun run-command-recipes-use-all
     :config (run-command-recipes-use-all)))
 
