@@ -16,7 +16,6 @@
 
 (leaf citre
   :ensure t
-  :hook c++-mode-hook
   :custom (citre-tag-reference-mark . "")
   :bind (;; C-c u is the `citre' prefix
          ("C-c u u" . 'citre-update-this-tags-file)
