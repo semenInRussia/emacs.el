@@ -32,7 +32,6 @@
 
 (defvar my-modules-order
   (list
-   "package-management/my-straight.el"
    "package-management/my-leaf.el"
    "package-management"
    "my-libs.el"
