@@ -24,7 +24,9 @@
 ;; My configuration of `focus'.
 
 ;;; Code:
+
 (require 'my-leaf)
+
 
 (leaf focus
   :ensure t

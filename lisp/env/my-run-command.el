@@ -25,7 +25,7 @@
 
   (leaf run-command-recipes
     :ensure t
-    :defun run-command-recipes-use-all
+    :commands run-command-recipes-use-all
     :config (run-command-recipes-use-all)))
 
 (global-set-key (kbd "S-<f5>")  #'my-run-last-command)

@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2023 semenInRussia
 
-;; Author: $6 <hrams@DESKTOP-CQH054L>
+;; Author: semenInRussia
 ;; Version: 0.0.1
 ;; Package-Requires: ((dash "2.18.0") (s "1.12.0"))
 
