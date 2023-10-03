@@ -121,8 +121,6 @@ See also `org-save-all-org-buffers'"
 ;; my project: sync inbox (see GTD terms) with messages from the Telegram chat
 (leaf tg-inbox
   :ensure (tg-inbox :repo "semenInRussia/tg-inbox" :host github)
-  :load-path "~/projects/tg-inbox/"
-  :when (file-exists-p "~/projects/tg-inbox/")
   :commands tg-inbox-sync
   :config (add-hook 'tg-inbox-sync-post-hook #'tg-inbox-maybe-send-done-msg))
 
