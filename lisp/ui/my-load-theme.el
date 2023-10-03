@@ -8,31 +8,26 @@
 
 ;; This file is not part of GNU Emacs.
 
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 ;;; Commentary:
 
 ;;; Code:
 ;; See `doom-themes' (list of themes at starting comments)
 
 ;; List of my favorite themes:
+;; The best one from `ef-themes':
 ;; - `ef-cyprus'
+;; The favorite `doom' themes:
+;; - `doom-dark+'
+;; - `doom-one'
 ;; - `doom-1337'.  The best one, I think
-;; - `gruber-darker'.  Cool, but `org-mode' and `vertico' are bad
 ;; - `doom-monokai-classic'.  Cool
+;; - `doom-gruvbox' (see also just `gruvbox')
+;; Indie:
+;; - `gruber-darker'.  Cool, but `org-mode' and `vertico' are bad
+;; - `flatland'
+;; - `chery-blossom'
+;; - `gruvbox'
 ;; - `solarized'
-;; - `flatland-theme'
 
 (require 'my-leaf)
 
@@ -59,6 +54,16 @@
   :ensure t
   :config (global-hl-line-mode))
 
+(leaf flatland-theme
+  :ensure t
+  :custom-face ((sml-modeline-end-face . '((t :inherit default :border nil)))))
+
+(leaf cherry-blossom-theme
+  :ensure t)
+
+(leaf gruvbox-theme
+  :ensure t)
+
 (leaf os1-theme
   :ensure (os1-theme
            :host github
@@ -67,7 +72,10 @@
            (os1-use-variable-pitch . nil)
            (os1-use-more-italic . t)))
 
-(load-theme 'ef-maris-light :no-confirm)
+
+;; just load theme, the respective autloads and settings (see above)
+;; will be loaded
+(load-theme 'doom-one :no-confirm)
 
 (setq-default line-spacing 0.1)
 

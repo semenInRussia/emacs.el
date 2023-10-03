@@ -73,11 +73,11 @@ Active region is region from BEG to END"
       (sp-get
           (sp-get-sexp)
         (replace-string-in-region "," ",\n" :beg :end))
-      (sp-get (sp-get-sexp) (indent-region-line-by-line :beg :end))))
+      (sp-get (sp-get-sexp) (indent-region-line-by-line :beg :end)))))
 
-  (if (require 'lsp-bridge nil :noerror)
-      (add-hook 'python-mode-hook 'lsp-bridge-mode)
-    (add-hook 'python-mode-hook 'my-lsp-ensure)))
+(leaf eglot
+  :ensure t
+  :hook (python-mode-hook . my-lsp-ensure))
 
 (provide 'my-python)
 ;;; my-python.el ends here
