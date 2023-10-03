@@ -100,24 +100,24 @@ NOTE that it changes the `default-directory', you can don't use full paths."
 (ert-deftest test-pam-sync-with-straight ()
   "Test `pam-sync-with-straight'."
   (pam--with-sandbox
-    (straight-pull-recipe-repositories
-     '(org-elpa
-       melpa
-       gnu-elpa-mirror
-       nongnu-elpa
-       el-get
-       emacsmirror-mirror))
-    ;; install packages with `straight'
-    (straight-use-package 'dash)
-    (straight-use-package 's)
-    ;; ensure: packages haven't installed in `pam' yet
-    (should-not (file-exists-p "pam/dash.el"))
-    (should-not (file-exists-p "pam/s.el"))
-    ;; do sync
-    (pam-sync-with-straight)
-    ;; check
-    (should (file-exists-p "pam/dash.el"))
-    (should (file-exists-p "pam/s.el"))))
+   (straight-pull-recipe-repositories
+    '(org-elpa
+      melpa
+      gnu-elpa-mirror
+      nongnu-elpa
+      el-get
+      emacsmirror-mirror))
+   ;; install packages with `straight'
+   (straight-use-package 'dash)
+   (straight-use-package 's)
+   ;; ensure: packages haven't installed in `pam' yet
+   (should-not (file-exists-p "pam/dash.el"))
+   (should-not (file-exists-p "pam/s.el"))
+   ;; do sync
+   (pam-sync-with-straight)
+   ;; check
+   (should (file-exists-p "pam/dash.el"))
+   (should (file-exists-p "pam/s.el"))))
 
 (ert-deftest test-pam-update-all-packages-autoloads ()
   "Test `pam-update-all-packages-autoloads'."

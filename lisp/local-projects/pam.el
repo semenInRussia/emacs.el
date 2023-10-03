@@ -45,11 +45,12 @@
 ;; NOTE: here I don't wrote (require \\='straight), because in the most of Emacs
 ;;   sessions `straight' is extra dependency of `pam', `straight' will be loaded
 ;;   only when it's really imported.  It saves a little bit of time
-(autoload 'straight-use-package "straight")
-(autoload 'straight-get-recipe "straight")
-(autoload 'straight-rebuild-package "straight")
-(autoload 'straight-rebuild-all "straight")
 (autoload 'straight--build-dir "straight")
+(autoload 'straight-get-recipe "straight")
+(autoload 'straight-pull-recipe-repositories "straight")
+(autoload 'straight-rebuild-all "straight")
+(autoload 'straight-rebuild-package "straight")
+(autoload 'straight-use-package "straight")
 
 (eval-and-compile
   (defvar straight-use-package-post-build-functions)
@@ -110,7 +111,7 @@ Defaults to 2 functions:
   "Evaluate the BODY with changed hooks for `straight'."
   (declare (indent 0))
   `(progn
-     (require 'straight)
+     (pam--load-straight)
      (let ((straight-use-package-post-build-functions
             (append
              straight-use-package-post-build-functions
@@ -287,12 +288,18 @@ Notice that it can take a long time."
   (cddr  ;; here `cddr' skips "." and ".." from the front list
    (directory-files (straight--build-dir))))
 
+(defun pam--load-straight ()
+  "Load straight.el for `pam' things."
+  (unless (featurep 'straight)
+    (require 'straight)
+    (straight-pull-recipe-repositories)))
+
 (defun pam--sync-straight-package (pkg &rest _ignore)
   "Sync with `pam' PKG which have already installed and built with `straight'.
 
 It can be hook to `straight-use-package-post-build-functions' instead of other
 `pam' functions"
-  (run-hook-with-args pam-post-build-functions
+  (run-hook-with-args 'pam-post-build-functions
                       pkg))
 
 (defun pam--copy-straight-files (pkg &optional _ignore)
@@ -316,14 +323,14 @@ directories, instead of just replacing one with other"
     (dolist (file (cddr (directory-files src)))
       ;; copy files: SRC -> DST
       (cond
+       ;; make a directory in DST and move all SRC files into it
        ((file-directory-p file)
-        ;; make a directory in DST and move all SRC files into it
         (unless (file-exists-p (file-name-concat dst file))
           (make-directory (file-name-concat dst file)))
         (pam--copy-files (expand-file-name file)
                          (file-name-concat dst file)))
+       ;; delete a file from DST and copy from SRC
        (t
-        ;; delete a file from DST and copy from SRC
         (ignore-errors
           (delete-file (file-name-concat dst file)))
         (copy-file file (file-name-concat dst file) 'ok-if-already-exists))))))
