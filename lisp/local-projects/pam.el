@@ -46,6 +46,7 @@
 ;;   sessions `straight' is extra dependency of `pam', `straight' will be loaded
 ;;   only when it's really imported.  It saves a little bit of time
 (autoload 'straight--build-dir "straight")
+(autoload 'straight-fetch-package "straight")
 (autoload 'straight-get-recipe "straight")
 (autoload 'straight-pull-recipe-repositories "straight")
 (autoload 'straight-rebuild-all "straight")
@@ -102,6 +103,13 @@ Defaults to 2 functions:
 2. that append autoloads into the `pam' autloads file"
   :group 'pam
   :type 'hook)
+
+(defvar pam-straight-already-loaded-p nil
+  "Determine that straight.el was already loaded.
+
+Note that `featurep' here isn't work, because we also should do some
+other things (load source code + some other things, see sources of
+straight.el)")
 
 ;;; Macros
 
@@ -181,13 +189,25 @@ before building and activation occurs."
     (pam--with-straight-hooks
       (straight-use-package melpa-style-recipe no-clone no-build))))
 
-(defun pam-rebuild-package (melpa-style-recipe &optional recursive)
-  "Rebuild the package.
+(defun pam-fetch-package (package)
+  "Fetch the source of a PACKAGE and save it in the `pam' directory.
 
-The package is defined with MELPA-STYLE-RECIPE (see the `straight'
+You can call this function update.  The difference with
+`straight-fetch-package' is that files will be synced with the `pam'
+directory and autoloads file with `pam-autoloads-filename'."
+  (interactive (list
+                (completing-read "Which recipe to update: "
+                                 (pam--straight-packages))))
+  (pam--with-straight-hooks
+    (straight-fetch-package package 'from-upstream)))
+
+(defun pam-rebuild-package (package &optional recursive)
+  "Rebuild the PACKAGE.
+
+The package is defined with PAKCAGE (see the `straight'
 documentation).  The difference with `straight-rebuild-package' is that after
 build files will be copied into the `pam' directory and autoloads file will be
-updated.  In other it is the same function MELPA-STYLE-RECIPE and RECURSIVE will
+updated.  In other it is the same function PACKAGE and RECURSIVE will
 be passed to `straight-rebuild-package'
 
 Notice that while `pam-use-package' check the mode (install or only activate a
@@ -197,7 +217,7 @@ command."
                 (completing-read "Which recipe to rebuild: "
                                  (pam--straight-packages))))
   (pam--with-straight-hooks
-    (straight-rebuild-package melpa-style-recipe recursive)))
+    (straight-rebuild-package package recursive)))
 
 (defun pam-rebuild-all ()
   "Rebuild all installed packages.
@@ -290,7 +310,7 @@ Notice that it can take a long time."
 
 (defun pam--load-straight ()
   "Load straight.el for `pam' things."
-  (unless (featurep 'straight)
+  (unless pam-straight-already-loaded-p
     (defvar bootstrap-version)
     (let ((bootstrap-file
            (expand-file-name
@@ -304,7 +324,8 @@ Notice that it can take a long time."
           (eval-print-last-sexp)))
       (load bootstrap-file nil 'nomessage))
     (require 'straight)
-    (straight-pull-recipe-repositories)))
+    (straight-pull-recipe-repositories)
+    (setq pam-straight-already-loaded-p t)))
 
 (defun pam--sync-straight-package (pkg &rest _ignore)
   "Sync with `pam' PKG which have already installed and built with `straight'.
