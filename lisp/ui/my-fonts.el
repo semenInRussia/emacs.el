@@ -22,9 +22,6 @@
   :group 'my
   :type 'string)
 
-(setq nerd-icons-font-family my-fonts-main
-      nerd-icons-scale-factor 0.9)
-
 (defcustom my-font-size
   20
   "Name of the main font to display all."
