@@ -3,7 +3,7 @@ on: [push]
 
 jobs:
   zip:
-    runs-on: ubuntu-latest
+    runs-on: manjaro-latest
 
     steps:
       - name: Setup Emacs
