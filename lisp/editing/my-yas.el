@@ -8,19 +8,6 @@
 
 ;; This file is not part of GNU Emacs.
 
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 ;;; Commentary:
 
 ;; My configuration for the `yasnippet'
@@ -33,6 +20,10 @@
 (require 'dash)
 
 
+(defvar my-snippets-dir (locate-user-emacs-file "snippets")
+  "The directory in which I save snippets for `yasnippet'.")
+
+
 (leaf yasnippet
   :ensure (yasnippet :repo "joaotavora/yasnippet")
   :defun (yas--table-hash
@@ -42,11 +33,10 @@
   ;; :global-minor-mode yas-global-mode
   :hook ((prog-mode-hook . yas-minor-mode)
          (text-mode-hook . yas-minor-mode))
-  :custom `((yas-snippet-dirs .
-                              ',(list
-                                 (locate-user-emacs-file "snippets")))
-            (yas-wrap-around-region . t))
-  :config (yas-reload-all))
+  :custom (yas-wrap-around-region . t)
+  :config
+  (setq yas-snippet-dirs (list my-snippets-dir))
+  (yas-reload-all))
 
 (declare-function cape--table-with-properties "cape")
 (declare-function cape--bounds "cape")
