@@ -55,7 +55,7 @@
     :bind (:flymake-mode-map
            ("C-c fd" . 'flymake-show-project-diagnostics)
            ([remap next-error] . 'flymake-goto-next-error)
-           ([remap prev-error] . 'flymake-goto-prev-error)))
+           ([remap previous-error] . 'flymake-goto-prev-error)))
 
   ;; set default LSP servers for all supported languages
   (defvar eglot-server-programs)  ; make compiler happier
