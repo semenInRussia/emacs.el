@@ -63,5 +63,8 @@
 (defvar native-comp-async-report-warnings-errors)
 (setq native-comp-async-report-warnings-errors nil)
 
+(leaf sudo-edit
+  :ensure t)
+
 (provide 'my-misc)
 ;;; my-misc.el ends here
