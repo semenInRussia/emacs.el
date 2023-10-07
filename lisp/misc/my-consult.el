@@ -29,14 +29,16 @@
   :commands (consult-register-format
              consult-register-window
              consult-xref)
-  :defvar (consult-narrow-key consult-project-function consult-buffer-sources)
-  :bind (:minibuffer-local-map
-         ("M-s" . consult-history) ;; orig. next-matching-history-element
-         ("M-r" . consult-history))
-  :bind (("C-x C-b" . consult-buffer)
-         ("C-c i" . consult-imenu)
-         ("C-c n" . consult-imenu-multi))
-  :bind ((:meow-normal-state-keymap
+  :defvar (consult-narrow-key
+           consult-project-function
+           consult-buffer-sources)
+  :bind ((:minibuffer-local-map
+          ("M-s" . consult-history) ;; orig. next-matching-history-element
+          ("M-r" . consult-history))
+         (("C-x C-b" . consult-buffer)
+          ("C-c i" . consult-imenu)
+          ("C-c n" . consult-imenu-multi))
+         (:meow-normal-state-keymap
           :package meow
           ("X" . consult-line)
           ("Q" . consult-goto-line))
@@ -53,7 +55,9 @@
          ("M-g e" . consult-compile-error)
          ("M-g I" . consult-imenu-multi)
          ("M-g i" . consult-imenu))
-  :custom ((register-preview-delay  . 0.5)
+
+  :custom (;; Idk what is it
+           (register-preview-delay  . 0.5)
            (register-preview-function . #'consult-register-format))
 
   ;; i don't know what does the next line
@@ -94,9 +98,11 @@
     :ensure t
     :hook (embark-collect-mode-hook . consult-preview-at-point-mode))
 
-  ;; don't suggest `recentf' files in `consult-buffer'
-  (remove-from-list! consult-buffer-sources
-                     'consult--source-recent-file))
+  ;; don't suggest `recentf' files in `consult-buffer', because on
+  ;; Windows10 it can crush the Emacs :oops
+  (when (equal system-type 'windows-nt)
+    (remove-from-list! consult-buffer-sources
+                       'consult--source-recent-file)))
 
 (leaf consult-dir
   :ensure t)
