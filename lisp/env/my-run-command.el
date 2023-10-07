@@ -25,6 +25,7 @@
 
   (leaf run-command-recipes
     :ensure t
+    :require t
     :commands run-command-recipes-use-all
     :config (run-command-recipes-use-all)))
 
