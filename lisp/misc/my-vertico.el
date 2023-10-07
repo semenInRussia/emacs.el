@@ -34,7 +34,10 @@
            ("DEL" . vertico-directory-delete-char)
            ("M-DEL" . vertico-directory-delete-word)))
 
-  ;; beautifull icons inside `vertico'
+  ;; scroll, mouse inside the `vertico' buffer
+  (leaf vertico-mouse
+    :hook (vertico-mode-hook . vertico-mouse-mode))
+
   (leaf nerd-icons
     :ensure t)
 
@@ -48,7 +51,10 @@
   ;; show a bit of additional info inside the `vertico' `minibuffer'
   (leaf marginalia
     :ensure t
-    :global-minor-mode marginalia-mode))
+    :global-minor-mode marginalia-mode)
+
+  ;; when I type "~/", the rest text is deleted
+  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy))
 
 (provide 'my-vertico)
 ;;; my-vertico.el ends here
