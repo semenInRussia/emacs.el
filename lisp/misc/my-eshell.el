@@ -21,5 +21,15 @@
          ([remap beginning-of-line]      . 'eshell-begin-on-new-line)
          ([remap beginning-of-line-text] . 'eshell-begin-on-new-line)))
 
+(leaf eshell-git-prompt
+  :ensure t
+  :hook (ehsell-mode-hook . my-disable-hl-line-mode)
+  :config
+  (defun my-disable-hl-line-mode ()
+    "Don't highlight the line at point, if this mode is enabled.
+
+This mode is called `hl-line-mode'."
+    (hl-line-mode 0)))
+
 (provide 'my-eshell)
 ;;; my-eshell.el ends here

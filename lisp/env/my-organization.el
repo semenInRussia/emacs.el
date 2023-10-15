@@ -2,10 +2,6 @@
 
 ;; Copyright (C) 2022-2023 Semen Khramtsov
 
-;; Author: Semen Khramtsov <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
-
 ;;; Commentary:
 
 ;; My configuration for the my organization it inspired with GTD.  Some things I
@@ -43,7 +39,11 @@
                                   ;; it consists of Maybe, Films and Books to Read
                                   ("~/agenda/agenda.org" :regexp . "\\(?:Maybe\\|Films\\|Books\\)")
                                   ;; GTD projects
-                                  ("~/agenda/projects.org" :level . 2)))
+                                  ("~/agenda/projects.org" :level . 2)
+                                  ;; my target is to win an ICT
+                                  ;; olympiad, so I learn the computer
+                                  ;; science
+                                  ("~/agenda/CS.org")))
   :config
   ;; save all agenda files, after I do refiling
   (defun my-gtd-save-org-buffers ()

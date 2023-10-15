@@ -36,7 +36,7 @@
     :require t)
 
   ;; (straight-use-package '(just :host github :repo "semenInRussia/just.el"))
-  (leaf just                              ;nofmt
+  (leaf just
     :ensure (just :host github :repo "semenInRussia/just.el")
     :require t)
 
