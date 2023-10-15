@@ -10,6 +10,9 @@
 
 ;;; Code:
 
+(require 'dash)
+
+
 ;; do it, because C-x C-r can conflict with C-x r, when `meow-keypad' is used
 (global-set-key (kbd "C-x C-r") nil)
 
@@ -19,9 +22,10 @@
 ;;; registers to jump to some config directories
 ;;
 ;; also I have some bookmarks (also to these directories or files)
-(set-register ?L '(file . "~/.emacs.d/lisp/local-projects/"))
-(set-register ?l '(file . "~/.emacs.d/lisp/"))
-(set-register ?i '(file . "~/.emacs.d/init.el"))
+(--each '((?L . "lisp/local-projects/")
+          (?l . "lisp/")
+          (?i . "init.el"))
+  (set-register (car it) (cons 'file (locate-user-emacs-file (cdr it)))))
 
 (provide 'my-register)
 ;;; my-register.el ends here
