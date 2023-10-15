@@ -10,9 +10,6 @@
 
 (require 'my-leaf)
 
-(defvar persp-key-map nil)
-(define-prefix-command 'persp-key-map)
-
 
 (leaf persp-mode
   :ensure t
@@ -81,7 +78,7 @@ has a number 1, not 0"
 (leaf consult
   :after consult persp-mode
   :config
-  (consult-customize consult--source-buffer :hidden t :default nil)
+  (consult-customize consult--source-buffer :hidden nil :default nil)
 
   (defun my-persp-buffer-names ()
     "Return the list of the current perspective buffers names."
