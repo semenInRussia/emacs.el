@@ -15,7 +15,18 @@
 (require 'my-leaf)
 (require 'f)
 
-(defvar uncrustify-cfg-file (f-full "~/uncrustify.cfg"))
+(defvar my-apheleia-c-formatter 'clang-tidy
+  "What formatter for C and C++ prefer.
+
+Can be one of the following:
+
+- clang-tidy
+- uncrustify")
+
+(defvar uncrustify-cfg-file (f-full "~/uncrustify.cfg")
+  "Path to the uncrustify config file.
+
+Uncrtustify is a formatter for C++/Java/C/C#/D and other C-like languages.")
 
 
 (leaf apheleia
@@ -97,18 +108,21 @@
          (yaml-mode-hook . apheleia-mode)
          (yaml-ts-mode-hook . apheleia-mode))
   :setf (;; a formatter for C++
-         ((alist-get 'c++-mode apheleia-mode-alist)
-          . 'uncrustify)
-         ((alist-get 'c-mode apheleia-mode-alist)
-          . 'uncrustify)
-         ((alist-get 'uncrustify apheleia-formatters)
-          . '("uncrustify" "-f" filepath "-c" uncrustify-cfg-file "-o"))
          ;; find the --edition of "rustfmt"
          ((alist-get 'rustfmt apheleia-formatters)
           . '("rustfmt" "--edition" "2021" "--quiet" "--emit" "stdout"))
          ;; use black+isort
          ((alist-get 'python-mode apheleia-mode-alist)
-          . '(isort black))))
+          . '(isort black)))
+  :config
+  (pcase my-apheleia-c-formatter
+    (uncrustify
+     (setf (alist-get 'c++-mode apheleia-mode-alist) 'uncrustify
+           (alist-get 'c-mode apheleia-mode-alist) 'uncrustify
+           (alist-get 'uncrustify apheleia-formatters) '("uncrustify"
+                                                         "-f" filepath
+                                                         "-c" uncrustify-cfg-file
+                                                         "-o")))))
 
 (provide 'my-apheleia)
 ;;; my-apheleia.el ends here
