@@ -69,9 +69,12 @@
            ;; instead of built-in `projectile-find-regexp' sometimes use command
            ;; from `projectile-prefix-map' more useful , than "C-c s" for
            ;; example, when you swithch to project and need to find regexp
-           ("g" . consult-ripgrep))
+           ("g" . consult-ripgrep)
+           ;; show the project iBuffer list => choose a project buffer with `consult'
+           ("b" . consult-project-buffer)
+           ("C-b" . consult-project-buffer))
     :config
-    ;; change "Find regrexp" with `consult-ripgrep' instead of
+    ;; change "Find regexp" with `consult-ripgrep' instead of
     ;; `project-find-regexp'
     (->>
      project-switch-commands
