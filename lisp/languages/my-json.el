@@ -1,4 +1,4 @@
-;;; my-json.el --- My configuration for json
+;;; my-json.el --- My configuration for editing JSON inside Emacs
 
 ;; Copyright (C) 2022 Semen Khramtsov
 
@@ -6,35 +6,23 @@
 ;; Version: 0.1
 ;; URL: https://github.com/semenInRussia/emacs.el
 
-;; This file is not part of GNU Emacs.
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 ;;; Commentary:
 
-;; My configuration for json
+;; My configuration for editing JSON inside Emacs.
 
 ;;; Code:
 
 (require 'my-leaf)
 
+
 (leaf json-mode
   :ensure (json-mode :repo "joshwnj/json-mode" :host github)
   :bind (:json-mode-map
          ([:remap my-format-expression] . json-pretty-print-buffer))
+
   :hook (json-mode-hook . my-json-fix-indent-funcs)
-  :config                               ;nofmt
+
+  :config
   (leaf json-snatcher
     :ensure (json-snatcher :repo "Sterlingg/json-snatcher" :host github)
     :bind (:json-mode-map

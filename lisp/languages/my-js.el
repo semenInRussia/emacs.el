@@ -36,7 +36,8 @@
   :mode "\\.js$"
   :config
   (if (not (require 'lsp-bridge nil :noerror))
-      (user-error "`lsp-bridge' didn't installed!!!  LSPs for JS can't work")
+      (ignore-errors
+        (user-error "`lsp-bridge' didn't installed!!!  LSPs for JS can't work"))
     (add-to-list 'lsp-bridge-multi-lang-server-mode-list
                  '((typescript-mode js-mode)
                    . "typescript_rome")))
