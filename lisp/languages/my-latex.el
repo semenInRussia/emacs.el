@@ -6,24 +6,9 @@
 ;; Version: 0.1
 ;; URL: https://github.com/semenInRussia/emacs.el
 
-;; This file is not part of GNU Emacs.
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 ;;; Commentary:
 
-;; My config for LaTeX
+;; My config for LaTeX.
 
 ;;; Code:
 
@@ -34,21 +19,11 @@
 
 
 (declare-function aas-set-snippets "aas.el")
-
-(declare-function my-embrace-add-paren-of-cdlatex-math "my-latex.el")
-(declare-function my-embrace-add-paren-latex-command "my-latex.el")
-(declare-function my-embrace-add-paren-latex-style-command "my-latex.el")
-(declare-function my-latex-style-command-left-paren-regexp "my-latex.el")
-(declare-function my-latex-style-command-left-paren "my-latex.el")
-
 (declare-function TeX-master-file-ask "tex.el")
-(declare-function cdlatex-wrap-environment "cdlatex.el")
-
 (declare-function texmathp "texmathp.el")
 
 (defvar cdlatex-command-alist-comb)
 (defvar cdlatex-math-modify-alist)
-(defvar cdlatex-math-modify-alist-default)
 
 
 (defcustom my-latex-master-files-alist
@@ -61,11 +36,11 @@
   "Find auctex master file for the current buffer."
   (interactive)
   (setq-local TeX-master
-              (and
-               (buffer-file-name)
-               (or
-                (my-latex-lookup-master-file-of (buffer-file-name))
-                (TeX-master-file-ask)))))
+              (or
+               (and
+                (buffer-file-name)
+                (my-latex-lookup-master-file-of (buffer-file-name)))
+               t)))
 
 (defun my-latex-lookup-master-file-of (filename)
   "Lookup a auctex master file for the file with FILENAME."
@@ -78,9 +53,8 @@
   "Return t, when master file key alist MASTER-FILE-KEY match with FILENAME."
   (->
    master-file-key
-   (car)
-   (f-full)
-   (wildcard-to-regexp)
+   car f-full
+   wildcard-to-regexp
    (string-match-p filename)))
 
 (defvar latex-documentclasses
@@ -98,7 +72,6 @@
 (add-hook 'LaTeX-mode-hook 'turn-off-flycheck)
 
 (add-hook 'LaTeX-mode-hook 'my-latex-find-master-file)
-(add-hook 'LaTeX-mode-hook 'my-latex-expansion-mode)
 (add-hook 'LaTeX-mode-hook 'my-latex-disable-auto-fill)
 
 
@@ -108,72 +81,21 @@
 
 
 (leaf tex-mode
-  :defun (((er/mark-LaTeX-math er/mark-LaTeX-inside-environment)
-           . expand-region)
-          (latex-complete-envnames . tex-mode)
-          ((LaTeX-current-environment
-            LaTeX-insert-item
-            LaTeX-env-item
-            LaTeX-find-matching-begin
-            LaTeX-find-matching-end
-            LaTeX-mark-section)
-           . latex))
-  :custom (TeX-master . nil)
+  :defun ((er/mark-LaTeX-math er/mark-LaTeX-inside-environment) . expand-region)
   :bind (:latex-mode-map
          :package tex-mode
          ("C-c C-@"  . my-latex-mark-inside-environment-or-math)
          ("C-c C-\\" . my-latex-equation-to-split)
          ("C-c C-w"  . my-latex-kill-section))
-  :config                               ;nofmt
-  (leaf aio
-    :ensure t)
-
+  :config
   (leaf xenops
     :ensure (xenops :repo "dandavison/xenops")
     :hook LaTeX-mode-hook
-    :after tex-mode
     :custom (xenops-math-image-scale-factor . 2))
 
   (leaf my-latex-insert
     :load-path* "lisp/languages/latex/"
     :hook (LaTeX-mode-hook . my-latex-expansion-mode))
-
-  ;; (leaf yasnippet
-  ;;   :bind (:yas-keymap
-  ;;          ("<tab>" . yas-next-field-or-cdlatex)
-  ;;          ("TAB"   . yas-next-field-or-cdlatex))
-  ;;   :disabled t
-  ;;   :config                             ;nofmt
-  ;;   (require 'calc-lang)
-  ;;   (require 'font-latex)
-
-  ;;   (defun cdlatex-in-yas-field ()
-  ;;     (when-let* ((_ (overlayp yas--active-field-overlay))
-  ;;                 (end (overlay-end yas--active-field-overlay)))
-  ;;       (if (>= (point) end)
-  ;;           (let ((s (thing-at-point 'sexp)))
-  ;;             (unless (and s
-  ;;                          (assoc
-  ;;                           (substring-no-properties s)
-  ;;                           cdlatex-command-alist-comb))
-  ;;               (yas-next-field-or-maybe-expand)
-  ;;               t))
-  ;;         (let (cdlatex-tab-hook minp)
-  ;;           (setq minp
-  ;;                 (min
-  ;;                  (save-excursion (cdlatex-tab) (point))
-  ;;                  (overlay-end yas--active-field-overlay)))
-  ;;           (goto-char minp)
-  ;;           t))))
-
-  ;;   (defun yas-next-field-or-cdlatex nil
-  ;;     "Jump to the next Yas field correctly with cdlatex active."
-  ;;     (interactive)
-  ;;     (if (or
-  ;;          (bound-and-true-p cdlatex-mode)
-  ;;          (bound-and-true-p org-cdlatex-mode))
-  ;;         (cdlatex-tab)
-  ;;       (yas-next-field-or-maybe-expand))))
 
   (defun my-latex-mark-inside-environment-or-math ()
     "If the cursor place inside of the math environment mark that."
@@ -283,7 +205,9 @@
     ;; eval after `my-drag' is loaded
     :init
     (add-up-dragger 'my-latex-try-drag-left-list-item)
-    (add-down-dragger 'my-latex-try-drag-right-list-item)))
+    (add-down-dragger 'my-latex-try-drag-right-list-item))
+
+  (setopt TeX-fold-macro-spec-list '(("{1}" ("emph")))))
 
 (provide 'my-latex)
 ;;; my-latex.el ends here
