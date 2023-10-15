@@ -52,7 +52,31 @@
                   (persp-mode -1))))
   :bind-keymap (:mode-specific-map
                 :package subr-x
-                ("," . persp-key-map)))
+                ("," . persp-key-map))
+  :config
+  (defun my-persp-swith-by-number (num)
+    "Switch to the perspective with a given NUM.
+
+Perspectives sorted by create time.  Note that the first perspective
+has a number 1, not 0"
+    (interactive (list (read-number "Number of a perspective: ")))
+    (->>
+     (persp-names-current-frame-fast-ordered)
+     (nth (1- num))
+     persp-switch))
+
+  (->>
+   '(1 2 3 4 5 6 7 8 9)
+   (--mapcat
+    `((defun ,(intern (concat "my-persp-swith-" (number-to-string it))) ()
+        ,(format "Switch to %s perspective." it)
+        (interactive)
+        (my-persp-swith-by-number ,it))
+      (define-key persp-mode-map
+                  (kbd ,(concat "M-" (number-to-string it)))
+                  ',(intern (concat "my-persp-swith-" (number-to-string it))))))
+   (cons 'progn)
+   eval))
 
 (leaf consult
   :after consult persp-mode
