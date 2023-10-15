@@ -15,12 +15,12 @@
 (require 'my-leaf)
 (require 'f)
 
-(defvar my-apheleia-c-formatter 'clang-tidy
+(defvar my-apheleia-c-formatter 'clang-format
   "What formatter for C and C++ prefer.
 
 Can be one of the following:
 
-- clang-tidy
+- clang-format
 - uncrustify")
 
 (defvar uncrustify-cfg-file (f-full "~/uncrustify.cfg")
@@ -115,14 +115,19 @@ Uncrtustify is a formatter for C++/Java/C/C#/D and other C-like languages.")
          ((alist-get 'python-mode apheleia-mode-alist)
           . '(isort black)))
   :config
-  (pcase my-apheleia-c-formatter
-    (uncrustify
-     (setf (alist-get 'c++-mode apheleia-mode-alist) 'uncrustify
-           (alist-get 'c-mode apheleia-mode-alist) 'uncrustify
-           (alist-get 'uncrustify apheleia-formatters) '("uncrustify"
-                                                         "-f" filepath
-                                                         "-c" uncrustify-cfg-file
-                                                         "-o")))))
+  (cond
+   ((equal my-apheleia-c-formatter 'uncrustify)
+    (setf (alist-get 'c++-mode apheleia-mode-alist) 'uncrustify
+          (alist-get 'c-mode apheleia-mode-alist) 'uncrustify
+          (alist-get 'uncrustify apheleia-formatters) '("uncrustify"
+                                                        "-f" filepath
+                                                        "-c" uncrustify-cfg-file
+                                                        "-o")))
+   ((equal my-apheleia-c-formatter 'clang-format)
+    (setf (alist-get 'c++-mode apheleia-mode-alist) 'clang-format
+          (alist-get 'c-mode apheleia-mode-alist) 'clang-format))
+   (t
+    (message "Undefined C++ formatter"))))
 
 (provide 'my-apheleia)
 ;;; my-apheleia.el ends here
