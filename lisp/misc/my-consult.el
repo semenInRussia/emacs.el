@@ -103,9 +103,26 @@
 
   ;; don't suggest `recentf' files in `consult-buffer', because on
   ;; Windows10 it can crush the Emacs :oops
-  (when (equal system-type 'windows-nt)
-    (remove-from-list! consult-buffer-sources
-                       'consult--source-recent-file)))
+  (if (equal system-type 'windows-nt)
+      (remove-from-list! consult-buffer-sources
+                         'consult--source-recent-file)
+    (defun my-consult--source-recentf-items ()
+      (let ((ht (consult--buffer-file-hash))
+            file-name-handler-alist ;; No Tramp slowdown please.
+            items)
+        (dolist (file recentf-list (nreverse items))
+          ;; Emacs 29 abbreviates file paths by default, see
+          ;; `recentf-filename-handlers'.
+          (unless (eq (aref file 0) ?/)
+            (setq file (expand-file-name file)))
+          (unless (gethash file ht)
+            (push (propertize
+                   (file-name-nondirectory file)
+                   'multi-category `(file . ,file))
+                  items)))))
+
+    (plist-put consult--source-recent-file
+               :items #'my-consult--source-recentf-items)))
 
 (leaf consult-dir
   :ensure t)
