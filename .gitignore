@@ -28,3 +28,7 @@ xenops/
 /devdocs/
 /emacs-gc-stats.eld.gz
 /persp-confs/
+/session.*
+/tramp
+/elpa/
+/custom.el
