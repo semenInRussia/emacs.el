@@ -8,48 +8,24 @@
 
 ;;; Code:
 
+(require 'dash)
 (require 'my-leaf)
+
+(defvar persp-key-map)
 
 
 (leaf persp-mode
   :ensure t
-  ;; enable (enable `persp-mode', only when user either hit one of `persp-mode' commands, which are started
-  ;; on C-c or enable `persp-mode' via M-x.
-  :commands persp-mode
-  :config (persp-mode 'enable)
+  :global-minor-mode persp-mode
   ;; change prefix from the default "C-c p" to "C-c ,"
+  :defvar persp-mode-map
   :custom `((persp-keymap-prefix . ,(kbd "C-c ,"))
-            (persp-load-buffer-functions . nil))
-  :preface
-  (defvar persp-key-map nil)
-  (define-prefix-command 'persp-key-map)
-  :bind (:persp-key-map
-         :package subr-x
-         ("n" . persp-next)
-         ("p" . persp-prev)
-         ("s" . persp-frame-switch)
-         ("S" . persp-window-switch)
-         ("r" . persp-rename)
-         ("c" . persp-copy)
-         ("C" . persp-kill)
-         ("z" . persp-save-and-kill)
-         ("a" . persp-add-buffer)
-         ("b" . persp-switch-to-buffer)
-         ("t" . persp-temporarily-display-buffer)
-         ("i" . persp-import-buffers)
-         ("I" . persp-import-win-conf)
-         ("k" . persp-remove-buffer)
-         ("K" . persp-kill-buffer)
-         ("w" . persp-save-state-to-file)
-         ("W" . persp-save-to-file-by-names)
-         ("l" . persp-load-state-from-file)
-         ("L" . persp-load-from-file-by-names)
-         ("o" . (lambda ()
-                  (interactive)
-                  (persp-mode -1))))
-  :bind-keymap (:mode-specific-map
-                :package subr-x
-                ("," . persp-key-map))
+            ;; if `persp-auto-resume-time' <= 0, then `persp-mode' don't load all auto-saved
+            ;; perspectives at startup, if you need in them, do `persp-load-state-from-file'
+            (persp-auto-resume-time . 0))
+  :config (persp-set-keymap-prefix persp-keymap-prefix)
+  ;; some my custom functions
+  :defun (persp-names-current-frame-fast-ordered persp-switch)
   :config
   (defun my-persp-swith-by-number (num)
     "Switch to the perspective with a given NUM.
@@ -75,10 +51,19 @@ has a number 1, not 0"
    (cons 'progn)
    eval))
 
+(with-eval-after-load 'persp-mode
+  (define-key mode-specific-map "," persp-key-map))
+
+
 (leaf consult
   :after consult persp-mode
+  :defun (consult--buffer-state
+          consult--customize-put
+          my-persp-buffer-names
+          persp-buffer-list-restricted)
   :config
-  (consult-customize consult--source-buffer :hidden nil :default nil)
+  (consult--customize-put '(consult--source-buffer) :default nil)
+  (consult--customize-put '(consult--source-buffer) :hidden nil)
 
   (defun my-persp-buffer-names ()
     "Return the list of the current perspective buffers names."
