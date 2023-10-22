@@ -111,9 +111,8 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
 ;;; Local Projects
 ;; It is my own small "packages" which aren't so big to create real packages
 (eval-and-compile
-  (let ((load-suffixes '("el" "elc")))
-    (add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects"))
-    (load (locate-user-emacs-file "lisp/local-projects/my-autoload.el") :noerror)))
+  (add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects"))
+  (load (locate-user-emacs-file "lisp/local-projects/my-autoload") :noerror))
 
 ;;; add to `load-path' all installed packages
 ;;
