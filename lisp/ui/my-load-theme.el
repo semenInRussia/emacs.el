@@ -75,7 +75,7 @@
 
 ;; just load theme, the respective autloads and settings (see above)
 ;; will be loaded
-(load-theme 'ef-cyprus :no-confirm)
+(load-theme 'doom-gruvbox :no-confirm)
 
 (setq-default line-spacing 0.1)
 
