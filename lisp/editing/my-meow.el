@@ -6,30 +6,20 @@
 ;; Version: 0.1
 ;; Homepage: https://github.com/semeninrussia/emacs.el
 
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 ;;; Commentary:
 
-;; My configuration of `meow'.  `meow' is a modal editing mode for Emacs.
-;; It was inspired by kakoune and has Helix-like key bindings.  I don't love
-;; virgin `meow' (without any configs), because every command is "hardcoded" with
-;; contributers.  For example the keybindings "o" and "O" is hardcoded with Lisp expresion
-;; and jump only around round parentheses, but can also around quotes, double-quotes, symbols,
-;; i think that use `forward-sexp', `backward-sexp' and `mark-sexp' is the better choice.  So
-;; i try to move on `boon': also modal editing mode for Emacs that was created 9 years
-;; ago, while `meow' only 3 and has by 3 times lesser stars on GitHub.
-;; I try to fight with it using my own structural state (see `my-structural')
+;; My configuration of `meow'.  `meow' is a modal editing mode for
+;; Emacs.  It was inspired by kakoune and has Helix-like key bindings.
+;; I don't love virgin `meow' (without any configs), because every
+;; command is "hardcoded" with contributers.  For example the
+;; keybindings "o" and "O" is hardcoded with Lisp expresion and jump
+;; only around round parentheses, but can also around quotes,
+;; double-quotes, symbols, i think that use `forward-sexp',
+;; `backward-sexp' and `mark-sexp' is the better choice.  So i try to
+;; move on `boon': also modal editing mode for Emacs that was created
+;; 9 years ago, while `meow' only 3 and has by 3 times lesser stars on
+;; GitHub.  I try to fight with it using my own structural state (see
+;; `my-structural')
 
 ;;; Code:
 
