@@ -40,6 +40,7 @@
   (leaf org-roam-ui
     :ensure t
     :defun org-roam-ui-mode
+    :custom (org-roam-ui-open-on-start . nil)
     :config (org-roam-ui-mode t)))
 
 (provide 'my-org-roam)
