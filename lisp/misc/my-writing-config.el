@@ -4,30 +4,18 @@
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
-;; Package-Requires: ((dash "2.18.0") (s "1.12.0"))
 ;; Homepage: https://github.com/semeninrussia/emacs.el
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
 ;; My configuration for the writing other configuration.
 
 ;;; Code:
+
 (require 'my-leaf)
 
 (require 'dash)
+(require 'f)
 (require 's)
 
 (declare-function inspector-inspect "inspector.el")
@@ -38,7 +26,7 @@
 DIRECTORY defaults to ~/.emacs.d/lisp/"
   (interactive "sName of the configuration module: \nDDirectory: ")
   (setq directory (or directory user-emacs-directory))
-  (->>                                  ;nofmt
+  (->>
    module-name
    (s-append ".el")
    (s-prepend "my-")
@@ -49,7 +37,7 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
     "writing-config"
     module-name
     (format
-     ";;; my-writing-config.el --- My configuration of `writing-config' -*- lexical-binding: t; -*-
+     ";;; my-writing-config.el --- My configuration of writing-config -*- lexical-binding: t; -*-
 
 ;; Copyright (C) %s semenInRussia
 
@@ -57,24 +45,14 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
 ;; Version: 0.1
 ;; Homepage: https://github.com/semeninrussia/emacs.el
 
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 ;;; Commentary:
 
-;; My configuration of `writing-config'.
+;; My configuration of writing-config.
 
 ;;; Code:
+
+(require 'leaf)
+
 
 (leaf writing-config)
 
@@ -91,7 +69,9 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
 
 (leaf ecukes
   :ensure t
-  :bind (:my-feature-local-map :package feature-mode ("e" . ecukes))
+  :bind (:feature-mode-map
+         :package feature-mode
+         ("C-c C-e" . ecukes))
   :hook (ecukes-mode-hook . my-feature-mode-hook)
   :config (leaf espuds :ensure t :require t))
 
@@ -108,7 +88,7 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
    (--keep
     (-when-let
         ((_ module duration)
-         (s-match "‘\\(.*?\\)’ module took \\(.*?\\)sec" it))             ;nofmt
+         (s-match "‘\\(.*?\\)’ module took \\(.*?\\)sec" it))
       (cons module (string-to-number duration))))
    (--sort (> (cdr it) (cdr other)))
    (inspector-inspect))
