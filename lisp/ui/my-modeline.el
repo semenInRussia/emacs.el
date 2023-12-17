@@ -28,6 +28,8 @@
            (doom-modeline-height . 48)
            ;; enconding not useful I think.
            (doom-modeline-buffer-encoding . nil)
+           ;; version of env too
+           (doom-modeline-env-version . nil)
            ;; don't show directory names in `doom-modeline'
            (doom-modeline-project-detection . 'project)
            (doom-modeline-buffer-file-name-style . 'buffer-name))
