@@ -39,11 +39,7 @@
                                   ;; it consists of Maybe, Films and Books to Read
                                   ("~/agenda/agenda.org" :regexp . "\\(?:Maybe\\|Films\\|Books\\)")
                                   ;; GTD projects
-                                  ("~/agenda/projects.org" :level . 2)
-                                  ;; my target is to win an ICT
-                                  ;; olympiad, so I learn the computer
-                                  ;; science
-                                  ("~/agenda/CS.org")))
+                                  ("~/agenda/projects.org" :level . 2)))
   :config
   ;; save all agenda files, after I do refiling
   (defun my-gtd-save-org-buffers ()
