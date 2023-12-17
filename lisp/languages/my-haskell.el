@@ -10,8 +10,11 @@
 (require 'my-leaf)
 
 
+(defvar flymake-allowed-file-name-masks)
+
 (leaf haskell-mode
   :ensure (haskell-mode :repo "haskell/haskell-mode" :host github)
+  :defvar flymake-allowed-file-name-masks
   ;; :ensure-system-package (("hoogle" . "cabal install hoogle"))
   :hook ((haskell-mode-hook . haskell-indent-mode)
          (haskell-mode-hook . interactive-haskell-mode)
