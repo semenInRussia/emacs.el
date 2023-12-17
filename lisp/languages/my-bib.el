@@ -38,11 +38,10 @@
   :bind (:org-mode-map
          :package org
          ("C-c C-S-b" . 'org-cite-insert))
-  :custom ((org-cite-global-bibliography . '("~/bib.bib"))
-           (org-cite-insert-processor   . 'citar)
-           (org-cite-follow-processor   . 'citar)
-           (org-cite-activate-processor . 'citar)
-           (citar-bibliography . org-cite-global-bibliography))
+  :custom `((org-cite-global-bibliography . '("~/bib.bib"))
+            (org-cite-insert-processor   . 'citar)
+            (org-cite-follow-processor   . 'citar)
+            (org-cite-activate-processor . 'citar))
   :defvar (org-cite-global-bibliography
            citar-indicators
            citar-bibliography
@@ -65,6 +64,9 @@
   ;;        ;; plain text
   ;;        citar-indicator-files
   ;;        my-citar-indicator-notes-nerd-icons))
+
+  (with-eval-after-load 'org
+    (setq citar-bibliography org-cite-global-bibliography))
 
   ;; `citar' + `embark'
   (leaf citar-embark
