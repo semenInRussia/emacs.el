@@ -14,10 +14,6 @@
   "A symbol which tells to Emacs which one choose: LSP or ctags.")
 
 (leaf cc-mode
-  :setq-default (;; enable auto insert newline after ";"
-                 (c-auto-newline . t)
-                 (c-electric-flag . t)
-                 (c-hungry-delete-key . t))
   :config (leaf google-c-style
             :ensure (google-c-style :repo "google/styleguide" :host github)
             :hook ((c++-mode-hook c-mode-hook)   . google-set-c-style)))
