@@ -33,6 +33,7 @@
 ;; load `citar', but for `embark'
 (leaf citar
   :ensure t
+  :defun (unless (functionp 'citar-capf) (defalias 'citar-capf #'ignore))
   :init (add-to-list 'completion-at-point-functions 'citar-capf)
   :hook (org-mode-hook . citar-capf-setup)
   :bind (:org-mode-map
