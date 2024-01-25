@@ -35,7 +35,7 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
       (when (and (not already-loaded) (memq feature features))
         (let ((time (my-time-subtract-millis (current-time) require-start-time)))
           (add-to-list 'my-require-times
-                       (list feature require-start-time time)
+                       (list (intern (format "%s" feature)) require-start-time time)
                        t))))))
 
 (advice-add 'require :around 'my-require-times-wrapper)
@@ -234,3 +234,4 @@ When you apply this command line argument after init Emacs open the my agenda"
 
 (provide 'init)
 ;;; init.el ends here
+(put 'narrow-to-region 'disabled nil)
