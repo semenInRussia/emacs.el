@@ -100,14 +100,6 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
     (byte-compile-file file)))
 
 
-;; generate and byte-compile my-modules.el
-;;
-;; NOTE: I do it after local-projects, because `my-build-config' is a local
-;; project too
-(when (member "--modules" command-line-args)
-  (require 'my-build-config)
-  (my-build-config))
-
 ;; add some files into the `load-path' that config files can require theme and
 ;; byte-compiler will be happy
 (eval-and-compile
@@ -119,6 +111,14 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
 (eval-and-compile
   (add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects"))
   (load (locate-user-emacs-file "lisp/local-projects/my-autoload") :noerror))
+
+;; generate and byte-compile my-modules.el
+;;
+;; NOTE: I do it after local-projects, because `my-build-config' is a local
+;; project too
+(when (member "--modules" command-line-args)
+  (require 'my-build-config)
+  (my-build-config))
 
 ;;; add to `load-path' all installed packages
 ;;
