@@ -1,20 +1,17 @@
-;;; init.el --- Initialize Emacs Lisp code for my Emacs -*- lexical-binding: t; -*-
-
-;; Copyright (C) 2023
-
-;; Author: semenInRussia <hrams205@gmail.com>
-
-;;; Commentary:
-
-;; Initialize Elisp code for my Emacs.
-
-;;; Code:
-
 (require 'cl-lib)
 (require 'subr-x)  ; for `string-remove-prefix'
 
 ;; every custom variable of my config have the following group
 (defgroup my nil "Group for all my config files." :group 'tools)
+
+;; Increase how much is read from processes in a single chunk (default is 4kb).
+;; This is further increased elsewhere, where needed (like our LSP module).
+(setq read-process-output-max (* 64 1024))  ; 64kb
+
+;; don't load anything useless at the startup (like `emacs-lisp-mode' for
+;; *Scratch* or `dashboard')
+(setq initial-major-mode 'fundamental-mode
+      initial-scratch-message "Good Luck!\n: you can start")
 
 (defvar my-require-times nil
   "A list of (FEATURE LOAD-START-TIME LOAD-DURATION).
@@ -81,6 +78,14 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
     (tabulated-list-revert)
     (display-buffer (current-buffer))))
 
+;; change Emacs config directory depends on init file
+;;
+;; after this config you can easily run Emacs with "emacs -l init.el"
+;; not only when init.el inside ~/.emacs.d
+(setq user-emacs-directory
+      (file-name-directory (or load-file-name
+                               (buffer-file-name))))
+
 ;;; Handle some CLI options
 ;; byte-compile local-projects and generate autoloads
 (when (member "--local-projects" command-line-args)
@@ -94,13 +99,14 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
                                  ".*\\.el$"))
     (byte-compile-file file)))
 
-;; change Emacs config directory depends on init file
+
+;; generate and byte-compile my-modules.el
 ;;
-;; after this config you can easily run Emacs with "emacs -l init.el"
-;; not only when init.el inside ~/.emacs.d
-(setq user-emacs-directory
-      (file-name-directory (or load-file-name
-                               (buffer-file-name))))
+;; NOTE: I do it after local-projects, because `my-build-config' is a local
+;; project too
+(when (member "--modules" command-line-args)
+  (require 'my-build-config)
+  (my-build-config))
 
 ;; add some files into the `load-path' that config files can require theme and
 ;; byte-compiler will be happy
@@ -140,8 +146,6 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
 ;; in the most of configurations, after it Emacs load custom.el, but I fount it
 ;; a bit useless.  I prefer `setq' over `custom'
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-
-;;; Benchmarking
 
 ;; some useful macros
 (require 'my-macros)
@@ -216,14 +220,6 @@ When you apply this command line argument after init Emacs open the my agenda"
      (prog1 t
        (nano-agenda)))))
 
-;; generate and byte-compile my-modules.el
-;;
-;; NOTE: I do it after local-projects, because `my-build-config' is a local
-;; project too
-(when (member "--modules" command-line-args)
-  (require 'my-build-config)
-  (my-build-config))
-
 ;;; Load all config files
 
 ;; the most part of the config located inside "~/.emacs.d/lisp" I join all .el
@@ -237,13 +233,6 @@ When you apply this command line argument after init Emacs open the my agenda"
 
 (let ((file-name-handler-alist nil))
   (require 'my-modules))
-
-;; reset some settings which needed for fast load, but are stupid for
-;; editing, to better values for editing (their original values)
-(defvar gc-cons-threshold-original)
-(defvar file-name-handler-alist-original)
-(setq gc-cons-threshold gc-cons-threshold-original
-      file-name-handler-alist file-name-handler-alist-original)
 
 (provide 'init)
 ;;; init.el ends here
