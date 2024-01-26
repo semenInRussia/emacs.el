@@ -41,7 +41,7 @@
            ;; by default to run `corfu' you should press `C-M-i'
            (corfu-auto . t)
            ;; I don't like 0sec, because it bad for yasnippets
-           (corfu-auto-delay . 0.4)
+           (corfu-auto-delay . 0.3)
            ;; when `line-spacing' changed, the default `corfu-count' (10) is bad
            (corfu-count . 5))
   :config

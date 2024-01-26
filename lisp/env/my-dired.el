@@ -33,7 +33,8 @@
   ;; - last modified time
   ;; but u can show it with ")"
   :hook (dired-mode-hook . dired-hide-details-mode)
-  :defun ((my-dired-save-excursion . my-dired-commands.el)
+  :custom (dired-dwim-target . t)
+  :defun ((my-dired-save-excursion . my-dired-commands)
           (embark-open-externally . embark)
           dired-get-file-for-visit)
   :bind (:dired-mode-map
@@ -67,7 +68,7 @@
     :defvar dired-open-functions
     :push ((dired-open-functions . 'my-dired-open-function-pdf))
     :defun (my-dired . (my-pdf-file-p my-try-open-pdf-file))
-    :config                             ;nofmt
+    :config
     (defun my-dired-open-function-pdf ()
       "Open function for `dired-open-functions'."
       (my-try-open-pdf-file (dired-get-file-for-visit)))

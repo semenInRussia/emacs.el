@@ -16,13 +16,13 @@
 ;; every custom variable of my config have the following group
 (defgroup my nil "Group for all my config files." :group 'tools)
 
-(defun my-time-subtract-millis (b a)
-  "Subtract two time structutres: A and B and return milliseconds."
-  (* 1000.0 (float-time (time-subtract b a))))
-
 (defvar my-require-times nil
   "A list of (FEATURE LOAD-START-TIME LOAD-DURATION).
 LOAD-DURATION is the time taken in milliseconds to load FEATURE.")
+
+(defun my-time-subtract-millis (b a)
+  "Subtract two time structutres: A and B and return milliseconds."
+  (* 1000.0 (float-time (time-subtract b a))))
 
 (defun my-require-times-wrapper (orig feature &rest args)
   "Note in `my-require-times' the time taken to require each feature.
@@ -118,11 +118,17 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
 ;;
 ;; I'm use `pam' which is built over straight.
 ;;
-;; if packages was already installed, then every package was loaded from the
-;; `pam' directory, it's more faster than load packages from package specific directories
-;; because in 2nd case `load-path' will contain about 200+(*) directories and to load one package
-;; with `require' Emacs will checks all these dirs.  When all packages files located inside the `pam' dir
-;; Emacs checks only `pam' dir (instead of 200 other dirs)
+;; if packages was already installed, then every package was loaded
+;; from the `pam' directory, it's more faster than load packages from
+;; package specific directories (what do `straight') because in 2nd
+;; case `load-path' will contain about 200+(*) directories and to load
+;; one package with `require' Emacs will checks all these dirs.  When
+;; all packages files located inside the `pam' dir Emacs checks only
+;; `pam' dir (instead of 200 other dirs).
+;;
+;; O(n) vs O(1) to load one package (n is amount of packages)
+;;
+;; This optimization matters for Windows, where slow IO
 ;;
 ;; NOTE: amount of the directories in the `load-path' depends on amount of the
 ;;   packages and their dependencies (if you use straight)
@@ -232,6 +238,12 @@ When you apply this command line argument after init Emacs open the my agenda"
 (let ((file-name-handler-alist nil))
   (require 'my-modules))
 
+;; reset some settings which needed for fast load, but are stupid for
+;; editing, to better values for editing (their original values)
+(defvar gc-cons-threshold-original)
+(defvar file-name-handler-alist-original)
+(setq gc-cons-threshold gc-cons-threshold-original
+      file-name-handler-alist file-name-handler-alist-original)
+
 (provide 'init)
 ;;; init.el ends here
-(put 'narrow-to-region 'disabled nil)

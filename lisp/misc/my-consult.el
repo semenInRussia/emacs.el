@@ -44,9 +44,10 @@
           ("Q" . consult-goto-line))
          ;; C-c bindings in `mode-specific-map'
          ("C-c s" . consult-ripgrep)
-         ("C-c M-x" . consult-mode-command)
-         ("C-c k" . consult-kmacro)
+         ;; ("C-c M-x" . consult-mode-command)
+         ;; ("C-c k" . consult-kmacro)
          ("C-c m" . consult-man)
+         ("C-c q" . consult-keep-lines)
          ([remap Info-search] . consult-info)
          ("M-#" . consult-register-load)
          ("C-M-#" . consult-register)

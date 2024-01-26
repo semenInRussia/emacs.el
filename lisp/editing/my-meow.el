@@ -29,7 +29,6 @@
 (leaf meow
   :ensure (meow :repo "meow-edit/meow" :host github)
   :require t
-  :require my-meow-structural
   :defvar (meow-cheatsheet-layout
            meow-cheatsheet-layout-qwerty
            meow-replace-state-name-list)
@@ -132,7 +131,13 @@
      '("Z" . meow-comment)
      '("'" . repeat)
      '("%" . meow-query-replace-regexp)
+     ;; my own modal state
+     '("/"  . my-load-meow-structural-mode)
      '("<escape>" . ignore)))
+
+  (defun my-load-meow-structural-mode ()
+    (require 'my-meow-structural))
+
   (my-meow-setup)
   (meow-global-mode t)
 

@@ -13,7 +13,6 @@
 (require 'my-leaf)
 (require 'dash)
 
-
 (leaf devdocs
   :ensure t
   :hook ((python-mode-hook . my-devdocs-python-hook)

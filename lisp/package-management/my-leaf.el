@@ -2,22 +2,6 @@
 
 ;; Copyright (C) 2022-2023 semenInRussia
 
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 ;;; Commentary:
 
 ;; My config for `leaf'.
@@ -37,6 +21,19 @@
 
   (defun my-leaf-keywords-init ()
     "Initialize keywords for macro `leaf'."
+    (setq leaf-alias-keyword-alist '(;; use my small PAckage Manager called
+                                     ;; `pam' which is built over `straight'
+                                     (:ensure . :pam)
+                                     ;; I prefer use `setq' over `custom-set'
+                                     ;;
+                                     ;; the main reason is speed, it speed up my
+                                     ;; config in 2.4 times!!! (17secs => 7secs)
+                                     (:custom . :pre-setq)))
+
+    (setq leaf-system-defaults (plist-put leaf-system-defaults
+                                          :leaf-protect nil))
+
+    ;; NOTE that here is very hard to read code, please close your eyes..
     (add-to-list 'leaf-normalize
                  '((memq leaf--key (list :remove-hook))
                    ;; Accept: (sym . val), ((sym sym ...) . val), (sym sym ... . val)
@@ -242,10 +239,9 @@
 
             :pam
             `(,@(mapcar (lambda (elm)
-	        	              `(eval-and-compile
-	        	                 (pam-use-package ',(if (eq elm t)
-                                                    leaf--name
-                                                  elm))))
+	        	              `(pam-use-package ',(if (eq elm t)
+                                                  leaf--name
+                                                elm)))
                         leaf--value)
 	            ,@leaf--body)
             :pie
@@ -818,15 +814,7 @@
             :defer-config
             `((eval-after-load ',leaf--name
                 '(progn ,@leaf--value))
-              ,@leaf--body)))
-    (setq leaf-alias-keyword-alist '(;; use my small PAckage Manager called
-                                     ;; `pam' which is built over `straight'
-                                     (:ensure . :pam)
-                                     ;; I prefer use `setq' over `custom-set'
-                                     ;;
-                                     ;; the main reason is speed, it speed up my
-                                     ;; config in 2.4 times!!! (17secs => 7secs)
-                                     (:custom . :pre-setq))))
+              ,@leaf--body))))
 
   (my-leaf-keywords-init))
 

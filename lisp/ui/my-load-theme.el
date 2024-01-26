@@ -28,6 +28,10 @@
 ;; - `chery-blossom'
 ;; - `gruvbox'
 ;; - `solarized'
+;;
+;; Classic Style:
+;; - `doom-earl-grey'
+;; - `doom-flatwhite'
 
 (require 'my-leaf)
 
@@ -73,11 +77,11 @@
            (os1-use-more-italic . t)))
 
 
+(setq-default line-spacing 0.1)
+
 ;; just load theme, the respective autloads and settings (see above)
 ;; will be loaded
-(load-theme 'doom-gruvbox :no-confirm)
-
-(setq-default line-spacing 0.1)
+(load-theme 'ef-cyprus :no-confirm)
 
 (provide 'my-load-theme)
 ;;; my-load-theme.el ends here

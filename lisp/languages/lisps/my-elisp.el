@@ -1,6 +1,6 @@
 ;;; my-elisp.el --- My configuration of the elisp
 
-;; Copyright (C) 2022-2023 semenInRussia
+;; Copyright (C) 2022-2024 semenInRussia
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -18,7 +18,12 @@
 
 (leaf elisp-mode
   :config
-  (add-hook 'emacs-lisp-mode 'paxedit-mode)
+  (add-hook 'emacs-lisp-mode-hook 'paxedit-mode)
+  (add-hook 'emacs-lisp-mode-hook
+            (defun my-elisp-load-smartparens ()
+              ;; from local-projects
+              (require 'my-elisp-smartparens)
+              (remove-hook 'emacs-lisp-mode-hook 'my-elisp-load-smartparens)))
 
   (leaf inspector
     :ensure (inspector :repo "emacs-straight/inspector" :host github)

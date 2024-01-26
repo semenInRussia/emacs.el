@@ -55,17 +55,8 @@
     :ensure (auto-rename-tag :repo "jcs-elpa/auto-rename-tag" :host github))
 
   (leaf tagedit
-    :ensure (tagedit :repo "magnars/tagedit" :host github)
-    ;;    :bind `(,(--map
-    ;; `(,it
-    ;;   :package ,(my-map-to-major-mode it)
-    ;;   ([remap sp-kill-hybrid-sexp] . tagedit-kill)
-    ;;   ([remap sp-join-sexp]        . tagedit-join-tags)
-    ;;   ([remap sp-raise-sexp]       . tagedit-raise-tag)
-    ;;   ([remap sp-splice-sexp]      . tagedit-splice-tag)
-    ;;   ([remap sp-change-enclosing]  . tagedit-kill-attribute))
-    ;; (my-html-supported-modes-maps))))
-    )
+    :ensure (tagedit :repo "magnars/tagedit" :host github))
+
   (leaf emmet-mode
     :ensure (emmet-mode :repo "smihica/emmet-mode" :host github)
     :hook mhtml-mode-hook)

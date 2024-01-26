@@ -10,8 +10,8 @@
 ;; My configuration of `annotate'.
 
 ;;; Code:
-(require 'my-leaf)
 
+(require 'my-leaf)
 
 (leaf annotate
   :ensure t

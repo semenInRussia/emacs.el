@@ -11,7 +11,11 @@
 ;;; Code:
 
 (defmacro remove-from-list! (list-var &rest elements)
-  "Add ELEMENTS to LIST-VAR.
+  "Remove ELEMENTS from the LIST-VAR.
+
+This is a macro, under cover it use a function `remove' where argument
+is result of remove where argument is result of remove .. .. where
+argument is list.
 
 If element is already inside LIST-VAR, then don't add.  NOTE that LIST-VAR
 should be quoted."

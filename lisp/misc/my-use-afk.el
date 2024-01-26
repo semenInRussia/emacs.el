@@ -22,6 +22,8 @@
     ;; do things on the minibuffer items, browse the URL at the cursor
     ffap  ; a dependency
     embark
+    ;; sometimes
+    comment-dwim-2
     ;; I frequently use `dired', but it have a bad start up time, load it in AFK
     dired
     ;; I use `ace-window' (alternative to C-x o) in 100% of cases.

@@ -10,11 +10,10 @@
 ;; My config for `command-log-mode'
 
 ;;; Code:
+
 (require 'my-leaf)
 
-
-(leaf command-log-mode
-  :ensure t)
+(leaf command-log-mode :ensure t)
 
 (provide 'my-command-log-mode)
 ;;; my-command-log-mode.el ends here
