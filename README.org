@@ -1,4 +1,5 @@
 * semenInRussia emacs configration
+Some men tell me "So, you just copy Doom. Why?".  My answer is that my configration is even better than Doom + it isn't a stupid copy of Doom, my configuration have a big amount of interesting concepts which is unique for this config.  Plus the biggest part of my config is opposite to Doom.  Things where my config is better on 100% I will tell #nodoom, where is better by my opinion (everywhere, but here diff is bit) I will tell #dddm
 
 ** Features
 
@@ -6,27 +7,44 @@
 
   It includes
   + a big amount of themes
-  + diagnostics and other things from echo area at the top left corner
+  + diagnostics and other things from echo area at the top left corner (#nodoom)
   + amazing modeline
-  + icons everywhere
+  + icons everywhere (#nodoom)
   + No to ~prettify-mode~
-  + Small, but amazing paddings around screen
+  + Small, but amazing paddings around screen (#nodoom)
 
-- Very (really very) fast start up.
+- Very (really very) fast start up. (#nodoom #nodoom)
 
   On my old computer ~doomemacs~ starts in 4+ seconds (it prints it after startup), but in fact it also wait for when themes, modeline and other things will be loaded.  My config on other side take only 2secs and almost don't take time after.
 
 - A big amount of packages (192+)
 
-- ~meow~ over ~evil~
+- ~meow~ over ~evil~ (#dddm)
 
-- Own package manager, built over ~straight.el~.
+- Own package manager, built over ~straight.el~. (#nodoom)
 
   The benefit is a speed, it only one time add to the a path ~load-path~.  And other times Emacs will find a package only in this directory, instead of 220+ other dirs when use ~straight.el~
 
-- Use good-practice solutions, like replace heavy things with the more light.
+  It's even better than Doom package manager
+
+- Use good-practice solutions, like replace heavy things with the more light. (#nodoom)
 
 - Use ~perspectives~ (vertual desktops/workspaces for Emacs) with intuitive way
+
+** Extension (my config as framework)
+
+Interesting way to extension, which you can call chaos.
+
+You don't needed my ~pam~ package manager if you want anything other!  You don't needed in any strict file system!  You don't need in any macros!
+
+
+Every config file can be in any subfolder of ~/lisp/~, have any name, contains any things.  Only one separation is that files which not always needed at startup you can place at ~/lisp/local-projects/~ and you will need to build config ~emacs --modules~ and all files from ~/lisp/~ will be joined at ~/dist/my-modules.el~ you can see source of my-modules build inside ~local-projects/my-build-config.el~, also you can generate autoloads files for local-projects (use ~--local-projects~ flag) after that you everywhere can use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Autoload.html][autoloaded]] functions from ~local-projects~.
+
+So main files (files of framework part) are only:
+
+- ~early-init.el~ some speedhacks beginnings for ~init.el~
+- ~init.el~ but only a part, where handling of CLI arguments
+- ~local-projects/my-build-config.el~, I think you understand it
 
 
 ** Installiation
@@ -36,7 +54,9 @@ This Emacs configuration have the most fast way to install (if consider amount o
 You can extract an archive into any directory, and run emacs using ~--init-directory~ flag, like:
 
 #+BEGIN_SRC shell
-emacs --init-directory=~/semacs
+  emacs --init-directory=~/semacs    # semacs is cloned repo source
+  # or
+  emacs -l init.el     # init.el is the file from repo
 #+END_SRC
 
-So you can test it without ~chemacs~ and other stupid things
+So you can test it without ~chemacs~ and other stupid things, you even not neede in emacs29 --init-directory, but you still needed in emacs29
