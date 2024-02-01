@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: readvars
+# key: read
+# --
+${1:size_t} ${2:n};
+cin >> ${2:$(s-join " >> " (--map (s-trim it) (s-split "," yas/text)))};
+$0

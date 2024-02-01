@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: using
+# key: u
+# --
+using ${1:ull} = ${2:unsigned long long};
