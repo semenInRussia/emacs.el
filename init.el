@@ -99,26 +99,11 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
                                  ".*\\.el$"))
     (byte-compile-file file)))
 
-
-;; add some files into the `load-path' that config files can require theme and
-;; byte-compiler will be happy
-(eval-and-compile
-  (add-to-list 'load-path (locate-user-emacs-file "lisp/package-management/"))
-  (add-to-list 'load-path (locate-user-emacs-file "lisp/")))
-
 ;;; Local Projects
 ;; It is my own small "packages" which aren't so big to create real packages
 (eval-and-compile
   (add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects"))
   (load (locate-user-emacs-file "lisp/local-projects/my-autoload") :noerror))
-
-;; generate and byte-compile my-modules.el
-;;
-;; NOTE: I do it after local-projects, because `my-build-config' is a local
-;; project too
-(when (member "--modules" command-line-args)
-  (require 'my-build-config)
-  (my-build-config))
 
 ;;; add to `load-path' all installed packages
 ;;
@@ -140,6 +125,20 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
 ;;   packages and their dependencies (if you use straight)
 (require 'pam)
 (pam-activate)
+
+;; add some files into the `load-path' that config files can require theme and
+;; byte-compiler will be happy
+(eval-and-compile
+  (add-to-list 'load-path (locate-user-emacs-file "lisp/package-management/"))
+  (add-to-list 'load-path (locate-user-emacs-file "lisp/")))
+
+;; generate and byte-compile my-modules.el
+;;
+;; NOTE: I do it after local-projects, because `my-build-config' is a local
+;; project too
+(when (member "--modules" command-line-args)
+  (require 'my-build-config)
+  (my-build-config))
 
 ;; don't use init.el for custom.el which I don't use
 ;;
