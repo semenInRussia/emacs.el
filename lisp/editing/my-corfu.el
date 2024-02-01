@@ -35,7 +35,6 @@
   ;; `global-corfu-mode' enable auto complete, if `corfu-auto' is non-nil
   :config (global-corfu-mode t) (corfu-mode t)
   ;; make border of auto-completion minibuffer white/black, it looks like nice
-  ;; :custom-face ((corfu-border . '((t :background "black"))))
   :custom (;; by default 2 but 1 one is better
            (corfu-auto-prefix . 1)
            ;; by default to run `corfu' you should press `C-M-i'

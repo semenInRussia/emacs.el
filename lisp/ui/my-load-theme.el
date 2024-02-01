@@ -22,6 +22,7 @@
 ;; - `doom-1337'.  The best one, I think
 ;; - `doom-monokai-classic'.  Cool
 ;; - `doom-gruvbox' (see also just `gruvbox')
+;;
 ;; Indie:
 ;; - `gruber-darker'.  Cool, but `org-mode' and `vertico' are bad
 ;; - `flatland'
@@ -42,6 +43,7 @@
 (leaf doom-themes
   :ensure t
   :custom ((doom-themes-enable-italic . t)
+           (doom-themes-padded-modeline . nil)
            (doom-themes-enable-bold . t)))
 
 (leaf gruber-darker-theme
@@ -76,12 +78,31 @@
            (os1-use-variable-pitch . nil)
            (os1-use-more-italic . t)))
 
-
-(setq-default line-spacing 0.1)
+(setq-default line-spacing 0.20)
 
 ;; just load theme, the respective autloads and settings (see above)
 ;; will be loaded
-(load-theme 'ef-cyprus :no-confirm)
+(load-theme 'doom-1337 :no-confirm)
+(custom-set-faces
+ ;; The most important
+
+ ;; selected text with more light bg
+ '(region ((t :background "#777")))
+
+ ;; Selection Popup (a `vertico' package)
+
+ ;; I sometimes use a mouse to choose anything from `vertico' buffer
+ ;; (What?), so for me it's important
+ '(vertico-mouse ((t :background "#777")))
+
+ ;; Auto-Complete Popup (`corfu' package)
+
+ ;; light yellow border for auto-complete
+ '(corfu-border ((t :background "#FBE3BF")))
+ ;; italic name of the item like Function, Module, Method
+ '(corfu-annotations ((t :italic t)))
+ ;; use more like a string literals colors for current complete item
+ '(corfu-current ((t :background "#252526" :bold t))))
 
 (provide 'my-load-theme)
 ;;; my-load-theme.el ends here
