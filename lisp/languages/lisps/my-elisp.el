@@ -40,7 +40,11 @@
     :hook emacs-lisp-mode-hook)
 
   (leaf elisp-refs
-    :ensure t))
+    :ensure t)
+
+  ;; my small package to insert a new struct field at M-ret
+  (leaf my-elisp-class-bindings
+    :bind ("M-RET" . my-elisp-new-field-of-class)))
 
 (leaf suggest
   :ensure (suggest :repo "Wilfred/suggest.el" :host github))
