@@ -279,8 +279,10 @@ Notice that it can take a long time."
 (defun pam-update-all-packages-autoloads ()
   "Add autoloads of every package to my-packages-autoloads.el."
   (delete-file (pam--autoloads-file))
-  (mapc #'pam--save-pkg-autoloads
-        (pam--straight-packages)))
+  (let ((pkgs (pam--straight-packages)))
+    (while pkgs
+      (pam--save-pkg-autoloads (car pkgs))
+      (setq pkgs (cdr pkgs)))))
 
 (defun pam-create-files ()
   "Make the `pam' build directory and touch the autoloads file."
@@ -324,7 +326,7 @@ Notice that it can take a long time."
           (eval-print-last-sexp)))
       (load bootstrap-file nil 'nomessage))
     (require 'straight)
-    (straight-pull-recipe-repositories)
+    ;; (straight-pull-recipe-repositories)
     (setq pam-straight-already-loaded-p t)))
 
 (defun pam--sync-straight-package (pkg &rest _ignore)
@@ -388,6 +390,7 @@ be useful in other cases."
     (write-region (point-min) (point-max)
                   (pam--autoloads-file)
                   'append)))
+
 
 (provide 'pam)
 ;;; pam.el ends here
