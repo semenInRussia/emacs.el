@@ -1,5 +1,5 @@
-# -*- mode: snippet -*-
+# mode: snippet
 # name: vector
-# key: vec
+# key: v
 # --
-std::vector<${1:Class}> ${2:var}${3:(${4:10}, $1($5))};
+vector<${1:int}> ${2:a}${3:(${4:10})};

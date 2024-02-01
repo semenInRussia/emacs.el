@@ -1,8 +1,7 @@
 # -*- mode: snippet -*-
 # name: struct ... { ... }
-# key: struct
+# key: s
 # --
-struct ${1:name}
-{
-    $0
+struct ${1:name} {
+  $0;
 };
