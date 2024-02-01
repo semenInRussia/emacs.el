@@ -82,11 +82,13 @@ With prefix arg don't indent."
   (setq w32-pass-apps-to-system nil)
   (setq w32-apps-modifier 'hyper))
 
+
 (--each
     '(("M-y" . consult-yank-from-kill-ring)
       ("C-a" . beginning-of-line-text)
       ("C-o" . open-line-saving-indent)
-      ("M-y" . consult-yank-from-kill-ring))
+      ("M-y" . consult-yank-from-kill-ring)
+      ("C-x C-y" . duplicate-line))
   (global-set-key (kbd (car it)) (cdr it)))
 
 (provide 'my-editing)
