@@ -24,7 +24,7 @@
 
 (defcustom my-font-size
   20
-  "Name of the main font to display all."
+  "Size of font in editor."
   :group 'my
   :type 'number)
 
