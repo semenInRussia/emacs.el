@@ -17,6 +17,9 @@ jobs:
       - name: Do a First Emacs Call
         run: emacs -batch -l init.el --install --local-projets --modules
 
+      - name: Create the Archive from Generated Files
+        run: zip -r semacs.zip lisp pam straight cows dist init.el early-init.el small-init.el README.org snippets .gitignore .github
+
       - name: Release the New Config Version
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -24,13 +27,4 @@ jobs:
           automatic_release_tag: "latest"
           prerelease: true
           title: "Built Emacs Config"
-          files: |
-            .github
-            cows
-            lisp
-            snippets
-            .gitignore
-            early-init.el
-            init.el
-            README.org
-            small-init.el
+          files: semacs.zip
