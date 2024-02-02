@@ -19,7 +19,13 @@
 ;; move on `boon': also modal editing mode for Emacs that was created
 ;; 9 years ago, while `meow' only 3 and has by 3 times lesser stars on
 ;; GitHub.  I try to fight with it using my own structural state (see
-;; `my-structural')
+;; `my-meow-structural')
+
+;; UPD: I have used `meow' 9 months, now i think that it's a very nice
+;; modal editing, better than the default `xah-fly-keys' and cooler
+;; than Vim (because all `meow' chooses are logical, we can do one
+;; thing with only one path of keybindings, "select mode" and "keypad
+;; mode" is wwwoooow!
 
 ;;; Code:
 
@@ -33,17 +39,28 @@
            meow-cheatsheet-layout-qwerty
            meow-replace-state-name-list)
   :defun (my-meow-setup . my-meow)
-  :defun (meow-global-mode
+  :defun (;; `meow'
+          meow-global-mode
+          ;; some things to define new keys
+          ;; - motion
           meow-motion-overwrite-define-key
           meow-motion-overwrite-define-key
-          meow-leader-define-key
+          ;; - normal
           meow-normal-define-key
+          ;; - leader
           meow-leader-define-keys
+          meow-leader-define-key
           meow-leader-define-state)
-  :custom (meow-use-clipboard . t)
+  :custom (
+           ;; for me this is must-have, without it I looks like a
+           ;; noob, but some men thinks that divide system clipboard and editor is
+           ;; a cool idea, (they are stranger)
+           (meow-use-clipboard . t))
   :config
   (defun my-meow-setup ()
     (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+    ;; motion mode is modes which provide own modal editing.  For
+    ;; example `dired' and `magit', use j and k in them as arrows
     (meow-motion-overwrite-define-key
      '("j" . meow-next)
      '("k" . meow-prev)
@@ -63,10 +80,11 @@
      '("8" . meow-digit-argument)
      '("9" . meow-digit-argument)
      '("0" . meow-digit-argument)
-     '("/" . meow-keypad-describe-key)
+     ;; some help things
+     '("/" . meow-keypad-describe-key)  ; `C-h k' for keypad
      '("?" . meow-cheatsheet))
     (meow-normal-define-key
-     '("0" . meow-expand-0)
+     ;; to choose some lines/words
      '("9" . meow-expand-9)
      '("8" . meow-expand-8)
      '("7" . meow-expand-7)
@@ -76,7 +94,9 @@
      '("3" . meow-expand-3)
      '("2" . meow-expand-2)
      '("1" . meow-expand-1)
+     '("0" . meow-expand-0)
      '("-" . negative-argument)
+     ;;
      '(";" . meow-reverse)
      '("," . meow-inner-of-thing)
      '("." . meow-bounds-of-thing)
@@ -128,14 +148,19 @@
      '("y" . meow-save)
      '("Y" . meow-sync-grab)
      '("z" . meow-pop-selection)
-     '("Z" . meow-comment)
+     '("Z" . meow-comment)  ; useless with me, M-; is ok
      '("'" . repeat)
      '("%" . meow-query-replace-regexp)
      ;; my own modal state
      '("/"  . my-load-meow-structural-mode)
      '("<escape>" . ignore)))
 
+  ;; jump to source
+  ;;
+  ;; eval:
+  ;; (find-file (locate-user-emacs-file "lisp/local-projects/my-meow-structural.el"))
   (defun my-load-meow-structural-mode ()
+    (interactive)
     (require 'my-meow-structural))
 
   (my-meow-setup)

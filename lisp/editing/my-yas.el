@@ -1,6 +1,6 @@
 ;;; my-yas.el --- My configuration for the `yasnippet'
 
-;; Copyright (C) 2022 Semen Khramtsov
+;; Copyright (C) 2022-2024 semenInRussia
 
 ;; Author: Semen Khramtsov <hrams205@gmail.com>
 ;; Version: 0.1
@@ -36,7 +36,11 @@
   :custom (yas-wrap-around-region . t)
   :config
   (setq yas-snippet-dirs (list my-snippets-dir))
-  (yas-reload-all))
+  ;; don't load snippets instantly after a file opened, wait some AFK
+  ;; time
+  (run-with-idle-timer 3 nil #'yas-reload-all))
+
+;; a completion for snippets with `cape' (capf)
 
 (declare-function cape--table-with-properties "cape")
 (declare-function cape--bounds "cape")

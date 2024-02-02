@@ -4,7 +4,7 @@
 
 ;;; Commentary:
 
-;; My configuration for the `smartparens'
+;; My configuration for the `smartparens': insert smartparens smart way
 
 ;;; Code:
 

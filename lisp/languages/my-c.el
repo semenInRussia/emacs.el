@@ -18,22 +18,22 @@
             :ensure (google-c-style :repo "google/styleguide" :host github)
             :hook ((c++-mode-hook c-mode-hook)   . google-set-c-style)))
 
-(add-variable-watcher
- 'my-c-backend
- (defun my-c-update-backend (backend &rest _ignore)
-   "Change backend for C/C++ development.
+(defun my-c-update-backend (backend &rest _ignore)
+  "Change backend for C/C++ development.
 
 Backend is either symbol tags or lsp"
-   (leaf citre
-     :when (equal my-c-backend 'tags)
-     :remove-hook ((c++-mode-hook c-mode-hook) . eglot-ensure)
-     :hook (c++-mode-hook c-mode-hook))
+  (leaf citre
+    :when (equal backend 'tags)
+    :remove-hook ((c++-mode-hook c-mode-hook) . my-lsp-ensure)
+    :hook (c++-mode-hook c-mode-hook))
 
-   (leaf eglot
-     :when (equal my-c-backend 'lsp)
-     :remove-hook ((c++-mode-hook c-mode-hook) . citre-mode)
-     :hook ((c++-mode-hook c-mode-hook) . eglot-ensure))))
+  (leaf eglot
+    :when (equal backend 'lsp)
+    :remove-hook ((c++-mode-hook c-mode-hook) . citre-mode)
+    :hook ((c++-mode-hook c-mode-hook) . my-lsp-ensure)))
 
+(add-variable-watcher 'my-c-backend
+                      #'my-c-update-backend)
 (my-c-update-backend my-c-backend)
 
 (provide 'my-c)
