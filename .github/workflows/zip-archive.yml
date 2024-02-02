@@ -18,11 +18,13 @@ jobs:
         run: emacs -batch -l init.el --install --local-projets --modules
 
       - name: Create the Archive from Generated Files
-        run: zip -r semacs.zip lisp pam cows dist init.el early-init.el small-init.el snippets .gitignore .github
+        run: zip -r semacs.zip lisp pam straight cows dist init.el early-init.el small-init.el README.org snippets .gitignore .github
 
-      - name: Upload the Archive
-        id: archive
-        uses: actions/upload-artifact@v3
+      - name: Release the New Config Version
+        uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          name: semacs
-          path: semacs.zip
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Built Emacs Config"
+          files: semacs.zip
