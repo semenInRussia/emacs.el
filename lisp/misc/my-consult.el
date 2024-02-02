@@ -44,6 +44,7 @@
           ("Q" . consult-goto-line))
          ;; C-c bindings in `mode-specific-map'
          ("C-c s" . consult-ripgrep)
+         ("C-x C-S-f" . consult-fd)
          ;; ("C-c M-x" . consult-mode-command)
          ;; ("C-c k" . consult-kmacro)
          ("C-c m" . consult-man)
