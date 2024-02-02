@@ -239,9 +239,10 @@
 
             :pam
             `(,@(mapcar (lambda (elm)
-	        	              `(pam-use-package ',(if (eq elm t)
-                                                  leaf--name
-                                                elm)))
+	        	              `(eval-and-compile
+                             (pam-use-package ',(if (eq elm t)
+                                                    leaf--name
+                                                  elm))))
                         leaf--value)
 	            ,@leaf--body)
             :pie
