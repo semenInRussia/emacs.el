@@ -41,12 +41,12 @@
 ;;; Local Projects
 ;; It is my own small "packages" which aren't so big to create real packages
 (eval-and-compile
-  (add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects"))
-  ;; add some files into the `load-path' that config files can require theme and
-  ;; byte-compiler will be happy
+  ;; add some files into the `load-path' that config files can require
+  ;; them and byte-compiler will be happy
   (add-to-list 'load-path (locate-user-emacs-file "lisp/package-management/"))
   (add-to-list 'load-path (locate-user-emacs-file "lisp/"))
-  (load (locate-user-emacs-file "lisp/local-projects/my-autoload") :noerror))
+  (load (locate-user-emacs-file "lisp/local-projects/my-autoload") :noerror)
+  (add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects")))
 
 (require 'my-bench)
 

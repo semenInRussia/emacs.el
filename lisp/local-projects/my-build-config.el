@@ -36,12 +36,12 @@
    "package-management"
    "my-libs.el"
    "my-lib.el"
+   "ui"
+   "env"
    "editing"
    "languages/lisps/my-lisp.el"
    "languages"
-   "env"
-   "misc"
-   "ui")
+   "misc")
   "Names of the directories and files that define an order to load.")
 
 (defvar my-modules-files-ignore-regexps

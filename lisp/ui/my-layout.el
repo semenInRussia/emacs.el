@@ -17,7 +17,7 @@
       inhibit-startup-echo-area-message t
       initial-scratch-message nil)
 
-(defcustom my-layout-size '(70 . 20)
+(defcustom my-layout-size '(80 . 20)
   "Cons of width and height of editor window."
   :group 'my
   :type '(cons number number))
