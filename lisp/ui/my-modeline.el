@@ -25,7 +25,7 @@
   :ensure t
   :ensure t
   :custom (;; it looks like more nice
-           (doom-modeline-height . 49)
+           (doom-modeline-height . 35)
            ;; enconding not useful I think.
            (doom-modeline-buffer-encoding . nil)
            ;; version of env too

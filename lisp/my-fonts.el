@@ -12,9 +12,6 @@
 
 ;;; Code:
 
-(require 'my-leaf)
-(require 'dash)
-
 ;; you can install this font, from the GitHub repo `nerd-fonts'
 (defcustom my-fonts-main
   "JetBrainsMonoNerdFont"
@@ -22,7 +19,7 @@
   :group 'my
   :type 'string)
 
-(defcustom my-font-size
+(defcustom my-fonts-size
   20
   "Size of font in editor."
   :group 'my
@@ -30,9 +27,11 @@
 
 (setq line-spacing 0.2)
 
-(set-face-attribute 'default nil
-                    :height 200
-                    :family "JetBrainsMono Nerd Font")
+(push (cons 'font
+            (format "%s-%s"
+                    my-fonts-main
+                    my-fonts-size))
+      default-frame-alist)
 
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
