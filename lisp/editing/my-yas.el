@@ -65,7 +65,7 @@ If INTERACTIVE is true, show the completion where suggested only snippets."
       (when-let (snippets (yas-active-keys))
         (let ((bounds (cape--bounds 'symbol)))
           `(,(car bounds) ,(cdr bounds)
-            ,(cape--table-with-properties snippets :category 'snippet)
+            ,(cape--properties-table snippets :category 'snippet)
             ,@my-yas--capf-properties)))))
 
   (defun my-yas-capf--docsig (key)
