@@ -46,10 +46,20 @@ So main files (files of framework part) are only:
 - ~init.el~ but only a part, where handling of CLI arguments
 - ~local-projects/my-build-config.el~, I think you understand it
 
-
 ** Installiation
 
-This Emacs configuration have the most fast way to install (if consider amount of 3rd party packages), to install this config you need to download a zip-archive from [[https://github.com/semenInRussia/emacs.el/actions][actions tab]] and extract an archive into any directory.
+Before installiation you must install ~JetBrainsMono Nerd Font~ or other Nerd Font, if your font isn't JetBrainsMono, change the variable inside =.config/emacs/lisp/ui/my-fonts.el=
+
+To install my config on your config as main use the following shell command, if you need to only try this config (without delete your thing), change .config/emacs on anything like ~/semacs
+
+#+begin_src shell
+  wget https://github.com/semenInRussia/emacs.el/releases/download/latest/semacs.zip && mkdir .config/emacs -p && unzip -o -d .config/emacs semacs.zip
+#+end_src
+
+In this commands 3 steps:
+1. Install the archive which is updated automatically after every commit.  This archive contains a configuration with installed 3rd party packages
+2. Make a directory where config will be located (defaults to .config/emacs but in windows it can be anything else)
+3. Unzip the archive to this folder
 
 You can extract an archive into any directory, and run emacs using ~--init-directory~ flag, like:
 
@@ -59,4 +69,4 @@ You can extract an archive into any directory, and run emacs using ~--init-direc
   emacs -l init.el     # init.el is the file from repo
 #+END_SRC
 
-So you can test it without ~chemacs~ and other stupid things, you even not neede in emacs29 --init-directory, but you still needed in emacs29
+So you can test it without ~chemacs~ and other stupid things, you even not need in emacs29 --init-directory, but you still needed in emacs29
