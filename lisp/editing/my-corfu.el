@@ -27,7 +27,13 @@
   ;; until `corfu' don't take some seconds before load, it make Emacs
   ;; a little worth, but with `my-use-afk' it's still cool
   :commands (corfu--in-region global-corfu-mode)
-  :init (setq-default completion-in-region-function 'corfu--in-region)
+  :init
+  (--each '(prog-mode-hook text-mode-hook)
+    (add-hook it
+              (defun my-corfu-set ()
+                "Set some vars for corfu."
+                (interactive)
+                (setq-local completion-in-region-function 'corfu--in-region))))
   ;; `completion-in-region-function' was already changed, but
   ;; `global-corfu-mode' enable auto complete, if `corfu-auto' is
   ;; non-nil, call `corfu-mode' to enable corfu locall in this buffer
