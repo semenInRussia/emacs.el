@@ -28,10 +28,11 @@
   :group 'my
   :type 'number)
 
-(set-face-attribute 'default nil
-                    :height (* my-font-size 10)
-                    :family my-fonts-main)
+(setq line-spacing 0.2)
 
+(set-face-attribute 'default nil
+                    :height 200
+                    :family "JetBrainsMono Nerd Font")
 
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)

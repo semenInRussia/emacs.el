@@ -98,11 +98,15 @@
  ;; Auto-Complete Popup (`corfu' package)
 
  ;; light yellow border for auto-complete
+ ;; make border of auto-completion minibuffer white/black, it looks like nice
  '(corfu-border ((t :background "#FBE3BF")))
  ;; italic name of the item like Function, Module, Method
  '(corfu-annotations ((t :italic t)))
  ;; use more like a string literals colors for current complete item
- '(corfu-current ((t :background "#252526" :bold t))))
+ '(corfu-current ((t :background "#252526" :bold t)))
+
+ ;; highlight TODO with red background, italic black text
+ '(hl-todo ((t :backgorund "#FF5E5E" :foreground "black" :italic t))))
 
 (provide 'my-load-theme)
 ;;; my-load-theme.el ends here
