@@ -53,6 +53,9 @@
   :ensure (mocker :repo "sigma/mocker.el" :host github)
   :doc "A library for testing `elisp' with mocks")
 
+(leaf my-reload
+  :hook emacs-lisp-mode-hook)
+
 (leaf my-elisp-embrace
   :hook (emacs-lisp-mode-hook . my-embrace-emacs-lisp-mode-hook))
 

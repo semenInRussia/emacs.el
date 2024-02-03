@@ -19,6 +19,8 @@ Some men tell me "So, you just copy Doom. Why?".  My answer is that my configrat
 
 - A big amount of packages (192+)
 
+- Reload the configuration Emacs lisp file after it saved.  Inspired by ~VSCode~ and ~NVChad~
+
 - ~meow~ over ~evil~ (#dddm)
 
 - Own package manager, built over ~straight.el~. (#nodoom)
