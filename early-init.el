@@ -39,18 +39,12 @@
 ;; HACK: I intentionally avoid calling `menu-bar-mode', `tool-bar-mode', and
 ;;   `scroll-bar-mode' because they do extra work to manipulate frame variables
 ;;   that isn't necessary this early in the startup process.
-(eval-and-compile
-  (add-to-list 'load-path
-               (concat
-                (file-name-directory
-                 (or load-file-name
-                     (buffer-file-name)
-                     ""))
-                "lisp")))
-(require 'my-fonts)
-(push '(menu-bar-lines . 0)   default-frame-alist)
-(push '(tool-bar-lines . 0)   default-frame-alist)
-(push '(vertical-scroll-bars) default-frame-alist)
+(setq default-frame-alist
+      (append
+       '((menu-bar-lines . 0)
+         (tool-bar-lines . 0)
+         (vertical-scroll-bars))
+       default-frame-alist))
 
 ;; Emacs "updates" its ui more often than it needs to, so slow it down slightly
 (setq idle-update-delay 1.0)  ; default is 0.5
