@@ -4,9 +4,10 @@
 (defvar gc-cons-threshold-original)
 (defvar file-name-handler-alist-original)
 
-(setq gc-cons-percentage 0.5
-      gc-cons-threshold-original gc-cons-threshold
-      gc-cons-threshold most-positive-fixnum)
+(setq gc-cons-threshold most-positive-fixnum)
+
+;; PERF: A second, case-insensitive pass over `auto-mode-alist' is time wasted.
+(setq auto-mode-case-fold nil)
 
 ;; from https://www.reddit.com/r/emacs/comments/3kqt6e/2_easy_little_known_steps_to_speed_up_emacs_start/
 (setq file-name-handler-alist-original file-name-handler-alist
@@ -16,8 +17,13 @@
  'after-init-hook
  (defun my-reset-some-hacks ()
    "Reset the effects some performance hacks to initial state."
-   (setq gc-cons-threshold gc-cons-threshold-original
-         file-name-handler-alist file-name-handler-alist-original)))
+   (setq file-name-handler-alist file-name-handler-alist-original)
+   ;; PERF: But make an exception for `gc-cons-threshold', which I
+   ;;   think all Emacs users and configs will benefit from. Still,
+   ;;   setting it to `most-positive-fixnum' is dangerous if downstream
+   ;;   does not reset it later to something reasonable, so I use 16mb
+   ;;   as a best fit guess. It's better than Emacs' 80kb default.
+   (setq gc-cons-threshold (* 16 1024 1024))))
 
 ;; PERF: Don't use precious startup time checking mtime on elisp bytecode.
 (setq load-prefer-newer noninteractive)
@@ -26,7 +32,7 @@
 (setq package-enable-at-startup nil)
 
 ;; PERF: A second, case-insensitive pass over `auto-mode-alist' is time wasted.
-(setq auto-mode-case-fold nil)
+;;(setq auto-mode-case-fold nil)
 
 ;; PERF: Disable bidirectional text scanning for a modest performance boost.
 ;;   I've set this to `nil' in the past, but the `bidi-display-reordering's docs

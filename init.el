@@ -87,6 +87,7 @@
 ;;
 ;; in the most of configurations, after it Emacs load custom.el, but I fount it
 ;; a bit useless.  I prefer `setq' over `custom'
+;;(setq custom-dont-initialize t)
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
 ;; some useful macros
@@ -162,6 +163,18 @@ When you apply this command line argument after init Emacs open the my agenda"
      (prog1 t
        (nano-agenda)))))
 
+(setq inhibit-startup-screen t
+      inhibit-startup-echo-area-message user-login-name)
+
+;; PERF,UX: Remove "For information about GNU Emacs..." message at startup.
+;;   It's redundant with our dashboard and incurs a premature redraw.
+(advice-add #'display-startup-echo-area-message :override #'ignore)
+;; PERF: Suppress the vanilla startup screen completely. We've disabled it
+;;   with `inhibit-startup-screen', but it would still initialize anyway.
+;;   This involves some file IO and/or bitmap work (depending on the frame
+;;   type) that we can no-op for a free 50-100ms boost in startup time.
+(advice-add #'display-startup-screen :override #'ignore)
+
 ;;; Load all config files
 
 ;; the most part of the config located inside "~/.emacs.d/lisp" I join all .el
@@ -173,7 +186,8 @@ When you apply this command line argument after init Emacs open the my agenda"
 
 (add-to-list 'load-path (file-name-directory my-modules-el-file))
 
-(let ((file-name-handler-alist nil))
+(let ((file-name-handler-alist nil)
+      (load-suffixes '(".elc" ".el")))
   (require 'my-modules))
 
 (provide 'init)

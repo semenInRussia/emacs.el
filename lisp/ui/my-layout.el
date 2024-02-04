@@ -22,6 +22,7 @@
   :group 'my
   :type '(cons number number))
 
+(setq frame-inhibit-implied-resize t)
 (setq initial-frame-alist
       (append
        (list (cons 'width (car my-layout-size))
