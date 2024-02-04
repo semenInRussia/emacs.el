@@ -10,8 +10,8 @@
 (require 'my-leaf)
 
 (leaf whitespace-cleanup-mode
-  :ensure (whitespace-cleanup-mode :repo "purcell/whitespace-cleanup-mode" :host github)
-  :global-minor-mode global-whitespace-cleanup-mode)
+  :ensure t
+  :hook prog-mode-hook text-mode-hook)
 
 (provide 'my-whitespace-cleanup-mode)
 ;;; my-whitespace-cleanup-mode.el ends here
