@@ -32,3 +32,4 @@ xenops/
 /tramp
 /elpa/
 /custom.el
+/.local/
