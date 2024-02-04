@@ -1,6 +1,6 @@
 ;;; my-meow.el --- My configuration of `meow' -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023 semenInRussia
+;; Copyright (C) 2023-2024 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
@@ -34,23 +34,22 @@
 
 (leaf meow
   :ensure (meow :repo "meow-edit/meow" :host github)
-  :require t
   :defvar (meow-cheatsheet-layout
            meow-cheatsheet-layout-qwerty
            meow-replace-state-name-list)
-  :defun (my-meow-setup . my-meow)
+  ;; :defun (my-meow-setup . my-meow)
   :defun (;; `meow'
           meow-global-mode
           ;; some things to define new keys
           ;; - motion
-          meow-motion-overwrite-define-key
-          meow-motion-overwrite-define-key
+          1meow-motion-overwrite-define-key
           ;; - normal
           meow-normal-define-key
           ;; - leader
           meow-leader-define-keys
           meow-leader-define-key
           meow-leader-define-state)
+  :require meow-helpers
   :custom (
            ;; for me this is must-have, without it I looks like a
            ;; noob, but some men thinks that divide system clipboard and editor is
@@ -58,7 +57,9 @@
            (meow-use-clipboard . t))
   :config
   (defun my-meow-setup ()
-    (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+    (with-eval-after-load 'meow-cheatsheet
+      (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty))
+
     ;; motion mode is modes which provide own modal editing.  For
     ;; example `dired' and `magit', use j and k in them as arrows
     (meow-motion-overwrite-define-key
