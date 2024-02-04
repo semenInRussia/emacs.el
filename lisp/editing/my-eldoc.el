@@ -1,6 +1,6 @@
 ;;; my-eldoc.el --- My configuration of the `eldoc'
 
-;; Copyright (C) 2022 Semen Khramtsov
+;; Copyright (C) 2022-2024 Semen Khramtsov
 
 ;; Author: Semen Khramtsov <hrams205@gmail.com>
 ;; Version: 0.1
@@ -8,23 +8,29 @@
 
 ;;; Commentary:
 
-;; My configuration of the `eldoc'
+;; My configuration of the `eldoc': show documentation for symbol
 
 ;;; Code:
 
 (require 'my-leaf)
 
 ;; use `eldoc' with `flycheck' instead of echo area
-(defvar flycheck-mode)
-(defvar flycheck-display-errors-function)
-(defvar flycheck-help-echo-function)
-
-(declare-function flycheck-error-group "flycheck.el")
-(declare-function flycheck-error-id "flycheck.el")
-(declare-function flycheck-error-message "flycheck.el")
-(declare-function flycheck-error-level "flycheck.el")
-(declare-function flycheck-overlay-errors-at "flycheck.el")
-
+(leaf flycheck
+  :after (eldoc eldoc-box)
+  ;; some things for byte-compiler
+  :defvar
+  (flycheck-mode
+   flycheck-display-errors-function
+   flycheck-help-echo-function)
+  :defun
+  (flycheck-error-group
+   flycheck-error-id
+   flycheck-error-message
+   flycheck-error-level
+   flycheck-overlay-errors-at)
+  :defer-config
+  (add-hook 'flycheck-mode-hook #'my-flycheck-prefer-eldoc)
+  (when flycheck-mode (my-flycheck-prefer-eldoc)))
 
 (defun my-flycheck-eldoc (callback &rest _ignored)
   "Print flycheck messages at point by calling CALLBACK."
@@ -71,41 +77,42 @@
   (setq flycheck-display-errors-function nil)
   (setq flycheck-help-echo-function nil))
 
-(with-eval-after-load 'flycheck
-  (add-hook 'flycheck-mode-hook #'my-flycheck-prefer-eldoc)
-  (when flycheck-mode
-    (my-flycheck-prefer-eldoc)))
-
 ;;; use beautifull documentation popup
-(eval-and-compile
-  (leaf eldoc
-    :require t
-    :custom ((eldoc-box-clear-with-C-g . t)
-             (eldoc-idle-delay . 1.0)))
+(leaf eldoc
+  :custom ((eldoc-box-clear-with-C-g . t)
+           (eldoc-idle-delay . 1.0)))
 
-  (leaf eldoc-box
-    :ensure (eldoc-box :repo "casouri/eldoc-box" :host github)
-    :require t
-    :custom (eldoc-box-fringe-use-same-bg . t)
-    :bind ("C-h C-k" . 'eldoc-box-quit-frame)))
 
-;; (setq eldoc-box-position-function
-;;       #'my-eldoc-box--bottom-corner-position-function)
 
-;; (defun my-eldoc-box--bottom-corner-position-function (width _)
-;;   "The default function to set childframe position.
-;; Used by `eldoc-box-position-function'.
-;; Position is calculated base on WIDTH and HEIGHT of childframe text window"
-;;   (pcase-let ((`(,_offset-l ,offset-r ,offset-t) eldoc-box-offset))
-;;     (cons (- (frame-outer-width (selected-frame)) width offset-r)
-;;           ;; y position + v-offset
-;;           offset-t)))
+(leaf eldoc-box
+  :ensure (eldoc-box :repo "casouri/eldoc-box" :host github)
+  :defvar eldoc-box-clear-with-C-g
+  :commands (eldoc-box--eldoc-message-function
+             eldoc-box--eldoc-display-function
+             eldoc-box-quit-frame)
+  :custom ((eldoc-box-fringe-use-same-bg . nil)
+           (eldoc-box-clear-with-C-g . t)))
 
-(define-global-minor-mode global-eldoc-box-hover-mode
-  eldoc-box-hover-mode
-  eldoc-box-hover-mode)
+(defun my-eldoc-box--enable ()
+  "Enable eldoc-box hover.
+Intended for internal use.
 
-(global-eldoc-box-hover-mode)
+This is full copy of `eldoc-box--enable', this is more cooler because
+we don't need in load eldoc while it isn't needed.  light-weight"
+  (if (not (boundp 'eldoc-display-functions))
+      (add-function :before-while (local 'eldoc-message-function)
+                    #'eldoc-box--eldoc-message-function)
+
+    (setq-local eldoc-box--old-eldoc-functions
+                eldoc-display-functions)
+    (setq-local eldoc-display-functions
+                (cons 'eldoc-box--eldoc-display-function
+                      (remq 'eldoc-display-in-echo-area
+                            eldoc-display-functions))))
+  (when eldoc-box-clear-with-C-g
+    (advice-add #'keyboard-quit :before #'eldoc-box-quit-frame)))
+
+(add-hook 'eldoc-mode-hook 'my-eldoc-box--enable)
 
 ;;; use `eldoc' with `eglot'
 
