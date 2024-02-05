@@ -14,9 +14,13 @@
   '(;; `consult' command `consult-buffer', really frequently useful by me,
     ;; I use it in 99% of Emacs sessions, load it when in AFK
     consult
+    vertico
     ;; auto-completion (`corfu')
     corfu
     kind-icon ; icons
+    ;; a popup about info at point or function signature (it's called
+    ;; hover in lsp terminology)
+    eldoc-box
     ;; my configuration really tied with `embark'.
     ;; I use it for: change reGisTeR of the region, kill the sexp at point,
     ;; do things on the minibuffer items, browse the URL at the cursor

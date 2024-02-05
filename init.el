@@ -16,11 +16,6 @@
 ;; them outweighs the utility of always keeping them on.
 (setq display-line-numbers-type nil)
 
-;; don't load anything useless at the startup (like `emacs-lisp-mode' for
-;; *Scratch* or `dashboard')
-(setq initial-major-mode 'fundamental-mode
-      initial-scratch-message "Good Luck!\n: you can start")
-
 ;; change Emacs config directory depends on init file
 ;;
 ;; after this config you can easily run Emacs with "emacs -l init.el"
@@ -47,10 +42,10 @@
 (eval-and-compile
   ;; add some files into the `load-path' that config files can require
   ;; them and byte-compiler will be happy
-  (add-to-list 'load-path (locate-user-emacs-file "lisp/package-management/"))
   (add-to-list 'load-path (locate-user-emacs-file "lisp/"))
-  (load (locate-user-emacs-file "lisp/local-projects/my-autoload") :noerror)
-  (add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects")))
+  (add-to-list 'load-path (locate-user-emacs-file "lisp/package-management/"))
+  (add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects"))
+  (load (locate-user-emacs-file "lisp/local-projects/my-autoload") :noerror :nomessage))
 
 (require 'my-bench)
 
@@ -163,8 +158,11 @@ When you apply this command line argument after init Emacs open the my agenda"
      (prog1 t
        (nano-agenda)))))
 
-(setq inhibit-startup-screen t
-      inhibit-startup-echo-area-message user-login-name)
+
+;; don't load anything useless at the startup (like `emacs-lisp-mode' for
+;; *Scratch* or `dashboard')
+(setq initial-major-mode 'fundamental-mode
+      initial-scratch-message "Good Luck!\n: you can start")
 
 ;; PERF,UX: Remove "For information about GNU Emacs..." message at startup.
 ;;   It's redundant with our dashboard and incurs a premature redraw.
@@ -186,8 +184,7 @@ When you apply this command line argument after init Emacs open the my agenda"
 
 (add-to-list 'load-path (file-name-directory my-modules-el-file))
 
-(let ((file-name-handler-alist nil)
-      (load-suffixes '(".elc" ".el")))
+(let ((file-name-handler-alist nil))
   (require 'my-modules))
 
 (provide 'init)

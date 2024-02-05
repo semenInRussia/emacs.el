@@ -4,7 +4,8 @@
 (defvar gc-cons-threshold-original)
 (defvar file-name-handler-alist-original)
 
-(setq gc-cons-threshold most-positive-fixnum)
+(setq gc-cons-threshold most-positive-fixnum
+      gc-cons-percentage 0.8)
 
 ;; PERF: A second, case-insensitive pass over `auto-mode-alist' is time wasted.
 (setq auto-mode-case-fold nil)
