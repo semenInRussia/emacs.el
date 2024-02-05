@@ -32,7 +32,7 @@
            ;; don't show directory names in `doom-modeline'
            (doom-modeline-project-detection . 'project)
            (doom-modeline-buffer-file-name-style . 'buffer-name))
-  :hook after-init-hook
+  :hook window-setup-hook
   :config
   ;; I use Emacs in fullscreen mode, so I don't see time that provided
   ;; by OS, so I need time in modeline.  EMACS IS MY OS!!!

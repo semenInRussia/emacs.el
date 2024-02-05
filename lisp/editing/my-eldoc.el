@@ -91,6 +91,8 @@
              eldoc-box--eldoc-display-function
              eldoc-box-quit-frame)
   :custom ((eldoc-box-fringe-use-same-bg . nil)
+           ;; press C-g if need
+           (eldoc-box-cleanup-interval . 3)
            (eldoc-box-clear-with-C-g . t)))
 
 (defun my-eldoc-box--enable ()

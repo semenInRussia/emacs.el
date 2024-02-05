@@ -51,6 +51,11 @@
          (tool-bar-lines . 0)
          (vertical-scroll-bars))
        default-frame-alist))
+;; And set these to nil so users don't have to toggle the modes twice to
+;; reactivate them.
+(setq menu-bar-mode nil
+      tool-bar-mode nil
+      scroll-bar-mode nil)
 
 ;; Emacs "updates" its ui more often than it needs to, so slow it down slightly
 (setq idle-update-delay 1.0)  ; default is 0.5
@@ -64,12 +69,6 @@
 ;; in non-focused windows.
 (setq-default cursor-in-non-selected-windows nil)
 (setq highlight-nonselected-windows nil)
-
-;; And set these to nil so users don't have to toggle the modes twice to
-;; reactivate them.
-(setq menu-bar-mode nil
-      tool-bar-mode nil
-      scroll-bar-mode nil)
 
 ;; More performant rapid scrolling over unfontified regions. May cause brief
 ;; spells of inaccurate syntax highlighting right after scrolling, which should

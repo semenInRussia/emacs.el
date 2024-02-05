@@ -15,11 +15,15 @@
 
 
 (leaf eglot
-  :custom `((eglot-ignored-server-capabilities
+  :custom `((eglot-sync-connect . 1)
+            (eglot-autoshutdown . t)
+            (eglot-ignored-server-capabilities
              . '(;; disable code lens
                  :codeLensProvider
                  ;; disable inlay hints
-                 :inlayHintProvider)))
+                 :inlayHintProvider))
+            (eglot-events-buffer-size . 0)
+            (eglot-auto-display-help-buffer . nil))
   :defun eglot-inlay-hints-mode
   :bind (:eglot-mode-map
          ("C-c lr" . 'eglot-rename)

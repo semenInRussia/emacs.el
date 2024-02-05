@@ -14,7 +14,7 @@
 
 ;; PERF: Line numbers are pretty slow all around. The performance boost of disabling
 ;; them outweighs the utility of always keeping them on.
-(setq display-line-numbers-type nil)
+;;(setq display-line-numbers-type nil)
 
 ;; change Emacs config directory depends on init file
 ;;
@@ -184,7 +184,11 @@ When you apply this command line argument after init Emacs open the my agenda"
 
 (add-to-list 'load-path (file-name-directory my-modules-el-file))
 
-(let ((file-name-handler-alist nil))
+
+(let ((file-name-handler-alist nil)
+      (load-suffixes '(".elc" ".el"))
+      (load-rep-load-file-rep-suffixes '(""))
+      )
   (require 'my-modules))
 
 (provide 'init)

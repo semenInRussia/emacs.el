@@ -37,7 +37,6 @@
   :defvar (meow-cheatsheet-layout
            meow-cheatsheet-layout-qwerty
            meow-replace-state-name-list)
-  ;; :defun (my-meow-setup . my-meow)
   :defun (;; `meow'
           meow-global-mode
           ;; some things to define new keys
