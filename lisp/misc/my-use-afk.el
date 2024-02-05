@@ -18,6 +18,8 @@
     ;; auto-completion (`corfu')
     corfu
     kind-icon ; icons
+    ;; recent visited files
+    recentf
     ;; a popup about info at point or function signature (it's called
     ;; hover in lsp terminology)
     eldoc-box

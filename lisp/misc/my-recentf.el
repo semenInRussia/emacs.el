@@ -23,13 +23,13 @@
            ;; auto cleanup is disabled, sometimes you must run
            ;; `recentf-cleanup'
            (recentf-auto-cleanup . 'never))
-  :config
+  :init
   (advice-add
    'consult-buffer :before
    (defun my-recentf-load ()
      (interactive)
-     (unless (boundp 'recentf-list)
-       (recentf-mode)))))
+     (unless recentf-mode
+       (recentf-mode t)))))
 
 (provide 'my-recentf)
 ;;; my-recentf.el ends here
