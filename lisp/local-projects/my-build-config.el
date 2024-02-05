@@ -34,6 +34,8 @@
   (list
    "package-management/my-leaf.el"
    "package-management"
+   "my-fonts.el"
+   "ui/my-layout.el"
    "my-libs.el"
    "my-lib.el"
    "ui"
@@ -131,6 +133,9 @@ The same to
     ;; make directories in which my-modules.el placed
     (unless (file-exists-p (file-name-directory dest))
       (make-directory (file-name-directory dest)))
+    ;; insert also autoloads
+    (newline)
+    ;; (insert-file-contents (locate-user-emacs-file "lisp/local-projects/my-autoload.el"))
     (append-to-file (point-min) (point-max) dest)))
 
 (provide 'my-build-config)
