@@ -12,6 +12,10 @@
 ;; This is further increased elsewhere, where needed (like our LSP module).
 (setq read-process-output-max (* 64 1024))  ; 64kb
 
+;; PERF: Line numbers are pretty slow all around. The performance boost of disabling
+;; them outweighs the utility of always keeping them on.
+(setq display-line-numbers-type nil)
+
 ;; don't load anything useless at the startup (like `emacs-lisp-mode' for
 ;; *Scratch* or `dashboard')
 (setq initial-major-mode 'fundamental-mode
