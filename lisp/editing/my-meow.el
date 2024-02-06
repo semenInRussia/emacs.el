@@ -33,21 +33,24 @@
 
 
 (leaf meow
-  :ensure (meow :repo "meow-edit/meow" :host github)
-  :defvar (meow-cheatsheet-layout
-           meow-cheatsheet-layout-qwerty
-           meow-replace-state-name-list)
+  :ensure (meow :repo "meow-edit/meow" :host github))
+
+(leaf meow-core
+  :global-minor-mode meow-global-mode
   :defun (;; `meow'
           meow-global-mode
           ;; some things to define new keys
           ;; - motion
-          1meow-motion-overwrite-define-key
+          meow-motion-overwrite-define-key
           ;; - normal
           meow-normal-define-key
           ;; - leader
           meow-leader-define-keys
           meow-leader-define-key
           meow-leader-define-state)
+  :defvar (meow-cheatsheet-layout
+           meow-cheatsheet-layout-qwerty
+           meow-replace-state-name-list)
   :require meow-helpers
   :custom (
            ;; for me this is must-have, without it I looks like a
@@ -155,6 +158,8 @@
      '("/"  . my-load-meow-structural-mode)
      '("<escape>" . ignore)))
 
+  (my-meow-setup)
+
   ;; jump to source
   ;;
   ;; eval:
@@ -162,9 +167,6 @@
   (defun my-load-meow-structural-mode ()
     (interactive)
     (require 'my-meow-structural))
-
-  (my-meow-setup)
-  (meow-global-mode t)
 
   ;; settings show of `meow' state in modeline
   ;;
