@@ -239,7 +239,7 @@ all commands of these packages, TeXinfo will be included in the manual."
   (add-to-list 'Info-default-directory-list (pam--build-dir))
   (pam-create-files)
   (load (string-trim-right (pam--autoloads-file) ".el")
-        :noerror
+	      nil
         :nomessage))
 
 (defun pam-delete-package (pkg &optional update-autoloads)
@@ -281,10 +281,22 @@ Notice that it can take a long time."
 (defun pam-update-all-packages-autoloads ()
   "Add autoloads of every package to my-packages-autoloads.el."
   (delete-file (pam--autoloads-file))
-  (let ((pkgs (pam--straight-packages)))
-    (while pkgs
-      (pam--save-pkg-autoloads (car pkgs))
-      (setq pkgs (cdr pkgs)))))
+  (let ((files
+         (directory-files (pam--build-dir)
+                          :full
+                          ".*-autoloads.el")))
+    (with-temp-buffer
+      (while files
+        (insert-file-contents (car files))
+        (newline)
+        (setq files (cdr files)))
+      (pam--save-buffer-to-autoloads))))
+
+(defun pam--save-buffer-to-autoloads ()
+  "Save the oepened buffer content to autoloads file."
+  (write-region (point-min) (point-max)
+                (pam--autoloads-file)
+                'append))
 
 (defun pam-create-files ()
   "Make the `pam' build directory and touch the autoloads file."
@@ -389,9 +401,7 @@ be useful in other cases."
       (when (string-suffix-p "-autoloads.el" file)
         (insert-file-contents file)))
     ;; write it to the end of autoloads file
-    (write-region (point-min) (point-max)
-                  (pam--autoloads-file)
-                  'append)))
+    (pam--save-buffer-to-autoloads)))
 
 (defun pam-byte-compile-pkg-autoloads ()
   "Byte compile `pam' package autoloads file.
