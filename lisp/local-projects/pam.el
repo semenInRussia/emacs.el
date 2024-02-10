@@ -1,6 +1,6 @@
 ;;; pam.el --- A fast Emacs package manager which is built over `straight' -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023 semenInRussia
+;; Copyright (C) 2023-2024 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.0.1
@@ -10,41 +10,48 @@
 
 ;; A fast Emacs package manager which is built over `straight'.
 
-;; When use a package instead of `straight-use-package' just add to the load
-;; path only ONE directory, load autoloads.  `straight' here add about 190~
-;; paths to the load path and load the same amount of autoloads files.  The
-;; `pam' version is more simple and lightweight, but the cons is that to install
-;; packages (don't activate) it still uses straight, if your packages didn't
-;; installed, you should add the --install option when run Emacs in your
-;; terminal, it replaces the default behaviour with the default `straight' way.
-;; Also if you need change the `pam' behaviour inside of a running Emacs session
-;; you can use the `pam-install-everything-mode' minor mode.
+;; When use a package instead of use `straight-use-package' add to the
+;; load path only ONE directory and load autoloads once at Emacs
+;; startup.  `straight' here add about 190~ paths to the load path and
+;; load the same amount of autoloads files.  The `pam' version is more
+;; fast and easy?, but the cons is that to install packages (don't
+;; activate) it still uses straight, if your packages didn't
+;; installed, you should add the --install option when run Emacs in
+;; your terminal, it replaces the default behaviour with the default
+;; `straight' way.  Also if you need change the `pam' behaviour inside
+;; of a running Emacs session you can use the
+;; `pam-install-everything-mode' minor mode.
 
-;; The main function which you should use in 90% of cases when you use `pam' is
-;; `pam-use' it's like `straight-use-package', but don't add any path to the
-;; `load-path', don't explore TeXinfo documents, don't check if the package must
-;; be byte-compiled.  All these things you can do once when call
-;; `pam-load-packages', it have the complexity O(1) (don't depend on the amount
-;; of packages) and looks like one call of `straight-use-package'.  Instead
-;; `pam-use' just install package if you enabled the respective mode (or used
-;; --install flag when call Emacs) or do NOTHING.  In real cases you install the
-;; config on other computer, run "emacs --install" and all packages will be
-;; installed with `straight' and `pam', so you can use Emacs in other session
-;; with just call "emacs" without flags and forgot about `straight' ever.
+;; The main function which you should use in 90% of cases when you use
+;; `pam' is `pam-use-package' it's like `straight-use-package', but
+;; don't add any path to the `load-path', don't explore TeXinfo
+;; documents, don't check that package must be byte-compiled, because
+;; it updated.  All these things you can do once when call
+;; `pam-load-packages', it have the complexity O(1) (don't depend on
+;; the amount of packages) and looks like one call of
+;; `straight-use-package'.  `pam-use-package' install package if you
+;; enabled the respective mode (or pass --install flag when call
+;; Emacs) otherwise do NOTHING.  In real cases when you install the
+;; config on other computer, run "emacs --install" and all packages
+;; will be installed with `straight' and `pam', after you can start
+;; new Emacs session with just call "emacs" without flags and forgot
+;; about `straight' ever.
 
-;; The most the package functions are aliases to their `straight' alternatives,
-;; the idea is forgot about the fact that `pam' is built over `straight' and just
-;; use pam-<one>, pam-<anotherone> and other package manager functions and don't
-;; think where function is define in `straight' or `pam'.  The "real" code in
-;; this package placed in little doses.
+;; The most the package functions are aliases to their `straight'
+;; alternatives, the idea is forgot about the fact that `pam' is built
+;; over `straight' and just use pam-<one>, pam-<anotherone> and other
+;; package manager functions and don't think where function is define
+;; in `straight' or `pam'.  The "real" code in this package placed in
+;; little doses.
 
 ;;; Code:
 
 ;;; autoload `straight' variables and functions.
 ;;
-;; NOTE: here I don't wrote (require \\='straight), because in the most of Emacs
-;;   sessions `straight' is extra dependency of `pam', `straight' will be loaded
-;;   only when it's really imported.  It saves a little bit of time
+;; NOTE: here I don't wrote (require \\='straight), because in the
+;;   most of Emacs sessions `straight' is extra dependency of `pam',
+;;   `straight' will be loaded only when it's really imported.  It
+;;   saves a little bit of time
 (autoload 'straight--build-dir "straight")
 (autoload 'straight-fetch-package "straight")
 (autoload 'straight-get-recipe "straight")
@@ -239,7 +246,7 @@ all commands of these packages, TeXinfo will be included in the manual."
   (add-to-list 'Info-default-directory-list (pam--build-dir))
   (pam-create-files)
   (load (string-trim-right (pam--autoloads-file) ".el")
-	nil
+	      nil
         :nomessage))
 
 (defun pam-delete-package (pkg &optional update-autoloads)
@@ -301,7 +308,8 @@ Notice that it can take a long time."
 (defun pam-create-files ()
   "Make the `pam' build directory and touch the autoloads file."
   (unless (file-exists-p (pam--build-dir))
-    (make-directory (pam--build-dir))))
+    (make-directory (pam--build-dir))
+    (make-empty-file (pam--autoloads-file))))
 
 ;;; Internal
 
