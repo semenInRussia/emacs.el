@@ -1,35 +1,75 @@
-;;; my-typst.el --- My configuration of `typst' -*- lexical-binding: t; -*-
+;;; my-typst.el --- My configuration for `typst' -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023 semenInRussia
-
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; Homepage: https://github.com/semeninrussia/emacs.el
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+;; Copyright (C) 2023-2024 semenInRussia
 
 ;;; Commentary:
 
-;; My configuration of `typst'.
+;; My configuration for `typst'.
 
 ;;; Code:
 
 (require 'my-leaf)
 
-(leaf typst-mode
-  :ensure t
-  :commands typst-mode)
+
+(defcustom my-typst-imenu-generic-expression
+  '(("h1"  "^# \\(.*\\)$" 1)
+    ("h2"  "^## \\(.*\\)$" 1)
+    ("h3"  "^### \\(.*\\)$" 1)
+    ("h4"  "^#### \\(.*\\)$" 1)
+    ("h5"  "^##### \\(.*\\)$" 1)
+    ("h6"  "^###### \\(.*\\)$" 1)
+    ("ref" "^.*?<\\(.*?\\)>.*$" 1))
+  "List of the specific for `typst-mode' generic expressions.
+
+See `imenu-generic-expression'"
+  :group 'my
+  :type '(repeat string))
+
+(defun my-typst-first-letter-of-heading-p ()
+  "Return non-nil, when the cursor placed at the typst heading start."
+  (save-excursion
+    (forward-char -1)
+    (skip-chars-backward " =")
+    (bolp)))
+
+(defun autoformat-typst-capitalize-heading-line ()
+  "Capitalize first letter of a heading line (lines which started with =).
+
+It's working for typst."
+  (and
+   (just-line-prefix-p "=")
+   (my-typst-first-letter-of-heading-p)
+   (upcase-char -1)))
+
+(defun autoformat-typst-capitalize-list-item ()
+  "Capitalize first letter of a list item line."
+  (interactive)
+  (and
+   ;; line starts with list item prefix
+   (--any-p (just-line-prefix-p it nil 'trim)
+            '("-" "+" "*"))
+   ;; the cursor is after the first character
+   (just-call-on-backward-char*
+    (looking-back (rx
+                   bol
+                   (* " ")
+                   (group (or "-" "+" "*"))
+                   (+ " "))
+                  nil))
+   ;; then upcase
+   (upcase-char -1)))
+
+(leaf typst-ts-mode
+  :ensure (typst-ts-mode :host sourcehut :repo "meow_king/typst-ts-mode")
+  :custom (typst-ts-mode-indent-offset . 2)
+  :config
+  (require 'my-autoformat)
+
+  (my-autoformat-bind-for-major-mode
+   'typst-ts-mode
+   'autoformat-typst-capitalize-heading-line
+   'autoformat-typst-capitalize-list-item
+   'my-autoformat-sentence-capitalization))
 
 (provide 'my-typst)
 ;;; my-typst.el ends here
