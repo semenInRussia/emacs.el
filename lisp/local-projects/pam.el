@@ -239,7 +239,7 @@ all commands of these packages, TeXinfo will be included in the manual."
   (add-to-list 'Info-default-directory-list (pam--build-dir))
   (pam-create-files)
   (load (string-trim-right (pam--autoloads-file) ".el")
-	      nil
+	nil
         :nomessage))
 
 (defun pam-delete-package (pkg &optional update-autoloads)

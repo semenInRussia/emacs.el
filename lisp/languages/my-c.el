@@ -19,7 +19,7 @@
             :hook ((c++-mode-hook c-mode-hook)   . google-set-c-style)))
 
 (defun my-c-update-backend (backend &rest _ignore)
-  "Change backend for C/C++ development.
+  "Change backend to a given BACKEND for C/C++ development.
 
 Backend is either symbol tags or lsp"
   (leaf citre
@@ -32,9 +32,9 @@ Backend is either symbol tags or lsp"
     :remove-hook ((c++-mode-hook c-mode-hook) . citre-mode)
     :hook ((c++-mode-hook c-mode-hook) . my-lsp-ensure)))
 
+(my-c-update-backend my-c-backend)
 (add-variable-watcher 'my-c-backend
                       #'my-c-update-backend)
-(my-c-update-backend my-c-backend)
 
 (provide 'my-c)
 ;;; my-c.el ends here
