@@ -83,9 +83,20 @@ With prefix arg don't indent."
   (setq w32-apps-modifier 'hyper))
 
 
+(defun my-beginning-of-line-text-or-visual-line ()
+  "I think the command name explain everything."
+  (interactive)
+  (goto-char
+   (max (save-excursion
+          (beginning-of-line-text)
+          (point))
+        (save-excursion
+          (beginning-of-visual-line)
+          (point)))))
+
 (--each
     '(("M-y" . consult-yank-from-kill-ring)
-      ("C-a" . beginning-of-line-text)
+      ("C-a" . my-beginning-of-line-text-or-visual-line)
       ("C-o" . open-line-saving-indent)
       ("M-y" . consult-yank-from-kill-ring)
       ("C-x C-y" . duplicate-line))
