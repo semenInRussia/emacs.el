@@ -9,6 +9,7 @@
 ;;; Code:
 
 (require 'my-leaf)
+(require 'dash)
 
 
 (defcustom my-typst-imenu-generic-expression
@@ -37,7 +38,7 @@ See `imenu-generic-expression'"
 
 It's working for typst."
   (and
-   (just-line-prefix-p "=")
+   (just-line-prefix-p "=" nil 'trim)
    (my-typst-first-letter-of-heading-p)
    (upcase-char -1)))
 
@@ -61,15 +62,30 @@ It's working for typst."
 
 (leaf typst-ts-mode
   :ensure (typst-ts-mode :host sourcehut :repo "meow_king/typst-ts-mode")
+  :bind (:typst-ts-mode-map
+         ("C-m" . typst-ts-mode-return))
   :custom (typst-ts-mode-indent-offset . 2)
   :config
+  (add-hook 'typst-ts-mode-hook 'visual-line-mode)
+  (add-hook 'typst-ts-mode-hook 'my-lsp-ensure)
+
   (require 'my-autoformat)
 
   (my-autoformat-bind-for-major-mode
    'typst-ts-mode
    'autoformat-typst-capitalize-heading-line
    'autoformat-typst-capitalize-list-item
-   'my-autoformat-sentence-capitalization))
+   'my-autoformat-sentence-capitalization)
+
+  (with-eval-after-load 'eglot
+    (add-to-list 'eglot-server-programs
+                 `(typst-ts-mode "typst-lsp"))
+    (add-to-list 'eglot-server-programs
+                 `(typst-ts-mode . ("typst-lsp"
+                                    :initializationOptions
+                                    (:exportPdf "onType"))))))
+
+
 
 (provide 'my-typst)
 ;;; my-typst.el ends here
