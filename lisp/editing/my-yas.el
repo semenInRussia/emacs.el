@@ -29,6 +29,7 @@
   :defun (yas--table-hash
           yas--filter-templates-by-condition
           yas--namehash-templates-alist)
+  :bind ("C-=" . yas-insert-snippet)
   ;; don't use `yas-global-mode', prefer local minor modes
   ;; :global-minor-mode yas-global-mode
   :hook ((prog-mode-hook . yas-minor-mode)
@@ -38,7 +39,7 @@
   (setq yas-snippet-dirs (list my-snippets-dir))
   ;; don't load snippets instantly after a file opened, wait some AFK
   ;; time
-  (run-with-idle-timer 3 nil #'yas-reload-all))
+  (run-with-idle-timer 1 nil #'yas-reload-all))
 
 ;; a completion for snippets with `cape' (capf)
 
