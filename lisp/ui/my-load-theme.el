@@ -99,7 +99,7 @@
 
  ;; light yellow border for auto-complete
  ;; make border of auto-completion minibuffer white/black, it looks like nice
- '(corfu-border ((t :background "#FBE3BF")))
+ '(corfu-border ((t :background "#f4f4f4")))
  ;; italic name of the item like Function, Module, Method
  '(corfu-annotations ((t :italic t)))
  ;; use more like a string literals colors for current complete item
