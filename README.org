@@ -1,4 +1,10 @@
 * semenInRussia emacs configration
+
+[[./doc/s1.png]]
+[[./doc/s2.png]]
+[[./doc/s3.png]]
+[[./doc/s4.png]]
+
 Some men tell me "So, you just copy Doom. Why?".  My answer is that my configration is even better than Doom + it isn't a stupid copy of Doom, my configuration have a big amount of interesting concepts which is unique for this config.  Plus the biggest part of my config is opposite to Doom.  Things where my config is better on 100% I will tell #nodoom, where is better by my opinion (everywhere, but here diff is bit) I will tell #dddm
 
 ** Features
