@@ -27,7 +27,11 @@
   ;; don't need to load `eglot' instantly after somebody open a file,
   ;; so file will be opened more quickly, and lsp will be activated
   ;; after some time
-  (run-with-idle-timer 1 nil #'eglot-ensure))
+  (let ((buf (current-buffer)))
+    (run-with-idle-timer 1 nil
+                         (lambda ()
+                           (with-current-buffer buf
+                             (eglot-ensure))))))
 
 (provide 'my-lsp)
 ;;; my-lsp.el ends here
