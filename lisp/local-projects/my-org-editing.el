@@ -1,6 +1,6 @@
 ;;; my-org-editing.el --- Some commands to edit an `org-mode' source -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023 semenInRussia
+;; Copyright (C) 2023-2024 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.0.1
@@ -25,6 +25,7 @@
 ;;; Code:
 
 (require 'org)
+(require 'just)
 
 
 ;;;###autoload
@@ -74,7 +75,7 @@ in the region."
   "Make PATH to an image to path for `org-mode' images specially."
   (->>
    path
-   (f-full)
+   f-full
    (s-chop-prefix (f-full default-directory))
    (s-prepend "./")))
 
