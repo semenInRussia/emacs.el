@@ -12,68 +12,22 @@
 (require 'just)
 (require 'my-leaf)
 (require 's)
-(require 'smartparens)
 
 
 (leaf python-mode
   :ensure t
   :mode "\\.py\\'"
-  :custom (python-shell-interpreter . "python")
-  :hook (python-mode-hook . my-python-fix-whitespaces-mode)
-  :custom ((lsp-bridge-python-lsp-server . nil)
+  :custom (;;; config for `lsp-bridge', the last time I prefer `eglot'
+           (lsp-bridge-python-lsp-server . nil)
            (lsp-bridge-python-multi-lsp-server . "pyright_ruff"))
-  :bind (:python-mode-map
-         ("C-c C-i" . py-sort-imports)
-         ("C-c C-o" . my-python-optional-type)
-         ("C-c M-p" . my-python-split-params))
   :config
-
-  (defun my-python-split-multi-imports-in-1-line ()
-    "Find all lines importing more then 1 thing from module and split it."
-    (interactive)
-    (save-excursion
-      (goto-char (point-min))
-      (while (search-forward-regexp
-              "^from +\\(.*?\\) +import +\\(\\(.*?\\), *\\)+" nil t)
-        (let ((line (just-text-at-line))
-              (from (match-string 1)))
-          (delete-region (pos-bol) (pos-eol))
-          (--each
-              (->>
-               line
-               (s-split "import")
-               (-last-item)
-               (s-split ",")
-               (-map 's-trim))
-            (insert "from " from " import " it)
-            (newline))))))
-
-  (defun my-python-optional-type (beg end)
-    "Turn a python type in the active region into optional.
-
-Active region is region from BEG to END"
-    (interactive "r")
-    (goto-char end)
-    (insert "]")
-    (goto-char beg)
-    (insert "Optional["))
-
-  (defun my-python-fix-whitespaces-mode ()
-    "Fix `whitespace-mode' for `python-mode'."
-    (interactive)
-    (setq-local whitespace-line-column 88))
-
-  (defun my-python-split-params ()
-    "Split params of a python def block into some lines."
-    (interactive)
-    (save-excursion
-      (end-of-line)
-      (search-backward "def")
-      (forward-sexp)
-      (sp-get
-          (sp-get-sexp)
-        (replace-string-in-region "," ",\n" :beg :end))
-      (sp-get (sp-get-sexp) (indent-region-line-by-line :beg :end)))))
+  ;; source is inside "local-projects" directory
+  (leaf my-python-editing
+    :bind (:python-mode-map
+           :package python
+           ("C-c C-i" . py-sort-imports)
+           ("C-c C-o" . my-python-optional-type)
+           ("C-c M-p" . my-python-split-params))))
 
 (leaf eglot
   :ensure t
