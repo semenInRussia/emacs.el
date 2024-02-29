@@ -187,8 +187,7 @@ When you apply this command line argument after init Emacs open the my agenda"
 
 (let ((file-name-handler-alist nil)
       (load-suffixes '(".elc" ".el"))
-      (load-rep-load-file-rep-suffixes '(""))
-      )
+      (load-rep-load-file-rep-suffixes '("")))
   (require 'my-modules))
 
 (provide 'init)
