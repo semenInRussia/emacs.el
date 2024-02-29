@@ -1,6 +1,6 @@
 ;;; my-python.el --- My configuration for Python -*- lexical-binding: t -*-
 
-;; Copyright (C) 2022-2023 semenInRussia
+;; Copyright (C) 2022-2024 semenInRussia
 
 ;;; Commentary:
 
@@ -28,6 +28,10 @@
            ("C-c C-i" . py-sort-imports)
            ("C-c C-o" . my-python-optional-type)
            ("C-c M-p" . my-python-split-params))))
+
+(leaf flymake-ruff
+  :ensure t
+  :hook (eglot-managed-mode-hook . flymake-ruff-load))
 
 (leaf eglot
   :ensure t
