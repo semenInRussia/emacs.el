@@ -78,16 +78,21 @@
            (os1-use-variable-pitch . nil)
            (os1-use-more-italic . t)))
 
-(setq-default line-spacing 0.20)
+(setq-default line-spacing 0.28)
 
 ;; just load theme, the respective autloads and settings (see above)
 ;; will be loaded
+
 (load-theme 'doom-1337 :no-confirm)
 (custom-set-faces
  ;; The most important
 
  ;; selected text with more light bg
  '(region ((t :background "#777")))
+
+ ;; ;; bold keywords
+ ;; '(font-lock-keyword-face ((t :innerhit t
+ ;;                              :bold t)))
 
  ;; Selection Popup (a `vertico' package)
 
