@@ -11,6 +11,12 @@
 (require 'my-leaf)
 
 
+(defun my-recentf-load ()
+  "Just load `recentf'."
+  (interactive)
+  (unless recentf-mode
+    (recentf-mode t)))
+
 (leaf recentf
   ;; :global-minor-mode recentf-mode
   :hook (prog-mode-hook
@@ -24,12 +30,8 @@
            ;; `recentf-cleanup'
            (recentf-auto-cleanup . 'never))
   :init
-  (advice-add
-   'consult-buffer :before
-   (defun my-recentf-load ()
-     (interactive)
-     (unless recentf-mode
-       (recentf-mode t)))))
+  (advice-add 'consult-buffer :before #'my-recentf-load)
+  (run-with-idle-timer 3 nil #'my-recentf-load))
 
 (provide 'my-recentf)
 ;;; my-recentf.el ends here
