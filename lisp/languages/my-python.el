@@ -31,7 +31,7 @@
 
 (leaf flymake-ruff
   :ensure t
-  :hook (eglot-managed-mode-hook . flymake-ruff-load))
+  :hook (python-mode-hook . flymake-ruff-load))
 
 (leaf eglot
   :ensure t
