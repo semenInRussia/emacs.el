@@ -1,11 +1,11 @@
-* semenInRussia emacs configration
+* semenInRussia emacs configuration
 
 [[./doc/s1.png]]
 [[./doc/s2.png]]
 [[./doc/s3.png]]
 [[./doc/s4.png]]
 
-Some men tell me "So, you just copy Doom. Why?".  My answer is that my configration is even better than Doom + it isn't a stupid copy of Doom, my configuration have a big amount of interesting concepts which is unique for this config.  Plus the biggest part of my config is opposite to Doom.  Things where my config is better on 100% I will tell #nodoom, where is better by my opinion (everywhere, but here diff is bit) I will tell #dddm
+Some men tell me "So, you just copy Doom. Why?".  My answer is that my configuration is even better than Doom + it isn't a stupid copy of Doom, my configuration have a big amount of interesting concepts which is unique for this config.  Plus the biggest part of my config is opposite to Doom.  Things where my config is better on 100% I will tell #nodoom, where is better by my opinion (everywhere, but here diff is bit) I will tell #dddm
 
 ** Features
 
@@ -17,7 +17,7 @@ Some men tell me "So, you just copy Doom. Why?".  My answer is that my configrat
   + amazing modeline
   + icons everywhere (#nodoom)
   + No to ~prettify-mode~
-  + Small, but amazing paddings around screen (#nodoom)
+  + Small, but amazing padding around screen (#nodoom)
 
 - Very (really very) fast start up. (#nodoom #nodoom)
 
@@ -31,13 +31,13 @@ Some men tell me "So, you just copy Doom. Why?".  My answer is that my configrat
 
 - Own package manager, built over ~straight.el~. (#nodoom)
 
-  The benefit is a speed, it only one time add to the a path ~load-path~.  And other times Emacs will find a package only in this directory, instead of 220+ other dirs when use ~straight.el~
+  The benefit is a speed, it only one time add to the a path ~load-path~.  And other times Emacs will find a package only in this directory, instead of 220+ other directories when use ~straight.el~
 
   It's even better than Doom package manager
 
 - Use good-practice solutions, like replace heavy things with the more light. (#nodoom)
 
-- Use ~perspectives~ (vertual desktops/workspaces for Emacs) with intuitive way
+- Use ~perspectives~ (virtual desktops/workspaces for Emacs) with intuitive way
 
 ** Extension (my config as framework)
 
@@ -46,17 +46,17 @@ Interesting way to extension, which you can call chaos.
 You don't needed my ~pam~ package manager if you want anything other!  You don't needed in any strict file system!  You don't need in any macros!
 
 
-Every config file can be in any subfolder of ~/lisp/~, have any name, contains any things.  Only one separation is that files which not always needed at startup you can place at ~/lisp/local-projects/~ and you will need to build config ~emacs --modules~ and all files from ~/lisp/~ will be joined at ~/dist/my-modules.el~ you can see source of my-modules build inside ~local-projects/my-build-config.el~, also you can generate autoloads files for local-projects (use ~--local-projects~ flag) after that you everywhere can use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Autoload.html][autoloaded]] functions from ~local-projects~.
+Every config file can be in any sub-folder of ~/lisp/~, have any name, contains any things.  Only one separation is that files which not always needed at startup you can place at ~/lisp/local-projects/~ and you will need to build config ~emacs --modules~ and all files from ~/lisp/~ will be joined at ~/dist/my-modules.el~ you can see source of my-modules build inside ~local-projects/my-build-config.el~, also you can generate autoloads files for local-projects (use ~--local-projects~ flag) after that you everywhere can use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Autoload.html][autoloaded]] functions from ~local-projects~.
 
 So main files (files of framework part) are only:
 
-- ~early-init.el~ some speedhacks beginnings for ~init.el~
+- ~early-init.el~ some speed-hacks beginnings for ~init.el~
 - ~init.el~ but only a part, where handling of CLI arguments
 - ~local-projects/my-build-config.el~, I think you understand it
 
-** Installiation
+** Installation
 
-Before installiation you must install ~JetBrainsMono Nerd Font~ or other Nerd Font, if your font isn't JetBrainsMono, change the variable inside =.config/emacs/lisp/ui/my-fonts.el=
+Before installation you must install ~JetBrainsMono Nerd Font~ or other Nerd Font, if your font isn't JetBrainsMono, change the variable inside =.config/emacs/lisp/ui/my-fonts.el=
 
 To install my config on your config as main use the following shell command, if you need to only try this config (without delete your thing), change .config/emacs on anything like ~/semacs
 
@@ -68,6 +68,8 @@ In this commands 3 steps:
 1. Install the archive which is updated automatically after every commit.  This archive contains a configuration with installed 3rd party packages
 2. Make a directory where config will be located (defaults to .config/emacs but in windows it can be anything else)
 3. Unzip the archive to this folder
+
+after this command on Linux you *MUST* run ~nerd-fonts-install-fonts~
 
 You can extract an archive into any directory, and run emacs using ~--init-directory~ flag, like:
 
