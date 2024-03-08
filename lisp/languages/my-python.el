@@ -17,7 +17,9 @@
 (leaf python-mode
   :ensure t
   :mode "\\.py\\'"
-  :custom (;;; config for `lsp-bridge', the last time I prefer `eglot'
+  :custom (;; don't guess the indent. it's always 4.  PEP rocks!
+           (python-indent-guess-indent-offset . nil)
+           ;; customize `lsp-bridge', now I prefer `eglot', but maybe..
            (lsp-bridge-python-lsp-server . nil)
            (lsp-bridge-python-multi-lsp-server . "pyright_ruff"))
   :config
