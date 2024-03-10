@@ -33,7 +33,12 @@
 
 (leaf flymake-ruff
   :ensure t
-  :hook (python-mode-hook . flymake-ruff-load))
+  :hook ((python-mode-hook . flymake-ruff-load)
+         (python-mode-hook . my-flymake-ruff-load))
+  :config
+  (defun my-flymake-ruff-load ()
+    "My version of loading `flymake-ruff' (ruff linter) for Python buffer."
+    (add-hook 'eglot-managed-mode-hook 'flymake-ruff-load nil :local)))
 
 (leaf eglot
   :ensure t
