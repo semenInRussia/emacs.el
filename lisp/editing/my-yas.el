@@ -43,11 +43,14 @@
 
 ;; a completion for snippets with `cape' (capf)
 
-(declare-function cape--table-with-properties "cape")
-(declare-function cape--bounds "cape")
-(declare-function cape-interactive "cape")
 
-(with-eval-after-load 'cape
+
+(leaf cape
+  :defun (cape--table-with-properties
+          cape--bounds
+          cape-interactive)
+  :after cape yasnippet corfu
+  :config
   (defvar my-yas--capf-properties
     (list :annotation-function (lambda (_) " Snippet ")
           :company-kind (lambda (_) 'snippet)
@@ -92,12 +95,11 @@ manipulate with it to show helpful things"
      (eq status 'finished)
      (yas-expand)))
 
-  (with-eval-after-load 'corfu
-    (add-hook
-     'corfu-mode-hook
-     (defun my-yas-capf-setup ()
-       "Add capf for `yasnippet'."
-       (add-hook 'completion-at-point-functions 'my-yas-capf 30 'local)))))
+  (add-hook
+   'corfu-mode-hook
+   (defun my-yas-capf-setup ()
+     "Add capf for `yasnippet'."
+     (add-hook 'completion-at-point-functions 'my-yas-capf 30 'local))))
 
 (provide 'my-yas)
 ;;; my-yas.el ends here
