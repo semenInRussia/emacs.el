@@ -1,4 +1,4 @@
-;;; init.el --- Load my config
+;;; init.el --- Load my configuration
 ;;; Commentary:
 ;;; Code:
 
