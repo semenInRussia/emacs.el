@@ -6,6 +6,10 @@
 
 (setq gc-cons-threshold most-positive-fixnum)
 
+;;; Don't display native-comp warnings
+(defvar native-comp-async-report-warnings-errors)
+(setq native-comp-async-report-warnings-errors nil)
+
 ;; PERF: A second, case-insensitive pass over `auto-mode-alist' is time wasted.
 (setq auto-mode-case-fold nil)
 
@@ -25,14 +29,18 @@
    ;;   as a best fit guess. It's better than Emacs' 80kb default.
    (setq gc-cons-threshold (* 16 1024 1024))))
 
+
+;; PERF: Emacs don't need to display mode-line at the startup, set
+;;   modeline to none hope that configuration change it after (I'm
+;;   using `doom-modeline' and enable it after startup, if you use the
+;;   default mode-line you need to delete this line or use other code)
+(setq-default mode-line-format nil)
+
 ;; PERF: Don't use precious startup time checking mtime on elisp bytecode.
 (setq load-prefer-newer noninteractive)
 
 ;; I prefer `straight' over `packages.el'
 (setq package-enable-at-startup nil)
-
-;; PERF: A second, case-insensitive pass over `auto-mode-alist' is time wasted.
-;;(setq auto-mode-case-fold nil)
 
 ;; PERF: Disable bidirectional text scanning for a modest performance boost.
 ;;   I've set this to `nil' in the past, but the `bidi-display-reordering's docs
@@ -51,6 +59,7 @@
          (tool-bar-lines . 0)
          (vertical-scroll-bars))
        default-frame-alist))
+
 ;; And set these to nil so users don't have to toggle the modes twice to
 ;; reactivate them.
 (setq menu-bar-mode nil

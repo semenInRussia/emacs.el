@@ -59,10 +59,6 @@
 ;;; smooth scrolling
 (add-hook 'emacs-startup-hook #'pixel-scroll-precision-mode)
 
-;;; Don't display native-comp warnings
-(defvar native-comp-async-report-warnings-errors)
-(setq native-comp-async-report-warnings-errors nil)
-
 (leaf sudo-edit
   :ensure t)
 
