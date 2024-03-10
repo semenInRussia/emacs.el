@@ -35,6 +35,6 @@
 ;; paddings
 (leaf spacious-padding
   :ensure t
-  :global-minor-mode spacious-padding-mode)
+  :global-minor-mode t)
 
 ;;; my-layout.el ends here

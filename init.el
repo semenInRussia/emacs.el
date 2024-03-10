@@ -100,8 +100,8 @@
    "Handle --kill command-line argument.
 
 Argument was named --kill, because it kill Emacs after Emacs is load.  It
-useful, if you needed in only install packages, byte compile config and other
-these things.
+useful, if you needed in only install packages, byte compile
+configuration and other these things.
 
 This is function for `command-line-functions'."
    (when (string-equal argi "--kill")
@@ -183,7 +183,6 @@ When you apply this command line argument after init Emacs open the my agenda"
   (user-error "File \"my-modules.el\" didn't created, suggest use --modules option"))
 
 (add-to-list 'load-path (file-name-directory my-modules-el-file))
-
 
 (let ((file-name-handler-alist nil)
       (load-suffixes '(".elc" ".el"))
