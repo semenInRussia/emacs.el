@@ -26,7 +26,7 @@
   ;; I load `corfu' only when it really needed.  It's awesome idea,
   ;; until `corfu' don't take some seconds before load, it make Emacs
   ;; a little worth, but with `my-use-afk' it's still cool
-  :commands (corfu--in-region global-corfu-mode)
+  :commands corfu--in-region global-corfu-mode
   :init
   (--each '(prog-mode-hook text-mode-hook)
     (add-hook it
