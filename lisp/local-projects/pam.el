@@ -154,7 +154,7 @@ all is installed"
   "Activate the package and MAYBE install it.
 
 The package is defined with MELPA-STYLE-RECIPE (see the `straight'
-documentation).  The behaviour depends on the value of the
+documentation).  The behavior depends on the value of the
 `pam-need-to-install-pkgs-p' variable.  If packages must be installed then this
 function install them using `straight' with passing NO-CLONE and NO-BUILD to
 `straight-use-package' (see below details), otherwise (packages already
