@@ -14,7 +14,7 @@
 
 ;; you can install this font, from the GitHub repo `nerd-fonts'
 (defcustom my-fonts-main
-  "JetBrainsMonoNerdFont"
+  "JetBrainsMono Nerd Font"
   "Name of the main font to display all."
   :group 'my
   :type 'string)
@@ -25,7 +25,7 @@
   :group 'my
   :type 'number)
 
-(setq line-spacing 0.2)
+(setq-default line-spacing 0.3)
 
 (push (cons 'font
             (format "%s-%s"

@@ -82,7 +82,6 @@
 ;;
 ;; in the most of configurations, after it Emacs load custom.el, but I fount it
 ;; a bit useless.  I prefer `setq' over `custom'
-;;(setq custom-dont-initialize t)
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
 ;; some useful macros
