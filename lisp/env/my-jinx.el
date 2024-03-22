@@ -15,9 +15,14 @@
 (require 'leaf)
 
 
+(defvar my-enchant-executable "enchant" "A path to executable of the Enchant program.")
+
 (leaf jinx
   :ensure t
   :custom (jinx-languages . "ru_RU en")
+  :when (and
+         (executable-find "enchant-2")
+         (seq-find #'executable-find '("gcc" "clang" "cc")))
   :bind (:meow-normal-state-keymap
          :package meow-core
          ("$" . jinx-correct))
