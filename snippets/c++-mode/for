@@ -1,7 +1,8 @@
 # -*- mode: snippet -*-
+# contributor: York Zhao
 # name: for
 # key: for
 # --
-for (${1:i = 0}; ${2:i < N}; ${3:++i}) {
+for (${1:int} ${2:i} = ${3:0}; $2 < ${4:MAXIMUM}; $2++) {
     $0
 }
