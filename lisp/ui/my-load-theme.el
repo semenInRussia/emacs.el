@@ -78,8 +78,6 @@
            (os1-use-variable-pitch . nil)
            (os1-use-more-italic . t)))
 
-(setq-default line-spacing 0.28)
-
 ;; just load theme, the respective autloads and settings (see above)
 ;; will be loaded
 
