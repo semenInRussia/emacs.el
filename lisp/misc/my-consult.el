@@ -1,6 +1,6 @@
 ;;; my-consult.el --- My config for `consult'
 
-;; Copyright (C) 2022, 2023 semenInRussia
+;; Copyright (C) 2022-2024 semenInRussia
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
 ;; URL: https://github.com/semenInRussia/emacs.el
@@ -28,7 +28,8 @@
   :ensure t
   :commands (consult-register-format
              consult-register-window
-             consult-xref)
+             consult-xref
+             consult--buffer-file-hash)
   :defvar (consult-narrow-key
            consult-project-function
            consult-buffer-sources)
@@ -66,25 +67,6 @@
   ;; i don't know what does the next line
   :hook ((completion-list-mode-hook . consult-preview-at-point-mode))
   :config
-
-  (leaf project
-    :bind (:project-prefix-map
-           ;; instead of built-in `projectile-find-regexp' sometimes use command
-           ;; from `projectile-prefix-map' more useful , than "C-c s" for
-           ;; example, when you swithch to project and need to find regexp
-           ("g" . consult-ripgrep)
-           ;; show the project iBuffer list => choose a project buffer with `consult'
-           ("b" . consult-project-buffer)
-           ("C-b" . consult-project-buffer))
-    :config
-    ;; change "Find regexp" with `consult-ripgrep' instead of
-    ;; `project-find-regexp'
-    (->>
-     project-switch-commands
-     (--replace-where
-      (equal (-second-item it) "Find regexp")
-      '(consult-ripgrep "Find regexp"))
-     (setq project-switch-commands)))
 
   ;; This adds thin lines, sorting and hides the mode line of the window.
   (advice-add #'register-preview :override #'consult-register-window)
@@ -125,7 +107,28 @@
                   items)))))
 
     (plist-put consult--source-recent-file
-               :items #'my-consult--source-recentf-items)))
+               :items 'my-consult--source-recentf-items)))
+
+;; some config to add to project keymap `consult' commands
+;; key-bindings
+(leaf project
+  :bind (:project-prefix-map
+         ;; instead of built-in `projectile-find-regexp' sometimes use command
+         ;; from `projectile-prefix-map' more useful , than "C-c s" for
+         ;; example, when you swithch to project and need to find regexp
+         ("g" . consult-ripgrep)
+         ;; show the project iBuffer list => choose a project buffer with `consult'
+         ("b" . consult-project-buffer)
+         ("C-b" . consult-project-buffer))
+  :config
+  ;; change "Find regexp" with `consult-ripgrep' instead of
+  ;; `project-find-regexp'
+  (->>
+   project-switch-commands
+   (--replace-where
+    (equal (-second-item it) "Find regexp")
+    '(consult-ripgrep "Find regexp"))
+   (setq project-switch-commands)))
 
 (leaf consult-dir
   :ensure t)
