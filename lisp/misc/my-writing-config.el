@@ -272,5 +272,26 @@ Will be changed automatically if you use
                  (f-join dest (f-filename it))
                  'ok-if-exists))))
 
+
+(autoload 'my-build-config "my-build-config" "\
+Build my config." t)
+(defun my-restart-build ()
+  "Restart Emacs with rebuild the config before."
+  (interactive)
+  (my-build-config)
+  (restart-emacs))
+
+(defvar my-config-map
+  (define-keymap
+    ;; Build and Restart
+    "b" #'my-build-config
+    "r" #'restart-emacs
+    "R" #'my-restart-build
+    "B" #'my-restart-build
+
+    "n" #'my-new-config-module
+    "t" 'my-require-times))
+(global-set-key (kbd "C-c e") my-config-map)
+
 (provide 'my-writing-config)
 ;;; my-writing-config.el ends here
