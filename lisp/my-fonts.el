@@ -27,7 +27,7 @@
   :group 'my
   :type 'number)
 
-(setq-default line-spacing 0.35)
+(setq-default line-spacing 0.30)
 
 (push (cons 'font
             (format "%s-%s"

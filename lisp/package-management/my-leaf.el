@@ -676,31 +676,6 @@
             :grugru
             `((grugru-define-multiple ,@leaf--value)
               ,@leaf--body)
-            :fast-exec
-            (let*
-                ((arguments
-                  (car leaf--value))
-                 (name leaf--name)
-                 (bindings
-                  (if
-                      (consp
-                       (car arguments))
-                      arguments
-                    (list arguments))))
-              (--each bindings
-                (unless
-                    (eq
-                     (-second-item it)
-                     'quote)
-                  (leaf-register-autoload
-                   (-second-item it)
-                   leaf--name)))
-              `((with-eval-after-load 'fast-exec
-                  ;; `require' macros needed in `eval-and-compile'
-                  (eval
-                   '(fast-exec-bind ',name
-                      (fast-exec-make-some-commands ,@bindings))))
-                ,@leaf--body))
             :leaf-defer
             (let*
                 ((eval-after-p

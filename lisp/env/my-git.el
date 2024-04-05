@@ -38,20 +38,17 @@
   (add-hook 'magit-mode-hook #'hl-line-mode))
 
 (leaf git-timemachine
-  :ensure (git-timemachine :repo "pidu/git-timemachine" :host gitlab)
-  :fast-exec ("Git Timemachine" 'git-timemachine))
+  :ensure (git-timemachine :repo "pidu/git-timemachine" :host gitlab))
 
 (leaf git-modes
   :ensure (git-modes :repo "magit/git-modes" :host github))
 
 (leaf gitignore-templates
-  :ensure t
-  :fast-exec ("Insert Git Ignore" 'gitignore-templates-insert))
+  :ensure t)
 
 (leaf github-clone
   :ensure (github-clone :repo "dgtized/github-clone.el" :host github)
-  :custom (github-clone-directory . "~/projects")
-  :fast-exec ("Clone a GitHub Project" 'github-clone))
+  :custom (github-clone-directory . "~/projects"))
 
 (leaf line-reminder
   :ensure (line-reminder :repo "emacs-vs/line-reminder" :host github)

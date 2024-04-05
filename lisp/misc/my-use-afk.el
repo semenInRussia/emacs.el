@@ -73,8 +73,6 @@
     org-cycle
     ;; snippets
     yasnippet
-    ;; fast-exec
-    fast-exec
     ;; my translator
     gts-core
     gts-implements

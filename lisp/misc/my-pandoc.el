@@ -1,5 +1,5 @@
 ;;; my-pandoc.el --- My config for the the pandoc
-;; Copyright (C) 2022-2023 Semen Khramtsov
+;; Copyright (C) 2022-2024 Semen Khramtsov
 
 ;;; Commentary:
 
@@ -23,13 +23,6 @@
     (s-lex-format
      "pandoc -t docx -f latex -o documents/${it}.docx ${it}.tex"))
    (mapc #'shell-command)))
-
-(with-eval-after-load 'fast-exec
-  (eval
-   '(fast-exec-bind 'pandoc
-      (fast-exec-make-some-commands
-       ("Convert Tex Files and Move to Documents Dir"
-        'my-pandoc-tex-to-documents-dir)))))
 
 (provide 'my-pandoc)
 ;;; my-pandoc.el ends here

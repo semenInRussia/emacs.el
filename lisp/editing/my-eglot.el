@@ -31,9 +31,6 @@
          ("C-c la"  . 'eglot-code-actions)
          ("C-c ll"  . 'eglot-code-actions)
          ([remap my-format-expression] . 'eglot-format))
-  :fast-exec (("Start a LSP Server for Current Buffer" 'eglot)
-              ("Reconnect the LSP Server" 'eglot-reconnect)
-              ("Disable the LSP Server" 'eglot-shutdown))
   :config
   ;; `eglot' use `flymake' instead of `flycheck', so i disable `flycheck'
   (add-hook 'eglot-managed-mode-hook #'turn-off-flycheck)

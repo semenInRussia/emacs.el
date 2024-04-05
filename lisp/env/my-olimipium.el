@@ -27,8 +27,6 @@
 
 (require 'my-lib)
 
-(declare-function fast-exec-make-command "fast-exec")
-
 (require 'dash)
 (require 'f)
 
@@ -59,16 +57,6 @@
        (string-to-number (f-base other))))
      (my-inc-filename)
      (find-file))))
-
-(defvar fast-exec--commands-bindings (make-hash-table :test 'eq))
-
-(with-eval-after-load 'fast-exec
-  (require 'fast-exec)
-  (puthash 'olimpium
-           (list
-            (fast-exec-make-command "New Olimpium Task"
-                                    'my-olimpium-new-solution))
-           fast-exec--commands-bindings))
 
 (provide 'my-olimipium)
 ;;; my-olimipium.el ends here

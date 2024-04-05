@@ -61,12 +61,6 @@ DIRECTORY defaults to ~/.emacs.d/lisp/"
      (format-time-string "%Y"))))
   (search-backward "(leaf "))
 
-(with-eval-after-load 'fast-exec
-  (eval
-   '(fast-exec-bind 'writing-config
-      (fast-exec-make-some-commands
-       ("New Config Module" 'my-new-config-module)))))
-
 (leaf ecukes
   :ensure t
   :bind (:feature-mode-map

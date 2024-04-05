@@ -306,9 +306,7 @@
                            "Weird"
                            "Wet Letter"
                            "Whimsy"
-                           "Wow")))
-  :fast-exec (("View a Text" 'figlet)
-              ("Insert a Text as Comment" 'figlet-comment)))
+                           "Wow"))))
 
 (provide 'my-figlet)
 ;;; my-figlet.el ends here

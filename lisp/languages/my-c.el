@@ -36,5 +36,42 @@ Backend is either symbol tags or lsp"
 (add-variable-watcher 'my-c-backend
                       #'my-c-update-backend)
 
+;; some settings to compile my C++ file using certain flags,
+;; optimizations, warnings which are useful for Olympiad programming
+(leaf run-command
+  :after run-command cc-mode
+  :defvar run-command-recipes
+  :config
+  (defun run-command-sportprog-recipe ()
+    "A recipe for `run-command' useful to sport programming."
+    (when (and (buffer-file-name)
+               (eq major-mode 'emacs-lisp-mode)))
+    (list
+     (and
+      (file-exists-p "input.txt")
+      (list
+       :display "Gcc: compile, execute with input.txt [all flags]"
+       :command-name "sport-execute-sample"
+       :command-line
+       (format
+        "g++ %s -Wdisabled-optimization -Wfloat-equal -Werror -g && cat input.txt | ./a.out"
+        (buffer-file-name))))
+     (list
+      :display "Gcc: execute only [all flags]"
+      :command-name "sport-execute"
+      :command-line
+      (format
+       "g++ %s -Wdisabled-optimization -Wfloat-equal -Werror -g && ./a.out"
+       (buffer-file-name)))
+     (list
+      :display "Gcc: compile only [all flags]"
+      :command-name "sport-compile"
+      :command-line
+      (format
+       "g++ %s -Wdisabled-optimization -Wfloat-equal -Werror -g"
+       (buffer-file-name)))))
+
+  (add-to-list 'run-command-recipes 'run-command-sportprog-recipe))
+
 (provide 'my-c)
 ;;; my-c.el ends here

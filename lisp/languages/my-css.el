@@ -31,11 +31,8 @@
 (require 'dash)
 
 
-(leaf facemenu
-  :fast-exec ("Display All Colors" #'list-colors-display))
-
 (leaf css-mode
-  :config                               ;nofmt
+  :config
   (leaf css-eldoc
     :ensure (css-eldoc :repo "zenozeng/css-eldoc" :host github)
     :hook (((css-mode-hook web-mode-hook)

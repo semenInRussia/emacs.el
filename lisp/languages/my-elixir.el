@@ -13,6 +13,16 @@
 
 
 (leaf elixir-mode
-  :ensure t)
+  :after elixir-mode eglot
+  :defvar eglot-server-programs
+  :config
+  (require 'eglot)
+  (add-to-list 'eglot-server-programs '(elixir-mode "~/temp/language_server.sh"))
+  (add-hook 'elixir-mode-hook 'my-lsp-ensure))
+
+(leaf elixir-mode
+  :ensure t
+  :defer-config
+  (add-hook 'elixir-mode-hook 'my-lsp-ensure))
 
 ;;; my-elixir.el ends here

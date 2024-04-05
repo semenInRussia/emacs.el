@@ -21,11 +21,8 @@
          (c++-mode-hook . my-devdocs-c++-hook)
          (LaTeX-mode-hook . my-devdocs-latex-hook)
          (haskell-mode-hook . my-devdocs-haskell-hook))
-  :fast-exec (("Install DevDocs Docset" 'devdocs-install)
-              ("Delete DevDocs Docset" 'devdocs-delete))
   :bind ("C-c d" . 'devdocs-lookup)
-  :config                               ;nofmt
-
+  :config
   (defun my-devdocs-python-hook ()
     "Set docsets of `devdocs' for `python-mode'."
     (setq-local devdocs-current-docs '("python~3.11")))

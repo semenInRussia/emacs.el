@@ -81,6 +81,8 @@
 ;; just load theme, the respective autloads and settings (see above)
 ;; will be loaded
 
+(add-hook 'prog-mode-hook
+          (lambda () (interactive) (toggle-truncate-lines 1)))
 (load-theme 'doom-1337 :no-confirm)
 (custom-set-faces
  ;; The most important

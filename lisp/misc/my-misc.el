@@ -1,8 +1,8 @@
-;;; my-misc.el --- My some little miscellaneous feautures
+;;; my-misc.el --- My some little miscellaneous features
 
-;; Copyright (C) 2022 Semen Khramtsov
+;; Copyright (C) 2022-2024 semenInRussia
 
-;; Author: Semen Khramtsov <hrams205@gmail.com>
+;; Author: semenInRussia hrams205@gmail.com>
 ;; Version: 0.1
 ;; URL: https://github.com/semenInRussia/emacs.el
 
@@ -11,7 +11,7 @@
 
 ;;; Commentary:
 
-;; My some little miscellaneous feautures
+;; My some little miscellaneous features
 
 ;;; Code:
 (require 'my-leaf)
@@ -21,11 +21,10 @@
 (setq make-backup-files         nil)
 (setq auto-save-list-file-name  nil)
 (defalias 'yes-or-no-p 'y-or-n-p)
-(toggle-truncate-lines t)
 
-;;; russian input method
-;;; now I can press `C-\\' and language on which I am now
-;; writting will be changed
+;; Russian input method
+;; ---
+;; now I can press `C-\\' and language I writing will be changed
 (with-eval-after-load 'my-modules
   (setq-default default-input-method "russian-computer")
   (setq default-file-name-coding-system 'utf-8)
@@ -38,12 +37,6 @@
   (interactive)
   (->> "~/broken.pptx" (f-read) (insert))
   (text-mode))
-
-(with-eval-after-load 'fast-exec
-  (eval
-   '(fast-exec-bind 'pptx
-      (fast-exec-make-some-commands
-       ("New Fake PPTX File" 'my-new-fake-pptx-file)))))
 
 ;;; I try to decrease the Emacs startup time
 (defun my-display-startup-time ()

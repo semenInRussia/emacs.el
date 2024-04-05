@@ -26,7 +26,6 @@
           ("T" . gts-do-translate)))
   :defvar gts-default-translator
   :defun (gts-buffer-render gts-translator gts-prompt-picker gts-google-engine)
-  :fast-exec ("Translate a String" 'gts-do-translate)
   :defer-config
   ;; I use Google Translate with the output in the separate buffer
   (setq gts-default-translator

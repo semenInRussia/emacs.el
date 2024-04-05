@@ -63,8 +63,6 @@
           ("ESC" . nil)
           ("M-n" . 'lsp-bridge-call-hierarchy-next)
           ("M-p" . 'lsp-bridge-call-hierarchy-prev)))
-  :fast-exec (("Start a LSP Server for Current Buffer" 'lsp-bridge-mode)
-              ("Reconnect the LSP Server" 'lsp-bridge-restart-process))
   :config
   (advice-add 'acm-is-elisp-mode-p
               :override
