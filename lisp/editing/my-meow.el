@@ -9,10 +9,10 @@
 ;;; Commentary:
 
 ;; My configuration of `meow'.  `meow' is a modal editing mode for
-;; Emacs.  It was inspired by kakoune and has Helix-like key bindings.
+;; Emacs.  It was inspired by Kakoune and has Helix-like key bindings.
 ;; I don't love virgin `meow' (without any configs), because every
-;; command is "hardcoded" with contributers.  For example the
-;; keybindings "o" and "O" is hardcoded with Lisp expresion and jump
+;; command is "hardcoded" with contributors.  For example the
+;; keybindings "o" and "O" is hardcoded with Lisp expression and jump
 ;; only around round parentheses, but can also around quotes,
 ;; double-quotes, symbols, i think that use `forward-sexp',
 ;; `backward-sexp' and `mark-sexp' is the better choice.  So i try to
