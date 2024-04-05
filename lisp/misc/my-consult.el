@@ -1,7 +1,7 @@
 ;;; my-consult.el --- My config for `consult'
 
-;; Copyright (C) 2022, 2023 Semen Khramtsov
-;; Author: Semen Khramtsov <hrams205@gmail.com>
+;; Copyright (C) 2022, 2023 semenInRussia
+;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
 ;; URL: https://github.com/semenInRussia/emacs.el
 

@@ -1,6 +1,6 @@
 ;;; my-markdown.el --- My configuration for `markdown-mode'
 
-;; Copyright (C) 2022-2024 Semen Khramtsov
+;; Copyright (C) 2022-2024 semenInRussia
 
 ;;; Commentary:
 

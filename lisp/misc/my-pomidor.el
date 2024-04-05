@@ -1,5 +1,5 @@
 ;;; my-pomidor.el --- My configuration for `pomidor': pomodoro techniques
-;; Copyright (C) 2022-2023 Semen Khramtsov
+;; Copyright (C) 2022-2023 semenInRussia
 
 ;;; Commentary:
 

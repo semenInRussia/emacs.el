@@ -1,6 +1,6 @@
 ;;; my-lisp.el --- my-lisp
 
-;; Copyright (C) 2022 Semen Khramtsov
+;; Copyright (C) 2022 semenInRussia
 
 ;;; Commentary:
 

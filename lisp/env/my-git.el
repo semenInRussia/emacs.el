@@ -1,6 +1,6 @@
 ;;; my-git.el --- My config for the Git: the most popular version control
 
-;; Copyright (C) 2022-2024 Semen Khramtsov
+;; Copyright (C) 2022-2024 semenInRussia
 
 ;;; Commentary:
 

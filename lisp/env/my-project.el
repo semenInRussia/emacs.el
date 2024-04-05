@@ -1,6 +1,6 @@
 ;;; my-project.el --- My configration for project.el
 
-;; Copyright (C) 2022-2023 Semen Khramtsov
+;; Copyright (C) 2022-2023 semenInRussia
 
 ;;; Commentary:
 

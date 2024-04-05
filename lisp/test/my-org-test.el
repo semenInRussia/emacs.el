@@ -1,8 +1,8 @@
 ;;; my-org-test.el --- Tests for my configuration of `org-mode'
 
-;; Copyright (C) 2022 Semen Khramtsov
+;; Copyright (C) 2022 semenInRussia
 
-;; Author: Semen Khramtsov <hrams205@gmail.com>
+;; Author: semenInRussia <hrams205@gmail.com>
 
 ;; This file is not part of GNU Emacs.
 

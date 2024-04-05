@@ -1,6 +1,6 @@
 ;;; my-run-command.el --- My configuration for `run-command'
 
-;; Copyright (C) 2022-2023 Semen Khramtsov
+;; Copyright (C) 2022-2023 semenInRussia
 
 ;;; Commentary:
 

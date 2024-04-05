@@ -1,8 +1,8 @@
 ;;; my-lib-test.el --- Tests for `my-lib'
 
-;; Copyright (C) 2022-2023 Semen Khramtsov
+;; Copyright (C) 2022-2023 semenInRussia
 
-;; Author: Semen Khramtsov <hrams205@gmail.com>
+;; Author: semenInRussia <hrams205@gmail.com>
 
 ;; This file is not part of GNU Emacs.
 

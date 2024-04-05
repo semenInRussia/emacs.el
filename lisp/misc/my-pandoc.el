@@ -1,5 +1,5 @@
 ;;; my-pandoc.el --- My config for the the pandoc
-;; Copyright (C) 2022-2024 Semen Khramtsov
+;; Copyright (C) 2022-2024 semenInRussia
 
 ;;; Commentary:
 

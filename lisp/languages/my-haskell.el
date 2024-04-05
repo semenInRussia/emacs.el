@@ -1,6 +1,6 @@
 ;;; my-haskell.el --- My config for `haskell'
 
-;; Copyright (C) 2022-2023 Semen Khramtsov
+;; Copyright (C) 2022-2023 semenInRussia
 
 ;;; Commentary:
 

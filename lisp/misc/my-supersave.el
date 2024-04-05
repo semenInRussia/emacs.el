@@ -1,5 +1,5 @@
 ;;; my-supersave.el --- My config for `supersave'
-;; Copyright (C) 2022-2023 Semen Khramtsov
+;; Copyright (C) 2022-2023 semenInRussia
 
 
 ;;; Commentary:

@@ -2,7 +2,7 @@
 
 ;; Info about me
 
-(setq user-full-name    "Semen Khramtsov"
+(setq user-full-name    "semenInRussia"
       user-mail-address "hrams205@gmail.com")
 
 (provide 'my-info)

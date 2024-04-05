@@ -1,8 +1,8 @@
 ;;; my-autoformat.el --- My engine to create functions that format code after every keystroke for every major mode -*- lexical-binding: t -*-
 
-;; Copyright (C) 2022-2023 Semen Khramtsov
+;; Copyright (C) 2022-2023 semenInRussia
 
-;; Author: Semen Khramtsov <hrams205@gmail.com>
+;; Author: semenInRussia <hrams205@gmail.com>
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.

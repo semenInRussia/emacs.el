@@ -1,6 +1,6 @@
 ;;; my-hl-todo.el --- My config source code for highlight todo commentaries
 
-;; Copyright (C) 2022-2024 Semen Khramtsov
+;; Copyright (C) 2022-2024 semenInRussia
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.

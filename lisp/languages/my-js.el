@@ -1,8 +1,8 @@
 ;;; my-js.el --- My configuration for JavaScript and TypeScript
 
-;; Copyright (C) 2022 Semen Khramtsov
+;; Copyright (C) 2022 semenInRussia
 
-;; Author: Semen Khramtsov <hrams205@gmail.com>
+;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
 ;; URL: https://github.com/semenInRussia/emacs.el
 

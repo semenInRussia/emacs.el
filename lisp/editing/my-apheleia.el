@@ -1,8 +1,8 @@
 ;;; my-apheleia.el --- My configuration of the `apheleia': auto format of source code after save
 
-;; Copyright (C) 2022 Semen Khramtsov
+;; Copyright (C) 2022 semenInRussia
 
-;; Author: Semen Khramtsov <hrams205@gmail.com>
+;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
 ;; URL: https://github.com/semenInRussia/emacs.el
 

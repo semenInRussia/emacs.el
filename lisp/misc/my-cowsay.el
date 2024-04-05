@@ -1,7 +1,7 @@
 ;;; my-cowsay.el --- My config of `cowsay'
 
-;; Copyright (C) 2022 Semen Khramtsov
-;; Author: Semen Khramtsov <hrams205@gmail.com>
+;; Copyright (C) 2022 semenInRussia
+;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
 ;; URL: https://github.com/semenInRussia/emacs.el
 
