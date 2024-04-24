@@ -30,7 +30,15 @@
 
 (leaf aas
   :ensure t
-  :global-minor-mode aas-global-mode)
+  ;; don't use global mode, because `aas' is used with me only inside
+  ;; a few amount of major modes
+  ;;
+  ;; :global-minor-mode aas-global-mode
+  ;;
+  ;; instead do it:
+  :hook ((latex-mode-hook . aas-mode)
+         (TeX-latex-mode-hook . aas-mode)
+         (org-mode-hook . aas-mode)))
 
 (provide 'my-aas)
 ;;; my-aas.el ends here

@@ -14,7 +14,7 @@
 
 ;; PERF: Line numbers are pretty slow all around. The performance boost of disabling
 ;; them outweighs the utility of always keeping them on.
-;;(setq display-line-numbers-type nil)
+(setq display-line-numbers-type nil)
 
 ;; change Emacs config directory depends on init file
 ;;
@@ -47,6 +47,8 @@
   (add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects"))
   (load (locate-user-emacs-file "lisp/local-projects/my-autoload") :noerror :nomessage))
 
+;; the function `my-require-times' to check init time for every Emacs
+;; module (access via SPC e t)
 (require 'my-bench)
 
 ;;; add to `load-path' all installed packages
@@ -187,6 +189,8 @@ When you apply this command line argument after init Emacs open the my agenda"
       (load-suffixes '(".elc" ".el"))
       (load-rep-load-file-rep-suffixes '("")))
   (require 'my-modules))
+
+(put 'narrow-to-region 'disabled nil)
 
 (provide 'init)
 ;;; init.el ends here

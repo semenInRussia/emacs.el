@@ -32,18 +32,8 @@
   :ensure (embrace :repo "cute-jumper/embrace.el" :host github)
   :defvar embrace-semantic-units-alist
   :setq-default (embrace-show-help-p . nil)
-  :bind ("C-."       . embrace-commander)
-  :hook (emacs-lisp-mode-hook . embrace-emacs-lisp-mode-hook)
-  :config                             ;nofmt
-  (unless (assq ?n embrace-semantic-units-alist)
-    (setq-default embrace-semantic-units-alist
-                  (cons
-                   '(?n . embrace-avy-semantic-unit)
-                   embrace-semantic-units-alist)))
-
-  (defun embrace-avy-semantic-unit ()
-    "Semantic unit for `embrace' which ask expression with the `avy'."
-    (call-interactively 'avy-mark-word)))
+  :bind ("C-z"       . embrace-commander)
+  :hook (emacs-lisp-mode-hook . embrace-emacs-lisp-mode-hook))
 
 (provide 'my-embrace)
 ;;; my-embrace.el ends here

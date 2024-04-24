@@ -1,6 +1,6 @@
 ;;; my-apheleia.el --- My configuration of the `apheleia': auto format of source code after save
 
-;; Copyright (C) 2022 semenInRussia
+;; Copyright (C) 2022-2024 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1

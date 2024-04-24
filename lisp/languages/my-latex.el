@@ -49,9 +49,9 @@
     :hook LaTeX-mode-hook
     :custom (xenops-math-image-scale-factor . 2))
 
-  ;; (leaf my-latex-insert
-  ;;   :load-path* "lisp/languages/latex/"
-  ;;   :hook (LaTeX-mode-hook . my-latex-expansion-mode))
+  (leaf my-latex-insert
+    :load-path* "lisp/languages/latex/"
+    :hook (LaTeX-mode-hook . my-latex-expansion-mode))
 
   (leaf laas
     :ensure (laas :repo "tecosaur/LaTeX-auto-activating-snippets" :host github)
@@ -114,16 +114,6 @@
     "Disable `auto-fill-mode'."
     (interactive)
     (auto-fill-mode 0))
-
-  ;; (leaf my-latex-drag
-  ;;   :after my-drag
-  ;;   :defun ((add-up-dragger add-down-dragger) . my-drag)
-  ;;   :commands (my-latex-try-drag-left-list-item
-  ;;              my-latex-try-drag-right-list-item)
-  ;;   ;; eval after `my-drag' is loaded
-  ;;   :init
-  ;;   (add-up-dragger 'my-latex-try-drag-left-list-item)
-  ;;   (add-down-dragger 'my-latex-try-drag-right-list-item))
 
   (setopt TeX-fold-macro-spec-list '(("{1}" ("emph")))))
 

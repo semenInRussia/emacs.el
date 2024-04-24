@@ -1,6 +1,6 @@
 ;;; my-org.el --- My configuration for `org-mode'
 
-;; Copyright (C) 2022 semenInRussia
+;; Copyright (C) 2022-2024 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
@@ -132,7 +132,7 @@
            :package org
            ("C-c C-." . my-org-options-transient)))
 
-  ;; very beautifull `org'
+  ;; very beautiful `org'
   ;;
   ;; for example, it show [1/3] like a pie progress. :o
   (leaf org-modern

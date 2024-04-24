@@ -1,6 +1,6 @@
 ;;; my-indent.el --- My configuration for the indentation
 
-;; Copyright (C) 2022 semenInRussia
+;; Copyright (C) 2022-2024 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
@@ -34,7 +34,6 @@
 (setq-default indent-tabs-mode nil)
 
 (setq-default tab-width 2)
-
 
 (leaf-keys
  (prog-mode-map ("RET" . newline-and-indent)))

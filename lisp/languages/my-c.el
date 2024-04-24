@@ -1,6 +1,6 @@
 ;;; my-c.el --- My configuration of c and c++ languages -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023 semenInRussia
+;; Copyright (C) 2023, 2024 semenInRussia
 
 ;;; Commentary:
 
@@ -50,25 +50,25 @@ Backend is either symbol tags or lsp"
      (and
       (file-exists-p "input.txt")
       (list
-       :display "Gcc: compile, execute with input.txt [all flags]"
+       :display "Sport: compile, execute with input.txt [all flags]"
        :command-name "sport-execute-sample"
        :command-line
        (format
-        "g++ %s -Wdisabled-optimization -Wfloat-equal -Werror -g && cat input.txt | ./a.out"
+        "g++ %s -Wdisabled-optimization -Werror -g && cat input.txt | ./a.out"
         (buffer-file-name))))
      (list
-      :display "Gcc: execute only [all flags]"
+      :display "Sport: execute only [all flags]"
       :command-name "sport-execute"
       :command-line
       (format
-       "g++ %s -Wdisabled-optimization -Wfloat-equal -Werror -g && ./a.out"
+       "g++ %s -Wdisabled-optimization -Werror -g && ./a.out"
        (buffer-file-name)))
      (list
-      :display "Gcc: compile only [all flags]"
+      :display "Sport: compile only [all flags]"
       :command-name "sport-compile"
       :command-line
       (format
-       "g++ %s -Wdisabled-optimization -Wfloat-equal -Werror -g"
+       "g++ %s -Wdisabled-optimization -Werror -g"
        (buffer-file-name)))))
 
   (add-to-list 'run-command-recipes 'run-command-sportprog-recipe))

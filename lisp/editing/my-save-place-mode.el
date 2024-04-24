@@ -19,7 +19,7 @@
 (require 'my-leaf)
 
 (leaf save-place-mode
-  :global-minor-mode save-place-mode)
+  :global-minor-mode t)
 
 (provide 'my-save-place-mode)
 ;;; my-save-place-mode.el ends here

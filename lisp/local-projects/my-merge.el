@@ -18,6 +18,7 @@
 
 (require 'meow-helpers)
 
+;;;###autoload(autoload 'meow-my-merge-mode "my-merge")
 (defvar my-merge-map
   (define-keymap
     :parent meow-normal-state-keymap
