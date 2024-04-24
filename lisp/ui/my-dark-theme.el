@@ -1,0 +1,48 @@
+;;; my-dark-theme.el --- Configuration for the editor view (dark theme) -*- lexical-binding: t -*-
+
+;; Copyright (C) 2024 semenInRussia
+;; Author: semenInRussia <hrams205@gmail.com>
+
+;;; Commentary:
+
+;; Sometimes I need to dark-theme, then I replace `my-light-theme'
+;; with `my-dark-theme' inside `my-load-theme'.  Configuration for
+;; the editor view (dark theme)
+
+;;; Code:
+
+(defun my-dark-theme ()
+  "Load dark theme."
+  (interactive)
+  (load-theme 'doom-1337 :no-confirm)
+  (custom-set-faces
+   ;; The most important
+
+   ;; selected text with more light bg
+   '(region ((t :background "#777")))
+
+   ;; ;; bold keywords
+   ;; '(font-lock-keyword-face ((t :innerhit t
+   ;;                              :bold t)))
+
+   ;; Selection Popup (a `vertico' package)
+
+   ;; I sometimes use a mouse to choose anything from `vertico' buffer
+   ;; (What?), so for me it's important
+   '(vertico-mouse ((t :background "#777")))
+
+   ;; Auto-Complete Popup (`corfu' package)
+
+   ;; light yellow border for auto-complete
+   ;; make border of auto-completion minibuffer white/black, it looks like nice
+   '(corfu-border ((t :background "#f4f4f4")))
+   ;; italic name of the item like Function, Module, Method
+   '(corfu-annotations ((t :italic t)))
+   ;; use more like a string literals colors for current complete item
+   '(corfu-current ((t :background "#252526" :bold t)))
+
+   ;; highlight TODO with red background, italic black text
+   '(hl-todo ((t :backgorund "#FF5E5E" :foreground "black" :italic t)))))
+
+(provide 'my-dark-theme)
+;;; my-dark-theme.el ends here

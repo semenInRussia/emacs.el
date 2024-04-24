@@ -85,6 +85,8 @@
           (lambda () (interactive) (toggle-truncate-lines 1)))
 
 (add-hook 'after-init-hook 'my-dark-theme)
+;; (add-hook 'after-init-hook 'my-light-theme)
+
 
 (provide 'my-load-theme)
 ;;; my-load-theme.el ends here

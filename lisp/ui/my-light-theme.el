@@ -1,0 +1,41 @@
+;;; my-light-theme.el --- Configuration for the editor view (light theme) -*- lexical-binding: t -*-
+
+;; Copyright (C) 2024 semenInRussia
+;; Author: semenInRussia <hrams205@gmail.com>
+
+;;; Commentary:
+
+;; Sometimes I need to light-theme, then I replace `my-dark-theme'
+;; with `my-light-theme' inside `my-load-theme'.  Configuration for
+;; the editor view (light theme)
+
+;;; Code:
+
+(defun my-light-theme ()
+  "Load light theme."
+  (interactive)
+  (load-theme 'doom-one-light :no-confirm)
+  (custom-set-faces
+   ;; selected text with more light bg
+   '(region ((t :background "#aaf")))
+
+   ;; Selection Popup (a `vertico' package)
+   ;; I sometimes use a mouse to choose anything from `vertico' buffer
+   ;; (What?), so for me it's important
+   '(vertico-mouse ((t :background "#aaf")))
+
+   ;; Auto-Complete Popup (`corfu' package)
+
+   ;; light yellow border for auto-complete
+   ;; make border of auto-completion minibuffer white/black, it looks like nice
+   '(corfu-border ((t :background "#000")))
+   ;; italic name of the item like Function, Module, Method
+   '(corfu-annotations ((t :italic t)))
+   ;; use more like a string literals colors for current complete item
+   '(corfu-current ((t :background "#aaf" :bold t)))
+
+   ;; highlight TODO with red background, italic black text
+   '(hl-todo ((t :backgorund "#FF5E5E" :foreground "black" :italic t)))))
+
+(provide 'my-light-theme)
+;;; my-light-theme.el ends here
