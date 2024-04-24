@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: usaco-fstream
+# key: fst
+# --
+ifstream cin("${1:1}.in");
+ofstream cout("$1.out");
