@@ -52,6 +52,7 @@
     :hook marginalia-mode-hook)
 
   ;; show a bit of additional info inside the `vertico' `minibuffer'
+
   (leaf marginalia
     :ensure t
     :global-minor-mode marginalia-mode)
