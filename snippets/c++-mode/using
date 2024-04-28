@@ -2,4 +2,4 @@
 # name: using
 # key: u
 # --
-using ${1:ull} = ${2:unsigned long long};
+using ${1:ll} = ${2:long long};
