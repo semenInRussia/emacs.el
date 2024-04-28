@@ -84,8 +84,13 @@
 (add-hook 'prog-mode-hook
           (lambda () (interactive) (toggle-truncate-lines 1)))
 
-(add-hook 'after-init-hook 'my-dark-theme)
-;; (add-hook 'after-init-hook 'my-light-theme)
+(defvar my-theme-func)
+;; or (setq my-theme-func 'my-light-theme)
+(setq my-theme-func 'my-dark-theme)
+
+(add-hook 'after-init-hook my-theme-func)
+(when (functionp my-theme-func)
+  (funcall my-theme-func))
 
 
 (provide 'my-load-theme)
