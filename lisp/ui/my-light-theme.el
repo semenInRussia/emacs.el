@@ -14,7 +14,10 @@
 (defun my-light-theme ()
   "Load light theme."
   (interactive)
-  (load-theme 'doom-one-light :no-confirm)
+  ;; acario-light
+  ;; bluloco-light
+  ;; solorized-light
+  (load-theme 'doom-bluloco-light :no-confirm)
   (custom-set-faces
    ;; selected text with more light bg
    '(region ((t :background "#aaf")))
