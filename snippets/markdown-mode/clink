@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: contest-link
+# key: clink
+# --
+*Link:* https://codeforces.com/contests/$0

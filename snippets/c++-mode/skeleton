@@ -1,0 +1,19 @@
+# -*- mode: snippet -*-
+# name: skeleton
+# key: !
+# --
+// Copyright 2024 semenInRussia
+
+#include <iostream>
+
+using namespace std;
+
+using ll = long long;
+using pii = pair<int, int>;
+const int inf = 1e9+7;
+
+int main() {
+  int n;
+  cin >> n;
+  $0
+}

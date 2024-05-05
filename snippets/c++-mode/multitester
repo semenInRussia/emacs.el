@@ -1,0 +1,26 @@
+# -*- mode: snippet -*-
+# name: multitester
+# key: !!
+# --
+// Copyright 2024 semenInRussia
+
+#include <iostream>
+
+using namespace std;
+
+using ll = long long;
+using pii = pair<int, int>;
+const int inf = 1e9+7;
+
+void solve() {
+  int n;
+  cin >> n;
+  $0
+}
+
+int main() {
+  int tt;
+  cin >> tt;
+  while (tt--)
+    solve();
+}
