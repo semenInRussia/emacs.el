@@ -46,7 +46,8 @@ Backend is either symbol tags or lsp"
 (defvar my-sport-map
   (define-keymap
     "C-i" #'my-sport-insert-samples
-    "C-f" #'my-sport-find-samples-file))
+    "C-f" #'my-sport-find-samples-file
+    "C-p" #'run-python))
 (global-set-key (kbd "C-c ;") my-sport-map)
 
 (defun my-sport-find-samples-file ()
