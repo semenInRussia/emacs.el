@@ -20,6 +20,7 @@
 
    ;; selected text with more light bg
    '(region ((t :background "#777")))
+   '(cursor ((t :background "#fff")))
 
    ;; ;; bold keywords
    ;; '(font-lock-keyword-face ((t :innerhit t
@@ -40,6 +41,12 @@
    '(corfu-annotations ((t :italic t)))
    ;; use more like a string literals colors for current complete item
    '(corfu-current ((t :background "#252526" :bold t)))
+
+   ;; highlight current symbol with nice background background
+   '(eglot-highlight-symbol-face ((t :background "#333"
+                                     :bold t
+                                     ;; :underline t
+                                     )))
 
    ;; highlight TODO with red background, italic black text
    '(hl-todo ((t :backgorund "#FF5E5E" :foreground "black" :italic t)))))

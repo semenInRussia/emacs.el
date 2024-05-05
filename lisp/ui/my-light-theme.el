@@ -20,7 +20,12 @@
   (load-theme 'doom-bluloco-light :no-confirm)
   (custom-set-faces
    ;; selected text with more light bg
-   '(region ((t :background "#aaf")))
+   '(region ((t :background "#ddf")))
+
+   ;; highlight the current line with a light red color
+   '(hl-line ((t :background "#eef")))
+
+   '(secondary-selection ((t :background "#ccf")))
 
    ;; Selection Popup (a `vertico' package)
    ;; I sometimes use a mouse to choose anything from `vertico' buffer
@@ -36,6 +41,10 @@
    '(corfu-annotations ((t :italic t)))
    ;; use more like a string literals colors for current complete item
    '(corfu-current ((t :background "#aaf" :bold t)))
+
+   ;; highlight current symbol with nice background background
+   '(eglot-highlight-symbol-face ((t :background "#eee"
+                                     :bold t)))
 
    ;; highlight TODO with red background, italic black text
    '(hl-todo ((t :backgorund "#FF5E5E" :foreground "black" :italic t)))))
