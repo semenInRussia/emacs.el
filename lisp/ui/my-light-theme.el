@@ -40,7 +40,9 @@
    ;; italic name of the item like Function, Module, Method
    '(corfu-annotations ((t :italic t)))
    ;; use more like a string literals colors for current complete item
-   '(corfu-current ((t :background "#aaf" :bold t)))
+   '(corfu-current ((t :bold t
+                       :foreground "#000"
+                       :background nil)))
 
    ;; highlight current symbol with nice background background
    '(eglot-highlight-symbol-face ((t :background "#eee"
