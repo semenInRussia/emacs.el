@@ -13,6 +13,7 @@ Some men tell me "So, you just copy Doom. Why?".  My answer is that my configura
 
   It includes
   + a big amount of themes
+  + a big supprt of two themes: light and dark.  You can change it for session using `M-x my-light-theme` or `M-x my-dark-theme`.  If you need to change it forever, replace a line in `my-load-theme.el` file
   + diagnostics and other things from echo area at the top left corner (#nodoom)
   + amazing modeline
   + icons everywhere (#nodoom)
