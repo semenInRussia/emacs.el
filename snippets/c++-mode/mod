@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: mod
+# key: mod
+# --
+const int mod =$0 1e9+7; // 998244353;

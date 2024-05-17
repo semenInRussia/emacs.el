@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: inf
+# key: inf
+# --
+const ${1:int} inf = ${1:$(if (equal yas-text "int") "1e9" "1e18")};
