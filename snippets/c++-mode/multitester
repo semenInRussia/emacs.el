@@ -2,7 +2,7 @@
 # name: multitester
 # key: !!
 # --
-// Copyright 2024 semenInRussia
+// semenInRussia 2024
 #include <iostream>
 using namespace std;
 using ll = long long;

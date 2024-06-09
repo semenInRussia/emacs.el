@@ -19,7 +19,8 @@
    ;; The most important
 
    ;; selected text with more light bg
-   '(region ((t :background "#777")))
+   '(region ((t :background "#557")))
+   '(secondary-selection ((t :background "#337")))
    '(cursor ((t :background "#fff")))
 
    ;; ;; bold keywords
@@ -49,7 +50,9 @@
                                      )))
 
    ;; highlight TODO with red background, italic black text
-   '(hl-todo ((t :backgorund "#FF5E5E" :foreground "black" :italic t)))))
+   '(hl-todo ((t :backgorund "#FF5E5E" :foreground "black" :italic t)))
+
+   '()))
 
 (provide 'my-dark-theme)
 ;;; my-dark-theme.el ends here

@@ -18,9 +18,8 @@
   :custom ((auto-insert-alist .
                               '((c++-mode .
                                           (nil
-                                           "// Copyright "
+                                           "// semenInRussia "
                                            (my-current-year)
-                                           " semenInRussia"
                                            _)))))
   :global-minor-mode auto-insert-mode)
 
