@@ -46,7 +46,6 @@ Interesting way to extension, which you can call chaos.
 
 You don't needed my ~pam~ package manager if you want anything other!  You don't needed in any strict file system!  You don't need in any macros!
 
-
 Every config file can be in any sub-folder of ~/lisp/~, have any name, contains any things.  Only one separation is that files which not always needed at startup you can place at ~/lisp/local-projects/~ and you will need to build config ~emacs --modules~ and all files from ~/lisp/~ will be joined at ~/dist/my-modules.el~ you can see source of my-modules build inside ~local-projects/my-build-config.el~, also you can generate autoloads files for local-projects (use ~--local-projects~ flag) after that you everywhere can use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Autoload.html][autoloaded]] functions from ~local-projects~.
 
 So main files (files of framework part) are only:
@@ -57,7 +56,7 @@ So main files (files of framework part) are only:
 
 ** Installation
 
-Before installation you must install ~JetBrainsMono Nerd Font~ or other Nerd Font, if your font isn't JetBrainsMono, change the variable inside =.config/emacs/lisp/ui/my-fonts.el=
+Before installation you must install ~JetBrainsMono Nerd Font~ (use [[https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/JetBrainsMono.zip][this]] zip file) or other Nerd Font, if your font isn't JetBrainsMono, change the variable inside =.config/emacs/lisp/ui/my-fonts.el=
 
 To install my config on your config as main use the following shell command, if you need to only try this config (without delete your thing), change .config/emacs on anything like ~/semacs
 
