@@ -38,13 +38,6 @@
     :ensure (just :host github :repo "semenInRussia/just.el")
     :require t)
 
-  (leaf queue :ensure t)
-  (leaf request :ensure t)
-  (leaf async :ensure t)
-  (leaf alert :ensure t)
-  (leaf fringe-helper :ensure t)
-  (leaf ht :ensure t)
-  (leaf ov :ensure t)
   (leaf indicators :ensure t)
   (leaf svg-lib :ensure t))
 
