@@ -15,7 +15,9 @@
 (setq inhibit-startup-screen t
       inhibit-startup-message t
       inhibit-startup-echo-area-message t
-      initial-scratch-message nil)
+      initial-scratch-message nil
+      use-file-dialog nil
+      use-dialog-box nil)
 
 (defcustom my-layout-size '(70 . 20)
   "Cons of width and height of editor window."

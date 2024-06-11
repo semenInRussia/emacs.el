@@ -39,6 +39,7 @@
          ("M-'" . consult-register-store)
          ("C-M-'" . consult-register)
          ("C-M--" . consult-mark)
+         ("C-c X" . consult-line-multi)
          (("C-x C-b" . consult-buffer)
           ("C-c i" . consult-imenu)
           ("C-c n" . consult-imenu-multi))
