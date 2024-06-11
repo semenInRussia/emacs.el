@@ -150,7 +150,7 @@
      '("X" . consult-line)
      '("y" . meow-save)
      '("Y" . meow-sync-grab)
-     '("z" . meow-pop-selection)
+     '("z" . embrace-commander)
      '("Z" . meow-comment)  ; useless with me, M-; is ok
      '("'" . repeat)
      '("%" . meow-query-replace-regexp)
