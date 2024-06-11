@@ -1,6 +1,6 @@
 ;;; my-dired.el --- My configuration of the `dired'
 
-;; Copyright (C) 2022 semenInRussia
+;; Copyright (C) 2022-2024 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
@@ -82,22 +82,6 @@
     (defun my-pdf-file-p (filename)
       "Return t, when FILENAME is path to a PDF file."
       (s-suffix-p ".pdf" filename)))
-
-  (leaf dired-subtree
-    :ensure (dired-subtree :repo "Fuco1/dired-hacks" :host github)
-    :defun dired-subtree-beginning
-    :bind (:dired-mode-map
-           :package dired
-           ("TAB" . 'dired-subtree-cycle)
-           ("/"   . 'my-dired-subtree-in-special-buffer))
-    :config                           ;nofmt
-    (defun my-dired-subtree-in-special-buffer ()
-      "Open current `dired-subtree' in the separate `dired' buffer."
-      (interactive)
-      (my-dired-save-excursion
-       (dired-subtree-beginning)
-       (forward-line -1)
-       (dired (thing-at-point 'filename)))))
 
   ;; show directories with 1 file
   ;;
