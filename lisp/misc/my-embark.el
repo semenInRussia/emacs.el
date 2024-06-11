@@ -1,6 +1,6 @@
 ;;; my-embark.el --- My configuration of `embark' -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023 semenInRussia
+;; Copyright (C) 2023-2024 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
@@ -26,12 +26,10 @@
   :bind (("C-." . embark-act)
          ("C-M-." . embark-dwim)
          (:minibuffer-mode-map
-          :package minibuffer           ; built-in
+          :package minibuffer
           ("C-," . my-embark-act-noquit)
           ("C-<" . my-embark-act-all-noexit)
-          ("C->" . embark-act-all)
-          ("C-S-m" . embark-export)
-          ("C-M-m" . embark-collect))
+          ("C->" . embark-act-all))
          (:embark-general-map
           ("." . my-embark-google-search)))
 

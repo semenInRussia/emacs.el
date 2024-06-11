@@ -1,6 +1,6 @@
 ;;; my-eglot.el --- My configuration for lsp -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022 semenInRussia
+;; Copyright (C) 2022-2024 semenInRussia
 
 ;;; Commentary:
 
@@ -14,6 +14,16 @@
 (declare-function turn-off-flycheck "my-flycheck.el")
 
 
+(defun my-interactive-eglot-rename (&rest _args)
+  "A wrapper for `embark' over `eglot-rename' that run it interactively."
+  (message "Hi is %s" _args)
+  (eglot-rename
+   (read-from-minibuffer
+    (format "Rename `%s' to: " (or (thing-at-point 'symbol t)
+                                   "unknown symbol"))
+    nil nil nil nil
+    (symbol-name (symbol-at-point)))))
+
 (leaf eglot
   :custom `((eglot-sync-connect . 1)
             (eglot-autoshutdown . t)
@@ -25,12 +35,14 @@
             (eglot-events-buffer-size . 0)
             (eglot-auto-display-help-buffer . nil))
   :defun eglot-inlay-hints-mode
-  :bind (:eglot-mode-map
-         ("C-c lr" . 'eglot-rename)
-         ("<f6>"   . 'eglot-rename)
-         ("C-c la"  . 'eglot-code-actions)
-         ("C-c ll"  . 'eglot-code-actions)
-         ([remap my-format-expression] . 'eglot-format))
+  :bind ((:eglot-mode-map
+          ("C-c lr" . 'eglot-rename)
+          ("<f6>"   . 'eglot-rename)
+          ("C-c la"  . 'eglot-code-actions)
+          ("C-c ll"  . 'eglot-code-actions)
+          ([remap my-format-expression] . 'eglot-format))
+         (:embark-identifier-map
+          ("r" . my-interactive-eglot-rename)))
   :config
   ;; `eglot' use `flymake' instead of `flycheck', so i disable `flycheck'
   (add-hook 'eglot-managed-mode-hook #'turn-off-flycheck)
