@@ -1,6 +1,6 @@
 ;;; my-eshell.el --- My configuration of `eshell' -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022 semenInRussia
+;; Copyright (C) 2022-2024 semenInRussia
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
 ;; Homepage: https://github.com/semeninrussia/emacs.el
@@ -16,10 +16,11 @@
 
 
 (leaf eshell
-  :bind (:eshell-mode-map
-         :package esh-mode
-         ([remap beginning-of-line]      . 'eshell-begin-on-new-line)
-         ([remap beginning-of-line-text] . 'eshell-begin-on-new-line)))
+  :bind (("C-`" . eshell)
+         (:eshell-mode-map
+          :package esh-mode
+          ([remap beginning-of-line] . 'eshell-begin-on-new-line)
+          ([remap beginning-of-line-text] . 'eshell-begin-on-new-line))))
 
 (leaf eshell-git-prompt
   :ensure t
