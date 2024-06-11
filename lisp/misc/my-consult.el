@@ -36,6 +36,8 @@
   :bind ((:minibuffer-local-map
           ("M-s" . consult-history) ;; orig. next-matching-history-element
           ("M-r" . consult-history))
+         ("M-'" . consult-register-store)
+         ("C-M-'" . consult-register)
          (("C-x C-b" . consult-buffer)
           ("C-c i" . consult-imenu)
           ("C-c n" . consult-imenu-multi))
@@ -52,8 +54,6 @@
          ("C-c m" . consult-man)
          ("C-c q" . consult-keep-lines)
          ([remap Info-search] . consult-info)
-         ("M-#" . consult-register-load)
-         ("C-M-#" . consult-register)
          ;; Other custom bindings
          ;; M-g bindings in `goto-map'
          ("M-g e" . consult-compile-error)
