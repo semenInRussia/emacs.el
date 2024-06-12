@@ -47,8 +47,9 @@
 (set-selection-coding-system 'utf-8)
 
 (leaf ligature
-  :commands ligature-set-ligatures global-ligature-mode
+  :ensure t
   :require t
+  :commands ligature-set-ligatures global-ligature-mode
   :config
   (ligature-set-ligatures 'prog-mode '("--" "---" "==" "===" "!="
                                        "!==" "=!=" "=:=" "=/=" "<="
