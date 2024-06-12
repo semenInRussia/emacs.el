@@ -10,13 +10,18 @@
 
 ;; My configuration for fonts
 
-;; Code:
+;;; Code:
 
 (require 'my-leaf)
 
-;; you can install this font, from the GitHub repo `nerd-fonts'
 (defcustom my-fonts-main
-  "JetBrainsMono Nerd Font"
+  '("JetBrainsMono Nerd Font"
+    "JetBrainsMono"
+    "FiraCode Nerd Font"
+    "FiraCode"
+    "Cascadia Code Nerd Font"
+    "Cascadia Code"
+    "Cascadia Code NF")
   "Name of the main font to display all."
   :group 'my
   :type 'string)
@@ -28,11 +33,13 @@
 
 (setq-default line-spacing 0.30)
 
-(push (cons 'font
-            (format "%s-%s"
-                    my-fonts-main
-                    my-fonts-size))
-      default-frame-alist)
+(let ((fonts my-fonts-main))
+  (while fonts
+    (when (find-font (font-spec :name (car fonts)))
+      (push (cons 'font (format "%s-%s" (car fonts) my-fonts-size))
+            default-frame-alist)
+      (setq fonts nil))
+    (setq fonts (cdr fonts))))
 
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
@@ -41,6 +48,7 @@
 
 (leaf ligature
   :commands ligature-set-ligatures global-ligature-mode
+  :require t
   :config
   (ligature-set-ligatures 'prog-mode '("--" "---" "==" "===" "!="
                                        "!==" "=!=" "=:=" "=/=" "<="

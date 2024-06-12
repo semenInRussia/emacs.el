@@ -37,8 +37,7 @@
   ;;
   ;; instead do it:
   :hook ((latex-mode-hook . aas-mode)
-         (TeX-latex-mode-hook . aas-mode)
-         (org-mode-hook . aas-mode)))
+         (TeX-latex-mode-hook . aas-mode)))
 
 (provide 'my-aas)
 ;;; my-aas.el ends here

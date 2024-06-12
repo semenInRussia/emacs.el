@@ -99,20 +99,18 @@ Only names, without #, + and :"
   (interactive)
   (cond
    ((just-call-on-prev-line*
-     (or
-      (just-line-is-whitespaces-p)
-      (my-org-heading-p)
-      (my-org-properties-end-p)
-      (my-org-list-item-p)))
+     (or (just-line-is-whitespaces-p)
+         (my-org-heading-p)
+         (my-org-properties-end-p)
+         (my-org-list-item-p)))
     (my-autoformat-sentence-capitalization t))
    ((just-call-on-prev-line* (equal (pos-bol) (point-min)))
     (my-autoformat-sentence-capitalization))
    (t
     (just-call-on-backward-char*
-     (and
-      (looking-back my-autoformat-sentence-end nil)
-      (looking-at-p "[[:alpha:]]")
-      (upcase-char 1))))))
+     (and (looking-back my-autoformat-sentence-end nil)
+          (looking-at-p "[[:alpha:]]")
+          (upcase-char 1))))))
 
 (defun my-org-heading-p ()
   "Return t, when the cursor located at a `org-mode' heading text."
