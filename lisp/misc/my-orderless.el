@@ -10,9 +10,7 @@
 
 
 (leaf orderless
-  :ensure (orderless :host github
-                     :repo "minad/orderless"
-                     :files ("*.el" "extensions/*.el"))
+  :ensure t
   :commands orderless
   :init (setq completion-styles '(orderless)))
 
