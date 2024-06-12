@@ -34,37 +34,42 @@
                     my-fonts-size))
       default-frame-alist)
 
-(leaf ligature
-  :ensure t
-  :config
-  ;; Enable the "www" ligature in every possible major mode
-  (ligature-set-ligatures 't '("www"))
-  ;; Enable traditional ligature support in eww-mode, if the
-  ;; `variable-pitch' face supports it
-  (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
-  ;; Enable all Cascadia Code ligatures in programming modes
-  (mapc
-   (lambda (it)
-     (ligature-set-ligatures it '("-|" "-~" "---" "-<<" "-<" "--" "->" "->>" "-->" "///" "/=" "/=="
-                                  "/>" "//" "/*" "*>" "***" "*/" "<-" "<<-" "<=>" "<=" "<|" "<||"
-                                  "<|||" "<|>" "<:" "<>" "<-<" "<<<" "<==" "<<=" "<=<" "<==>" "<-|"
-                                  "<<" "<~>" "<=|" "<~~" "<~" "<$>" "<$" "<+>" "<+" "</>" "</" "<*"
-                                  "<*>" "<->" "<!--" ":>" ":<" ":::" "::" ":?" ":?>" ":=" "::=" "=>>"
-                                  "==>" "=/=" "=!=" "=>" "===" "=:=" "==" "!==" "!!" "!=" ">]" ">:"
-                                  ">>-" ">>=" ">=>" ">>>" ">-" ">=" "&&&" "&&" "|||>" "||>" "|>" "|]"
-                                  "|}" "|=>" "|->" "|=" "||-" "|-" "||=" "||" ".." ".?" ".=" ".-" "..<"
-                                  "..." "+++" "+>" "++" "[||]" "[<" "[|" "{|" "??" "?." "?=" "?:" "##"
-                                  "###" "####" "#[" "#{" "#=" "#!" "#:" "#_(" "#_" "#?" "#(" ";;" "_|_"
-                                  "__" "~~" "~~>" "~>" "~-" "~@" "$>" "^=" "]#")))
-   '(prog-mode text-mode))
-  ;; Enables ligature checks globally in all buffers. You can also do it
-  ;; per mode with `ligature-mode'.
-  (global-ligature-mode t))
-
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
 (set-language-environment 'utf-8)
 (set-selection-coding-system 'utf-8)
+
+(leaf ligature
+  :commands ligature-set-ligatures global-ligature-mode
+  :config
+  (ligature-set-ligatures 'prog-mode '("--" "---" "==" "===" "!="
+                                       "!==" "=!=" "=:=" "=/=" "<="
+                                       ">=" "&&" "&&&" "&=" "++" "+++"
+                                       "***" ";;" "!!"  "??" "???"
+                                       "?:" "?." "?=" "<:" ":<" ":>"
+                                       ">:" "<:<" "<>" "<<<" ">>>"
+                                       "<<" ">>" "||" "-|" "_|_" "|-"
+                                       "||-" "|=" "||=" "##" "###"
+                                       "####" "#{" "#[" "]#" "#(" "#?"
+                                       "#_" "#_(" "#:" "#!" "#=" "^="
+                                       "<$>" "<$" "$>" "<+>" "<+" "+>"
+                                       "<*>" "<*" "*>" "</" "</>" "/>"
+                                       "<!--" "<#--" "-->" "->" "->>"
+                                       "<<-" "<-" "<=<" "=<<" "<<="
+                                       "<==" "<=>" "<==>" "==>" "=>"
+                                       "=>>" ">=>" ">>=" ">>-" ">-"
+                                       "-<" "-<<" ">->" "<-<" "<-|"
+                                       "<=|" "|=>" "|->" "<->" "<~~"
+                                       "<~" "<~>" "~~" "~~>" "~>" "~-"
+                                       "-~" "~@" "[||]" "|]" "[|" "|}"
+                                       "{|" "[<" ">]" "|>" "<|" "||>"
+                                       "<||" "|||>" "<|||" "<|>" "..."
+                                       ".." ".=" "..<" ".?" "::" ":::"
+                                       ":=" "::=" ":?" ":?>" "//"
+                                       "///" "/*" "*/" "/=" "//="
+                                       "/==" "@_" "__" "???"  "<:<"
+                                       ";;;"))
+  (global-ligature-mode t))
 
 (provide 'my-fonts)
 ;;; my-fonts.el ends here
