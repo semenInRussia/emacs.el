@@ -12,17 +12,17 @@
 (require 'dash)
 
 (declare-function turn-off-flycheck "my-flycheck.el")
+(declare-function eglot-rename "eglot")
 
 
-(defun my-interactive-eglot-rename (&rest _args)
-  "A wrapper for `embark' over `eglot-rename' that run it interactively."
-  (message "Hi is %s" _args)
+(defun my-interactive-eglot-rename (id)
+  "A wrapper for `embark' over `eglot-rename' that run it interactively.
+
+Rename variable which is symbol ID"
   (eglot-rename
-   (read-from-minibuffer
-    (format "Rename `%s' to: " (or (thing-at-point 'symbol t)
-                                   "unknown symbol"))
-    nil nil nil nil
-    (symbol-name (symbol-at-point)))))
+   (read-from-minibuffer (format "Rename `%s' to: "  id)
+                         nil nil nil nil
+                         (format "%s" id))))
 
 (leaf eglot
   :custom `((eglot-sync-connect . 1)
