@@ -13,8 +13,8 @@
 (require 'my-leaf)
 
 (leaf files
-  :global-minor-mode auto-save-visited-mode
-  :custom (auto-save-interval . 3)) ;; default is 3
+  :hook ((text-mode-hook prog-mode-hook) . auto-save-visited-mode)
+  :custom (auto-save-interval . 2)) ;; default is 3
 
 ;;; my-autosave.el ends here
 (provide 'my-autosave)
