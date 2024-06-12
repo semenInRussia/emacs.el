@@ -37,7 +37,8 @@
   :mode ("\\.tex$" . latex-mode))
 
 (leaf tex-mode
-  :defun ((er/mark-LaTeX-math er/mark-LaTeX-inside-environment) . expand-region)
+  :defun (texmathp
+          ((er/mark-LaTeX-math er/mark-LaTeX-inside-environment) . expand-region))
   :bind (:latex-mode-map
          :package tex-mode
          ("C-c C-@"  . my-latex-mark-inside-environment-or-math)
@@ -56,21 +57,23 @@
   (leaf laas
     :ensure (laas :repo "tecosaur/LaTeX-auto-activating-snippets" :host github)
     :hook LaTeX-mode-hook
-    :aas (laas-mode
-          :cond #'texmathp
-          ;; Some Physics Units
-          "As" "\\mathrm{А}"
-          "Vs"  "\\mathrm{В}"
-          "Oms"  "\\mathrm{Ом}"
-          "cls" "^\\circ C"
+    :defun (aas-set-snippets . aas)
+    :config
+    (aas-set-snippets 'laas-mode
+      :cond #'texmathp
+      ;; Some Physics Units
+      "As" "\\mathrm{А}"
+      "Vs"  "\\mathrm{В}"
+      "Oms"  "\\mathrm{Ом}"
+      "cls" "^\\circ C"
 
-          ;; Some Physics Sheet
-          "eqv" "\\mathrm{Экв.}"
+      ;; Some Physics Sheet
+      "eqv" "\\mathrm{Экв.}"
 
-          ;; Some Cool Symbols
-          "trg" "\\triangle"
-          "agl" "\\angle"
-          "grd" "^\\circ"))
+      ;; Some Cool Symbols
+      "trg" "\\triangle"
+      "agl" "\\angle"
+      "grd" "^\\circ"))
 
   (leaf cdlatex
     :ensure (cdlatex :repo "cdominik/cdlatex" :host github)

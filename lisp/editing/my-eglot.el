@@ -42,6 +42,7 @@ Rename variable which is symbol ID"
           ("C-c ll"  . 'eglot-code-actions)
           ([remap my-format-expression] . 'eglot-format))
          (:embark-identifier-map
+          :package embark
           ("r" . my-interactive-eglot-rename)))
   :config
   ;; `eglot' use `flymake' instead of `flycheck', so i disable `flycheck'

@@ -695,28 +695,6 @@
                   `((eval-after-load ',leaf--name
                       '(,@let-or-progn ,@leaf--body)))
                 `(,@leaf--body)))
-            :aas
-            (let*
-                ((arguments
-                  (car leaf--value))
-                 (has-special-keymap
-                  (and
-                   (symbolp
-                    (car arguments))
-                   (not
-                    (keywordp
-                     (car arguments)))))
-                 (keymap
-                  (if has-special-keymap
-                      (car arguments)
-                    leaf--name))
-                 (bindings
-                  (if has-special-keymap
-                      (cdr arguments)
-                    arguments)))
-              `((eval-after-load 'aas
-                  '(aas-set-snippets ',keymap ,@bindings))
-                ,@leaf--body))
             :setq
             `(,@(mapcar
                  (lambda

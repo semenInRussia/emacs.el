@@ -293,5 +293,9 @@ Build my config." t)
     "t" 'my-require-times))
 (global-set-key (kbd "C-c e") my-config-map)
 
+;; settings of byte-compile remarks (warnings)
+(with-eval-after-load 'bytecomp
+  (setq byte-compile-warnings t))
+
 (provide 'my-writing-config)
 ;;; my-writing-config.el ends here

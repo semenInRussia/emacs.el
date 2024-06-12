@@ -26,7 +26,8 @@
 
 (leaf yasnippet
   :ensure (yasnippet :repo "joaotavora/yasnippet")
-  :defun (yas--table-hash
+  :defun (yas-reload-all
+          yas--table-hash
           yas--filter-templates-by-condition
           yas--namehash-templates-alist)
   :bind ("C-=" . yas-insert-snippet)
@@ -92,6 +93,7 @@ manipulate with it to show helpful things"
   (defun my-yas-capf--exit (name status)
     "Exit from `my-yas-capf'."
     (and
+     name
      (eq status 'finished)
      (yas-expand)))
 
