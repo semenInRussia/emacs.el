@@ -1,11 +1,13 @@
-* semenInRussia emacs configuration
+* semenInRussia Emacs config (maybe called SEMACS?)
 
 [[./doc/s1.png]]
 [[./doc/s2.png]]
 [[./doc/s3.png]]
 [[./doc/s4.png]]
 
-Some men tell me "So, you just copy Doom. Why?".  My answer is that my configuration is even better than Doom + it isn't a stupid copy of Doom, my configuration have a big amount of interesting concepts which is unique for this config.  Plus the biggest part of my config is opposite to Doom.  Things where my config is better on 100% I will tell #nodoom, where is better by my opinion (everywhere, but here diff is bit) I will tell #dddm
+Some men asked me "So, you copied Doom. Why?".  My answer is that my config is even better than Doom (for me) + it isn't a copy of Doom, I even wasn't user of Doom never.
+
+My configuration have a big amount of interesting concepts which are uniquenproperties for this config.  Plus the biggest part of my config is opposite to Doom.  Things where my config is better on 100% I will tell #nodoom, where is better by my opinion (everywhere, but here diff is bit) I will tell #dddm
 
 ** Features
 
@@ -28,25 +30,45 @@ Some men tell me "So, you just copy Doom. Why?".  My answer is that my configura
 
 - Reload the configuration Emacs lisp file after it saved.  Inspired by ~VSCode~ and ~NVChad~
 
+- more fast way to install
+
 - ~meow~ over ~evil~ (#dddm)
 
 - Own package manager, built over ~straight.el~. (#nodoom)
 
   The benefit is a speed, it only one time add to the a path ~load-path~.  And other times Emacs will find a package only in this directory, instead of 220+ other directories when use ~straight.el~
 
-  It's even better than Doom package manager
+  It's even better than Doom package manager, my package manager also join all autoloads file into one and byte compile it like Doom
 
 - Use good-practice solutions, like replace heavy things with the more light. (#nodoom)
 
 - Use ~perspectives~ (virtual desktops/workspaces for Emacs) with intuitive way
 
+- Some optimizations for Windows
+
+- big usage of `embark` (just fun)
+
+- Some things for sport programming
+
+  + special recipes to compile and run C++ files
+  + Edit input.txt (add input samples), now you can press f5 in C++ buffer, choose run with input.txt. wkw!
+  + in gdb debugger you can just insert whole input.txt content in one line (it's useful)
+  + a big amount if helpful snippets
+  + insert template with snippet ! and multitester with !!
+
+
 ** Extension (my config as framework)
 
 Interesting way to extension, which you can call chaos.
 
-You don't needed my ~pam~ package manager if you want anything other!  You don't needed in any strict file system!  You don't need in any macros!
+if you need use this "framework":
+You don't need my ~pam~ package manager!  You don't need any strict file system!  You don't need macros!
 
-Every config file can be in any sub-folder of ~/lisp/~, have any name, contains any things.  Only one separation is that files which not always needed at startup you can place at ~/lisp/local-projects/~ and you will need to build config ~emacs --modules~ and all files from ~/lisp/~ will be joined at ~/dist/my-modules.el~ you can see source of my-modules build inside ~local-projects/my-build-config.el~, also you can generate autoloads files for local-projects (use ~--local-projects~ flag) after that you everywhere can use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Autoload.html][autoloaded]] functions from ~local-projects~.
+Every config file can be in any sub-folder of ~/lisp/~, have any name, contains any things.  Only one separation is that files which not always needed at startup you can place at ~/lisp/local-projects/~.
+
+You will build config ~emacs --modules~ and all files from ~/lisp/~ will be joined at ~/dist/my-modules.el~ you can see source of my-modules build inside ~local-projects/my-build-config.el~ (in this file you can also change order of including lisp files into my-modules) also you can generate autoloads files for local-projects (use ~--local-projects~ flag) after that you everywhere can use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Autoload.html][autoloaded]] functions from ~local-projects~.
+
+Also you can build config with call `emacs --modules` in any shell
 
 So main files (files of framework part) are only:
 
@@ -54,13 +76,32 @@ So main files (files of framework part) are only:
 - ~init.el~ but only a part, where handling of CLI arguments
 - ~local-projects/my-build-config.el~, I think you understand it
 
+** Packager Manager
+
+this config uses a small package manager which is wrapper over straight.el.  I called it `pam`
+
+Idea is simple:
+
+- when install :: after package is cloned and built in straight directory, `pam` copy all important package files into directory `pam` and append autoloads into one certain `pam` file
+
+- when use :: just add =pam= directory to =load-path= and load ONCE AT EMACS START. it's better than load every autoload and add to load path ever new package after startup. on windows this optimization is matter
+
+so there are two types of handling =(pam-use-package 'package)=:
+1. install with `straight`
+2. do nothing
+
+if your packages are installed choose second which is default.  If you need to install new packages choose 1, you can either use =emacs --install= or =M-x pam-install-everything-mode=
+
 ** Installation
 
 Before installation you must install ~JetBrainsMono Nerd Font~ (use [[https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/JetBrainsMono.zip][this]] zip file) or other Nerd Font, if your font isn't JetBrainsMono, change the variable inside =.config/emacs/lisp/ui/my-fonts.el=
 
-To install my config on your config as main use the following shell command, if you need to only try this config (without delete your thing), change .config/emacs on anything like ~/semacs
+also suggest to install `ripgrep` tool.
+
+To install my config on your config as main use the following shell command, if you need to only try this config (without delete your thing), change .config/emacs on anything like ~/semacs (on windows replace .config with anything like AppData/Roaming)
 
 #+begin_src shell
+  # cd home directory!
   wget https://github.com/semenInRussia/emacs.el/releases/download/latest/semacs.zip && mkdir .config/emacs -p && unzip -o -d .config/emacs semacs.zip
 #+end_src
 
