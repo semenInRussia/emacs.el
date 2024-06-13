@@ -27,6 +27,9 @@
            (doom-modeline-height . 50)
            ;; enconding not useful I think.
            (doom-modeline-buffer-encoding . nil)
+           ;; state
+           (doom-modeline-buffer-state-icon . nil)
+           (doom-modeline-modal . nil)
            ;; version of env too
            (doom-modeline-env-version . nil)
            ;; don't show directory names in `doom-modeline'
