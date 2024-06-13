@@ -101,15 +101,20 @@ if your packages are installed choose second which is default.  If you need to i
 
 Before installation you must install ~JetBrainsMono Nerd Font~ (use [[https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/JetBrainsMono.zip][this]] zip file) or other Nerd Font, if your font isn't JetBrainsMono, change the variable inside =.config/emacs/lisp/ui/my-fonts.el=
 
-also suggest to install [[https://github.com/BurntSushi/ripgrep][ripgrep]] tool.
-
-To install my config on your config as main use the following shell command, if you need to only try this config (without delete your thing), change .config/emacs on anything like ~/semacs (on windows replace .config with anything like AppData/Roaming)
+Also suggest to install [[https://github.com/BurntSushi/ripgrep][ripgrep]] tool.
 
 Also (if you are Mac OS or Linux user) suggest install [[https://github.com/AbiWord/enchant][enchant]]: a spell checker, see [[https://github.com/minad/jinx][jinx]]
+
+To install my config on your config as main use the following shell command, if you need to only try this config (without delete your thing), change .config/emacs on anything like ~/semacs (on windows replace .config with anything like AppData/Roaming)
 
 #+begin_src shell
   # cd home directory!
   wget https://github.com/semenInRussia/emacs.el/releases/download/latest/semacs.zip && mkdir .config/emacs -p && unzip -o -d .config/emacs semacs.zip
+
+  # on windows
+  # cd home directory %USER%
+  cd AppData/Roaming/
+  wget https://github.com/semenInRussia/emacs.el/releases/download/latest/semacs.zip && unzip -o -d .emacs.d semacs.zip
 #+end_src
 
 In this commands 3 steps:
