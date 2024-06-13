@@ -31,16 +31,30 @@
   :group 'my
   :type 'number)
 
+(defun font-installed-p (name)
+  "Return non-nil if the font with the name NAME is exist."
+  (find-font (font-spec :name name)))
+
+(unless (assoc 'font default-frame-alist)
+  (let ((fonts my-fonts-main))
+    (while fonts
+      (when (font-installed-p (car fonts))
+        (push (cons 'font (format "%s-%s" (car fonts) my-fonts-size))
+              default-frame-alist)
+        (setq fonts nil))
+      (setq fonts (cdr fonts)))))
+
+(leaf nerd-icons
+  :ensure t
+  :require t
+  :config
+  (when (and (display-graphic-p)
+             (not (font-installed-p nerd-icons-font-family)))
+    (nerd-icons-install-fonts t)))
+
 (setq-default line-spacing 0.30)
 
-(let ((fonts my-fonts-main))
-  (while fonts
-    (when (find-font (font-spec :name (car fonts)))
-      (push (cons 'font (format "%s-%s" (car fonts) my-fonts-size))
-            default-frame-alist)
-      (setq fonts nil))
-    (setq fonts (cdr fonts))))
-
+;;; UTF-8
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
 (set-language-environment 'utf-8)

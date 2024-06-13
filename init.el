@@ -162,7 +162,8 @@ Byte-compile every file of local-projects and generate autoloads file"
 
 (let ((file-name-handler-alist nil)
       (load-suffixes '(".elc" ".el"))
-      (load-rep-load-file-rep-suffixes '("")))
+      (load-rep-load-file-rep-suffixes '(""))
+      (auto-mode-case-fold nil))
   (require 'my-modules))
 
 (put 'narrow-to-region 'disabled nil)

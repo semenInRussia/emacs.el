@@ -17,8 +17,6 @@
 (require 'my-leaf)
 
 
-(leaf nerd-icons :ensure t)
-
 (leaf doom-modeline
   :ensure t
   :custom (;; it looks like more nice

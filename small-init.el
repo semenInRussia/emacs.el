@@ -26,25 +26,34 @@ If a compiled version is exists, load it."
 (declare-function pam-activate "pam")
 (my-load-file (locate-user-emacs-file "lisp/package-management/pam.el"))
 (pam-activate)
+
 (my-load-file (locate-user-emacs-file "lisp/package-management/my-leaf.el"))
 (my-load-file (locate-user-emacs-file "lisp/my-libs.el"))
 (my-load-file (locate-user-emacs-file "lisp/my-lib.el"))
+
 ;; highlight errors on the fly
 (my-load-file (locate-user-emacs-file "lisp/editing/my-flycheck.el"))
+
 ;; snippets
 (my-load-file (locate-user-emacs-file "lisp/editing/my-yas.el"))
+
 ;; auto-completion popup
 (my-load-file (locate-user-emacs-file "lisp/editing/my-corfu.el"))
+
 ;; auto-enclosing parentheses
 (my-load-file (locate-user-emacs-file "lisp/editing/my-smartparens.el"))
+
 ;; some small editing tips
 (my-load-file (locate-user-emacs-file "lisp/editing/my-editing.el"))
 (my-load-file (locate-user-emacs-file "lisp/editing/my-indent.el"))
 (my-load-file (locate-user-emacs-file "lisp/editing/my-search.el"))
+
 ;; load fonts
 (my-load-file (locate-user-emacs-file "lisp/ui/my-fonts.el"))
-;; multiple cursors that bound to "M-,"
+
+;; multiple cursors that bound to "C-,"
 (my-load-file (locate-user-emacs-file "lisp/editing/my-multiple-cursors.el"))
+
 ;; "M-o" to jump between buffers, also you can manipulate with windows, for
 ;; example "M-o x <N>" delete the Nth window
 (my-load-file (locate-user-emacs-file "lisp/editing/my-buffer-navigation.el"))
@@ -55,7 +64,9 @@ If a compiled version is exists, load it."
 (my-load-file (locate-user-emacs-file "lisp/misc/my-consult.el"))
 
 ;; start a server to fast opening files in the same session
-(server-start)
+(require 'server)
+(unless (server-running-p)
+  (server-start))
 
 (provide 'small-init)
 ;;; small-init.el ends here

@@ -10,8 +10,12 @@
       inhibit-startup-message t
       inhibit-startup-echo-area-message t
       initial-scratch-message nil
+      ;; don't use system things, only Emacs
       use-file-dialog nil
-      use-dialog-box nil)
+      use-dialog-box nil
+      ;; Inhibit resizing frame
+      frame-inhibit-implied-resize t
+      frame-resize-pixelwise t)
 
 (defcustom my-layout-size '(70 . 35)
   "Cons of width and height of editor window."
