@@ -4,7 +4,7 @@ A good (I think) configuration for [[https://emacs.org][Emacs]] which have a *BI
 
 This config is *required in Emacs29.1 version*, even better if Emacs was compiled with native-compilation feature
 
-In this config you can find a big amount of new concepts for editor configs (I think).  One of the most interesting features is that you can install this config (not count installing fonts, [[https://github.com/AbiWord/enchant][enchant2]] (spell checker) and [[https://github.com/BurntSushi/ripgrep][ripgrep]]) very quickly, because all packages are built in zip archive (see releases or [[*Installation]] section)
+In this config you can find a big amount of new concepts for editor configs (I think).  One of the most interesting features is that you can install this config (not count installing fonts, [[https://github.com/AbiWord/enchant][enchant2]] (spell checker) and [[https://github.com/BurntSushi/ripgrep][ripgrep]]) very quickly, because all packages are built in zip archive (see releases or [[#Installation]] section)
 
 [[./doc/s1.png]]
 
