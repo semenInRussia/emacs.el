@@ -1,14 +1,8 @@
-;;; my-layout.el --- My settings to layout: paddings -*- lexical-binding: t; -*-
-
-;; Copyright (C) 2023 semenInRussia
-
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; Homepage: https://github.com/semeninrussia/emacs.el
-
+;;; my-layout.el --- My settings to layout -*- lexical-binding: t; -*-
+;; Copyright (C) 2023-2024 semenInRussia
 ;;; Commentary:
 
-;; My settings to layout: paddings
+;; My settings to layout: padding, window size
 
 ;;; Code:
 
@@ -19,7 +13,7 @@
       use-file-dialog nil
       use-dialog-box nil)
 
-(defcustom my-layout-size '(70 . 20)
+(defcustom my-layout-size '(70 . 35)
   "Cons of width and height of editor window."
   :group 'my
   :type '(cons number number))
@@ -27,11 +21,10 @@
 (setq initial-frame-alist
       (append
        (list (cons 'width (car my-layout-size))
-             (cons 'width (cdr my-layout-size)))
+             (cons 'height (cdr my-layout-size)))
        initial-frame-alist))
 
 (require 'my-leaf)
-
 (setq frame-title-format '(buffer-file-name "%f" ("%b")))
 
 ;; paddings
