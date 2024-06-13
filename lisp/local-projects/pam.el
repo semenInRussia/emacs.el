@@ -377,8 +377,11 @@ be useful in other cases"
 
 The difference with just copy directory, is that it tries to merge conflicted
 directories, instead of just replacing one with other"
-  (let ((default-directory src))
-    (dolist (file (cddr (directory-files src)))
+  (let ((default-directory src)
+        (files (cddr (directory-files src)))
+        file)
+    (while files
+      (setq file (car files))
       ;; copy files: SRC -> DST
       (cond
        ;; make a directory in DST and move all SRC files into it
@@ -391,7 +394,8 @@ directories, instead of just replacing one with other"
        (t
         (ignore-errors
           (delete-file (file-name-concat dst file)))
-        (copy-file file (file-name-concat dst file) 'ok-if-already-exists))))))
+        (copy-file file (file-name-concat dst file) 'ok-if-already-exists)))
+      (setq files (cdr files)))))
 
 (defun pam--save-pkg-autoloads (pkg &optional _ignore)
   "Save all autoloads of `straight' built PKG into `pam' autoloads file.
