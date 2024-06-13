@@ -33,7 +33,8 @@
   ;; - last modified time
   ;; but u can show it with ")"
   :hook (dired-mode-hook . dired-hide-details-mode)
-  :custom (dired-dwim-target . t)
+  :custom ((dired-dwim-target . t)
+           (delete-by-moving-to-trash . t))
   :defun ((my-dired-save-excursion . my-dired-commands)
           (embark-open-externally . embark)
           dired-get-file-for-visit)
