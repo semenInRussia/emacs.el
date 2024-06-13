@@ -18,14 +18,12 @@
 
 
 (leaf nerd-icons :ensure t)
-(leaf shrink-path :ensure t)
-
 
 (leaf doom-modeline
   :ensure t
   :custom (;; it looks like more nice
-           (doom-modeline-height . 50)
-           ;; enconding not useful I think.
+           (doom-modeline-height . 35)
+           ;; encoding not useful I think.
            (doom-modeline-buffer-encoding . nil)
            ;; state
            (doom-modeline-buffer-state-icon . nil)
@@ -34,7 +32,8 @@
            (doom-modeline-env-version . nil)
            ;; don't show directory names in `doom-modeline'
            (doom-modeline-project-detection . 'project)
-           (doom-modeline-buffer-file-name-style . 'buffer-name))
+           ;; (doom-modeline-buffer-file-name-style . 'buffer-name)
+           )
   :hook window-setup-hook
   :config
   ;; I use Emacs in fullscreen mode, so I don't see time that provided
@@ -42,7 +41,12 @@
   ;; I need only to time (not date) in 24hour format
   (defvar display-time-format) ;; make compile happy
   (setq display-time-format "%H:%M")
-  (display-time-mode 1)
+
+  (advice-add 'toggle-frame-fullscreen
+              :after
+              (defun my-toggle-display-time-mode (&rest args)
+                (ignore args)
+                (display-time-mode 'toggle)))
 
   ;; disable show line and column numbers in modeline, because it only
   ;; take off extra place
@@ -53,15 +57,15 @@
   ;; amount of text in the file is important
   (size-indication-mode t))
 
-(define-minor-mode my-modeline-at-top-mode
-  "Place mode-line at the top of the screen."
-  :value nil
-  (if my-modeline-at-top-mode
-      (progn
-        (setq-default header-line-format mode-line-format)
-        (setq-default mode-line-format nil))
-    (setq-default mode-line-format header-line-format)
-    (setq header-line-format nil)))
+;; (define-minor-mode my-modeline-at-top-mode
+;;   "Place mode-line at the top of the screen."
+;;   :value nil
+;;   (if my-modeline-at-top-mode
+;;       (progn
+;;         (setq-default header-line-format mode-line-format)
+;;         (setq-default mode-line-format nil))
+;;     (setq-default mode-line-format header-line-format)
+;;     (setq header-line-format nil)))
 
 (provide 'my-modeline)
 ;;; my-modeline.el ends here
