@@ -23,10 +23,6 @@
    '(secondary-selection ((t :background "#337")))
    '(cursor ((t :background "#fff")))
 
-   ;; ;; bold keywords
-   ;; '(font-lock-keyword-face ((t :innerhit t
-   ;;                              :bold t)))
-
    ;; Selection Popup (a `vertico' package)
 
    ;; I sometimes use a mouse to choose anything from `vertico' buffer
@@ -35,8 +31,8 @@
 
    ;; Auto-Complete Popup (`corfu' package)
 
-   ;; light yellow border for auto-complete
-   ;; make border of auto-completion minibuffer white/black, it looks like nice
+   ;; light yellow border for auto-complete make border of
+   ;; auto-completion minibuffer white/black, it looks like nice
    '(corfu-border ((t :background "#f4f4f4")))
    ;; italic name of the item like Function, Module, Method
    '(corfu-annotations ((t :italic t)))
@@ -45,14 +41,10 @@
 
    ;; highlight current symbol with nice background background
    '(eglot-highlight-symbol-face ((t :background "#333"
-                                     :bold t
-                                     ;; :underline t
-                                     )))
+                                     :bold t)))
 
    ;; highlight TODO with red background, italic black text
-   '(hl-todo ((t :backgorund "#FF5E5E" :foreground "black" :italic t)))
-
-   '()))
+   '(hl-todo ((t :backgorund "#FF5E5E" :foreground "black" :italic t)))))
 
 (provide 'my-dark-theme)
 ;;; my-dark-theme.el ends here

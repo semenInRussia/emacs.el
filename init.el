@@ -5,8 +5,24 @@
 (require 'cl-lib)
 (require 'subr-x)  ; for `string-remove-prefix'
 
+;;; HACKS
+
 ;; every custom variable of my config have the following group
 (defgroup my nil "Group for all my config files." :group 'tools)
+
+;; don't load anything useless at the startup (like `emacs-lisp-mode' for
+;; *Scratch* or `dashboard')
+(setq initial-major-mode 'fundamental-mode
+      initial-scratch-message "Good Luck!\n: you can start")
+
+;; PERF,UX: Remove "For information about GNU Emacs..." message at startup.
+;;   It's redundant with our dashboard and incurs a premature redraw.
+(advice-add #'display-startup-echo-area-message :override #'ignore)
+;; PERF: Suppress the vanilla startup screen completely. We've disabled it
+;;   with `inhibit-startup-screen', but it would still initialize anyway.
+;;   This involves some file IO and/or bitmap work (depending on the frame
+;;   type) that we can no-op for a free 50-100ms boost in startup time.
+(advice-add #'display-startup-screen :override #'ignore)
 
 ;; Increase how much is read from processes in a single chunk (default is 4kb).
 ;; This is further increased elsewhere, where needed (like our LSP module).
@@ -25,6 +41,7 @@
                                (buffer-file-name))))
 
 ;;; Handle some CLI options
+
 ;; byte-compile local-projects and generate autoloads
 (when (member "--local-projects" command-line-args)
   ;; generate autoloads
@@ -129,50 +146,7 @@ This is function for `command-line-functions'."
 Byte-compile every file of local-projects and generate autoloads file"
    (when (string-equal argi "--local-projects")
      ;; it handled above
-     t))
-
- ;; --show-bench
- (defun my-show-bench-cli-handle-arg ()
-   "Handle --install command-line argument."
-   (when (string-equal argi "--show-bench")
-     (prog1 t
-       ;; `my-require-times' is defined in init.el
-       (my-require-times))))
-
- ;; --zettel
- (defun my-handle-cli-zettel ()
-   "Handle --zettel command line ARG.
-
-When you apply this command line argument after init Emacs open one of the
-Zettelkasten node"
-   (when (string-equal argi "--zettel")
-     (prog1 t
-       (message "zettel")
-       (org-roam-node-find))))
-
- ;; --agenda
- (defun my-handle-cli-agenda ()
-   "Handle --agenda command line ARG.
-
-When you apply this command line argument after init Emacs open the my agenda"
-   (when (string-equal argi "--agenda")
-     (prog1 t
-       (nano-agenda)))))
-
-
-;; don't load anything useless at the startup (like `emacs-lisp-mode' for
-;; *Scratch* or `dashboard')
-(setq initial-major-mode 'fundamental-mode
-      initial-scratch-message "Good Luck!\n: you can start")
-
-;; PERF,UX: Remove "For information about GNU Emacs..." message at startup.
-;;   It's redundant with our dashboard and incurs a premature redraw.
-(advice-add #'display-startup-echo-area-message :override #'ignore)
-;; PERF: Suppress the vanilla startup screen completely. We've disabled it
-;;   with `inhibit-startup-screen', but it would still initialize anyway.
-;;   This involves some file IO and/or bitmap work (depending on the frame
-;;   type) that we can no-op for a free 50-100ms boost in startup time.
-(advice-add #'display-startup-screen :override #'ignore)
+     t)))
 
 ;;; Load all config files
 
