@@ -5,10 +5,10 @@
 (require 'cl-lib)
 (require 'subr-x)  ; for `string-remove-prefix'
 
-;;; HACKS
-
 ;; every custom variable of my config have the following group
 (defgroup my nil "Group for all my config files." :group 'tools)
+
+;;; HACKS
 
 ;; don't load anything useless at the startup (like `emacs-lisp-mode' for
 ;; *Scratch* or `dashboard')
@@ -40,7 +40,7 @@
       (file-name-directory (or load-file-name
                                (buffer-file-name))))
 
-;;; Handle some CLI options
+;;; Handle --local-projects flag
 
 ;; byte-compile local-projects and generate autoloads
 (when (member "--local-projects" command-line-args)
@@ -89,15 +89,18 @@
 (require 'pam)
 (pam-activate)
 
+;;; Handle --modules
+
 ;; generate and byte-compile my-modules.el
 ;;
 ;; NOTE: I do it after local-projects, because `my-build-config' is a local
 ;; project too
+(declare-function my-build-config "my-build-config.el")
 (when (member "--modules" command-line-args)
   (require 'my-build-config)
   (my-build-config))
 
-;; don't use init.el for custom.el which I don't use
+;;; don't use init.el for custom.el which I don't use
 ;;
 ;; in the most of configurations, after it Emacs load custom.el, but I fount it
 ;; a bit useless.  I prefer `setq' over `custom'
@@ -106,24 +109,19 @@
 ;; some useful macros
 (require 'my-macros)
 
-(declare-function nano-agenda "nano-agenda")
-(declare-function my-require-times "init")
-(declare-function my-build-config "my-build-config.el")
-(declare-function org-roam-node-find "org-roam")
-
+(declare-function my-require-times "my-bench")
 (add-to-list!
  'command-line-functions
  ;; --kill
  (defun my-kill-cli-handle-arg ()
    "Handle --kill command-line argument.
 
-Argument was named --kill, because it kill Emacs after Emacs is load.  It
-useful, if you needed in only install packages, byte compile
+Argument was named --kill, because it kill Emacs after Emacs is load.
+It useful, if you needed in only install packages, byte compile
 configuration and other these things.
 
 This is function for `command-line-functions'."
    (when (string-equal argi "--kill")
-     ;; it handled above
      (kill-emacs))
 
    ;; --modules
@@ -136,7 +134,7 @@ my-modules.el file with the `my-build-config' function
 
 This is function for `command-line-functions'."
      (when (string-equal argi "--modules")
-       ;; it handled above
+       ;; it was handled above
        t)))
 
  ;; --local-projects
@@ -145,7 +143,7 @@ This is function for `command-line-functions'."
 
 Byte-compile every file of local-projects and generate autoloads file"
    (when (string-equal argi "--local-projects")
-     ;; it handled above
+     ;; it was handled above
      t)))
 
 ;;; Load all config files
