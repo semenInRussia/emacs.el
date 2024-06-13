@@ -41,7 +41,6 @@
     (add-hook 'eglot-managed-mode-hook 'flymake-ruff-load nil :local)))
 
 (leaf eglot
-  :ensure t
   :hook (python-mode-hook . my-lsp-ensure))
 
 (provide 'my-python)
