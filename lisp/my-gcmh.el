@@ -10,9 +10,9 @@
 
 (require 'leaf)
 
-
 (leaf gcmh
   :ensure t
+  :disabled t
   :global-minor-mode t)
 
 ;;; my-gcmh.el ends here
