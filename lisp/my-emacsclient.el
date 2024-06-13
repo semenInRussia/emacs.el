@@ -11,7 +11,7 @@
 (declare-function server-running-p "server")
 
 (add-hook
- 'emacs-startup-hook
+ 'after-init-hook
  (defun my-maybe-server-start ()
    "Run the Emacs server if servers haven't been started."
    (require 'server)
