@@ -18,11 +18,13 @@
   :group 'my
   :type '(cons number number))
 
-(setq initial-frame-alist
-      (append
-       (list (cons 'width (car my-layout-size))
-             (cons 'height (cdr my-layout-size)))
-       initial-frame-alist))
+(dolist (var '(initial-frame-alist
+               default-frame-alist))
+  (set var
+       (append
+        (list (cons 'width (car my-layout-size))
+              (cons 'height (cdr my-layout-size)))
+        (eval var))))
 
 (require 'my-leaf)
 (setq frame-title-format '(buffer-file-name "%f" ("%b")))

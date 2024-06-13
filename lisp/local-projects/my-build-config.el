@@ -1,6 +1,6 @@
 ;;; my-build-config.el --- Join all my config files into one init.el -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023 semenInRussia
+;; Copyright (C) 2023-2024 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 

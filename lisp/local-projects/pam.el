@@ -155,32 +155,33 @@ all is installed"
 
 The package is defined with MELPA-STYLE-RECIPE (see the `straight'
 documentation).  The behavior depends on the value of the
-`pam-need-to-install-pkgs-p' variable.  If packages must be installed then this
-function install them using `straight' with passing NO-CLONE and NO-BUILD to
-`straight-use-package' (see below details), otherwise (packages already
-installed) do nothing, notice that here activation is extra, because in `pam'
-you activate all packages only once.
+`pam-need-to-install-pkgs-p' variable.  If packages must be installed
+then this function install them using `straight' with passing NO-CLONE
+and NO-BUILD to `straight-use-package' (see below details), otherwise
+(packages already installed) do nothing, notice that here activation
+is extra, because in `pam' you activate all packages only once.
 
-The result value of this function is either nil, that tells package wasn't
-installed or activated or non-nil value otherwise.
+The result value of this function is either nil, that tells package
+wasn't installed or activated or non-nil value otherwise.
 
-The paragraphs below tells about arguments which are used if package should be
-installed:
+The paragraphs below tells about arguments which are used if package
+should be installed:
 
-First, the package recipe is registered with straight.el.  If NO-CLONE is a
-function, then it is called with two arguments: the package name as a string,
-and a boolean value indicating whether the local repository for the package is
-available.  In that case, the return value of the function is used as the value
-of NO-CLONE instead.  In any case, if NO-CLONE is non-nil, then processing stops
-here.
+First, the package recipe is registered with straight.el.  If NO-CLONE
+is a function, then it is called with two arguments: the package name
+as a string, and a boolean value indicating whether the local
+repository for the package is available.  In that case, the return
+value of the function is used as the value of NO-CLONE instead.  In
+any case, if NO-CLONE is non-nil, then processing stops here.
 
-Otherwise, the repository is cloned, if it is missing.  If NO-BUILD is a
-function, then it is called with one argument: the package name as a string.  In
-that case, the return value of the function is used as the value of NO-BUILD
-instead.  In any case, if NO-BUILD is non-nil, then processing halts here.
-Otherwise, the package is built and activated.  Note that if the package recipe
-has a nil `:build' entry, then NO-BUILD is ignored and processing always stops
-before building and activation occurs."
+Otherwise, the repository is cloned, if it is missing.  If NO-BUILD is
+a function, then it is called with one argument: the package name as a
+string.  In that case, the return value of the function is used as the
+value of NO-BUILD instead.  In any case, if NO-BUILD is non-nil, then
+processing halts here.  Otherwise, the package is built and activated.
+Note that if the package recipe has a nil `:build' entry, then
+NO-BUILD is ignored and processing always stops before building and
+activation occurs."
   (interactive (list
                 (if (not pam-need-to-install-pkgs-p)
                     (user-error "Sorry, you can't install a pkg with `pam' when the `pam-install-everything-mode' is disabled")
