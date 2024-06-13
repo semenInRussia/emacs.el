@@ -1,5 +1,11 @@
 * semenInRussia Emacs config (maybe called SEMACS?)
 
+A good (I think) configuration for [[https://emacs.org][Emacs]] which have a *BIG AMOUNT* of unique features.  This config 100% not for everyone Emacs user.  I think you must have any Emacs background to use it (but maybe not)
+
+This config is *required in Emacs29.1 version*, even better if Emacs was compiled with native-compilation feature
+
+In this config you can find a big amount of new concepts for editor configs (I think).  One of the most interesting features is that you can install this config (not count installing fonts, [[https://github.com/AbiWord/enchant][enchant2]] (spell checker) and [[https://github.com/BurntSushi/ripgrep][ripgrep]]) very quickly, because all packages are built in zip archive (see releases or [[*Installation]] section)
+
 [[./doc/s1.png]]
 
 Some men asked me "So, you copied Doom. Why?".  My answer is that my config is even better than Doom (for me) + it isn't a copy of Doom, I even wasn't user of Doom never.
@@ -7,7 +13,7 @@ Some men asked me "So, you copied Doom. Why?".  My answer is that my config is e
 [[./doc/s2.png]]
 [[./doc/s4.png]]
 
-My configuration have a big amount of interesting concepts which are uniquenproperties for this config.  Plus the biggest part of my config is opposite to Doom.  Things where my config is better on 100% I will tell #nodoom, where is better by my opinion (everywhere, but here diff is bit) I will tell #dddm
+My configuration have a big amount of interesting concepts which are unique properties.  Plus the biggest part of my config is opposite to Doom.  Things where my config is better on 100% I will tell #nodoom, where is better by my opinion (everywhere, but here diff is bit) I will tell #dddm
 
 ** Features
 
@@ -15,7 +21,7 @@ My configuration have a big amount of interesting concepts which are uniquenprop
 
   It includes
   + a big amount of themes
-  + a big supprt of two themes: light and dark.  You can change it for session using `M-x my-light-theme` or `M-x my-dark-theme`.  If you need to change it forever, replace a line in `my-load-theme.el` file
+  + a big support of two themes: light and dark.  You can change it for session using =M-x my-light-theme= or =M-x my-dark-theme=.  If you need to change it forever, replace a line in =my-load-theme.el= file
   + diagnostics and other things from echo area at the top left corner (#nodoom)
   + amazing modeline
   + icons everywhere (#nodoom)
@@ -24,7 +30,7 @@ My configuration have a big amount of interesting concepts which are uniquenprop
 
 - Very (really very) fast start up. (#nodoom #nodoom)
 
-  On my old computer ~doomemacs~ starts in 4+ seconds (it prints it after startup), but in fact it also wait for when themes, modeline and other things will be loaded.  My config on other side take only 2secs and almost don't take time after.
+  On my old computer ~doomemacs~ starts in 4+ seconds (it prints it after startup), but in fact it also wait for when themes, modeline and other things will be loaded.  My config on other side take only 2secs(sometimes even 0.9s) and almost don't take time after.
 
 - A big amount of packages (192+)
 
@@ -46,7 +52,7 @@ My configuration have a big amount of interesting concepts which are uniquenprop
 
 - Some optimizations for Windows
 
-- big usage of `embark` (just fun)
+- big usage of [[https://github.com/oantolin/embark/][embark]] (just fun)
 
 - Some things for sport programming
 
@@ -67,7 +73,7 @@ Every config file can be in any sub-folder of ~/lisp/~, have any name, contains 
 
 You will build config ~emacs --modules~ and all files from ~/lisp/~ will be joined at ~/dist/my-modules.el~ you can see source of my-modules build inside ~local-projects/my-build-config.el~ (in this file you can also change order of including lisp files into my-modules) also you can generate autoloads files for local-projects (use ~--local-projects~ flag) after that you everywhere can use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Autoload.html][autoloaded]] functions from ~local-projects~.
 
-Also you can build config with call `emacs --modules` in any shell
+Also you can build config with call ~emacs --modules~ in any shell
 
 So main files (files of framework part) are only:
 
@@ -95,9 +101,11 @@ if your packages are installed choose second which is default.  If you need to i
 
 Before installation you must install ~JetBrainsMono Nerd Font~ (use [[https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/JetBrainsMono.zip][this]] zip file) or other Nerd Font, if your font isn't JetBrainsMono, change the variable inside =.config/emacs/lisp/ui/my-fonts.el=
 
-also suggest to install `ripgrep` tool.
+also suggest to install [[https://github.com/BurntSushi/ripgrep][ripgrep]] tool.
 
 To install my config on your config as main use the following shell command, if you need to only try this config (without delete your thing), change .config/emacs on anything like ~/semacs (on windows replace .config with anything like AppData/Roaming)
+
+Also (if you are Mac OS or Linux user) suggest install [[https://github.com/AbiWord/enchant][enchant]]: a spell checker, see [[https://github.com/minad/jinx][jinx]]
 
 #+begin_src shell
   # cd home directory!
@@ -109,7 +117,9 @@ In this commands 3 steps:
 2. Make a directory where config will be located (defaults to .config/emacs but in windows it can be anything else)
 3. Unzip the archive to this folder
 
-after this command on Linux you *MUST* run ~nerd-fonts-install-fonts~
+after this command on Linux or MacOS you *MUST* run ~nerd-fonts-install-fonts~, maybe not
+
+Also if you need in [[https://github.com/minad/jinx][jinx]], run ~M-x pam-use-package jinx~
 
 You can extract an archive into any directory, and run emacs using ~--init-directory~ flag, like:
 
@@ -120,3 +130,25 @@ You can extract an archive into any directory, and run emacs using ~--init-direc
 #+END_SRC
 
 So you can test it without ~chemacs~ and other stupid things, you even not need in emacs29 --init-directory, but you still needed in emacs29
+
+** Requirements
+
+- *Emacs 29.1+* (check [[https://www.gnu.org/software/emacs/][here]])
+- Ripgrep (check [[https://github.com/BurntSushi/ripgrep][here]])
+- Enchant :not for Windows: (check [[https://github.com/AbiWord/enchant][here]], also install needed dictionaries, maybe use the following shell)
+
+  #+begin_src shell
+    cd .config/enchant/
+    wget https://raw.githubusercontent.com/LibreOffice/dictionaries/master/en/en_US.dic
+    wget https://raw.githubusercontent.com/LibreOffice/dictionaries/master/en/en_US.aff
+    wget https://raw.githubusercontent.com/LibreOffice/dictionaries/master/ru_RU/ru_RU.dic
+    wget https://raw.githubusercontent.com/LibreOffice/dictionaries/master/ru_RU/ru_RU.aff
+    mkdir hunspell
+    mv en_US.aff en.aff
+    mv en_US.dic en.dic
+    mkdir hunspell
+    cp *dic hunspell
+    cp *aff hunspell
+  #+end_src
+
+  - Fonts (better [[https://www.jetbrains.com/lp/mono/][JetBrains Mono]] and Symbols Nerd Font Mono : [[https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/NerdFontsSymbolsOnly.zip][link to zip archive]])
