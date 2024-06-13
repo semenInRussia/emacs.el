@@ -1,6 +1,6 @@
 ;;; my-modeline.el --- My configuration for modeline
 
-;; Copyright (C) 2022 semenInRussia
+;; Copyright (C) 2022-2024 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
@@ -25,16 +25,20 @@
            (doom-modeline-height . 35)
            ;; encoding not useful I think.
            (doom-modeline-buffer-encoding . nil)
-           ;; state
-           (doom-modeline-buffer-state-icon . nil)
+           ;; `imenu' support
+           (doom-modeline-support-imenu . t)
+           ;; don't show Bot, percentages and other
+           (doom-modeline-percent-position . nil)
+           ;; show count of Errors and Warnings with more simple way
+           (doom-modeline-check-simple-format . t)
+           ;; modal state (`meow')
            (doom-modeline-modal . nil)
            ;; version of env too
            (doom-modeline-env-version . nil)
            ;; don't show directory names in `doom-modeline'
            (doom-modeline-project-detection . 'project)
-           ;; (doom-modeline-buffer-file-name-style . 'buffer-name)
-           )
-  :hook window-setup-hook
+           (doom-modeline-buffer-file-name-style . 'buffer-name))
+  :hook after-init-hook
   :config
   ;; I use Emacs in fullscreen mode, so I don't see time that provided
   ;; by OS, so I need time in modeline.  EMACS IS MY OS!!!
