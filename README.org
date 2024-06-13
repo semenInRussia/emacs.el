@@ -1,11 +1,11 @@
 * semenInRussia Emacs config (maybe called SEMACS?)
 
 [[./doc/s1.png]]
-[[./doc/s2.png]]
-[[./doc/s3.png]]
-[[./doc/s4.png]]
 
 Some men asked me "So, you copied Doom. Why?".  My answer is that my config is even better than Doom (for me) + it isn't a copy of Doom, I even wasn't user of Doom never.
+
+[[./doc/s2.png]]
+[[./doc/s4.png]]
 
 My configuration have a big amount of interesting concepts which are uniquenproperties for this config.  Plus the biggest part of my config is opposite to Doom.  Things where my config is better on 100% I will tell #nodoom, where is better by my opinion (everywhere, but here diff is bit) I will tell #dddm
 
@@ -55,7 +55,6 @@ My configuration have a big amount of interesting concepts which are uniquenprop
   + in gdb debugger you can just insert whole input.txt content in one line (it's useful)
   + a big amount if helpful snippets
   + insert template with snippet ! and multitester with !!
-
 
 ** Extension (my config as framework)
 
