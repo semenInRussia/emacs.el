@@ -39,8 +39,9 @@
 ;; not only when init.el inside ~/.emacs.d
 (eval-and-compile
   (setq user-emacs-directory
-	(file-name-directory (or load-file-name
-				 (buffer-file-name)))))
+	      (file-name-directory (or load-file-name
+				                         (buffer-file-name)
+                                 byte-compile-current-file))))
 
 ;;; Handle --local-projects flag
 
