@@ -13,6 +13,7 @@
 ;;; Code:
 
 (require 'my-leaf)
+(require 'cl-lib)
 
 (defcustom my-fonts-main
   '("JetBrainsMono"
@@ -36,13 +37,9 @@
   (find-font (font-spec :name name)))
 
 (unless (assoc 'font default-frame-alist)
-  (let ((fonts my-fonts-main))
-    (while fonts
-      (when (font-installed-p (car fonts))
-        (push (cons 'font (format "%s-%s" (car fonts) my-fonts-size))
-              default-frame-alist)
-        (setq fonts nil))
-      (setq fonts (cdr fonts)))))
+  (let ((font (cl-find-if #'font-installed-p my-fonts-main)))
+    (setf (alist-get 'font default-frame-alist)
+          (format "%s-%s" font my-fonts-size))))
 
 (leaf nerd-icons
   :ensure t
