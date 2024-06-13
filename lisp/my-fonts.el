@@ -1,6 +1,6 @@
 ;;; my-fonts.el --- My configuration for fonts
 
-;; Copyright (C) 2022, 2023 semenInRussia
+;; Copyright (C) 2022-2024 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
@@ -15,12 +15,12 @@
 (require 'my-leaf)
 
 (defcustom my-fonts-main
-  '("JetBrainsMono Nerd Font"
-    "JetBrainsMono"
-    "FiraCode Nerd Font"
+  '("JetBrainsMono"
+    "JetBrainsMono Nerd Font"
     "FiraCode"
-    "Cascadia Code Nerd Font"
+    "FiraCode Nerd Font"
     "Cascadia Code"
+    "Cascadia Code Nerd Font"
     "Cascadia Code NF")
   "Name of the main font to display all."
   :group 'my
@@ -52,7 +52,7 @@
              (not (font-installed-p nerd-icons-font-family)))
     (nerd-icons-install-fonts t)))
 
-(setq-default line-spacing 0.30)
+(setq-default line-spacing 0.3)
 
 ;;; UTF-8
 (prefer-coding-system 'utf-8)

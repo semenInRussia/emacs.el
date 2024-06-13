@@ -17,7 +17,7 @@
       frame-inhibit-implied-resize t
       frame-resize-pixelwise t)
 
-(defcustom my-layout-size '(70 . 35)
+(defcustom my-layout-size '(72 . 35)
   "Cons of width and height of editor window."
   :group 'my
   :type '(cons number number))
