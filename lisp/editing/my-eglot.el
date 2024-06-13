@@ -60,5 +60,8 @@ Rename variable which is symbol ID"
   (setf (alist-get '(python-mode python-ts-mode) eglot-server-programs)
         '("pyright-langserver" "--stdio")))
 
+(leaf consult-eglot
+  :ensure t)
+
 (provide 'my-eglot)
 ;;; my-eglot.el ends here
