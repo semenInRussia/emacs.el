@@ -30,15 +30,17 @@
 
 ;; PERF: Line numbers are pretty slow all around. The performance boost of disabling
 ;; them outweighs the utility of always keeping them on.
+(defvar display-line-numbers-type)
 (setq display-line-numbers-type nil)
 
 ;; change Emacs config directory depends on init file
 ;;
 ;; after this config you can easily run Emacs with "emacs -l init.el"
 ;; not only when init.el inside ~/.emacs.d
-(setq user-emacs-directory
-      (file-name-directory (or load-file-name
-                               (buffer-file-name))))
+(eval-and-compile
+  (setq user-emacs-directory
+	(file-name-directory (or load-file-name
+				 (buffer-file-name)))))
 
 ;;; Handle --local-projects flag
 
