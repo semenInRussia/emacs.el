@@ -27,9 +27,8 @@
          ("C-M-." . embark-dwim)
          (:minibuffer-mode-map
           :package minibuffer
-          ("C-," . my-embark-act-noquit)
-          ("C-<" . my-embark-act-all-noexit)
-          ("C->" . embark-act-all))
+          ("C->" . embark-act-all)
+          (">" . embark-become))
          (:embark-general-map
           ("." . my-embark-google-search)))
 

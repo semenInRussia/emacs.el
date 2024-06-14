@@ -18,14 +18,15 @@
   :defun vertico-directory-tidy
   :custom ((vertico-count . 6)
            (enable-recursive-minibuffers . t))
+  :bind (:vertico-map
+         ("C-M-n" . vertico-next-group)
+         ("C-M-p" . vertico-previous-group))
   ;; it's part of `vertico-mode'
   :init
   (advice-add 'completing-read-default :around #'vertico--advice)
   (advice-add 'completing-read-multiple :around #'vertico--advice)
-
   :defun vertico-mode
   :config (vertico-mode t)
-
   :config
   ;; I press `M-delete' to go the up directory inside of `vertico'
   ;; and TAB to enter into the directory.
