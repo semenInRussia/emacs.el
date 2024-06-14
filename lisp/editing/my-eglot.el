@@ -32,7 +32,7 @@ Rename variable which is symbol ID"
                  :codeLensProvider
                  ;; disable inlay hints
                  :inlayHintProvider))
-            (eglot-events-buffer-size . 0)
+            (eglot-events-buffer-config . 0)
             (eglot-auto-display-help-buffer . nil))
   :defun eglot-inlay-hints-mode
   :bind ((:eglot-mode-map

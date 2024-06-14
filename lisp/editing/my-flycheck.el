@@ -53,7 +53,7 @@ This command run interactively
  the CMD ignoring embarks args.  CMD
 must be a symbol"
       (let ((name (string-trim (format "%s" cmd) "'")))
-        `(defun ,(intern (concat "my-embark-" name)) (_arg)
+        `(defun ,(intern (concat "my-embark-" name)) (_)
            ,(format "My wrapper over `%s' to be an embark action." name)
            (ignore _arg)
            (call-interactively ',(intern name))))))

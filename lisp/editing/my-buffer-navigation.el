@@ -68,22 +68,26 @@
   "Take object of BUFFER and return nil when don't need visit its."
   (->> buffer (buffer-name) (s-trim) (s-prefix-p "*Minibuf")))
 
-(defun my-split-right ()
-  "My version of `split-window-right', difference that new window is active."
-  (interactive)
+(defun my-split-right (&optional arg)
+  "My version of `split-window-right', difference that new window is active.
+
+ARG is mean that command called interactively."
+  (interactive "p")
   (split-window-right)
   (other-window 1)
-  (when (interactive-p)
+  (when arg
     (if (featurep 'consult)
         (consult-buffer)
       (call-interactively #'switch-to-buffer))))
 
-(defun my-split-below ()
-  "My version of `split-window-below', difference that new window is active."
-  (interactive)
+(defun my-split-below (&optional arg)
+  "My version of `split-window-below', difference that new window is active.
+
+ARG is mean that command called interactively."
+  (interactive "p")
   (split-window-below)
   (other-window 1)
-  (when (interactive-p)
+  (when arg
     (if (featurep 'consult)
         (consult-buffer)
       (call-interactively #'switch-to-buffer))))
@@ -139,7 +143,7 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
 `switch-to-buffer' commands are also supported."
   (interactive)
   (display-buffer-override-next-command
-   (lambda (buffer _)
+   (lambda (_ _)
      (let (window type)
        (setq
         window (aw-select (propertize " ACE" 'face 'mode-line-highlight))
