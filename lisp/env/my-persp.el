@@ -16,7 +16,7 @@
 
 (leaf persp-mode
   :ensure t
-  :global-minor-mode persp-mode
+  :config (persp-mode +1)
   ;; change prefix from the default "C-c p" to "C-c ,"
   :defvar persp-mode-map
   :custom `((persp-keymap-prefix . ,(kbd "C-c ,"))
