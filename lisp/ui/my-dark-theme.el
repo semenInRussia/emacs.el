@@ -16,8 +16,6 @@
   (interactive)
   (load-theme 'doom-1337 :no-confirm)
   (custom-set-faces
-   ;; The most important
-
    ;; selected text with more light bg
    '(region ((t :background "#557")))
    '(secondary-selection ((t :background "#337")))

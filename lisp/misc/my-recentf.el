@@ -29,6 +29,9 @@
            ;; auto cleanup is disabled, sometimes you must run
            ;; `recentf-cleanup'
            (recentf-auto-cleanup . 'never))
+  :bind (:embark-become-file+buffer-map
+         :package embark
+         ("r" . recentf))
   :init
   (advice-add 'consult-buffer :before #'my-recentf-load)
   (run-with-idle-timer 3 nil #'my-recentf-load))
