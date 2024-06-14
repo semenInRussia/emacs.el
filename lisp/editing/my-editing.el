@@ -97,6 +97,7 @@ With prefix arg don't indent."
 (--each
     '(("M-y" . consult-yank-from-kill-ring)
       ("C-a" . my-beginning-of-line-text-or-visual-line)
+      ("C-d" . delete-forward-char)
       ("C-o" . open-line-saving-indent)
       ("M-y" . consult-yank-from-kill-ring)
       ("C-x C-y" . duplicate-line))
