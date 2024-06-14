@@ -43,11 +43,17 @@ Backend is either symbol tags or lsp"
 (add-variable-watcher 'my-c-backend
                       #'my-c-update-backend)
 
+(defun my-copy-whole-buffer-as-kill ()
+  "Copy the content of whole current buffer onto `kill-ring'."
+  (interactive)
+  (kill-ring-save (point-min) (point-max)))
+
 (defvar my-sport-map
   (define-keymap
     "C-i" #'my-sport-insert-samples
     "C-f" #'my-sport-find-samples-file
-    "C-p" #'run-python))
+    "C-p" #'run-python
+    "C-y" #'my-copy-whole-buffer-as-kill))
 (global-set-key (kbd "C-c ;") my-sport-map)
 
 (defun my-sport-find-samples-file ()
