@@ -82,43 +82,45 @@
   :custom (eldoc-idle-delay . 1.0))
 
 (leaf eldoc-box
-  :ensure (eldoc-box :repo "casouri/eldoc-box" :host github)
-  :defun (eldoc-box--get-frame
-          eldoc-box--eldoc-message-function
-          eldoc-box--eldoc-display-function)
+  :ensure (eldoc-box
+           :repo "casouri/eldoc-box"
+           :host github)
+  :when (display-graphic-p)
+  :commands (eldoc-box--eldoc-message-function
+             eldoc-box--eldoc-display-function)
+  :defun eldoc-box--get-frame
   :bind (("C-h C-k" . eldoc-box-quit-frame)
          ("C-h C-v" . my-scroll-eldoc-box-frame))
-  :custom ((eldoc-box-fringe-use-same-bg . nil)
-           ;; press C-g if need
+  :custom (;; (eldoc-box-fringe-use-same-bg . nil)
            (eldoc-box-cleanup-interval . 30)
            (eldoc-box-clear-with-C-g . t))
-  :config
+  :init
   (defun my-scroll-eldoc-box-frame ()
     "Scroll the `eldoc-box' frame."
     (interactive)
     (with-selected-window (get-buffer-window eldoc-box--buffer t)
-      (scroll-up))))
+      (scroll-up)))
 
-(defun my-eldoc-box--enable ()
-  "Enable eldoc-box hover.
+  (defun my-eldoc-box--enable ()
+    "Enable eldoc-box hover.
+
 Intended for internal use.
 
 This is full copy of `eldoc-box--enable', this is more cooler because
 we don't need in load eldoc while it isn't needed.  light-weight"
-  (if (not (boundp 'eldoc-display-functions))
-      (add-function :before-while (local 'eldoc-message-function)
-                    #'eldoc-box--eldoc-message-function)
+    (if (not (boundp 'eldoc-display-functions))
+        (add-function :before-while (local 'eldoc-message-function)
+                      #'eldoc-box--eldoc-message-function)
+      (setq-local eldoc-box--old-eldoc-functions
+                  eldoc-display-functions)
+      (setq-local eldoc-display-functions
+                  (cons 'eldoc-box--eldoc-display-function
+                        (remq 'eldoc-display-in-echo-area
+                              eldoc-display-functions))))
+    (when eldoc-box-clear-with-C-g
+      (advice-add #'keyboard-quit :before #'eldoc-box-quit-frame)))
 
-    (setq-local eldoc-box--old-eldoc-functions
-                eldoc-display-functions)
-    (setq-local eldoc-display-functions
-                (cons 'eldoc-box--eldoc-display-function
-                      (remq 'eldoc-display-in-echo-area
-                            eldoc-display-functions))))
-  (when eldoc-box-clear-with-C-g
-    (advice-add #'keyboard-quit :before #'eldoc-box-quit-frame)))
-
-(add-hook 'eldoc-mode-hook 'my-eldoc-box--enable)
+  (add-hook 'eldoc-mode-hook 'my-eldoc-box--enable))
 
 ;;; use `eldoc' with `eglot'
 
