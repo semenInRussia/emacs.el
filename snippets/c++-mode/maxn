@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: maxn
+# key: maxn
+# --
+const int maxn = $0;
