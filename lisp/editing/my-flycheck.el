@@ -85,7 +85,8 @@ must be a symbol"
                 (overlay-end o)))))))
 
   (add-to-list 'embark-target-finders
-               #'my-embark-target-flycheck-at-point))
+               #'my-embark-target-flycheck-at-point
+               t))
 
 (provide 'my-flycheck)
 ;;; my-flycheck.el ends here
