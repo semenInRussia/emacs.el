@@ -31,11 +31,15 @@
 ;;    when I choose `consult-buffer' will be called, if I need other
 ;;    command (like `find-file'), I can hit > to which is
 ;;    `embark-become'
-;; 4. Split vertically with   ... C-x 5 ...
+;; 4. Split vertically with ... C-x 5 ...
 ;; 5. Make a window frame (for fun), with C-x f
 ;; 6. Also you can change the buffer of current window with M-[ and M-]
 ;; 7. If you are `meow' user, try q to either kill window, change
 ;;    buffer to other
+;; 8. If I need to open anything like documentation
+;;   (`describe-variable') I press "C-x 4 o", after choose command "C-h
+;;   v", after choose the place where this documentation buffer will be
+;;   opened
 
 ;;; Code:
 (require 'my-leaf)
@@ -115,6 +119,35 @@ window manager to present the frame in a floating state."
                (tab-bar-close-tab)
              (delete-frame)))))
 
+(defun ace-window-one-command ()
+  (interactive)
+  (let ((win (aw-select " ACE")))
+    (when (windowp win)
+      (with-selected-window win
+        (let* ((command (key-binding
+                         (read-key-sequence
+                          (format "Run in %s..." (buffer-name)))))
+               (this-command command))
+          (call-interactively command))))))
+
+(defun ace-window-prefix ()
+  "Use `ace-window' to display the buffer of the next command.
+The next buffer is the buffer displayed by the next command invoked
+immediately after this command (ignoring reading from the minibuffer).
+Creates a new window before displaying the buffer.
+When `switch-to-buffer-obey-display-actions' is non-nil,
+`switch-to-buffer' commands are also supported."
+  (interactive)
+  (display-buffer-override-next-command
+   (lambda (buffer _)
+     (let (window type)
+       (setq
+        window (aw-select (propertize " ACE" 'face 'mode-line-highlight))
+        type 'reuse)
+       (cons window type)))
+   nil "[ace-window]")
+  (message "Use `ace-window' to display next command buffer..."))
+
 (with-eval-after-load 'embark
   (keymap-set embark-become-file+buffer-map "2" #'my-split-below)
   (keymap-set embark-become-file+buffer-map "3" #'my-split-right))
@@ -133,7 +166,10 @@ window manager to present the frame in a floating state."
   ("M-0" . my-delete-window-frame)
 
   ;; Make window separately frame
-  ("C-x f" . my-buffer-to-frame-floating)))
+  ("C-x f" . my-buffer-to-frame-floating)
+
+  ("C-;" . ace-window-one-command)
+  ("C-x 4 o" . ace-window-prefix)))
 
 (provide 'my-buffer-navigation)
 ;;; my-buffer-navigation.el ends here
