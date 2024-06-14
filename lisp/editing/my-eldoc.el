@@ -95,6 +95,8 @@
            (eldoc-box-cleanup-interval . 30)
            (eldoc-box-clear-with-C-g . t))
   :init
+  (setq eldoc-box-max-pixel-width
+        (/ (frame-outer-width) 3))
   (defun my-scroll-eldoc-box-frame ()
     "Scroll the `eldoc-box' frame."
     (interactive)
