@@ -153,5 +153,11 @@ auto-completion popup with this capf")
   ;; prefer a `cape' one, so disable `ispell'
   (advice-add 'ispell-complete-word :override 'ignore))
 
+(leaf corfu-terminal
+  :ensure t
+  :unless (display-graphic-p)
+  :hook corfu-mode-hook
+  :config (corfu-terminal-mode +1))
+
 (provide 'my-corfu)
 ;;; my-corfu.el ends here
