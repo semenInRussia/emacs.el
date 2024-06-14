@@ -17,22 +17,26 @@
       frame-inhibit-implied-resize t
       frame-resize-pixelwise t)
 
-(defcustom my-layout-size '(72 . 30)
+(defcustom my-layout-size '(72 . 22)
   "Cons of width and height of editor window."
   :group 'my
   :type '(cons number number))
 
 (setf
+ ;; resize the window
  (alist-get 'width default-frame-alist) (car my-layout-size)
  (alist-get 'height default-frame-alist) (cdr my-layout-size)
- ;;
  (alist-get 'width initial-frame-alist) (car my-layout-size)
- (alist-get 'height initial-frame-alist) (cdr my-layout-size))
+ (alist-get 'height initial-frame-alist) (cdr my-layout-size)
+
+ ;; don't use the system title bar
+ frame-title-format '(buffer-file-name "%f" ("%b"))
+ (alist-get 'undecorated default-frame-alist) t
+ (alist-get 'drag-internal-border default-frame-alist) 1
+ (alist-get 'internal-border-width default-frame-alist) 5)
 
 (require 'my-leaf)
-(setq frame-title-format '(buffer-file-name "%f" ("%b")))
 
-;; paddings
 (leaf spacious-padding
   :ensure t
   ;; :global-minor-mode t
