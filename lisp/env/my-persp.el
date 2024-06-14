@@ -22,7 +22,8 @@
   :custom `((persp-keymap-prefix . ,(kbd "C-c ,"))
             ;; if `persp-auto-resume-time' <= 0, then `persp-mode' don't load all auto-saved
             ;; perspectives at startup, if you need in them, do `persp-load-state-from-file'
-            (persp-auto-resume-time . 0))
+            (persp-auto-resume-time . 0)
+            (persp-auto-save-opt . 0))
   :config (persp-set-keymap-prefix persp-keymap-prefix)
   ;; some my custom functions
   :defun (persp-names-current-frame-fast-ordered persp-switch)
