@@ -12,10 +12,9 @@
 (require 'my-leaf)
 
 (defvar persp-key-map)
-
-
 (leaf persp-mode
   :ensure t
+  :defun persp-mode persp-set-keymap-prefix
   :config (persp-mode +1)
   ;; change prefix from the default "C-c p" to "C-c ,"
   :defvar persp-mode-map
@@ -54,7 +53,6 @@ has a number 1, not 0"
 
 (with-eval-after-load 'persp-mode
   (define-key mode-specific-map "," persp-key-map))
-
 
 (leaf consult
   :after consult persp-mode
