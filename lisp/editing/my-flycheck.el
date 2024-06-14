@@ -13,19 +13,78 @@
 
 (require 'my-leaf)
 
-
 (leaf flycheck
   :ensure (flycheck :repo "flycheck/flycheck" :host github)
   :bind (:flycheck-mode-map
          ([remap next-error] . 'flycheck-next-error)
          ([remap previous-error] . 'flycheck-previous-error))
   :defun flycheck-mode
-  :global-minor-mode global-flycheck-mode
-  :config                             ;nofmt
+  :hook prog-mode-hook text-mode-hook
+  :config
   (defun turn-off-flycheck (&rest _)
     "Disable `flycheck-mode' locally for current buffer."
     (interactive)
-    (flycheck-mode 0)))
+    (flycheck-mode -1)))
+
+
+;;; Use `embark' with `flycheck'
+;;
+;; In `embark-general-map' I have a bound with . command to googling
+;; things.  If a `flycheck' diagnostic at point is exist, I can pres
+;; "C-. ." to google the error
+(leaf embark
+  :defun ((flycheck-copy-errors-as-kill
+           flycheck-overlays-at
+           flycheck-error-message
+           flycheck-overlay-errors-at)
+          . flycheck)
+  :defvar (flycheck-mode
+           embark-general-map
+           embark-keymap-alist
+           embark-target-finders)
+  :defer-config
+  (eval-and-compile
+    (defmacro my-embark-action (cmd)
+      "Define a command whcih can be an `emabark' action.
+
+This command run interactively
+
+ the CMD ignoring embarks args.  CMD
+must be a symbol"
+      (let ((name (string-trim (format "%s" cmd) "'")))
+        `(defun ,(intern (concat "my-embark-" name)) (_arg)
+           ,(format "My wrapper over `%s' to be an embark action." name)
+           (ignore _arg)
+           (call-interactively ',(intern name))))))
+
+  (defvar-keymap my-embark-flycheck-map
+    :doc "Keymap for Embark actions on `flycheck' diagnostics."
+    :parent embark-general-map
+    "RET" (my-embark-action 'flycheck-list-errors)
+    "n" (my-embark-action 'flycheck-next-error)
+    "p" (my-embark-action 'flycheck-previous-error)
+    "!" (my-embark-action 'flycheck-compile)
+    "e" (my-embark-action 'flycheck-explain-error-at-point))
+
+  (add-to-list 'embark-keymap-alist
+               '(flycheck my-embark-flycheck-map))
+
+  (eval-and-compile
+    (defun my-embark-target-flycheck-at-point ()
+      "Target for `embark' `flycheck' at point."
+      (when-let ((o (car (flycheck-overlays-at (point))))
+                 (_ flycheck-mode))
+        (cons 'flycheck
+              (cons
+               (seq-mapcat #'flycheck-error-message
+                           (flycheck-overlay-errors-at (point))
+                           'string)
+               (cons
+                (overlay-start o)
+                (overlay-end o)))))))
+
+  (add-to-list 'embark-target-finders
+               #'my-embark-target-flycheck-at-point))
 
 (provide 'my-flycheck)
 ;;; my-flycheck.el ends here

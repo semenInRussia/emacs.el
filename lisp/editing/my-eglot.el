@@ -48,12 +48,6 @@ Rename variable which is symbol ID"
   ;; `eglot' use `flymake' instead of `flycheck', so i disable `flycheck'
   (add-hook 'eglot-managed-mode-hook #'turn-off-flycheck)
 
-  (leaf flymake
-    :bind (:flymake-mode-map
-           ("C-c fd" . 'flymake-show-project-diagnostics)
-           ([remap next-error] . 'flymake-goto-next-error)
-           ([remap previous-error] . 'flymake-goto-prev-error)))
-
   ;; set default LSP servers for all supported languages
   (defvar eglot-server-programs)  ; make compiler happier
   ;; python (pyright)
