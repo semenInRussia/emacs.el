@@ -185,6 +185,7 @@ activation occurs."
   (interactive (list
                 (if (not pam-need-to-install-pkgs-p)
                     (user-error "Sorry, you can't install a pkg with `pam' when the `pam-install-everything-mode' is disabled")
+                  (pam--load-straight)
                   (straight-get-recipe
                    (when current-prefix-arg 'interactive) nil
                    (let ((installed nil))
