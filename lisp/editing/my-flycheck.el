@@ -33,6 +33,7 @@
 ;; things.  If a `flycheck' diagnostic at point is exist, I can pres
 ;; "C-. ." to google the error
 (leaf embark
+  :after flycheck
   :defun ((flycheck-copy-errors-as-kill
            flycheck-overlays-at
            flycheck-error-message

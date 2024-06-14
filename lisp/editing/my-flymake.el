@@ -33,7 +33,7 @@ Use object DIAG which is captured with one of `embark-target-finders'"
 ;;
 ;; see `my-flycheck' for simple showcases
 (leaf embark
-  :disabled
+  :after flymake
   :config
   (advice-add
    'embark-target-flymake-at-point
