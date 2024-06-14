@@ -79,21 +79,25 @@
 
 ;;; use beautifull documentation popup
 (leaf eldoc
-  :custom ((eldoc-box-clear-with-C-g . t)
-           (eldoc-idle-delay . 1.0)))
-
-
+  :custom (eldoc-idle-delay . 1.0))
 
 (leaf eldoc-box
   :ensure (eldoc-box :repo "casouri/eldoc-box" :host github)
-  :defvar eldoc-box-clear-with-C-g
-  :commands (eldoc-box--eldoc-message-function
-             eldoc-box--eldoc-display-function
-             eldoc-box-quit-frame)
+  :defun (eldoc-box--get-frame
+          eldoc-box--eldoc-message-function
+          eldoc-box--eldoc-display-function)
+  :bind (("C-h C-k" . eldoc-box-quit-frame)
+         ("C-h C-v" . my-scroll-eldoc-box-frame))
   :custom ((eldoc-box-fringe-use-same-bg . nil)
            ;; press C-g if need
            (eldoc-box-cleanup-interval . 30)
-           (eldoc-box-clear-with-C-g . t)))
+           (eldoc-box-clear-with-C-g . t))
+  :config
+  (defun my-scroll-eldoc-box-frame ()
+    "Scroll the `eldoc-box' frame."
+    (interactive)
+    (with-selected-window (get-buffer-window eldoc-box--buffer t)
+      (scroll-up))))
 
 (defun my-eldoc-box--enable ()
   "Enable eldoc-box hover.
