@@ -1,6 +1,6 @@
-;;; my-go-translate.el --- My config `go-translate'
+;;; my-go-translate.el --- My config `google-translate'
 
-;; Copyright (C) 2022 semenInRussia
+;; Copyright (C) 2022-2024 semenInRussia
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
 ;; URL: https://github.com/semenInRussia/emacs.el
@@ -15,25 +15,18 @@
 (require 'my-leaf)
 (require 'dash)
 
+(declare-function google-translate-translate "google-translate")
+(defun my-google-translate (text)
+  "Translate the TEXT which is one of `my-translate-languages' to other."
+  (if (string-match-p "[абвгдежзийклмнопрстуфхцшщьъыэюя]" text)  ;; russian text
+      (google-translate-translate "ru" "en" text)
+    (google-translate-translate "en" "ru" text)))
 
-(leaf go-translate
+(leaf google-translate
   :ensure t
-  :custom (gts-translate-list . '(("en" "ru")))
-  :bind (;; so I can just hit C-. or o with T following to translate a thing
-         ;; at point
-         (:embark-region-map
+  :bind ((:embark-region-map
           :package embark
-          ("T" . gts-do-translate)))
-  :defvar gts-default-translator
-  :defun (gts-buffer-render gts-translator gts-prompt-picker gts-google-engine)
-  :defer-config
-  ;; I use Google Translate with the output in the separate buffer
-  (setq gts-default-translator
-        (gts-translator :picker
-                        (gts-prompt-picker)
-                        :engines
-                        (list (gts-google-engine))
-                        :render (gts-buffer-render))))
+          ("T" . my-google-translate))))
 
 (provide 'my-go-translate)
 ;;; my-go-translate.el ends here
