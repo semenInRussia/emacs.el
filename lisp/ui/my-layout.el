@@ -24,6 +24,8 @@
 
 (setf
  ;; resize the window
+ window-resize-pixelwise t
+ frame-resize-pixelwise t
  (alist-get 'width default-frame-alist) (car my-layout-size)
  (alist-get 'height default-frame-alist) (cdr my-layout-size)
  (alist-get 'width initial-frame-alist) (car my-layout-size)
