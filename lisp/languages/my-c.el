@@ -43,10 +43,14 @@ Backend is either symbol tags or lsp"
 (add-variable-watcher 'my-c-backend
                       #'my-c-update-backend)
 
-(defun my-copy-whole-buffer-as-kill ()
-  "Copy the content of whole current buffer onto `kill-ring'."
-  (interactive)
-  (kill-ring-save (point-min) (point-max)))
+(defun my-copy-whole-buffer-as-kill (&optional msg-p)
+  "Copy the content of whole current buffer onto `kill-ring'.
+
+If MSG-P is non-nil, say that content was copied."
+  (interactive "p")
+  (kill-ring-save (point-min) (point-max))
+  (when msg-p
+    (message "%s chars was COPIED!" (- (point-max) (point-min)))))
 
 (defvar my-sport-map
   (define-keymap
