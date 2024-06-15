@@ -17,14 +17,23 @@
 (require 'my-leaf)
 
 
+(advice-add 'require
+            :around
+            (defun my-dont-require-doom-modeline-env (&rest args)
+              (if (eq (nth 1 args) 'doom-modeline-env)
+                  'lox
+                (apply args))))
+
 (leaf doom-modeline
   :ensure t
   :custom (;; it looks like more nice
            (doom-modeline-height . 35)
+           ;; just fun
+           (mode-line-right-align-edge . 'right-margin)
            ;; encoding not useful I think.
            (doom-modeline-buffer-encoding . nil)
-           ;; `imenu' support
-           (doom-modeline-support-imenu . t)
+           ;; don't use k8s
+           (doom-modeline-k8s-show-namespace)
            ;; don't show Bot, percentages and other
            (doom-modeline-percent-position . nil)
            ;; show count of Errors and Warnings with more simple way
@@ -34,7 +43,7 @@
            ;; version of env too
            (doom-modeline-env-version . nil)
            ;; don't show directory names in `doom-modeline'
-           (doom-modeline-project-detection . 'project)
+           ;; (doom-modeline-project-detection . 'project)
            (doom-modeline-buffer-file-name-style . 'buffer-name))
   :hook after-init-hook
   :config
