@@ -94,6 +94,8 @@ With prefix arg don't indent."
           (beginning-of-visual-line)
           (point)))))
 
+(repeat-mode)
+
 (--each
     '(("M-y" . consult-yank-from-kill-ring)
       ("C-a" . my-beginning-of-line-text-or-visual-line)
