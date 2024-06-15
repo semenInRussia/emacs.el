@@ -37,7 +37,9 @@
 
   (leaf eros
     :ensure (eros :repo "xiongtx/eros" :host github)
-    :hook emacs-lisp-mode-hook)
+    :bind (([remap eval-last-sexp] . #'eros-eval-last-sexp)
+           ([remap eval-defun] . #'eros-eval-defun))
+    :config (add-hook 'emacs-lisp-mode-hook 'eros-mode))
 
   (leaf elisp-refs
     :ensure t)
