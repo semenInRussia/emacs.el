@@ -72,9 +72,6 @@
     ;; snippets
     yasnippet
     ;; my translator
-    gts-core
-    gts-implements
-    gts-engine-bing
     go-translate
     ;; run-command
     run-command)
