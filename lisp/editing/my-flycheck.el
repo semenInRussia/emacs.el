@@ -55,7 +55,7 @@ must be a symbol"
       (let ((name (string-trim (format "%s" cmd) "'")))
         `(defun ,(intern (concat "my-embark-" name)) (_)
            ,(format "My wrapper over `%s' to be an embark action." name)
-           (ignore _arg)
+           (ignore _)
            (call-interactively ',(intern name))))))
 
   (defvar-keymap my-embark-flycheck-map
