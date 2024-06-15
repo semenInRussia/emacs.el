@@ -31,15 +31,16 @@
 ;;    when I choose `consult-buffer' will be called, if I need other
 ;;    command (like `find-file'), I can hit > to which is
 ;;    `embark-become'
-;; 4. Split vertically with ... C-x 5 ...
+;; 4. Split vertically with ... C-x 2 ...
 ;; 5. Make a window frame (for fun), with C-x f
-;; 6. Also you can change the buffer of current window with M-[ and M-]
+;; 6. Also you can change the buffer of current window with C-x C-n
+;;    and C-x C-p
 ;; 7. If you are `meow' user, try q to either kill window, change
 ;;    buffer to other
 ;; 8. If I need to open anything like documentation
-;;   (`describe-variable') I press "C-x 4 o", after choose command "C-h
-;;   v", after choose the place where this documentation buffer will be
-;;   opened
+;;   (`describe-variable') I press "C-x O", after choose command "C-h
+;;   v", after choose the place where this documentation buffer will
+;;   be opened
 
 ;;; Code:
 (require 'my-leaf)
@@ -67,6 +68,8 @@
 (defun my--visit-last-opened-buffer-ignore-p (buffer)
   "Take object of BUFFER and return nil when don't need visit its."
   (->> buffer (buffer-name) (s-trim) (s-prefix-p "*Minibuf")))
+
+(declare-function consult-buffer "consult")
 
 (defun my-split-right (&optional arg)
   "My version of `split-window-right', difference that new window is active.
@@ -123,6 +126,7 @@ window manager to present the frame in a floating state."
                (tab-bar-close-tab)
              (delete-frame)))))
 
+(declare-function aw-select "ace-window")
 (defun ace-window-one-command ()
   (interactive)
   (let ((win (aw-select " ACE")))
@@ -153,18 +157,24 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
   (message "Use `ace-window' to display next command buffer..."))
 
 (with-eval-after-load 'embark
+  (defvar embark-become-file+buffer-map)
   (keymap-set embark-become-file+buffer-map "2" #'my-split-below)
   (keymap-set embark-become-file+buffer-map "3" #'my-split-right))
+
+(defvar-keymap my-prev-next-buf-map
+  :repeat (:enter (next-buffer previous-buffer))
+  "n" #'next-buffer
+  "p" #'previous-buffer)
 
 (leaf-keys
  (("C-<tab>" . 'my-visit-last-opened-buffer)
   ;; Fast select buffers
-  ("M-[" . previous-buffer)
-  ("M-]" . next-buffer)
+  ("C-x C-p" . previous-buffer)
+  ("C-x C-n" . next-buffer)
 
   ;; split
-  ("C-x 3" . my-split-right)
-  ("C-x 2" . my-split-below)
+  ([remap split-window-right] . my-split-right) ;; C-x 3
+  ([remap split-window-below] . my-split-below) ;; C-x 2
 
   ;; Close window
   ("M-0" . my-delete-window-frame)
@@ -173,7 +183,7 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
   ("C-x f" . my-buffer-to-frame-floating)
 
   ("C-;" . ace-window-one-command)
-  ("C-x 4 o" . ace-window-prefix)))
+  ("C-x O" . ace-window-prefix)))
 
 (provide 'my-buffer-navigation)
 ;;; my-buffer-navigation.el ends here
