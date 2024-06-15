@@ -18,6 +18,11 @@
 (require 'dash)
 (require 'f)
 
+;; Scrolling more OK
+(setq scroll-margin 0
+      scroll-preserve-screen-position t
+      next-screen-context-lines 3)
+
 (setq make-backup-files         nil)
 (setq auto-save-list-file-name  nil)
 (defalias 'yes-or-no-p 'y-or-n-p)
