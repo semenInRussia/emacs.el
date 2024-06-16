@@ -9,21 +9,23 @@
 
 ;;; Commentary:
 
-;; Join all my config files into one init.el.  I use this script to make one
-;; big init.el file which has more fast startup time than load 1+ files.
+;; Join all my config files into one init.el.  I use this script to
+;; make one big init.el file which has more fast startup time than
+;; load 1+ files.
 
-;; `my-build-config' command joins all modules files from the ~/.emacs.d/lisp/
-;; into one dist/my-modules.el and compile it.  When I start Emacs init.el files
-;; just require my-modules.el, my-autoloads.el (from local projects) which are
-;; have already byte-compiled (or even NATIVE-compiled).  One big file instead
-;; of a lot of small is better in load time, because every `require' statement
-;; also take a bit of time.
+;; `my-build-config' command joins all modules files from the
+;; ~/.emacs.d/lisp/ into one dist/my-modules.el and compile it.  When
+;; I start Emacs init.el files just require my-modules.el,
+;; my-autoloads.el (from local projects) which are have already
+;; byte-compiled (or even NATIVE-compiled).  One big file instead of a
+;; lot of small is better in load time, because every `require'
+;; statement also take a bit of time.
 
 ;;; Code:
 
-;; NOTE that here I don't use external libraries like `dash' or `s', because I
-;; sometimes need to build configuration when old configuration was broken and
-;; `dash'/`s' haven't been loaded
+;; NOTE that here I don't use external libraries like `dash' or `s',
+;;   because I sometimes need to build configuration when old
+;;   configuration was broken and `dash'/`s' haven't been loaded
 (require 'cl-lib)
 
 (defvar my-modules-el-file (locate-user-emacs-file "dist/my-modules.el"))
@@ -36,14 +38,16 @@
    "package-management"
    "my-libs.el"
    "my-lib.el"
+   "my-fonts.el"
+   "ui/my-layout.el"
+   "ui/my-load-theme.el"
+   "ui/my-modeline.el"
+   "ui"
    "env"
    "editing"
    "languages/lisps/my-lisp.el"
    "languages"
-   "misc"
-   "my-fonts.el"
-   "ui/my-layout.el"
-   "ui")
+   "misc")
   "Names of the directories and files that define an order to load.")
 
 (defvar my-modules-files-ignore-regexps

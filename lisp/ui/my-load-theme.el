@@ -37,8 +37,7 @@
 (require 'my-leaf)
 
 
-(setq font-lock-maximum-decoration t
-      truncate-partial-width-windows nil)
+(setq font-lock-maximum-decoration t)
 
 (leaf doom-themes
   :ensure t
@@ -81,13 +80,14 @@
 ;; just load theme, the respective autloads and settings (see above)
 ;; will be loaded
 
-(setq-default truncate-lines t)
+(setq-default truncate-lines t
+              truncate-partial-width-windows nil)
 (defvar my-theme-func)
 ;; or (setq my-theme-func 'my-light-theme)
 ;; or (setq my-theme-func 'my-dark-theme)
 (setq my-theme-func 'my-dark-theme)
 
-(add-hook 'after-init-hook my-theme-func -100)
+(add-hook 'after-init-hook my-theme-func -90)
 (when (functionp my-theme-func)
   (funcall my-theme-func))
 

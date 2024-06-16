@@ -24,6 +24,10 @@
                   'lox
                 (apply args))))
 
+(add-hook 'after-init-hook
+          'doom-modeline-mode
+          -100)
+
 (leaf doom-modeline
   :ensure t
   :custom (;; it looks like more nice
@@ -33,7 +37,7 @@
            ;; encoding not useful I think.
            (doom-modeline-buffer-encoding . nil)
            ;; don't use k8s
-           (doom-modeline-k8s-show-namespace)
+           (doom-modeline-k8s-show-namespace . nil)
            ;; don't show Bot, percentages and other
            (doom-modeline-percent-position . nil)
            ;; show count of Errors and Warnings with more simple way
@@ -45,7 +49,6 @@
            ;; don't show directory names in `doom-modeline'
            ;; (doom-modeline-project-detection . 'project)
            (doom-modeline-buffer-file-name-style . 'buffer-name))
-  :hook after-init-hook
   :config
   ;; I use Emacs in fullscreen mode, so I don't see time that provided
   ;; by OS, so I need time in modeline.  EMACS IS MY OS!!!
