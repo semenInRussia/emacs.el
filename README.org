@@ -156,4 +156,4 @@ So you can test it without ~chemacs~ and other stupid things, you even not need 
     cp *aff hunspell
   #+end_src
 
-  - Fonts (better [[https://www.jetbrains.com/lp/mono/][JetBrains Mono]] and Symbols Nerd Font Mono : [[https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/NerdFontsSymbolsOnly.zip][link to zip archive]])
+- Fonts (better [[https://www.jetbrains.com/lp/mono/][JetBrains Mono]] and Symbols Nerd Font Mono : [[https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/NerdFontsSymbolsOnly.zip][link to zip archive]])
