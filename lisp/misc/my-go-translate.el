@@ -24,7 +24,7 @@
 
 (leaf google-translate
   :ensure t
-  :bind ((:embark-region-map
+  :bind ((:embark-general-map
           :package embark
           ("T" . my-google-translate))))
 
