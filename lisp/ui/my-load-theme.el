@@ -81,9 +81,7 @@
 ;; just load theme, the respective autloads and settings (see above)
 ;; will be loaded
 
-(add-hook 'prog-mode-hook
-          (lambda () (interactive) (setq-local truncate-lines t)))
-
+(setq-default truncate-lines t)
 (defvar my-theme-func)
 ;; or (setq my-theme-func 'my-light-theme)
 ;; or (setq my-theme-func 'my-dark-theme)
