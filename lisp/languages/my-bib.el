@@ -79,6 +79,7 @@
   (leaf parsebib :ensure t)
 
   (leaf citar-org-roam
+    :disabled t  ; im not use `org-roam' yet
     :ensure t
     :after org-roam
     :global-minor-mode citar-org-roam-mode
