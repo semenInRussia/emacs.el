@@ -29,7 +29,7 @@
   :custom (;; it looks like more nice
            (doom-modeline-height . 35)
            ;; just fun
-           (mode-line-right-align-edge . 'right-margin)
+           ;; (mode-line-right-align-edge . 'right-margin)
            ;; encoding not useful I think.
            (doom-modeline-buffer-encoding . nil)
            ;; don't use k8s

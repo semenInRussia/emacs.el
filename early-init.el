@@ -60,6 +60,10 @@
          (vertical-scroll-bars))
        default-frame-alist))
 
+;; Show current key-sequence in minibuffer ala 'set showcmd' in vim. Any
+;; feedback after typing is better UX than no feedback at all.
+(setq echo-keystrokes 0.02)
+
 ;; And set these to nil so users don't have to toggle the modes twice to
 ;; reactivate them.
 (setq menu-bar-mode nil

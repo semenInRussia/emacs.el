@@ -82,14 +82,14 @@
 ;; will be loaded
 
 (add-hook 'prog-mode-hook
-          (lambda () (interactive) (toggle-truncate-lines 1)))
+          (lambda () (interactive) (setq-local truncate-lines t)))
 
 (defvar my-theme-func)
 ;; or (setq my-theme-func 'my-light-theme)
 ;; or (setq my-theme-func 'my-dark-theme)
 (setq my-theme-func 'my-dark-theme)
 
-(add-hook 'after-init-hook my-theme-func)
+(add-hook 'after-init-hook my-theme-func -100)
 (when (functionp my-theme-func)
   (funcall my-theme-func))
 

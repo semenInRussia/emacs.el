@@ -12,10 +12,13 @@
       initial-scratch-message nil
       ;; don't use system things, only Emacs
       use-file-dialog nil
-      use-dialog-box nil
-      ;; Inhibit resizing frame
-      frame-inhibit-implied-resize t
-      frame-resize-pixelwise t)
+      use-dialog-box nil)
+
+;; UX: GUIs are inconsistent across systems, desktop environments, and themes,
+;;   and don't match the look of Emacs. They also impose inconsistent shortcut
+;;   key paradigms. I'd rather Emacs be responsible for prompting.
+(when (bound-and-true-p tooltip-mode)
+  (tooltip-mode -1))
 
 (defcustom my-layout-size '(72 . 22)
   "Cons of width and height of editor window."
@@ -23,9 +26,14 @@
   :type '(cons number number))
 
 (setf
- ;; resize the window
- window-resize-pixelwise t
+ ;; Don't resize the frames in steps; it looks weird, especially in tiling window
+ ;; managers, where it can leave unseemly gaps.
  frame-resize-pixelwise t
+ ;; Inhibit resizing frame
+ frame-inhibit-implied-resize t
+ ;; But do not resize windows pixelwise, this can cause crashes in some cases
+ ;; when resizing too many windows at once or rapidly.
+ window-resize-pixelwise nil
  (alist-get 'width default-frame-alist) (car my-layout-size)
  (alist-get 'height default-frame-alist) (cdr my-layout-size)
  (alist-get 'width initial-frame-alist) (car my-layout-size)

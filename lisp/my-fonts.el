@@ -36,7 +36,8 @@
   "Return non-nil if the font with the name NAME is exist."
   (find-font (font-spec :name name)))
 
-(unless (assoc 'font default-frame-alist)
+(when (and (display-graphic-p)
+           (not (assoc 'font default-frame-alist)))
   (let ((font (cl-find-if #'font-installed-p my-fonts-main)))
     (setf (alist-get 'font default-frame-alist)
           (format "%s-%s" font my-fonts-size))))

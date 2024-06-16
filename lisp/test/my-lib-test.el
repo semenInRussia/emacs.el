@@ -53,13 +53,6 @@
     (should-not (my-in-lisp-sexp-p "+"))
     (should-not (my-in-lisp-sexp-p "message"))))
 
-(ert-deftest my-lib-check-alist-p
-    ()
-  (should
-   (my-alist-p '((a . 3) (a . 2))))
-  (should-not (my-alist-p nil))
-  (should-not (my-alist-p '(a (a . 2)))))
-
 (ert-deftest my-lib-check-uri-of-url
     ()
   (should

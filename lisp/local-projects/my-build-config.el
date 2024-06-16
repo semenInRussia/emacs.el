@@ -34,16 +34,16 @@
   (list
    "package-management/my-leaf.el"
    "package-management"
-   "my-fonts.el"
-   "ui/my-layout.el"
    "my-libs.el"
    "my-lib.el"
-   "ui"
    "env"
    "editing"
    "languages/lisps/my-lisp.el"
    "languages"
-   "misc")
+   "misc"
+   "my-fonts.el"
+   "ui/my-layout.el"
+   "ui")
   "Names of the directories and files that define an order to load.")
 
 (defvar my-modules-files-ignore-regexps

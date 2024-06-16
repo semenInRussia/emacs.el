@@ -18,6 +18,37 @@
   ;; it's important, because the rest config use `leaf' macro
   (pam-use-package '(leaf :repo "conao3/leaf.el"))
   (require 'leaf)
+  (defmacro leaf-key (key command &optional keymap)
+  "Bind KEY to COMMAND in KEYMAP (`global-map' if not passed).
+
+KEY-NAME may be a vector, in which case it is passed straight to
+`define-key'.  Or it may be a string to be interpreted as spelled-out
+keystrokes.  See documentation of `edmacro-mode' for details.
+
+COMMAND must be an interactive function. lambda form, menu-item,
+or the form that returned one of them also be accepted.
+
+KEYMAP, if present, should be a keymap and not a quoted symbol.
+For example:
+  (leaf-key \"M-h\" #'some-interactive-function my-mode-map)
+
+You can also use [remap COMMAND] as KEY.
+For example:
+  (leaf-key [remap backward-sentence] 'sh-beginning-of-command)"
+  (let* ((key*     (eval key))
+         (command* (eval command))
+         (keymap*  (eval keymap))
+         (bindto   (cond ((symbolp command*) command*)
+                         ((eq (car-safe command*) 'lambda) '*lambda-function*)
+                         ((eq (car-safe command*) 'menu-item) '*menu-item*)))
+         (mmap     (or keymap* 'global-map))
+         (vecp     (vectorp key*))
+         (path     (leaf-this-file))
+         (_mvec    (if (vectorp key*) key* (read-kbd-macro key*)))
+         (mstr     (if (stringp key*) key* (key-description key*))))
+    `(define-key ,mmap ,(if vecp key* `(kbd ,key*))
+                 ,(if (eq bindto '*lambda-function*) command* `',command*))))
+
 
   (defun my-leaf-keywords-init ()
     "Initialize keywords for macro `leaf'."
