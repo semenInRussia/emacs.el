@@ -94,7 +94,15 @@ With prefix arg don't indent."
           (beginning-of-visual-line)
           (point)))))
 
-(repeat-mode)
+;; PERF,HACK: don't call `repeat-mode', cause it do extra work, like
+;;   counting their commands + do stuoid message'
+
+;; (repeat-mode)
+(require 'repeat)
+(setq repeat-mode t)
+(when repeat-keep-prefix
+  (add-hook 'pre-command-hook 'repeat-pre-hook))
+(add-hook 'post-command-hook 'repeat-post-hook)
 
 (--each
     '(("M-y" . consult-yank-from-kill-ring)
