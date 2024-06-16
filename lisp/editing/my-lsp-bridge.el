@@ -19,15 +19,12 @@
 (declare-function corfu-mode "corfu")
 
 
-(leaf posframe
-  :ensure (posframe :repo "tumashu/posframe" :host github))
-
 (leaf lsp-bridge
   :disabled t
   :ensure '(lsp-bridge :type git :host github :repo "manateelazycat/lsp-bridge"
                        :files (:defaults "*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
                        :build (:not compile))
-  :load-path* "lisp/site-lisp/lsp-bridge"
+  ;; :load-path* "lisp/site-lisp/lsp-bridge"
   :hook ((lsp-bridge-user-multiserver-dir . "~/lsp/multi")
          (lsp-bridge-user-langserver-dir . "~/lsp/single/")
          (lsp-bridge-mode-hook . (lambda ()
