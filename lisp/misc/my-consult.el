@@ -23,16 +23,21 @@
 ;; - `ripgrep' in the project
 ;; - choose one from `kill-ring' with preview
 ;; - `imenu' with preview
-;; - switch to buffer one of the project buffers, recent opened files and other
+;; - switch to buffer one of the project buffers, recent opened files
+;;   and other
 (leaf consult
   :ensure t
-  :commands (consult-register-format
+  :commands (consult--buffer-file-hash
+             consult-flymake
+             consult-register-format
              consult-register-window
-             consult-xref
-             consult--buffer-file-hash)
+             consult-xref)
   :defvar (consult-narrow-key
            consult-project-function
-           consult-buffer-sources)
+           consult-buffer-sources
+           recentf-list
+           consult--source-recent-file
+           project-switch-commands)
   :bind ((:minibuffer-local-map
           ("M-s" . consult-history) ;; orig. next-matching-history-element
           ("M-r" . consult-history))
@@ -59,6 +64,7 @@
          ;; Other custom bindings
          ;; M-g bindings in `goto-map'
          ("M-g e" . consult-compile-error)
+         ("M-g f" . my-consult-flymake-or-flycheck)
          ("M-g I" . consult-imenu-multi)
          ("M-g i" . consult-imenu))
 
@@ -69,6 +75,14 @@
   ;; i don't know what does the next line
   :hook ((completion-list-mode-hook . consult-preview-at-point-mode))
   :config
+
+  (defun my-consult-flymake-or-flycheck ()
+    "Run either `consult-flymake' or `consult-flycheck'."
+    (interactive)
+    (call-interactively
+     (if (bound-and-true-p flymake-mode)
+         #'consult-flymake
+       #'consult-flycheck)))
 
   ;; This adds thin lines, sorting and hides the mode line of the window.
   (advice-add #'register-preview :override #'consult-register-window)
@@ -110,6 +124,11 @@
 
     (plist-put consult--source-recent-file
                :items 'my-consult--source-recentf-items)))
+
+;; support of `consult-flycheck' navigate with errors, warnings and ...
+(leaf consult-flycheck
+  :ensure t
+  :commands consult-flycheck)
 
 ;; some config to add to project keymap `consult' commands
 ;; key-bindings
