@@ -17,28 +17,24 @@
 (declare-function async-byte-compile-file "async-bytecomp.el")
 
 
-(defun my-auto-recompile-current-elisp-file ()
+(defun my--maybe-compile-cur-buf ()
   "If the opened buffer is an Elisp file and it was be compiled, recompile it."
-  (and
-   (buffer-file-name)
-   (derived-mode-p 'emacs-lisp-mode)
-   (f-exists-p (f-swap-ext (buffer-file-name) "elc"))
-   (async-byte-compile-file (buffer-file-name))))
+  (and (buffer-file-name)
+       (derived-mode-p 'emacs-lisp-mode)
+       (f-exists-p (f-swap-ext (buffer-file-name) "elc"))
+       (async-byte-compile-file (buffer-file-name))))
 
-(define-minor-mode my-auto-recompile-current-elisp-file-mode
+(define-minor-mode my-recompile-mode
   "After each save of an Elisp file that was be compiled, recompile it.
 
 If the ARG is non-nil, then enable the mode, otherwise disable it."
   :init-value t
-  (if my-auto-recompile-current-elisp-file-mode
-      (add-hook 'after-save-hook 'my-auto-recompile-current-elisp-file t)
-    (remove-hook 'after-save-hook 'my-auto-recompile-current-elisp-file t)))
+  :group 'my
+  (if my-recompile-mode
+      (add-hook 'after-save-hook 'my--maybe-compile-cur-buf t)
+    (remove-hook 'after-save-hook 'my--maybe-compile-cur-buf t)))
 
-(define-global-minor-mode my-global-auto-recompile-current-elisp-file-mode
-  my-auto-recompile-current-elisp-file-mode
-  (lambda () (my-auto-recompile-current-elisp-file-mode t)))
-
-(my-global-auto-recompile-current-elisp-file-mode t)
+(add-hook 'emacs-lisp-mode-hook #'my-recompile-mode)
 
 (provide 'my-auto-compile)
 ;;; my-auto-compile.el ends here

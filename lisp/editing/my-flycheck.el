@@ -21,7 +21,7 @@
   :defun flycheck-mode
   :hook prog-mode-hook text-mode-hook
   :config
-  (defun turn-off-flycheck (&rest _)
+  (defun turn-off-flycheck (&ignore)
     "Disable `flycheck-mode' locally for current buffer."
     (interactive)
     (flycheck-mode -1)))
@@ -46,16 +46,12 @@
   :defer-config
   (eval-and-compile
     (defmacro my-embark-action (cmd)
-      "Define a command whcih can be an `emabark' action.
+      "Define a command which can be an `emabark' action.
 
-This command run interactively
-
- the CMD ignoring embarks args.  CMD
-must be a symbol"
+The CMD ignoring embarks args.  CMD must be a symbol"
       (let ((name (string-trim (format "%s" cmd) "'")))
-        `(defun ,(intern (concat "my-embark-" name)) (_)
+        `(defun ,(intern (concat "my-embark-" name)) ()
            ,(format "My wrapper over `%s' to be an embark action." name)
-           (ignore _)
            (call-interactively ',(intern name))))))
 
   (defvar-keymap my-embark-flycheck-map
@@ -73,16 +69,16 @@ must be a symbol"
   (eval-and-compile
     (defun my-embark-target-flycheck-at-point ()
       "Target for `embark' `flycheck' at point."
-      (when-let ((o (car (flycheck-overlays-at (point))))
-                 (_ flycheck-mode))
-        (cons 'flycheck
-              (cons
-               (seq-mapcat #'flycheck-error-message
-                           (flycheck-overlay-errors-at (point))
-                           'string)
-               (cons
-                (overlay-start o)
-                (overlay-end o)))))))
+      (let ((o (car (flycheck-overlays-at (point)))))
+        (when (and o flycheck-mode)
+          (cons 'flycheck
+                (cons
+                 (seq-mapcat #'flycheck-error-message
+                             (flycheck-overlay-errors-at (point))
+                             'string)
+                 (cons
+                  (overlay-start o)
+                  (overlay-end o))))))))
 
   (add-to-list 'embark-target-finders
                #'my-embark-target-flycheck-at-point

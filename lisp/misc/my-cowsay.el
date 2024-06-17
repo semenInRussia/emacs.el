@@ -2,7 +2,6 @@
 
 ;; Copyright (C) 2022 semenInRussia
 ;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
 ;; URL: https://github.com/semenInRussia/emacs.el
 
 ;;; Commentary:
@@ -16,21 +15,10 @@
 
 (leaf cowsay
   :ensure t
-  :defun cowsay--get-default-cow
-  :defvar cowsay-cows
+  :defun cowsay--get-default-cow cowsay-load-cows
+  :defvar cowsay-cows cowsay-directories
   :custom ((cowsay-directories . `(,(locate-user-emacs-file "cows"))))
-  :defer-config (cowsay-load-cows)
-  :config
-  (defun cowsay--prompt-for-cow (&rest _ignored)
-    "Read any cow name from the minibuffer."
-    (let ((default (cowsay--get-default-cow)))
-      (completing-read
-       "Cow: "
-       cowsay-cows
-       nil t
-       default
-       'cowsay-cow-history
-       default))))
+  :defer-config (cowsay-load-cows))
 
 (provide 'my-cowsay)
 ;;; my-cowsay.el ends here

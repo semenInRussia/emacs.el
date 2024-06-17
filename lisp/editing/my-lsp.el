@@ -19,9 +19,9 @@
 
 
 (defun my-lsp-ensure ()
-  "Run choosen lsp client for the current buffer*.
+  "Run chosen LSP client for the current buffer*.
 
-* or add a command to run lsp client to the future calls stacks."
+* or add a command to run LSP client to the future calls stacks."
   (interactive)
   ;; run it with idle timer.  It's useful, because in this case Emacs
   ;; don't need to load `eglot' instantly after somebody open a file,

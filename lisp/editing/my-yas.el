@@ -1,9 +1,7 @@
 ;;; my-yas.el --- My configuration for the `yasnippet'
 
 ;; Copyright (C) 2022-2024 semenInRussia
-
 ;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
 ;; URL: https://github.com/semenInRussia/emacs.el
 
 ;; This file is not part of GNU Emacs.
@@ -13,8 +11,6 @@
 ;; My configuration for the `yasnippet'
 
 ;;; Code:
-
-
 (require 'my-leaf)
 (require 's)
 (require 'dash)
@@ -43,13 +39,8 @@
   (run-with-idle-timer 1 nil #'yas-reload-all))
 
 ;; a completion for snippets with `cape' (capf)
-
-
-
 (leaf cape
-  :defun (cape--table-with-properties
-          cape--bounds
-          cape-interactive)
+  :defun cape--table-with-properties cape--bounds cape-interactive
   :after cape yasnippet corfu
   :config
   (defvar my-yas--capf-properties
@@ -76,26 +67,24 @@ If INTERACTIVE is true, show the completion where suggested only snippets."
   (defun my-yas-capf--docsig (key)
     "Snippet content for `corfu' which show it in the echo area.
 
-It takes the KEY (trigger) of snippet, because user type it and `corfu'
-manipulate with it to show helpful things"
+It takes the KEY (trigger) of snippet, because user type it and
+`corfu' manipulate with it to show helpful things"
     (->
      ;; the first snippets table
      (yas--get-snippet-tables major-mode)
-     (car)
+     car
      ;; fetch snippets with a given key
      (yas--fetch key)
      ;; choose the first
-     (car)
-     (cdr)
+     car cdr
      ;; get its content
-     (yas--template-content)))
+     yas--template-content))
 
   (defun my-yas-capf--exit (name status)
     "Exit from `my-yas-capf'."
-    (and
-     name
-     (eq status 'finished)
-     (yas-expand)))
+    (and name
+         (eq status 'finished)
+         (yas-expand)))
 
   (add-hook
    'corfu-mode-hook
