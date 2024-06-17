@@ -18,9 +18,7 @@
 (require 'f)   ; for `f-full'
 
 (leaf corfu
-  :ensure (corfu
-           :repo "minad/corfu"
-           :files ("*.el" "extensions/*"))
+  :ensure t
   ;; so when auto-completion is provided, load `corfu'
   ;;
   ;; I load `corfu' only when it really needed.  It's awesome idea,
@@ -58,7 +56,6 @@
   (leaf kind-icon
     :ensure (kind-icon :repo "emacs-straight/kind-icon"
                        :host github)
-    :after corfu
     :commands kind-icon-margin-formatter
     :defvar corfu-margin-formatters
     :custom ((kind-icon-use-icons . t)
@@ -80,7 +77,7 @@
     :init (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)))
 
 (leaf cape
-  :ensure (cape :repo "minad/cape" :host github)
+  :ensure t
   ;; I'm using the file from the following GitHub repository:
   ;; https://github.com/dwyl/english-words/
   ;;

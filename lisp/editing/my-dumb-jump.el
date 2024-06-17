@@ -15,7 +15,7 @@
               :host github))
 
 (leaf dumb-jump
-  :ensure (dumb-jump :repo "jacktasia/dumb-jump" :host github)
+  :ensure t
   :custom ((dumb-jump-prefer-searcher dumb-jump-force-searcher)
            . 'rg)
   :bind (("M-," . xref-go-back)
