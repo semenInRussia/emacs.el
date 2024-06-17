@@ -22,8 +22,9 @@
 
 
 (leaf embark
-  :defvar (embark-keymap-alist marginalia-prompt-categories)
   :ensure t
+  :defvar embark-keymap-alist marginalia-prompt-categories embark-indicators
+  :custom (prefix-help-command . #'embark-prefix-help-command)
   :bind (("C-." . embark-act)
          ("C-M-." . embark-dwim)
          (:minibuffer-mode-map
@@ -43,6 +44,11 @@
 
   ;; eval after `embark' was loaded
   :config
+  (setq embark-indicators
+        '(embark--vertico-indicator
+          embark-minimal-indicator  ; default is embark-mixed-indicator
+          embark-highlight-indicator
+          embark-isearch-highlight-indicator))
 
   (cl-flet ((op (g f)
 	            (lambda (x)
@@ -64,7 +70,7 @@
                  nil
                  (window-parameters (mode-line-format . none))))
 
-  ;;; SOME ADDITIONAL ACTIONS
+;;; SOME ADDITIONAL ACTIONS
 
   ;; googling a thing
   ;;
