@@ -34,6 +34,7 @@ Use object DIAG which is captured with one of `embark-target-finders'"
 ;; see `my-flycheck' for simple showcases
 (leaf embark
   :after flymake
+  :defun flymake--diag-text
   :config
   (advice-add
    'embark-target-flymake-at-point

@@ -440,12 +440,13 @@
                    (car leaf--value))
                 ,@leaf--body))
             :pre-setq
-            `(,@(mapcar
-                 (lambda
-                   (elm)
-                   `(setq ,(car elm)
-                          ,(cdr elm)))
-                 leaf--value)
+            `((with-no-warnings
+                ,@(mapcar
+                   (lambda
+                     (elm)
+                     `(setq ,(car elm)
+                            ,(cdr elm)))
+                   leaf--value))
               ,@leaf--body)
             :pre-setf
             `(,@(mapcar

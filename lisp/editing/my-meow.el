@@ -151,7 +151,6 @@
      '("y" . meow-save)
      '("Y" . meow-sync-grab)
      '("z" . embrace-commander)
-     '("Z" . meow-comment)  ; useless with me, M-; is ok
      '("'" . repeat)
      '("%" . meow-query-replace-regexp)
      ;; my own modal state

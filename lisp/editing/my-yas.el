@@ -31,6 +31,7 @@
   ;; :global-minor-mode yas-global-mode
   :hook ((prog-mode-hook . yas-minor-mode)
          (text-mode-hook . yas-minor-mode))
+  :defvar yas-snippet-dirs
   :custom (yas-wrap-around-region . t)
   :config
   (setq yas-snippet-dirs (list my-snippets-dir))
@@ -42,6 +43,7 @@
 (leaf cape
   :defun cape--table-with-properties cape--bounds cape-interactive
   :after cape yasnippet corfu
+  :defun my-yas-capf
   :config
   (defvar my-yas--capf-properties
     (list :annotation-function (lambda (_) " Snippet ")

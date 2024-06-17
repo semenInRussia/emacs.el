@@ -34,7 +34,7 @@ Rename variable which is symbol ID"
                  :inlayHintProvider))
             (eglot-events-buffer-config . 0)
             (eglot-auto-display-help-buffer . nil))
-  :defun eglot-inlay-hints-mode
+  :defun eglot-inlay-hints-mode eglot-code-actions
   :bind ((:eglot-mode-map
           ("C-c lr" . 'eglot-rename)
           ("<f6>"   . 'eglot-rename)
