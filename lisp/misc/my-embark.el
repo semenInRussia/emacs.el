@@ -13,6 +13,7 @@
 ;;; Code:
 
 (require 'my-leaf)
+(require 'dash)
 
 
 ;; TODO: put it to other more right place
@@ -30,22 +31,39 @@
           ("C->" . embark-act-all)
           (">" . embark-become))
          (:embark-general-map
-          ("." . my-embark-google-search)))
+          ("." . my-embark-google-search))
+         (:embark-file-map
+          ("2" . my-find-file-below)
+          ("3" . my-find-file-right)
+          ("5" . find-file-other-frame))
+         (:embark-buffer-map
+          ("2" . my-switch-to-buffer-below)
+          ("3" . my-switch-to-buffer-right)
+          ("5" . switch-to-buffer-other-frame)))
 
   ;; eval after `embark' was loaded
   :config
 
-  (defun my-embark-act-noquit ()
-    "Run action but don't quit the minibuffer afterwards."
-    (interactive)
-    (let ((embark-quit-after-action nil))
-      (embark-act)))
+  (eval-and-compile
+    (defun my--and-after (g f)
+      "Expand to d(x) = [g() f(x)]"
+      (lambda (x)
+        (funcall g)
+        (funcall f x))))
 
-  (defun my-embark-act-all-noexit ()
-    "Do `embark-act-all' without exit from the minibuffer."
-    (interactive)
-    (let ((embark-quit-after-action nil))
-      (embark-act-all)))
+  (cl-flet ((op (g f)
+	            (lambda (x)
+		            (funcall g)
+		            (funcall f x))))
+    (defalias 'my-find-file-right (op 'split-window-right
+                                      'find-file-other-window))
+    (defalias 'my-find-file-below (op 'split-window-below
+                                      'find-file-other-window))
+
+    (defalias 'my-switch-to-buffer-right (op 'split-window-right
+                                             'switch-to-buffer-other-window))
+    (defalias 'my-switch-to-buffer-below (op 'split-window-below
+                                             'switch-to-buffer-other-window)))
 
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
