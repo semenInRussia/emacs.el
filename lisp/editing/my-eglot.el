@@ -25,6 +25,7 @@ Rename variable which is symbol ID"
                          (format "%s" id))))
 
 (leaf eglot
+  :ensure (eglot :type built-in)
   :custom `((eglot-sync-connect . 1)
             (eglot-autoshutdown . t)
             (eglot-ignored-server-capabilities

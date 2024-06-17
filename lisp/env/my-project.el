@@ -14,6 +14,7 @@
 
 
 (leaf project
+  :ensure (project :type built-in)
   :hook (after-init-hook . my-bind--project)
   :bind (:project-prefix-map
          ;; at start `project-dired' is bound with C-x p D, but

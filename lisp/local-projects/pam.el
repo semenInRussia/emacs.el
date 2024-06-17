@@ -159,7 +159,7 @@ documentation).  The behavior depends on the value of the
 `pam-need-to-install-pkgs-p' variable.  If packages must be installed
 then this function install them using `straight' with passing NO-CLONE
 and NO-BUILD to `straight-use-package' (see below details), otherwise
-(packages already installed) do nothing, notice that here activation
+\\(packages already installed) do nothing, notice that here activation
 is extra, because in `pam' you activate all packages only once.
 
 The result value of this function is either nil, that tells package
