@@ -17,6 +17,7 @@
                  :host github)
   :bind (:magit-mode-map
          ("D" . magit-file-delete))
+  :defvar project-switch-commands
   :custom ((magit-refresh-status-buffer . t)
            (magit-disabled-section-inserters
             . '(magit-insert-diff-filter-header

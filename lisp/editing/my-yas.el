@@ -22,10 +22,15 @@
 
 (leaf yasnippet
   :ensure (yasnippet :repo "joaotavora/yasnippet")
-  :defun (yas-reload-all
-          yas--table-hash
+  :defun (yas--fetch
           yas--filter-templates-by-condition
-          yas--namehash-templates-alist)
+          yas--get-snippet-tables
+          yas--namehash-templates-alist
+          yas--table-hash
+          yas--template-content
+          yas-active-keys
+          yas-expand
+          yas-reload-all)
   :bind ("C-=" . yas-insert-snippet)
   ;; don't use `yas-global-mode', prefer local minor modes
   ;; :global-minor-mode yas-global-mode
@@ -41,7 +46,7 @@
 
 ;; a completion for snippets with `cape' (capf)
 (leaf cape
-  :defun cape--table-with-properties cape--bounds cape-interactive
+  :defun cape--properties-table cape--bounds cape-interactive
   :after cape yasnippet corfu
   :defun my-yas-capf
   :config

@@ -53,6 +53,9 @@
   (define-key compilation-mode-map "t" #'my-compilation-toggle-hide-details))
 
 
+(defvar-local my-compilation-hide-details-p nil
+  "Variable is non-nil if details of `compile' buffer was hiden.")
+
 (defun my-compilation-toggle-hide-details ()
   "Hide or show details inside of `compile' buffer."
   (interactive)
@@ -60,9 +63,6 @@
       (my-compilation-show-details)
     (my-compilation-hide-details))
   (setq-local my-compilation-hide-details-p (not my-compilation-hide-details-p)))
-
-(defvar-local my-compilation-hide-details-p nil
-  "Variable is non-nil if details of `compile' buffer was hiden.")
 
 (defun my-compilation-hide-details ()
   "Hide details like time at compile start inside `compile' buffer."

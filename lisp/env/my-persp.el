@@ -11,13 +11,12 @@
 (require 'dash)
 (require 'my-leaf)
 
-(defvar persp-key-map)
 (leaf persp-mode
   :ensure t
   :defun persp-mode persp-set-keymap-prefix
   :config (persp-mode +1)
   ;; change prefix from the default "C-c p" to "C-c ,"
-  :defvar persp-mode-map
+  :defvar persp-mode-map persp-key-map persp-keymap-prefix
   :custom `((persp-keymap-prefix . ,(kbd "C-c ,"))
             ;; if `persp-auto-resume-time' <= 0, then `persp-mode' don't load all auto-saved
             ;; perspectives at startup, if you need in them, do `persp-load-state-from-file'
@@ -51,6 +50,7 @@ has a number 1, not 0"
    (cons 'progn)
    eval))
 
+(defvar persp-key-map)
 (with-eval-after-load 'persp-mode
   (define-key mode-specific-map "," persp-key-map))
 
@@ -60,6 +60,7 @@ has a number 1, not 0"
           consult--customize-put
           my-persp-buffer-names
           persp-buffer-list-restricted)
+  :defvar consult-buffer-sources
   :config
   (consult--customize-put '(consult--source-buffer) :default nil)
   (consult--customize-put '(consult--source-buffer) :hidden nil)

@@ -88,9 +88,11 @@
   :when (display-graphic-p)
   :commands (eldoc-box--eldoc-message-function
              eldoc-box--eldoc-display-function)
-  :defun eldoc-box--get-frame
   :bind (("C-h C-k" . eldoc-box-quit-frame)
          ("C-h C-v" . my-scroll-eldoc-box-frame))
+  :defvar (eldoc-box--buffer
+           eldoc-box-clear-with-C-g
+           eldoc-box-max-pixel-width)
   :custom (;; (eldoc-box-fringe-use-same-bg . nil)
            (eldoc-box-cleanup-interval . 30)
            (eldoc-box-clear-with-C-g . t))
