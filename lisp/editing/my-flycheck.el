@@ -50,9 +50,10 @@
 
 The CMD ignoring embarks args.  CMD must be a symbol"
       (let ((name (string-trim (format "%s" cmd) "'")))
-        `(defun ,(intern (concat "my-embark-" name)) ()
+        `(defun ,(intern (concat "my-embark-" name)) (x)
            ,(format "My wrapper over `%s' to be an embark action." name)
-           (call-interactively ',(intern name))))))
+           (and x
+                (call-interactively ',(intern name)))))))
 
   (defvar-keymap my-embark-flycheck-map
     :doc "Keymap for Embark actions on `flycheck' diagnostics."
