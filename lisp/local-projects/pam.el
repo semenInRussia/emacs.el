@@ -101,9 +101,9 @@ you can redefine `pam--autoloads-file' with `advice'"
     pam--save-pkg-autoloads)
   "Abnormal hook run after building a package with `pam-use-package'.
 
-Each hook function is called with the name of the package as a
-string.  For forward compatibility, it should accept and ignore
-additional arguments.
+Each hook function is called with the name of the package as a string.
+For forward compatibility, it should accept and ignore additional
+arguments.
 
 Defaults to 2 functions:
 1. that copies `straight' files into the `pam' build directory.
@@ -130,10 +130,11 @@ straight.el)")
      (let ((straight-use-package-post-build-functions
             (append
              straight-use-package-post-build-functions
-             ;; add specific functions which will be runned after build.  Here I
-             ;; don't use `add-hook' to the `straight' hooks, because the user
-             ;; should can to choose `straight-use-package' or `pam-use-package'
-             ;; and they should have the different behaviours.
+             ;; add specific functions which will be runned after
+             ;; build.  Here I don't use `add-hook' to the `straight'
+             ;; hooks, because the user should can to choose
+             ;; `straight-use-package' or `pam-use-package' and they
+             ;; should have the different behaviours.
              pam-post-build-functions)))
        ,@body)))
 
@@ -142,9 +143,9 @@ straight.el)")
 (define-minor-mode pam-install-everything-mode
   "Toggle should or shouldn't `pam' install new packages.
 
-With enabled this minor mode, `pam-use-package' will use `straight-use-package'
-to install a package while the default behaviour is do nothing because already
-all is installed"
+With enabled this minor mode, `pam-use-package' will use
+`straight-use-package' to install a package while the default
+behaviour is do nothing because already all is installed"
   :global t
   :init-value nil
   :variable pam-need-to-install-pkgs-p
@@ -214,14 +215,14 @@ directory and autoloads file with `pam-autoloads-filename'."
   "Rebuild the PACKAGE.
 
 The package is defined with PAKCAGE (see the `straight'
-documentation).  The difference with `straight-rebuild-package' is that after
-build files will be copied into the `pam' directory and autoloads file will be
-updated.  In other it is the same function PACKAGE and RECURSIVE will
-be passed to `straight-rebuild-package'
+documentation).  The difference with `straight-rebuild-package' is
+that after build files will be copied into the `pam' directory and
+autoloads file will be updated.  In other it is the same function
+PACKAGE and RECURSIVE will be passed to `straight-rebuild-package'
 
-Notice that while `pam-use-package' check the mode (install or only activate a
-package), but `pam-rebuild-package' don't it, because rebuild is a more concrete
-command."
+Notice that while `pam-use-package' check the mode (install or only
+activate a package), but `pam-rebuild-package' don't it, because
+rebuild is a more concrete command."
   (interactive (list
                 (completing-read "Which recipe to rebuild: "
                                  (pam--straight-packages))))
@@ -231,9 +232,9 @@ command."
 (defun pam-rebuild-all ()
   "Rebuild all installed packages.
 
-Notice that while `pam-use-package' check the mode (install or only activate a
-package), but `pam-rebuild-all' don't it, because rebuild is a more concrete
-command."
+Notice that while `pam-use-package' check the mode (install or only
+activate a package), but `pam-rebuild-all' don't it, because rebuild
+is a more concrete command."
   (interactive)
   (pam--with-straight-hooks
     (straight-rebuild-all)))
@@ -241,8 +242,9 @@ command."
 (defun pam-activate ()
   "Activate all installed `pam' packages.
 
-After that you can load any installed package with `require', `M-x' will show
-all commands of these packages, TeXinfo will be included in the manual."
+After that you can load any installed package with `require', `M-x'
+will show all commands of these packages, TeXinfo will be included in
+the manual."
   (interactive)
   (add-to-list 'load-path (pam--build-dir))
   (add-to-list 'Info-default-directory-list (pam--build-dir))
@@ -254,9 +256,9 @@ all commands of these packages, TeXinfo will be included in the manual."
 (defun pam-delete-package (pkg &optional update-autoloads)
   "Remove the PKG from the `pam' directory.
 
-If UPDATE-AUTOLOADS is non-nil, then update my-packages-autoloads.el, NOTE that
-is a heavy function which can take a time, because it update autoloads for EVERY
-package"
+If UPDATE-AUTOLOADS is non-nil, then update my-packages-autoloads.el,
+NOTE that is a heavy function which can take a time, because it update
+autoloads for EVERY package"
   (interactive
    (list
     (completing-read "Which package? " (pam--straight-packages))
@@ -271,10 +273,11 @@ package"
       (mapc #'delete-file))
     (when (file-exists-p build-dir)
       (delete-directory build-dir :recursive))
-    ;; update the autoloads file for EVERY package, because delete only the part
-    ;; of my-package-autoloads is hard, if you should delete some `pam'
-    ;; packages, call `pam-delete-package' some times and only after manually
-    ;; call `pam-update-all-packages-autoloads'
+    ;; update the autoloads file for EVERY package, because delete
+    ;; only the part of my-package-autoloads is hard, if you should
+    ;; delete some `pam' packages, call `pam-delete-package' some
+    ;; times and only after manually call
+    ;; `pam-update-all-packages-autoloads'
     (when update-autoloads
       (pam-update-all-packages-autoloads))))
 
@@ -317,11 +320,11 @@ Notice that it can take a long time."
 
 (defun pam--build-dir ()
   "Return the path to the directory where `pam' store all packages files."
-  ;; Yes, here I just return the value of a variable.
-  ;; It's better than a variable, because `straight' use variables to get paths
-  ;; and `pam' must use function `pam--autoloads-file' that return the path,
-  ;; user shouldn't guess: Is it function or variable?  Choice already happened:
-  ;; everywhere - function
+  ;; Yes, here I just return the value of a variable.  It's better
+  ;; than a variable, because `straight' use variables to get paths
+  ;; and `pam' must use function `pam--autoloads-file' that return the
+  ;; path, user shouldn't guess: Is it function or variable?  Choice
+  ;; already happened: everywhere - function
   pam-build-dir)
 
 (defun pam--autoloads-file ()
@@ -401,14 +404,14 @@ directories, instead of just replacing one with other"
 (defun pam--save-pkg-autoloads (pkg &optional _ignore)
   "Save all autoloads of `straight' built PKG into `pam' autoloads file.
 
-Notice that this function expect that PKG was already built, otherwise this
-function can do really strange things.
+Notice that this function expect that PKG was already built, otherwise
+this function can do really strange things.
 
-Also this function doesn't GENERATE autoloads for PKG, expected that `straight'
-already done it, here just save them.
+Also this function doesn't GENERATE autoloads for PKG, expected that
+`straight' already done it, here just save them.
 
-This is a hook for `straight-use-package-post-build-functions', but it still can
-be useful in other cases."
+This is a hook for `straight-use-package-post-build-functions', but it
+still can be useful in other cases."
   (with-temp-buffer
     ;; insert all autoloads files contents
     (dolist (file (cddr (directory-files (straight--build-dir pkg) 'full)))
