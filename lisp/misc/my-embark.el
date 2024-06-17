@@ -44,13 +44,6 @@
   ;; eval after `embark' was loaded
   :config
 
-  (eval-and-compile
-    (defun my--and-after (g f)
-      "Expand to d(x) = [g() f(x)]"
-      (lambda (x)
-        (funcall g)
-        (funcall f x))))
-
   (cl-flet ((op (g f)
 	            (lambda (x)
 		            (funcall g)
