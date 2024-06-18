@@ -60,6 +60,7 @@
 
 (leaf ligature
   :ensure t
+  :when (display-graphic-p)
   :require t
   :commands ligature-set-ligatures global-ligature-mode
   :config
