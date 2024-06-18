@@ -31,7 +31,7 @@
                                  org
                                  project
                                  seq
-                                 transient
+                                 ;; transient  ; `magit' require not built-in version
                                  xref)
     "List of packages which are already built-in Emacs.")
 
