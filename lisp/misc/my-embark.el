@@ -15,6 +15,8 @@
 (require 'my-leaf)
 (require 'dash)
 
+(defvar-local vertico--input nil)  ; needed for `embark--vertico-indicator'
+
 
 ;; TODO: put it to other more right place
 (put 'upcase-region 'disabled nil)
@@ -46,7 +48,7 @@
   :config
   (setq embark-indicators
         '(embark--vertico-indicator
-          embark-minimal-indicator  ; default is embark-mixed-indicator
+          embark-minimal-indicator ; default is embark-mixed-indicator
           embark-highlight-indicator
           embark-isearch-highlight-indicator))
 
