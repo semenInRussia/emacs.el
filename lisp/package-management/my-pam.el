@@ -21,17 +21,18 @@
 ;; When `straight' and `pam' install this packages it can install
 ;; `eglot' second time.  In this file I fix this problem
 
-(defvar my-built-in-packages '(eglot
-                               eldoc
+(defvar my-built-in-packages '(eldoc
+                               eglot
                                external-completion
                                flymake
+                               imenu
                                jsonrpc
+                               org
                                project
                                seq
                                transient
-                               imenu
                                xref)
-  "List of packages which alread built-in Emacs.")
+  "List of packages which are already built-in Emacs.")
 
 (defun my-pam-mark-built-ins ()
   "My mark all built-in packages as built-in for `straight' and `pam'."
@@ -47,6 +48,6 @@
               (let ((need-p (not pam-straight-already-loaded-p)))
                 (apply args)
                 (and need-p
-                     (my-pam-mark-built-in)))))
+                     (my-pam-mark-built-ins)))))
 
 ;;; my-pam.el ends here

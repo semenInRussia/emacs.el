@@ -14,7 +14,7 @@
 
 
 (leaf org
-  :ensure t
+  ;; :ensure t
   :defun (meow-insert . meow-command)
   :custom ((org-file-apps
             . '(("\\.\\'" . default)
