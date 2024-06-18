@@ -21,35 +21,37 @@
 ;; When `straight' and `pam' install this packages it can install
 ;; `eglot' second time.  In this file I fix this problem
 
-(defvar my-built-in-packages '(eldoc
-                               eglot
-                               external-completion
-                               flymake
-                               imenu
-                               jsonrpc
-                               org
-                               project
-                               seq
-                               transient
-                               xref)
-  "List of packages which are already built-in Emacs.")
+(eval-and-compile
+  (defvar my-built-in-packages '(eldoc
+                                 eglot
+                                 external-completion
+                                 flymake
+                                 imenu
+                                 jsonrpc
+                                 org
+                                 project
+                                 seq
+                                 transient
+                                 xref)
+    "List of packages which are already built-in Emacs.")
 
-(defun my-pam-mark-built-ins ()
-  "My mark all built-in packages as built-in for `straight' and `pam'."
-  (let ((xs my-built-in-packages))
-    (while xs
-      (message "Mark the package %s" (car xs))
-      (pam-use-package `(,(car xs)
-                         :type built-in))
-      (setq xs (cdr xs)))))
+  (defun my-pam-mark-built-ins ()
+    "My mark all built-in packages as built-in for `straight' and `pam'."
+    (let ((xs my-built-in-packages))
+      (while xs
+        (message "Mark the package %s" (car xs))
+        (pam-use-package `(,(car xs)
+                           :type built-in))
+        (setq xs (cdr xs)))))
 
-(with-eval-after-load 'pam
-  (advice-add 'pam--load-straight
-              :around
-              (defun my-pam-maybe-mark-built-ins (&rest args)
-                (let ((need-p (not pam-straight-already-loaded-p)))
-                  (apply args)
-                  (and need-p
-                       (my-pam-mark-built-ins))))))
+  (with-eval-after-load 'pam
+    (advice-add 'pam--load-straight
+                :around
+                (defun my-pam-maybe-mark-built-ins (&rest args)
+                  (let ((need-p (not pam-straight-already-loaded-p)))
+                    (apply args)
+                    (and need-p
+                         (my-pam-mark-built-ins)))))))
 
 ;;; my-pam.el ends here
+(provide 'my-pam)
