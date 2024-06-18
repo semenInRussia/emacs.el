@@ -24,9 +24,68 @@
 
 ;;; Code:
 
-(require 'org)
 (require 'just)
+(require 'org)
 
+(declare-function meow-insert-mode "meow")
+(declare-function repeat-at-last-keystroke "my-lib")
+
+;;; URL functions
+
+(defvar my-url-prefixes
+  '("https://" "http://" "ftp://" "file://")
+  "List of the prefixes, which indicates that is URL.")
+
+(defun my-uri-of-url (url)
+  "Get the URI of URL."
+  (or
+   (-some->> url
+     (s-chop-prefixes my-url-prefixes)
+     (s-split "/")
+     ;; ensure that has some URL parts, otherwise return nil
+     cdr
+     -last-item
+     (s-split "?")
+     car)
+   ""))
+
+(defun my-url-p (str)
+  "Return non-nil, if STR is URL."
+  (--some (s-prefix-p it str) my-url-prefixes))
+
+(defun my-read-image-url ()
+  "Read the URL of a image from the user.
+
+If copied text is a URL, then return.  If region is active, then return a text
+in the region.  Otherwise, read a URL from the minibuffer."
+  (or (my-url-from-kill-ring)
+      (just-text-in-region)
+      (read-string "Enter URL for image, please: ")))
+
+(defun my-read-url ()
+  "Read the URL of from the user.
+
+If copied text is a URL, then return.  If region is active, then return a text
+in the region.  Otherwise, read a URL from the minibuffer."
+  (or (my-url-from-kill-ring)
+      (just-text-in-region)
+      (read-string "URL, please: ")))
+
+(defun my-url-from-kill-ring ()
+  "If the last element of the kill ring is a URL, get it, otherwise get nil."
+  (let ((copied (current-kill 0)))
+    (and (my-url-p copied) copied)))
+
+(defun my-read-string-or-nil
+    (prompt &optional initial-input history default-value inherit-input-method)
+  "Read string from the minibuffer, if the user type nothing, return nil.
+
+Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
+`read-string'"
+  (let ((input
+         (read-string prompt initial-input history default-value
+                      inherit-input-method)))
+    (unless (s-blank-p input) input)))
 
 ;;;###autoload
 (defun my-org-clear-subtree ()
