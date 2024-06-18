@@ -11,6 +11,7 @@
 
 ;;; Code:
 
+;;;###autoload
 (defun my-dark-theme ()
   "Load dark theme."
   (interactive)

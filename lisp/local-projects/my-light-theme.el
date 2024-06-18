@@ -11,6 +11,7 @@
 
 ;;; Code:
 
+;;;###autoload
 (defun my-light-theme ()
   "Load light theme."
   (interactive)

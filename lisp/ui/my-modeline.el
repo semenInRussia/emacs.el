@@ -55,12 +55,7 @@
   ;; I need only to time (not date) in 24hour format
   (defvar display-time-format) ;; make compile happy
   (setq display-time-format "%H:%M")
-
-  (advice-add 'toggle-frame-fullscreen
-              :after
-              (defun my-toggle-display-time-mode (&rest args)
-                (ignore args)
-                (display-time-mode 'toggle)))
+  (display-time-mode t)
 
   ;; disable show line and column numbers in modeline, because it only
   ;; take off extra place
