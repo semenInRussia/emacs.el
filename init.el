@@ -45,6 +45,8 @@
 
 ;;; Handle --local-projects flag
 
+(message "args is %s" command-line-args)
+
 ;; byte-compile local-projects and generate autoloads
 (when (member "--local-projects" command-line-args)
   ;; generate autoloads
@@ -65,8 +67,7 @@
   (add-to-list 'load-path (locate-user-emacs-file "lisp/"))
   (add-to-list 'load-path (locate-user-emacs-file "lisp/package-management/"))
   (add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects"))
-  (load (locate-user-emacs-file "lisp/local-projects/my-autoload") :noerror :nomessage)
-  )
+  (load (locate-user-emacs-file "lisp/local-projects/my-autoload") :noerror :nomessage))
 
 ;; the function `my-require-times' to check init time for every Emacs
 ;; module (access via SPC e t)
@@ -88,8 +89,9 @@
 ;;
 ;; This optimization matters for Windows, where slow IO
 ;;
-;; NOTE: amount of the directories in the `load-path' depends on amount of the
-;;   packages and their dependencies (if you use straight)
+;; NOTE: amount of the directories in the `load-path' depends on
+;;   amount of the packages and their dependencies (if you use
+;;   straight)
 (require 'pam)
 (pam-activate)
 
@@ -97,8 +99,8 @@
 
 ;; generate and byte-compile my-modules.el
 ;;
-;; NOTE: I do it after local-projects, because `my-build-config' is a local
-;; project too
+;; NOTE: I do it after local-projects, because `my-build-config' is a
+;; local project too
 (declare-function my-build-config "my-build-config.el")
 (when (member "--modules" command-line-args)
   (require 'my-build-config)
@@ -106,8 +108,8 @@
 
 ;;; don't use init.el for custom.el which I don't use
 ;;
-;; in the most of configurations, after it Emacs load custom.el, but I fount it
-;; a bit useless.  I prefer `setq' over `custom'
+;; in the most of configurations, after it Emacs load custom.el, but I
+;; fount it a bit useless.  I prefer `setq' over `custom'
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
 ;; some useful macros
