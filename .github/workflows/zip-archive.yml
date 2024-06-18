@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Do a First Emacs Call
-        run: emacs -batch -l init.el --install --local-projets --modules
+        run: emacs -batch -l init.el --install --local-projects --modules
 
       - name: Byte-Compile init.el
         run: emacs --batch --eval '(byte-compile-file "init.el")'
