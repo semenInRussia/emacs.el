@@ -50,12 +50,8 @@
   ;; generate autoloads
   (loaddefs-generate (locate-user-emacs-file "lisp/local-projects")
                      (locate-user-emacs-file "lisp/local-projects/my-autoload.el"))
-  ;; byte-compile every file from the "local-projects" dir (including autoloads
-  ;; file)
-  (dolist (file (directory-files (locate-user-emacs-file "lisp/local-projects/")
-                                 'full
-                                 ".*\\.el$"))
-    (byte-compile-file file)))
+  ;; also I byte-compile them after load `my-modules'
+  )
 
 ;;; Local Projects
 ;; It is my own small "packages" which aren't so big to create real packages
@@ -166,6 +162,16 @@ Byte-compile every file of local-projects and generate autoloads file"
       (load-rep-load-file-rep-suffixes '(""))
       (auto-mode-case-fold nil))
   (require 'my-modules))
+
+
+;; Handle --local-projects flag. Part 2: byte-compile all
+(when (member "--local-projects" command-line-args)
+  ;; byte-compile every file from the "local-projects" dir (including autoloads
+  ;; file)
+  (dolist (file (directory-files (locate-user-emacs-file "lisp/local-projects/")
+                                 'full
+                                 ".*\\.el$"))
+    (byte-compile-file file)))
 
 (put 'narrow-to-region 'disabled nil)
 
