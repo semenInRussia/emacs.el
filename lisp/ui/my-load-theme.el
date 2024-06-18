@@ -36,38 +36,18 @@
 
 (require 'my-leaf)
 
-
 (setq font-lock-maximum-decoration t)
+(leaf doom-themes :ensure t)
+(leaf gruber-darker-theme :ensure t)
+(leaf monokai-theme :ensure t)
 
-(leaf doom-themes
-  :ensure t
-  :custom ((doom-themes-enable-italic . t)
-           (doom-themes-padded-modeline . nil)
-           (doom-themes-enable-bold . t)))
+;; (leaf modus-themes
+;;   :custom ((modus-themes-bold-constructs . t)
+;;            (modus-themes-italic-constructs . t)))
 
-(leaf gruber-darker-theme
-  :ensure t)
-
-(leaf monokai-theme
-  :ensure t)
-
-(leaf modus-themes
-  :custom ((modus-themes-bold-constructs . t)
-           (modus-themes-italic-constructs . t)))
-
-(leaf ef-themes
-  :ensure t
-  :config (global-hl-line-mode))
-
-(leaf flatland-theme
-  :ensure t
-  :custom-face ((sml-modeline-end-face . '((t :inherit default :border nil)))))
-
-(leaf cherry-blossom-theme
-  :ensure t)
-
-(leaf gruvbox-theme
-  :ensure t)
+(leaf ef-themes :ensure t)
+(leaf flatland-theme :ensure t)
+(leaf gruvbox-theme :ensure t)
 
 (leaf os1-theme
   :ensure (os1-theme
@@ -90,7 +70,6 @@
 (add-hook 'after-init-hook my-theme-func -90)
 (when (functionp my-theme-func)
   (funcall my-theme-func))
-
 
 (provide 'my-load-theme)
 ;;; my-load-theme.el ends here

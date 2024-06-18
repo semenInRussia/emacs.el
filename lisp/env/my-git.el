@@ -26,8 +26,7 @@
   (with-eval-after-load 'project
     (add-to-list 'project-switch-commands '(magit-project-status "Magit") t)
     (keymap-set project-prefix-map "m" 'magit-project-status))
-  :config
-  (add-hook 'magit-mode-hook #'hl-line-mode))
+  :config (add-hook 'magit-mode-hook #'hl-line-mode))
 
 (leaf git-timemachine
   :ensure (git-timemachine :repo "pidu/git-timemachine" :host gitlab))

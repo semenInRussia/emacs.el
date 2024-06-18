@@ -40,7 +40,6 @@
     :ensure (just :host github :repo "semenInRussia/just.el")
     :require t)
 
-  (leaf indicators :ensure t)
   (leaf svg-lib :ensure t))
 
 (provide 'my-libs)

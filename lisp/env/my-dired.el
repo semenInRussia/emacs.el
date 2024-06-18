@@ -68,30 +68,6 @@
   (leaf dired-hacks-utils
     :ensure t)
 
-  ;; open PDF and other not in Emacs
-  (leaf dired-open
-    :ensure t
-    :bind (:dired-mode-map
-           :package dired
-           ("RET" . 'dired-open-file))
-    :defvar dired-open-functions
-    :push ((dired-open-functions . 'my-dired-open-function-pdf))
-    :defun (my-dired . (my-pdf-file-p my-try-open-pdf-file))
-    :config
-    (defun my-dired-open-function-pdf ()
-      "Open function for `dired-open-functions'."
-      (my-try-open-pdf-file (dired-get-file-for-visit)))
-
-    (defun my-try-open-pdf-file (filename)
-      "If file at FILENAME is a pdf file, then open as pdf, other return nil."
-      (when (my-pdf-file-p filename)
-        (embark-open-externally filename)
-        t))
-
-    (defun my-pdf-file-p (filename)
-      "Return t, when FILENAME is path to a PDF file."
-      (s-suffix-p ".pdf" filename)))
-
   ;; show directories with 1 file
   ;;
   ;; it be like "a/b.txt", instead of just "a"

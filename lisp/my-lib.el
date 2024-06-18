@@ -6,10 +6,6 @@
 
 ;;; Code:
 
-(declare-function sp-get-enclosing-sexp "smartparens")
-(declare-function sp-get-sexp "smartparens")
-(declare-function sp-get "smartparens")
-
 (require 'dash)
 (require 'f)
 (require 's)
