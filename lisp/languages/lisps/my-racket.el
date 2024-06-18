@@ -1,6 +1,6 @@
 ;;; my-racket.el --- My Configuration For The Lanugage `racket'
 
-;; Copyright (C) 2022 semenInRussia
+;; Copyright (C) 2022-2024 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
@@ -33,6 +33,10 @@
 (require 'smartparens)
 
 (declare-function my-autoformat-bind-for-major-mode "my-autoformat")
+(declare-function my-in-lisp-sexp-p "my-parens")
+(declare-function my-goto-lisp-sexp-begin "my-parens")
+(declare-function my-goto-lisp-sexp-end "my-parens")
+(declare-function my-mark-lisp-sexp-inner "my-parens")
 
 
 (leaf racket-mode
