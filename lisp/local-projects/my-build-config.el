@@ -30,6 +30,7 @@
 
 (defvar my-modules-el-file (locate-user-emacs-file "dist/my-modules.el"))
 (defvar my-config-modules-prefix (locate-user-emacs-file "lisp/"))
+(defvar my-local-projcets-autoloads-file (locate-user-emacs-file "lisp/local-projects/my-autoload.el"))
 
 
 (defvar my-modules-order
@@ -115,6 +116,18 @@
 (defun my-join-modules (dest)
   "Join all configuration modules into one file with DEST filename."
   (with-temp-buffer
+    ;; autoloads for local-projects
+    (insert "(with-no-warnings")
+    (insert-file-contents my-local-projcets-autoloads-file)
+    (goto-char (point-max))
+    (insert ")")
+    (replace-string-in-region "no-byte-compile: t"
+                              "no-byte-compile: nil"
+                              (point-min) (point-max))
+    (replace-string-in-region "no-native-compile: t"
+                              "no-native-compile: nil"
+                              (point-min) (point-max))
+    ;;
     (mapc 'insert-file-contents (nreverse (my-all-modules-files)))
     (goto-char (point-max))
     (replace-regexp-in-region "^(provide 'my-[a-zA-Z-]*?)" "\n"

@@ -65,7 +65,9 @@
   (add-to-list 'load-path (locate-user-emacs-file "lisp/"))
   (add-to-list 'load-path (locate-user-emacs-file "lisp/package-management/"))
   (add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects"))
-  (load (locate-user-emacs-file "lisp/local-projects/my-autoload") :noerror :nomessage))
+  ;; load local-projects inside `my-modules'
+  ;; (load (locate-user-emacs-file "lisp/local-projects/my-autoload") :noerror :nomessage)
+  )
 
 ;; the function `my-require-times' to check init time for every Emacs
 ;; module (access via SPC e t)
