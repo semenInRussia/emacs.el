@@ -6,8 +6,8 @@
 ;;; Commentary:
 
 ;; Sometimes I need to dark-theme, then I replace `my-light-theme'
-;; with `my-dark-theme' inside `my-load-theme'.  Configuration for
-;; the editor view (dark theme)
+;; with `my-dark-theme' inside `my-load-theme'.  Configuration for the
+;; editor view (dark theme)
 
 ;;; Code:
 
@@ -15,7 +15,7 @@
   "Load dark theme."
   (interactive)
   (load-theme 'doom-1337 :no-confirm)
-  (custom-set-faces
+  (custom-theme-set-faces 'doom-1337
    ;; selected text with more light bg
    '(region ((t :background "#557")))
    '(secondary-selection ((t :background "#337")))
