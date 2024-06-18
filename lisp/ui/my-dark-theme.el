@@ -15,7 +15,8 @@
   "Load dark theme."
   (interactive)
   (load-theme 'doom-1337 :no-confirm)
-  (custom-theme-set-faces 'doom-1337
+  (custom-set-faces
+   ;; 'doom-1337
    ;; selected text with more light bg
    '(region ((t :background "#557")))
    '(secondary-selection ((t :background "#337")))
