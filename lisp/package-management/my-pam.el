@@ -38,16 +38,18 @@
   "My mark all built-in packages as built-in for `straight' and `pam'."
   (let ((xs my-built-in-packages))
     (while xs
+      (message "Mark the package %s" (car xs))
       (pam-use-package `(,(car xs)
                          :type built-in))
       (setq xs (cdr xs)))))
 
-(advice-add 'pam--load-straight
-            :around
-            (defun my-pam-maybe-mark-built-ins (&rest args)
-              (let ((need-p (not pam-straight-already-loaded-p)))
-                (apply args)
-                (and need-p
-                     (my-pam-mark-built-ins)))))
+(with-eval-after-load 'pam
+  (advice-add 'pam--load-straight
+              :around
+              (defun my-pam-maybe-mark-built-ins (&rest args)
+                (let ((need-p (not pam-straight-already-loaded-p)))
+                  (apply args)
+                  (and need-p
+                       (my-pam-mark-built-ins))))))
 
 ;;; my-pam.el ends here
