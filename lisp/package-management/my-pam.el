@@ -1,0 +1,52 @@
+;;; my-pam.el --- My configuration of pam -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2024 semenInRussia
+
+;; Author: semenInRussia <hrams205@gmail.com>
+;; Version: 0.1
+;; Homepage: https://github.com/semeninrussia/emacs.el
+
+;;; Commentary:
+
+;; My configuration of `pam': my own small package manager built over
+;; `straight'.
+
+;;; Code:
+
+(require 'leaf)
+
+;; Some packages can depended on the packages which already installed
+;; into Emacs.  (see `consult-eglot')
+;;
+;; When `straight' and `pam' install this packages it can install
+;; `eglot' second time.  In this file I fix this problem
+
+(defvar my-built-in-packages '(eglot
+                               eldoc
+                               external-completion
+                               flymake
+                               jsonrpc
+                               project
+                               seq
+                               transient
+                               imenu
+                               xref)
+  "List of packages which alread built-in Emacs.")
+
+(defun my-pam-mark-built-ins ()
+  "My mark all built-in packages as built-in for `straight' and `pam'."
+  (let ((xs my-built-in-packages))
+    (while xs
+      (pam-use-package `(,(car xs)
+                         :type built-in))
+      (setq xs (cdr xs)))))
+
+(advice-add 'pam--load-straight
+            :around
+            (defun my-pam-maybe-mark-built-ins (&rest args)
+              (let ((need-p (not pam-straight-already-loaded-p)))
+                (apply args)
+                (and need-p
+                     (my-pam-mark-built-in)))))
+
+;;; my-pam.el ends here
