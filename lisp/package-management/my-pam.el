@@ -13,7 +13,6 @@
 
 ;;; Code:
 
-(require 'leaf)
 (require 'pam)
 
 ;; Some packages can depended on the packages which already installed
