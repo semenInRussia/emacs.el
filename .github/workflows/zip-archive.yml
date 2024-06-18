@@ -14,14 +14,14 @@ jobs:
       - name: Clone the Config
         uses: actions/checkout@v3
 
+      - name: Do a First Emacs Call
+        run: emacs -batch -l init.el --install --local-projets --modules
+
       - name: Byte-Compile init.el
         run: emacs --batch --eval '(byte-compile-file "init.el")'
 
       - name: ... and early-init.el
         run: emacs --batch --eval '(byte-compile-file "early-init.el")'
-
-      - name: Do a First Emacs Call
-        run: emacs -batch -l init.el --install --local-projets --modules
 
       - name: Create the Archive from Generated Files
         run: zip -r semacs.zip doc lisp pam cows dist init.el init.elc early-init.el early-init.elc small-init.el README.org snippets .git .gitignore .github
