@@ -78,22 +78,15 @@
       (lambda (regexp) (string-match-p regexp filename))
       my-modules-files-ignore-regexps))))
 
-(defmacro my-remove-from (var elt)
-  "Remove an ELT from the list at VAR.
-The same to
-\(setq var (remove elt var))"
-  `(setq ,var (remove ,elt ,var)))
-
 (defun my-all-modules-files ()
   "Return list of all modules filenames using `my-modules-order'."
   (let ((order (mapcar
                 (lambda (it) (concat my-config-modules-prefix it))
                 my-modules-order))
-        order-item
         (files (cl-remove-if
                 #'my-file-igored-as-module-p
                 (directory-files-recursively (locate-user-emacs-file "lisp") "my-.*\\.el$" nil)))
-        f
+        f order-item
         sorted)
     (while order
       (setq order-item (car order))
