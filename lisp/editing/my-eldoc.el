@@ -79,6 +79,7 @@
 
 ;;; use beautifull documentation popup
 (leaf eldoc
+  :ensure (eldoc :type built-in)
   :custom (eldoc-idle-delay . 1.0))
 
 (leaf eldoc-box

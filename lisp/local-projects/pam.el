@@ -513,7 +513,7 @@ This is a file where `pam' stored all autoloads of every package."
                    (expand-file-name target-file))))
             (if byte-native-compiling
                 ;; Defer elc production.
-                (setf byte-to-native-output-buffer-file
+                (setq byte-to-native-output-buffer-file
                       (cons (current-buffer) target-file))
               (byte-write-target-file (current-buffer) target-file))
             (or noninteractive
