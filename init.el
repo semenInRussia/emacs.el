@@ -45,11 +45,8 @@
 
 ;;; Handle --local-projects flag
 
-(message "args is %s" command-line-args)
-
 ;; byte-compile local-projects and generate autoloads
 (when (member "--local-projects" command-line-args)
-  (message "generate autoloads")
   ;; generate autoloads
   (loaddefs-generate (locate-user-emacs-file "lisp/local-projects")
                      (locate-user-emacs-file "lisp/local-projects/my-autoload.el"))
