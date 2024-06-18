@@ -16,7 +16,7 @@
                      :repo "semenInRussia/emacs-kinopoisk"
                      :files ("*.el" "extensions/*.el")))
 
-(pam-use-package 'helm)
+(pam-use-package 'helm-core)
 
 
 ;;; my-kinopoisk.el ends here
