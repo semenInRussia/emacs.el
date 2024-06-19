@@ -12,7 +12,8 @@
 
 (leaf which-key
   :ensure t
-  :global-minor-mode which-key-mode
+  :global-minor-mode t
+  :custom ((which-key-show-transient-maps . t))
   :defun which-key-setup-side-window-bottom
   :config (which-key-setup-side-window-bottom))
 

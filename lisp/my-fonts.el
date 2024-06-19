@@ -1,13 +1,8 @@
 ;;; my-fonts.el --- My configuration for fonts
-
 ;; Copyright (C) 2022-2024 semenInRussia
-
 ;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
 
 ;;; Commentary:
-
 ;; My configuration for fonts
 
 ;;; Code:
@@ -38,7 +33,7 @@
 
 (when (and (display-graphic-p)
            (not (assoc 'font default-frame-alist)))
-  (let ((font (cl-find-if #'font-installed-p my-fonts-main)))
+  (let ((font (seq-find #'font-installed-p my-fonts-main)))
     (setf (alist-get 'font default-frame-alist)
           (format "%s-%s" font my-fonts-size))))
 

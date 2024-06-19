@@ -48,7 +48,6 @@
     transient
     magit-base
     magit-git
-    add-log
     pcvs-util
     gmm-utils
     mail-utils
@@ -71,8 +70,10 @@
     org-cycle
     ;; snippets
     yasnippet
+    ;; perspectives
+    persp-mode
     ;; my translator
-    go-translate
+    google-translate
     ;; run-command
     run-command)
   "This is the list of modules which should be loaded after some seconds of AFK.

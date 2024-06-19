@@ -12,8 +12,7 @@
 
 ;;; Code:
 
-(require 'leaf)
-
+(require 'my-leaf)
 
 (defvar my-enchant-executable "enchant" "A path to executable of the Enchant program.")
 
@@ -23,9 +22,10 @@
   :when (and
          (executable-find "enchant-2")
          (seq-find #'executable-find '("gcc" "clang" "cc")))
-  :bind (:meow-normal-state-keymap
-         :package meow-core
-         ("$" . jinx-correct))
-  :hook (text-mode-hook prog-mode-hook))
+  :bind (("M-$" . jinx-correct)
+         (:meow-normal-state-keymap
+          :package meow-core
+          ("$" . jinx-correct)))
+  :hook text-mode-hook prog-mode-hook)
 
 ;;; my-jinx.el ends here
