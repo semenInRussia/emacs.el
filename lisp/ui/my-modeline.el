@@ -10,8 +10,15 @@
 
 ;; I don't use `doom-modeline-env'
 (defvar my-dont-load-them)  ; make byte-compiler happy
-(puthash 'doom-modeline-env t my-dont-load-them)
 (add-hook 'after-init-hook 'doom-modeline-mode -100)
+(advice-add 'require
+            :around
+            (defun my-dont-modeline-env (&rest r)
+              "Don't load `doom-modeline-env'."
+              (interactive "P")
+              (if (eq (nth 1 r) 'doom-modeline-env)
+                  t
+                (apply r))))
 
 
 (leaf doom-modeline
