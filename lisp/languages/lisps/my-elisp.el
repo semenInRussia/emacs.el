@@ -1,30 +1,20 @@
 ;;; my-elisp.el --- My configuration of the elisp
-
 ;; Copyright (C) 2022-2024 semenInRussia
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-
 ;; My configuration of the `emacs-lisp-mode'
 
 ;;; Code:
-
-(require 'my-leaf)
-
-(require 's)
 (require 'dash)
+(require 'my-leaf)
+(require 's)
 
 (leaf elisp-mode
   :config
-  (add-hook 'emacs-lisp-mode-hook 'paxedit-mode)
-  (add-hook 'emacs-lisp-mode-hook
-            (defun my-elisp-load-smartparens ()
-              ;; from local-projects
-              (require 'my-elisp-smartparens)
-              (remove-hook 'emacs-lisp-mode-hook 'my-elisp-load-smartparens)))
-
+  (require 'my-elisp-smartparens) ; from local-projects
   (leaf inspector
     :ensure (inspector :repo "emacs-straight/inspector" :host github)
     :bind (:emacs-lisp-mode-map
@@ -32,21 +22,22 @@
            ("C-c C-i" . inspector-inspect-last-sexp)))
 
   (leaf paredit
-    :ensure (paredit :repo "https://mumble.net/~campbell/git/paredit.git" :host nil)
+    :ensure t
     :hook emacs-lisp-mode-hook)
 
   (leaf eros
-    :ensure (eros :repo "xiongtx/eros" :host github)
+    :ensure t
     :bind (([remap eval-last-sexp] . #'eros-eval-last-sexp)
-           ([remap eval-defun] . #'eros-eval-defun))
-    :config (add-hook 'emacs-lisp-mode-hook 'eros-mode))
+           ([remap eval-defun] . #'eros-eval-defun)))
 
   (leaf elisp-refs
     :ensure t)
 
   ;; my small package to insert a new struct field at M-ret
   (leaf my-elisp-class-bindings
-    :bind ("M-RET" . my-elisp-new-field-of-class)))
+    :bind (:emacs-lisp-mode-map
+           :package elisp-mode
+           ("M-RET" . my-elisp-new-field-of-class))))
 
 (leaf suggest
   :ensure (suggest :repo "Wilfred/suggest.el" :host github))
@@ -55,9 +46,7 @@
   :ensure (mocker :repo "sigma/mocker.el" :host github)
   :doc "A library for testing `elisp' with mocks")
 
-(leaf my-reload
-  :hook emacs-lisp-mode-hook)
-
+(leaf my-reload :hook emacs-lisp-mode-hook)
 (leaf my-elisp-embrace
   :hook (emacs-lisp-mode-hook . my-embrace-emacs-lisp-mode-hook))
 
