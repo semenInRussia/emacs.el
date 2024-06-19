@@ -32,8 +32,8 @@
     dired
     ;; I use `ace-window' (alternative to C-x o) in 100% of cases.
     ;; I don't need to wait 1-2secs before it.
-    avy        ; dep
     ace-window
+    my-window-funcs
     ;; lsp server (`eglot')
     imenu
     ert
