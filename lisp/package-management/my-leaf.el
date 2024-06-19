@@ -18,6 +18,7 @@
   ;; it's important, because the rest config use `leaf' macro
   (pam-use-package 'leaf)
   (pam-use-package 'leaf-keywords)
+  (autoload 'leaf-keywords-handler-mode-hook "leaf-keywords")
   (require 'leaf)
   (defmacro leaf-key (key command &optional keymap)
     (let* ((key*     (eval key))
