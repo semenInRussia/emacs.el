@@ -22,38 +22,35 @@
   (end-of-line)
   (delete-horizontal-space t))
 
-(defvar yank-advised-indent-threshold 1000
-  "Threshold (# chars) over which indentation does not automatically occur.")
+(setf
+ ;; Don't resize the frames in steps; it looks weird, especially in tiling window
+ ;; managers, where it can leave unseemly gaps.
+ frame-resize-pixelwise t
+ ;; Inhibit resizing frame
+ frame-inhibit-implied-resize t
+ ;; But do not resize windows pixelwise, this can cause crashes in some cases
+ ;; when resizing too many windows at once or rapidly.
+ window-resize-pixelwise nil
+ (alist-get 'width default-frame-alist) (car my-layout-size)
+ (alist-get 'height default-frame-alist) (cdr my-layout-size)
+ (alist-get 'width initial-frame-alist) (car my-layout-size)
+ (alist-get 'height initial-frame-alist) (cdr my-layout-size)
 
-(defun yank-advised-indent-function (beg end)
-  "Do indentation, as long as the region beetween BEG END isn't too large."
-  (when (<= (- end beg) yank-advised-indent-threshold)
-    (indent-region beg end nil)))
+ ;; don't use the system title bar
+ frame-title-format '(buffer-file-name "%f" ("%b"))
+ (alist-get 'undecorated default-frame-alist) t
+ (alist-get 'drag-internal-border default-frame-alist) 1
+ (alist-get 'internal-border-width default-frame-alist) 5)
 
-(defadvice yank (after yank-indent activate)
-  "Indent yanked text.
-With prefix arg don't indent."
-  (if (not (ad-get-arg 0))
-      (let ((transient-mark-mode nil))
-        (yank-advised-indent-function
-         (region-beginning)
-         (region-end)))))
+(leaf yank-indent
+  :ensure (yank-indent :repo "jimeh/yank-indent" :host github))
 
-(defadvice yank-pop (after yank-pop-indent activate)
-  "Indent yanked text.
-With prefix arg don't indent."
-  (if (not (ad-get-arg 0))
-      (let ((transient-mark-mode nil))
-        (yank-advised-indent-function
-         (region-beginning)
-         (region-end)))))
-
-(defvar w32-apps-modifier)
 (defvar w32-pass-lwindow-to-system)
 (defvar w32-lwindow-modifier)
 (defvar w32-pass-rwindow-to-system)
 (defvar w32-rwindow-modifier)
 (defvar w32-pass-apps-to-system)
+(defvar w32-apps-modifier)
 
 ;; make PC keyboard's Win key or other to type Super or Hyper, for emacs running on Windows.
 (when (eq system-type 'windows-nt)

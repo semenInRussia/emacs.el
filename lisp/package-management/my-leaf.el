@@ -419,17 +419,17 @@
                      `(advice-add ,@elm))
                    (car leaf--value))
                 ,@leaf--body))
-            :advice-remove
-            (progn
-              (leaf-register-autoload
-               (cadr leaf--value)
-               leaf--name)
-              `(,@(mapcar
-                   (lambda
-                     (elm)
-                     `(advice-remove ,@elm))
-                   (car leaf--value))
-                ,@leaf--body))
+            ;; :advice-remove
+            ;; (progn
+            ;;   (leaf-register-autoload
+            ;;    (cadr leaf--value)
+            ;;    leaf--name)
+            ;;   `(,@(mapcar
+            ;;        (lambda
+            ;;          (elm)
+            ;;          `(advice-remove ,@elm))
+            ;;        (car leaf--value))
+            ;;     ,@leaf--body))
             :pre-setq
             `((with-no-warnings ;; with-no-warnings added with me
                 ,@(mapcar
@@ -455,15 +455,15 @@
                           ,(car elm)))
                  leaf--value)
               ,@leaf--body)
-            :pl-pre-setq
-            `(,@(mapcar
-                 (lambda
-                   (elm)
-                   `(setq ,(car elm)
-                          (leaf-handler-auth ,leaf--name ,(car elm)
-                                             ,(cdr elm))))
-                 leaf--value)
-              ,@leaf--body)
+            ;; :pl-pre-setq
+            ;; `(,@(mapcar
+            ;;      (lambda
+            ;;        (elm)
+            ;;        `(setq ,(car elm)
+            ;;               (leaf-handler-auth ,leaf--name ,(car elm)
+            ;;                                  ,(cdr elm))))
+            ;;      leaf--value)
+            ;;   ,@leaf--body)
             ;; :auth-pre-setq
             ;; `(,@(mapcar
             ;;      (lambda

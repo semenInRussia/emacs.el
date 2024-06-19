@@ -39,9 +39,7 @@
     "My mark all built-in packages as built-in for `straight' and `pam'."
     (let ((xs my-built-in-packages))
       (while xs
-        (message "Mark the package %s" (car xs))
-        (pam-use-package `(,(car xs)
-                           :type built-in))
+        (pam-use-package `(,(car xs) :type built-in))
         (setq xs (cdr xs)))))
 
   (with-eval-after-load 'pam

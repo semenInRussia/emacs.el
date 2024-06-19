@@ -18,8 +18,6 @@
   :ensure t
   :custom ((dumb-jump-prefer-searcher dumb-jump-force-searcher)
            . 'rg)
-  :bind (("M-," . xref-go-back)
-         ("M-." . xref-find-definitions))
   :hook (xref-backend-functions . dumb-jump-xref-activate))
 
 (provide 'my-dumb-jump)

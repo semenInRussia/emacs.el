@@ -32,14 +32,10 @@
   :ensure (git-timemachine :repo "pidu/git-timemachine" :host gitlab))
 
 (leaf git-modes
-  :ensure (git-modes :repo "magit/git-modes" :host github))
+  :ensure t)
 
 (leaf gitignore-templates
   :ensure t)
-
-(leaf github-clone
-  :ensure (github-clone :repo "dgtized/github-clone.el" :host github)
-  :custom (github-clone-directory . "~/projects"))
 
 (provide 'my-git)
 ;;; my-git.el ends here

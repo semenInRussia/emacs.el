@@ -166,8 +166,10 @@
 
   (my-meow-setup)
 
-  (defalias #'meow--fix-thing-selection-mark
-    (apply-partially #'nth 2))
+  (advice-add #'meow--fix-thing-selection-mark
+              :override
+              (defun my-meow--selmark (_thing _pos mark)
+                mark))
 
   ;; jump to source
   ;;

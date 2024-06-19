@@ -21,11 +21,8 @@
 (eval-and-compile
   ;; `eval-and-compile' installs all libraries in compile-time
   ;; , so "(require \\='dash)" compiles successufelly
-  (leaf seq
-    :ensure (seq :type built-in))
-
   (leaf dash
-    :ensure (dash :repo "magnars/dash.el" :host github)
+    :ensure t
     :require t)
 
   (leaf s
