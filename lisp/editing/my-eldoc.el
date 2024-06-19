@@ -73,14 +73,14 @@
   "Prefer `eldoc' over the echo area for `flycheck'."
   (interactive)
   (add-hook 'eldoc-documentation-functions #'my-flycheck-eldoc nil t)
-  (setq eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
-  (setq flycheck-display-errors-function nil)
-  (setq flycheck-help-echo-function nil))
+  (setq eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly
+        flycheck-display-errors-function nil
+        flycheck-help-echo-function nil))
 
-;;; use beautifull documentation popup
+;;; use beautiful documentation popup
 (leaf eldoc
   :ensure (eldoc :type built-in)
-  :custom (eldoc-idle-delay . 1.0))
+  :custom (eldoc-idle-delay . 0.2))
 
 (leaf eldoc-box
   :ensure (eldoc-box
