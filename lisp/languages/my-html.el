@@ -39,13 +39,13 @@
   ;; :type '(repeat symbol)
   )
 
-(defun my-html-supported-modes-hooks ()
-  "Return list from the hooks for each of `my-html-supported-modes'."
-  (-map 'my-major-mode-to-hook my-html-supported-modes))
+;; (defun my-html-supported-modes-hooks ()
+;;   "Return list from the hooks for each of `my-html-supported-modes'."
+;;   (-map 'my-major-mode-to-hook my-html-supported-modes))
 
-(defun my-html-supported-modes-maps ()
-  "Return list from the maps for each of `my-html-supported-modes'."
-  (-map 'my-major-mode-to-map my-html-supported-modes))
+;; (defun my-html-supported-modes-maps ()
+;;   "Return list from the maps for each of `my-html-supported-modes'."
+;;   (-map 'my-major-mode-to-map my-html-supported-modes))
 
 (leaf mhtml-mode
   :mode "\\.html$"

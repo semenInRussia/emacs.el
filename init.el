@@ -2,6 +2,8 @@
 ;;; Commentary:
 ;;; Code:
 
+(require 'cl-lib)
+
 ;; every custom variable of my config have the following group
 (defgroup my nil "Group for all my config files." :group 'tools)
 

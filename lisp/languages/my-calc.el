@@ -14,29 +14,13 @@
 (require 'dash)
 (require 's)
 
-
+;; also see `my-calc-funcs'
 (leaf calc
   :defun (calc-yank-internal calc-pack calc-vector-mean)
   :custom (calc-left-label . "  ")
   :bind (:calc-edit-mode-map
          :package calc-yank
-         ([remap save-buffer] . calc-edit-finish))
-  :config
-  (defun my-calc-mean-yank (vec)
-    "Yank to calculator vector of numbers VEC as string and compute mean.
-
-When call interactively, VEC equal lines of the clipboard as numbers, same
-mechanism use `calc-yank'"
-    (interactive
-     (list
-      (->>
-       (current-kill 0 t)
-       (s-split-words)
-       (-remove-item "•")
-       (s-join "\n"))))
-    (calc-yank-internal 0 vec)
-    (calc-pack (length (s-lines vec)))
-    (calc-vector-mean nil)))
+         ([remap save-buffer] . calc-edit-finish)))
 
 (provide 'my-calc)
 ;;; my-calc.el ends here

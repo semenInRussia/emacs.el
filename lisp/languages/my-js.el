@@ -35,12 +35,12 @@
   :defvar lsp-bridge-multi-lang-server-mode-list
   :mode "\\.js$"
   :config
-  (if (not (require 'lsp-bridge nil :noerror))
-      (ignore-errors
-        (user-error "`lsp-bridge' didn't installed!!!  LSPs for JS can't work"))
-    (add-to-list 'lsp-bridge-multi-lang-server-mode-list
-                 '((typescript-mode js-mode)
-                   . "typescript_rome")))
+  ;; (if (not (require 'lsp-bridge nil :noerror))
+  ;;     (ignore-errors
+  ;;       (user-error "`lsp-bridge' didn't installed!!!  LSPs for JS can't work"))
+  ;;   (add-to-list 'lsp-bridge-multi-lang-server-mode-list
+  ;;                '((typescript-mode js-mode)
+  ;;                  . "typescript_rome")))
   (leaf js-comint
     :ensure (js-comint :repo "redguardtoo/js-comint" :host github)))
 
@@ -49,11 +49,12 @@
   :hook (typescript-mode-hook . my-lsp-ensure)
   :custom (typescript-indent-level . 2)
   :config
-  (if (not (require 'lsp-bridge nil :noerror))
-      (user-error "`lsp-bridge' didn't installed!!!  LSPs for JS can't work")
-    (add-to-list 'lsp-bridge-multi-lang-server-mode-list
-                 '((typescript-mode js-mode)
-                   . "typescript_rome"))))
+  ;; (if (not (require 'lsp-bridge nil :noerror))
+  ;;     (user-error "`lsp-bridge' didn't installed!!!  LSPs for JS can't work")
+  ;;   (add-to-list 'lsp-bridge-multi-lang-server-mode-list
+  ;;                '((typescript-mode js-mode)
+  ;;                  . "typescript_rome")))
+  )
 
 (provide 'my-js)
 ;;; my-js.el ends here
