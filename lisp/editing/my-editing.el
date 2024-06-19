@@ -22,10 +22,6 @@
   (end-of-line)
   (delete-horizontal-space t))
 
-(defvar yank-indent-modes
-  '(prog-mode sgml-mode js2-mode)
-  "Modes in which to indent regions that are yanked (or yank-popped).")
-
 (defvar yank-advised-indent-threshold 1000
   "Threshold (# chars) over which indentation does not automatically occur.")
 
@@ -35,31 +31,22 @@
     (indent-region beg end nil)))
 
 (defadvice yank (after yank-indent activate)
-  "If current mode is one of 'yank-indent-modes, indent yanked text.
+  "Indent yanked text.
 With prefix arg don't indent."
-  (if (and
-       (not (ad-get-arg 0))
-       (--any? (derived-mode-p it) yank-indent-modes))
+  (if (not (ad-get-arg 0))
       (let ((transient-mark-mode nil))
         (yank-advised-indent-function
          (region-beginning)
          (region-end)))))
 
 (defadvice yank-pop (after yank-pop-indent activate)
-  "If current mode is one of 'yank-indent-modes, indent yanked text.
+  "Indent yanked text.
 With prefix arg don't indent."
-  (if (and
-       (not (ad-get-arg 0))
-       (member major-mode yank-indent-modes))
+  (if (not (ad-get-arg 0))
       (let ((transient-mark-mode nil))
         (yank-advised-indent-function
          (region-beginning)
          (region-end)))))
-
-(defun yank-unindented ()
-  "Just `yunk'."
-  (interactive)
-  (yank 1))
 
 (defvar w32-apps-modifier)
 (defvar w32-pass-lwindow-to-system)
@@ -109,7 +96,6 @@ With prefix arg don't indent."
       ("C-a" . my-beginning-of-line-text-or-visual-line)
       ("C-d" . delete-forward-char)
       ("C-o" . open-line-saving-indent)
-      ("M-y" . consult-yank-from-kill-ring)
       ("C-x C-y" . duplicate-line))
   (global-set-key (kbd (car it)) (cdr it)))
 
