@@ -16,7 +16,8 @@
 (eval-and-compile
   ;; `eval-and-compile' really install the package in compile time,
   ;; it's important, because the rest config use `leaf' macro
-  (pam-use-package '(leaf :repo "conao3/leaf.el"))
+  (pam-use-package 'leaf)
+  (pam-use-package 'leaf-keywords)
   (require 'leaf)
   (defmacro leaf-key (key command &optional keymap)
     (let* ((key*     (eval key))
