@@ -1,32 +1,18 @@
 ;;; my-modeline.el --- My configuration for modeline
-
 ;; Copyright (C) 2022-2024 semenInRussia
-
 ;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
-
-;; This file is not part of GNU Emacs.
 
 ;;; Commentary:
-
 ;; My configuration for modeline
 
 ;;; Code:
-
 (require 'my-leaf)
 
+;; I don't use `doom-modeline-env'
+(defvar my-dont-load-them)  ; make byte-compiler happy
+(puthash 'doom-modeline-env t my-dont-load-them)
+(add-hook 'after-init-hook 'doom-modeline-mode -100)
 
-(advice-add 'require
-            :around
-            (defun my-dont-require-doom-modeline-env (&rest args)
-              (if (eq (nth 1 args) 'doom-modeline-env)
-                  'lox
-                (apply args))))
-
-(add-hook 'after-init-hook
-          'doom-modeline-mode
-          -100)
 
 (leaf doom-modeline
   :ensure t

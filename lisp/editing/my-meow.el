@@ -32,6 +32,12 @@
 (require 'my-leaf)
 
 
+(when (display-graphic-p)
+  ;; `meow-esc' isn't needed if now it's graphic session (only it used
+  ;; for terminals)
+  (defvar my-dont-load-them)
+  (puthash 'meow-esc t my-dont-load-them))
+
 (leaf meow
   :ensure (meow :repo "meow-edit/meow" :host github))
 
@@ -52,8 +58,7 @@
            meow-cheatsheet-layout-qwerty
            meow-replace-state-name-list)
   :require meow-helpers
-  :custom (
-           ;; for me this is must-have, without it I looks like a
+  :custom (;; for me this is must-have, without it I looks like a
            ;; noob, but some men thinks that divide system clipboard and editor is
            ;; a cool idea, (they are stranger)
            (meow-use-clipboard . t))

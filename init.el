@@ -2,9 +2,6 @@
 ;;; Commentary:
 ;;; Code:
 
-(require 'cl-lib)
-(require 'subr-x)  ; for `string-remove-prefix'
-
 ;; every custom variable of my config have the following group
 (defgroup my nil "Group for all my config files." :group 'tools)
 
@@ -32,6 +29,22 @@
 ;; them outweighs the utility of always keeping them on.
 (defvar display-line-numbers-type)
 (setq display-line-numbers-type nil)
+
+;; PERF: I don't to load some elisp modules, but some packages do it
+;; even if it isn't needed.  For example, `doom-modeline' load
+;; `doom-modeline-env' (it's needed to show the version of current
+;; environment), but for me it isn't required, so I provide the list
+;; of Elisp modules which aren't loaded
+(defvar my-dont-load-them (make-hash-table :test 'eq
+                                           :size 10)
+  "List of symbols of Elisp modules which shouldn't be loaded by `require'.")
+
+(advice-add 'require :around
+            (defun my-dont-load-it (&rest r)
+              "Advice over `require', because it isn't needed."
+              (if (gethash (nth 1 r) my-dont-load-them)
+                  (nth 1 r)
+                (apply r))))
 
 ;; change Emacs config directory depends on init file
 ;;
@@ -87,7 +100,9 @@
 ;;   amount of the packages and their dependencies (if you use
 ;;   straight)
 (require 'pam)
+(puthash 'tex-site t my-dont-load-them)
 (pam-activate)
+(remhash 'tex-site my-dont-load-them)
 
 ;;; Handle --modules
 

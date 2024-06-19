@@ -145,7 +145,7 @@ straight.el)")
 
 With enabled this minor mode, `pam-use-package' will use
 `straight-use-package' to install a package while the default
-behaviour is do nothing because already all is installed"
+behavior is do nothing because already all is installed"
   :global t
   :init-value nil
   :variable pam-need-to-install-pkgs-p
@@ -247,7 +247,8 @@ will show all commands of these packages, TeXinfo will be included in
 the manual."
   (interactive)
   (add-to-list 'load-path (pam--build-dir))
-  (add-to-list 'Info-default-directory-list (pam--build-dir))
+  (with-eval-after-load 'tex-site
+    (add-to-list 'Info-default-directory-list (pam--build-dir)))
   (pam-create-files)
   (load (string-trim-right (pam--autoloads-file) ".el")
 	      nil
