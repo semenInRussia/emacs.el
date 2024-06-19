@@ -161,9 +161,7 @@
             `(,@leaf--value ,@leaf--body)
             :when
             (when leaf--body
-              `((when ,@(if
-                            (= 1
-                               (length leaf--value))
+              `((when ,@(if (= 1 (length leaf--value))
                             leaf--value
                           `((and ,@leaf--value)))
                   ,@leaf--body)))
@@ -193,8 +191,8 @@
             ;; `(,@leaf--body)
             ;; :file
             ;; `(,@leaf--body)
-            :url
-            `(,@leaf--body)
+            ;; :url
+            ;; `(,@leaf--body)
             ;; :added
             ;; `(,@leaf--body)
             :emacs<
@@ -222,15 +220,15 @@
               `((when
                     (version<= ,leaf--value emacs-version)
                   ,@leaf--body)))
-            :package
-            `(,@(mapcar
-                 (lambda
-                   (elm)
-                   `(eval-and-compile
-                      (leaf-handler-package ,leaf--name ,(car elm)
-                                            ,(cdr elm))))
-                 leaf--value)
-              ,@leaf--body)
+            ;; :package
+            ;; `(,@(mapcar
+            ;;      (lambda
+            ;;        (elm)
+            ;;        `(eval-and-compile
+            ;;           (leaf-handler-package ,leaf--name ,(car elm)
+            ;;                                 ,(cdr elm))))
+            ;;      leaf--value)
+            ;;   ,@leaf--body)
             ;; :feather
             ;; `(,@(mapcar
             ;;      (lambda
@@ -473,24 +471,24 @@
             ;;                                  ,(cdr elm))))
             ;;      leaf--value)
             ;;   ,@leaf--body)
-            :custom
-            `(,@(mapcar
-                 (lambda
-                   (elm)
-                   `(customize-set-variable ',(car elm)
-                                            ,(cdr elm)
-                                            ,(leaf--create-custom-comment :custom)))
-                 leaf--value)
-              ,@leaf--body)
-            :custom*
-            `(,@(mapcar
-                 (lambda
-                   (elm)
-                   `(customize-set-variable ',(car elm)
-                                            ,(cdr elm)
-                                            ,(leaf--create-custom-comment :custom*)))
-                 leaf--value)
-              ,@leaf--body)
+            ;; :custom
+            ;; `(,@(mapcar
+            ;;      (lambda
+            ;;        (elm)
+            ;;        `(customize-set-variable ',(car elm)
+            ;;                                 ,(cdr elm)
+            ;;                                 ,(leaf--create-custom-comment :custom)))
+            ;;      leaf--value)
+            ;;   ,@leaf--body)
+            ;; :custom*
+            ;; `(,@(mapcar
+            ;;      (lambda
+            ;;        (elm)
+            ;;        `(customize-set-variable ',(car elm)
+            ;;                                 ,(cdr elm)
+            ;;                                 ,(leaf--create-custom-comment :custom*)))
+            ;;      leaf--value)
+            ;;   ,@leaf--body)
             ;; :pl-custom
             ;; `(,@(mapcar
             ;;      (lambda
@@ -525,39 +523,39 @@
               ,@leaf--body)
             :init
             `(,@leaf--value ,@leaf--body)
-            :hydra
-            (progn
-              (leaf-register-autoload
-               (cadr leaf--value)
-               leaf--name)
-              `(,@(mapcar
-                   (lambda
-                     (elm)
-                     `(defhydra ,@elm))
-                   (car leaf--value))
-                ,@leaf--body))
-            :mode-hydra
-            (progn
-              (leaf-register-autoload
-               (cadr leaf--value)
-               leaf--name)
-              `(,@(mapcar
-                   (lambda
-                     (elm)
-                     `(major-mode-hydra-define+ ,@elm))
-                   (car leaf--value))
-                ,@leaf--body))
-            :pretty-hydra
-            (progn
-              (leaf-register-autoload
-               (cadr leaf--value)
-               leaf--name)
-              `(,@(mapcar
-                   (lambda
-                     (elm)
-                     `(pretty-hydra-define+ ,@elm))
-                   (car leaf--value))
-                ,@leaf--body))
+            ;; :hydra
+            ;; (progn
+            ;;   (leaf-register-autoload
+            ;;    (cadr leaf--value)
+            ;;    leaf--name)
+            ;;   `(,@(mapcar
+            ;;        (lambda
+            ;;          (elm)
+            ;;          `(defhydra ,@elm))
+            ;;        (car leaf--value))
+            ;;     ,@leaf--body))
+            ;; :mode-hydra
+            ;; (progn
+            ;;   (leaf-register-autoload
+            ;;    (cadr leaf--value)
+            ;;    leaf--name)
+            ;;   `(,@(mapcar
+            ;;        (lambda
+            ;;          (elm)
+            ;;          `(major-mode-hydra-define+ ,@elm))
+            ;;        (car leaf--value))
+            ;;     ,@leaf--body))
+            ;; :pretty-hydra
+            ;; (progn
+            ;;   (leaf-register-autoload
+            ;;    (cadr leaf--value)
+            ;;    leaf--name)
+            ;;   `(,@(mapcar
+            ;;        (lambda
+            ;;          (elm)
+            ;;          `(pretty-hydra-define+ ,@elm))
+            ;;        (car leaf--value))
+            ;;     ,@leaf--body))
             :transient
             (progn
               `(,@(mapcar
@@ -732,15 +730,15 @@
                           ,(car elm)))
                  leaf--value)
               ,@leaf--body)
-            :pl-setq
-            `(,@(mapcar
-                 (lambda
-                   (elm)
-                   `(setq ,(car elm)
-                          (leaf-handler-auth ,leaf--name ,(car elm)
-                                             ,(cdr elm))))
-                 leaf--value)
-              ,@leaf--body)
+            ;; :pl-setq
+            ;; `(,@(mapcar
+            ;;      (lambda
+            ;;        (elm)
+            ;;        `(setq ,(car elm)
+            ;;               (leaf-handler-auth ,leaf--name ,(car elm)
+            ;;                                  ,(cdr elm))))
+            ;;      leaf--value)
+            ;;   ,@leaf--body)
             ;; :auth-setq
             ;; `(,@(mapcar
             ;;      (lambda
