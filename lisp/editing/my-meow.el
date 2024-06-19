@@ -53,7 +53,9 @@
           ;; - leader
           meow-leader-define-keys
           meow-leader-define-key
-          meow-leader-define-state)
+          meow-leader-define-state
+          ;; ..internal
+          meow--fix-thing-selection-mark)
   :defvar (meow-cheatsheet-layout
            meow-cheatsheet-layout-qwerty
            meow-replace-state-name-list)
@@ -163,6 +165,9 @@
      '("<escape>" . ignore)))
 
   (my-meow-setup)
+
+  (defalias #'meow--fix-thing-selection-mark
+    (apply-partially #'nth 2))
 
   ;; jump to source
   ;;
