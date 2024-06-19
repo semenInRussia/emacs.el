@@ -17,18 +17,15 @@
 (require 's)
 
 
+(setq-default c-basic-offset 2)
+
 (defvar my-c-backend 'lsp
   "A symbol which tells to Emacs which one choose: LSP or ctags.")
 
-(leaf cc-mode
-  :config (leaf google-c-style
-            :ensure (google-c-style :repo "google/styleguide" :host github)
-            :hook ((c++-mode-hook c-mode-hook)   . google-set-c-style)))
-
 (defun my-c-update-backend (backend &rest _ignore)
-  "Change backend to a given BACKEND for C/C++ development.
+  "Change back end to a given BACKEND for C/C++ development.
 
-Backend is either symbol tags or lsp"
+Back end is either symbol tags or LSP"
   (leaf citre
     :when (equal backend 'tags)
     :remove-hook ((c++-mode-hook c-mode-hook) . my-lsp-ensure)
@@ -40,31 +37,17 @@ Backend is either symbol tags or lsp"
     :hook ((c++-mode-hook c-mode-hook) . my-lsp-ensure)))
 
 (my-c-update-backend my-c-backend)
-(add-variable-watcher 'my-c-backend
-                      #'my-c-update-backend)
+(add-variable-watcher 'my-c-backend #'my-c-update-backend)
 
-(defun my-copy-whole-buffer-as-kill (&optional msg-p)
-  "Copy the content of whole current buffer onto `kill-ring'.
-
-If MSG-P is non-nil, say that content was copied."
-  (interactive "p")
-  (kill-new (buffer-string))
-  (when msg-p
-    (message "%s chars was COPIED!" (- (point-max) (point-min)))))
-
-(defvar my-sport-map
-  (define-keymap
-    "C-i" #'my-sport-insert-samples
-    "C-f" #'my-sport-find-samples-file
-    "C-p" #'run-python
-    "C-y" #'my-copy-whole-buffer-as-kill
-    "C-w" #'my-copy-whole-buffer-as-kill))
+(declare-function my-copy-whole-buffer-as-kill "my-sport-funcs")
+(declare-function my-sport-insert-samples "my-sport-funcs")
+(declare-function my-sport-find-samples-file "my-sport-funcs")
+(defvar-keymap my-sport-map
+  "C-f" #'my-sport-find-samples-file
+  "C-i" #'my-sport-insert-samples
+  "C-p" #'run-python
+  "C-w" #'my-copy-whole-buffer-as-kill)
 (global-set-key (kbd "C-c ;") my-sport-map)
-
-(defun my-sport-find-samples-file ()
-  "Find input.txt file for current C++ file."
-  (interactive)
-  (find-file "input.txt"))
 
 ;; some settings to compile my C++ file using certain flags,
 ;; optimizations, warnings which are useful for Olympiad programming
@@ -101,23 +84,6 @@ If MSG-P is non-nil, say that content was copied."
        "g++ %s -Wdisabled-optimization -Werror -g"
        (buffer-file-name)))))
   (add-to-list 'run-command-recipes 'run-command-sportprog-recipe))
-
-;; In sport programming I sometimes use debugger (gdb) or run
-;; `eshell'.  When I run `gud-gdb' (see `my-realgud') I need to enter
-;; all samples data (located in file input.txt) in one line.  The
-;; following function do it.  I also can call it with (C-c ; C-i, it)
-;; + it is like on (C-x i) which inserts content of the file.
-(defun my-sport-insert-samples ()
-  "And insert the content of the input.txt onto the buffer in one line."
-  (interactive)
-  (and
-   (or (file-exists-p "input.txt")
-       (user-error "File input.txt isn't exists, create it using C-c ; C-f (SPC ; f)"))
-   (->>
-    "input.txt"
-    f-read-text
-    (s-replace "\n" " ")
-    insert)))
 
 (provide 'my-c)
 ;;; my-c.el ends here
