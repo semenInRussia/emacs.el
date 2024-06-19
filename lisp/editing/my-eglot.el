@@ -53,7 +53,9 @@ Rename variable which is symbol ID"
   (defvar eglot-server-programs)  ; make compiler happier
   ;; python (pyright)
   (setf (alist-get '(python-mode python-ts-mode) eglot-server-programs)
-        '("pyright-langserver" "--stdio")))
+        '("pyright-langserver" "--stdio"))
+
+  (fset #'jsonrpc--log-event #'ignore))  ; massive perf boost---don't log every event
 
 (leaf consult-eglot
   :ensure t)
