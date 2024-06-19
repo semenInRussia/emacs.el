@@ -61,7 +61,9 @@
     :ensure (emmet-mode :repo "smihica/emmet-mode" :host github)
     :hook mhtml-mode-hook)
 
+  ;;; DEPRECATED: I don't use it
   (leaf impatient-mode
+    :disabled
     :ensure (impatient-mode :repo "skeeto/impatient-mode" :host github)
     :defun (imp-visit-buffer impatient-mode)
     :bind (:html-mode-map

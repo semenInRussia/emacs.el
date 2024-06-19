@@ -22,7 +22,6 @@
   :ensure (feature-mode :repo "michaelklishin/cucumber.el" :host github)
   :hook (feature-mode-hook . my-feature-mode-hook)
   :bind (:feature-mode-map
-         ("RET" . newline-and-indent)
          ("M-RET" . my-feature-add-and-statement))
   :config
   (defun my-feature-mode-hook ()
