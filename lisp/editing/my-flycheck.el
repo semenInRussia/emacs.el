@@ -21,7 +21,7 @@
   :defun flycheck-mode
   :hook prog-mode-hook text-mode-hook
   :config
-  (defun turn-off-flycheck (&ignore)
+  (defun turn-off-flycheck (&rest _)
     "Disable `flycheck-mode' locally for current buffer."
     (interactive)
     (flycheck-mode -1)))
