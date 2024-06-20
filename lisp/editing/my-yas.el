@@ -55,5 +55,43 @@
            "Add capf for `yasnippet'."
            (add-hook 'completion-at-point-functions 'my-yas-capf 30 'local))))
 
+(leaf embark
+  :doc "Support of `embark' for `yasnippet', for example when I hit C-=."
+  :after marginalia embark
+  :defvar (marginalia-prompt-categories
+           embark-keymap-alist
+           embark-general-map)
+  :defun (yas-visit-snippet-file . yasnippet)
+  :config
+  (defvar-keymap my-yasnippet-actions
+    :parent embark-general-map
+    "v" #'yas-visit-snippet-file
+    "I" #'yas-insert-snippet)
+
+  (add-to-list 'embark-keymap-alist '(snippet . my-yasnippet-actions))
+  (add-to-list 'marginalia-prompt-categories '("Choose a snippet" . snippet)))
+
+;; (eval-when-compile
+;;   (require 'marginalia))
+;; (leaf marginalia
+;;   :defer-config
+;;   (declare-function yas--template-name "yasnippet")
+;;   (declare-function yas--template-group "yasnippet")
+;;   (defun my-marginalia-annotate-snippet (key)
+;;     "Annotate `yasnippet' snippet with KEY with name and type."
+;;     (when (boundp 'yas--tables)
+;;       (let* ((snip (cdar (yas--fetch (gethash major-mode yas--tables) key)))
+;;              (name (and snip (yas--template-name snip)))
+;;              (group (and snip (yas--template-group snip))))
+;;         (marginalia--fields
+;;          ((concat group
+;;                   #(" " 0 1 (display (space :align-to center))))
+;;           :face 'marginalia-documentation)
+;;          (name
+;;           :face 'marginalia-documentation)))))
+
+;;   (add-to-list 'marginalia-annotator-registry
+;;                '(snippet my-marginalia-annotate-snippet builtin none)))
+
 (provide 'my-yas)
 ;;; my-yas.el ends here
