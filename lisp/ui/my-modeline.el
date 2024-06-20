@@ -9,7 +9,6 @@
 (require 'my-leaf)
 
 ;; I don't use `doom-modeline-env'
-(defvar my-dont-load-them)  ; make byte-compiler happy
 (add-hook 'after-init-hook 'doom-modeline-mode -100)
 (advice-add 'require
             :around

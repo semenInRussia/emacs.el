@@ -32,12 +32,6 @@
 (require 'my-leaf)
 
 
-(when (display-graphic-p)
-  ;; `meow-esc' isn't needed if now it's graphic session (only it used
-  ;; for terminals)
-  (defvar my-dont-load-them)
-  (puthash 'meow-esc t my-dont-load-them))
-
 (leaf meow
   :ensure (meow :repo "meow-edit/meow" :host github))
 
