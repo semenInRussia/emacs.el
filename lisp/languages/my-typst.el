@@ -14,7 +14,7 @@
   :bind (:typst-ts-mode-map
          ("C-m" . typst-ts-mode-return))
   :custom (typst-ts-mode-indent-offset . 2)
-  :config
+  :defer-config
   (add-hook 'typst-ts-mode-hook 'visual-line-mode)
   (add-hook 'typst-ts-mode-hook 'my-lsp-ensure)
 

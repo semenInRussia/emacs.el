@@ -12,7 +12,7 @@
 
 (leaf markdown-mode
   :ensure t
-  :config
+  :defer-config
   (add-hook 'markdown-mode-hook 'visual-line-mode)
 
   (leaf markdown-toc
@@ -25,6 +25,7 @@
     :ensure (edit-indirect :repo "Fanael/edit-indirect" :host github))
 
   (require 'my-autoformat)
+  (declare-function my-autoformat-bind-for-major-mode "my-autoformat")
   (my-autoformat-bind-for-major-mode 'markdown-mode
                                      'autoformat-markdown-capitalize-heading-line
                                      'autoformat-markdown-capitalize-list-item
