@@ -68,6 +68,7 @@
 (setq my-theme-func 'my-dark-theme)
 
 (add-hook 'after-init-hook my-theme-func -90)
+(add-hook 'after-init-hook 'global-hl-line-mode)
 (when (functionp my-theme-func)
   (funcall my-theme-func))
 
