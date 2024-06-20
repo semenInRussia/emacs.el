@@ -14,7 +14,6 @@
 
 (leaf elisp-mode
   :config
-  (require 'my-elisp-smartparens) ; from local-projects
   (leaf inspector
     :ensure (inspector :repo "emacs-straight/inspector" :host github)
     :bind (:emacs-lisp-mode-map
@@ -37,7 +36,16 @@
   (leaf my-elisp-class-bindings
     :bind (:emacs-lisp-mode-map
            :package elisp-mode
-           ("M-RET" . my-elisp-new-field-of-class))))
+           ("M-RET" . my-elisp-new-field-of-class)))
+
+  ;; from local-projects
+  (leaf my-elisp-smartparens
+    :after elisp-mode
+    :config
+    (add-hook 'emacs-lisp-mode-hook
+              (defun my-rq-elisp-sp ()
+                "Require `my-elisp-smartparens'."
+                (require 'my-elisp-smartparens)))))
 
 (leaf suggest
   :ensure (suggest :repo "Wilfred/suggest.el" :host github))
