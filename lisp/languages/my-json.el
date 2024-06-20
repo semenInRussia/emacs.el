@@ -19,20 +19,14 @@
   :ensure (json-mode :repo "joshwnj/json-mode" :host github)
   :bind (:json-mode-map
          ([:remap my-format-expression] . json-pretty-print-buffer))
-
+  :setq-default (js-indent-level . 2)
   :hook (json-mode-hook . my-json-fix-indent-funcs)
-
   :config
   (leaf json-snatcher
     :ensure (json-snatcher :repo "Sterlingg/json-snatcher" :host github)
     :bind (:json-mode-map
            :package json-mode
-           ("C-c M-w" . jsons-print-path)))
-
-  (defun my-json-fix-indent-funcs ()
-    "Fix the functions that changes indent in JSON files."
-    (interactive)
-    (setq-local js-indent-level 2)))
+           ("C-c M-w" . jsons-print-path))))
 
 (provide 'my-json)
 ;;; my-json.el ends here

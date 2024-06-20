@@ -40,7 +40,7 @@
 (defun my-new-fake-pptx-file ()
   "Make this buffer, fake presentation with format (.pptx)."
   (interactive)
-  (->> "~/broken.pptx" (f-read) (insert))
+  (->> "~/broken.pptx" f-read insert)
   (text-mode))
 
 ;;; I try to decrease the Emacs startup time

@@ -50,15 +50,15 @@
 (leaf mhtml-mode
   :mode "\\.html$"
   :hook (mhtml-mode-hook . my-lsp-ensure)
-  :config                               ;nofmt
+  :config
   (leaf auto-rename-tag
     :ensure (auto-rename-tag :repo "jcs-elpa/auto-rename-tag" :host github))
 
-  (leaf tagedit
-    :ensure (tagedit :repo "magnars/tagedit" :host github))
+  ;; (leaf tagedit
+  ;;   :ensure (tagedit :repo "magnars/tagedit" :host github))
 
   (leaf emmet-mode
-    :ensure (emmet-mode :repo "smihica/emmet-mode" :host github)
+    :ensure t
     :hook mhtml-mode-hook)
 
   ;;; DEPRECATED: I don't use it

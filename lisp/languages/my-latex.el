@@ -18,20 +18,6 @@
 (require 'smartparens)
 
 
-(defvar latex-documentclasses
-  '("article"
-    "reoport"
-    "book"
-    "proc"
-    "minimal"
-    "slides"
-    "memoir"
-    "letter"
-    "beamer")
-  "List of the names for built-in LaTeX documentclasses.")
-
-(add-hook 'LaTeX-mode-hook 'my-latex-disable-auto-fill)
-
 (leaf auctex
   :ensure (auctex :repo "emacs-straight/auctex" :host github)
   :mode ("\\.tex$" . latex-mode))
@@ -46,13 +32,12 @@
          ("C-c C-w"  . my-latex-kill-section))
   :config
   (leaf xenops
-    :ensure (xenops :repo "dandavison/xenops")
+    :ensure t
     :hook LaTeX-mode-hook
     :custom (xenops-math-image-scale-factor . 2))
 
-  (leaf my-latex-insert
-    :load-path* "lisp/languages/latex/"
-    :hook (LaTeX-mode-hook . my-latex-expansion-mode))
+  ;; (leaf my-latex-insert
+  ;;   :hook (LaTeX-mode-hook . my-latex-expansion-mode))
 
   (leaf laas
     :ensure (laas :repo "tecosaur/LaTeX-auto-activating-snippets" :host github)
@@ -113,12 +98,11 @@
   ;;          ("C-c M-n" . 'latex-r-cycle-math-parens)
   ;;          ("C-c C-s" . 'latex-r-split-environment)))
 
-  (defun my-latex-disable-auto-fill ()
-    "Disable `auto-fill-mode'."
-    (interactive)
-    (auto-fill-mode 0))
-
-  (setopt TeX-fold-macro-spec-list '(("{1}" ("emph")))))
+  ;; (defun my-latex-disable-auto-fill ()
+  ;;   "Disable `auto-fill-mode'."
+  ;;   (interactive)
+  ;;   (auto-fill-mode 0))
+  )
 
 (provide 'my-latex)
 ;;; my-latex.el ends here

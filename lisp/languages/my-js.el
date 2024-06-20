@@ -32,7 +32,7 @@
 (leaf js
   :defvar lsp-bridge-single-lang-server-mode-list
   :hook (js-mode-hook . my-lsp-ensure)
-  :defvar lsp-bridge-multi-lang-server-mode-list
+  ;; :defvar lsp-bridge-multi-lang-server-mode-list
   :mode "\\.js$"
   :config
   ;; (if (not (require 'lsp-bridge nil :noerror))

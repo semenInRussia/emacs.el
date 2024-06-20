@@ -1,22 +1,13 @@
 ;;; my-bib.el --- My configuration for bibliography management -*- lexical-binding: t; -*-
-
 ;; Copyright (C) 2022-2023 semenInRussia
-
 ;; Author: semenInRussia <hrams205@gmail.com>
 
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 ;;; Commentary:
-
 ;; My configuration for bibliography management.
 
 ;;; Code:
-
 (require 'my-leaf)
-
 (require 'dash)
-
 
 (leaf bibtex
   :custom ((bibtex-align-at-equal-sign  . t)

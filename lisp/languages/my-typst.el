@@ -20,10 +20,12 @@
 
   (require 'my-autoformat)
   (declare-function my-autoformat-bind-for-major-mode "my-autoformat")
-  (my-autoformat-bind-for-major-mode 'typst-ts-mode
-                                     'autoformat-typst-capitalize-heading-line
-                                     'autoformat-typst-capitalize-list-item
-                                     'my-autoformat-sentence-capitalization)
+  (my-autoformat-bind-for-major-mode
+   'typst-ts-mode
+   ;; --
+   'autoformat-typst-capitalize-heading-line
+   'autoformat-typst-capitalize-list-item
+   'my-autoformat-sentence-capitalization)
 
   (with-eval-after-load 'eglot
     (defvar eglot-server-programs)

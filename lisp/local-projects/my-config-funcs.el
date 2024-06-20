@@ -6,6 +6,32 @@
 
 ;;; Code:
 (require 'f)
+(require 'my-lib)
+
+(defvar my-local-project-was-updated nil
+  "Variable is non-nil if one of my \"local-project\" was edited.
+
+If before exit Emacs this variable is non-nil byte-compile
+local-projects autoloads.
+
+Will be changed automatically if you use
+`my-do-autoload-for-local-projects-files'")
+
+(defun my-maybe-byte-compile-local-projects-autoloads ()
+  (when my-local-project-was-updated
+    (my-byte-compile-local-projects-autoloads)))
+
+;;;###autoload
+(define-minor-mode my-autoautoload-local-mode
+  "A minor mode which update autoloads for local-projects on save.
+
+After before kill try to byte-compile this autoloads"
+  :group 'me
+  (if my-autoautoload-local-mode
+      (progn (add-hook 'after-save-hook #'my-do-autoload-for-local-projects-files nil 'local)
+             (add-hook 'kill-emacs-hook #'my-maybe-byte-compile-local-projects-autoloads))
+    (progn (remove-hook 'after-save-hook #'my-do-autoload-for-local-projects-files)
+           (remove-hook 'kill-emacs-hook #'my-maybe-byte-compile-local-projects-autoloads))))
 
 ;;;###autoload
 (defun my-do-autoload-for-local-projects-files ()
@@ -104,7 +130,7 @@
                    (or (not byte-native-compiling)
                        (and byte-native-compiling byte+native-compile)))
           (goto-char (point-max))
-          (insert "\n")			; aaah, unix.
+          (insert "\n")                 ; aaah, unix.
           (cond
            ((and (file-writable-p target-file)
                  ;; We attempt to create a temporary file in the
@@ -158,6 +184,50 @@
                 (insert (format "%S\n" (cons var filename))))
               (write-region (point-min) (point-max) dynvar-file)))))
       t)))
+
+(declare-function my-build-config "my-build-config")
+
+;;;###autoload
+(defun my-restart-build ()
+  "Restart Emacs with rebuild the config before."
+  (interactive)
+  (my-build-config)
+  (restart-emacs))
+
+;;;###autoload
+(defun my-new-config-module (module-name &optional directory)
+  "Create a new configuration file named MODULE-NAME in the DIRECTORY.
+
+DIRECTORY defaults to ~/.emacs.d/lisp/"
+  (interactive "sName of the configuration module: \nDDirectory: ")
+  (setq directory (or directory user-emacs-directory))
+  (->> module-name
+       (s-append ".el")
+       (s-prepend "my-")
+       (s-prepend directory)
+       find-file)
+  (insert
+   (s-replace
+    "writing-config"
+    module-name
+    (format
+     ";;; my-writing-config.el --- My configuration of writing-config -*- lexical-binding: t; -*-
+
+;; Copyright (C) %s semenInRussia
+;; Author: semenInRussia <hrams205@gmail.com>
+
+;;; Commentary:
+;; My configuration of writing-config.
+
+;;; Code:
+(require 'my-leaf)
+
+(leaf writing-config)
+
+(provide 'my-writing-config)
+;;; my-writing-config.el ends here"
+     (my-current-year))))
+  (search-backward "(leaf "))
 
 (provide 'my-config-funcs)
 ;;; my-config-funcs.el ends here

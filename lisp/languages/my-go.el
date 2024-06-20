@@ -1,6 +1,6 @@
 ;;; my-go.el --- My configuration of the `go'
 
-;; Copyright (C) 2022 semenInRussia
+;; Copyright (C) 2022-2024 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 ;; Version: 0.1
@@ -33,7 +33,7 @@
 
 
 (leaf go-mode
-  :ensure (go-mode :repo "dominikh/go-mode.el" :host github)
+  :ensure t
   :hook (go-mode-hook . my-lsp-ensure))
 
 (provide 'my-go)

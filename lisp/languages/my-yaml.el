@@ -5,8 +5,7 @@
 ;; My configuration of yaml: markup language
 
 ;;; Code:
-
-(require 'leaf)
+(require 'my-leaf)
 
 (leaf yaml-mode
   :ensure t)

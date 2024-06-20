@@ -1,6 +1,6 @@
 ;;; my-afk.el --- Load some heavy packages after some seconds of AFK -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023 semenInRussia
+;; Copyright (C) 2023-2024 semenInRussia
 
 ;;; Commentary:
 
@@ -88,8 +88,7 @@ them when they really needed"
   :group 'my
   :type 'number)
 
-(defcustom my-use-afk-timeout-between-loads
-  1
+(defcustom my-use-afk-timeout-between-loads 1
   "Secs between loadidng heavy modules."
   :group 'my
   :type 'number)

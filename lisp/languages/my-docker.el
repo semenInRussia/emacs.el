@@ -8,7 +8,7 @@
 (require 'my-leaf)
 
 (leaf dockerfile-mode
-  :ensure (dockerfile-mode :repo "spotify/dockerfile-mode" :host github))
+  :ensure t)
 
 (provide 'my-docker)
 ;;; my-docker.el ends here
