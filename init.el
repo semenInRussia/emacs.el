@@ -42,14 +42,13 @@
 				                         (buffer-file-name)
                                  byte-compile-current-file))))
 
-(declare-function my-byte-compile-local-projects-autoloads "my-config-funcs.el")
+(declare-function my-byte-compile-local-projects-autoloads "my-config-funcs")
 ;;; Handle --local-projects flag
 ;; byte-compile local-projects and generate autoloads
 (when (member "--local-projects" command-line-args)
   ;; generate autoloads
   (loaddefs-generate (locate-user-emacs-file "lisp/local-projects")
                      (locate-user-emacs-file "lisp/local-projects/my-autoload.el"))
-  (my-byte-compile-local-projects-autoloads)
   ;; also I byte-compile EACH of local projects them after load
   ;; `my-modules'
   )
@@ -178,6 +177,7 @@ Byte-compile every file of local-projects and generate autoloads file"
 (when (member "--local-projects" command-line-args)
   ;; byte-compile every file from the "local-projects" dir (including autoloads
   ;; file)
+  (my-byte-compile-local-projects-autoloads)
   (dolist (file (directory-files (locate-user-emacs-file "lisp/local-projects/")
                                  'full
                                  ".*\\.el$"))
