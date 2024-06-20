@@ -51,7 +51,10 @@
 
 (leaf my-reload :hook emacs-lisp-mode-hook)
 (leaf my-elisp-embrace
-  :hook (emacs-lisp-mode-hook . my-embrace-emacs-lisp-mode-hook))
+  :after embrace
+  :hook (emacs-lisp-mode-hook . my-embrace-emacs-lisp-mode-hook)
+  :config (and (eq major-mode 'emacs-lisp-mode)
+               (my-embrace-emacs-lisp-mode-hook)))
 
 (provide 'my-elisp)
 ;;; my-elisp.el ends here

@@ -11,7 +11,11 @@
   :ensure (embrace :repo "cute-jumper/embrace.el" :host github)
   :setq-default (embrace-show-help-p . nil)
   :bind ("C-z" . embrace-commander)
-  :hook (emacs-lisp-mode-hook . embrace-emacs-lisp-mode-hook))
+  :defun embrace-emacs-lisp-mode-hook
+  :config
+  (add-hook 'emacs-lisp-mode-hook #'embrace-emacs-lisp-mode-hook)
+  (and (eq major-mode 'emacs-lisp-mode)
+       (embrace-emacs-lisp-mode-hook)))
 
 (provide 'my-embrace)
 ;;; my-embrace.el ends here
