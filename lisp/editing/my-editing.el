@@ -23,7 +23,8 @@
   (delete-horizontal-space t))
 
 (leaf yank-indent
-  :ensure (yank-indent :repo "jimeh/yank-indent" :host github))
+  :ensure (yank-indent :repo "jimeh/yank-indent" :host github)
+  :hook prog-mode-hook text-mode-hook)
 
 (defvar w32-pass-lwindow-to-system)
 (defvar w32-lwindow-modifier)
