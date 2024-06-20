@@ -40,7 +40,7 @@
   ;;   :hook (LaTeX-mode-hook . my-latex-expansion-mode))
 
   (leaf laas
-    :ensure (laas :repo "tecosaur/LaTeX-auto-activating-snippets" :host github)
+    :ensure t
     :hook LaTeX-mode-hook
     :defun (aas-set-snippets . aas)
     :config
@@ -62,15 +62,14 @@
 
   (leaf cdlatex
     :ensure (cdlatex :repo "cdominik/cdlatex" :host github)
-    :hook (LaTeX-mode-hook  . turn-on-cdlatex)
+    :hook (LaTeX-mode-hook . turn-on-cdlatex)
     :bind (:cdlatex-mode-map
            ("<tab>" . cdlatex-tab)
            (";" . my-latex-dollar))
     :custom ((cdlatex-math-modify-alist
-              .
-              '((?q "\\sqrt" nil t nil nil)
-                (?u "\\breve" "\\uline" t nil nil)
-                (?v "\\vec" nil t nil nil)))))
+              . '((?q "\\sqrt" nil t nil nil)
+                  (?u "\\breve" "\\uline" t nil nil)
+                  (?v "\\vec" nil t nil nil)))))
 
   (leaf my-latex-insert
     :bind (:latex-mode-map

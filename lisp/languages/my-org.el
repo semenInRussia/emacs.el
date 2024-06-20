@@ -46,6 +46,19 @@
            ("C-c C-M-w" . my-org-clear-subtree)
            ("C-c C-t"   . my-org-todo)))
 
+  (leaf org-preview
+    :ensure (org-preview :repo "karthink/org-preview"
+                         :host github)
+    :commands org-preview-mode)
+
+  (leaf xenops
+    :ensure t
+    :custom (xenops-math-image-scale-factor . 2))
+
+  (leaf laas
+    :ensure t
+    :hook org-mode-hook)
+
   ;; format `org-mode' code after every key hit
   (leaf my-org-autoformat
     :hook (org-mode-hook . my-autoformat-mode))
