@@ -124,20 +124,20 @@ configuration and other these things.
 
 This is function for `command-line-functions'."
    (when (string-equal argi "--kill")
-     (kill-emacs))
+     (kill-emacs)))
 
-   ;; --modules
-   (defun my-modules-cli-handle-arg ()
-     "Handle --modules command-line argument.
+ ;; --modules
+ (defun my-modules-cli-handle-arg ()
+   "Handle --modules command-line argument.
 
 Argument was named --modules, because it build my-modules.el file (or
 `my-modules-el-file').  So when this argument is specified, then build
 my-modules.el file with the `my-build-config' function
 
 This is function for `command-line-functions'."
-     (when (string-equal argi "--modules")
-       ;; it was handled above
-       t)))
+   (when (string-equal argi "--modules")
+     ;; it was handled above
+     t))
 
  ;; --bcompile
  (defun my-bcompile-cli-handle-arg ()
