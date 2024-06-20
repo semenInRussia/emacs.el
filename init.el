@@ -154,6 +154,14 @@ This is function for `command-line-functions'."
 Byte-compile every file of local-projects and generate autoloads file"
    (when (string-equal argi "--local-projects")
      ;; it was handled above
+     t))
+
+ (defun my-install-cli-handle-arg ()
+   "Handle --install command-line argument (see `pam').
+
+Byte-compile every file of install and generate autoloads file"
+   (when (string-equal argi "--install")
+     ;; it was handled above
      t)))
 
 ;;; Load all config files
