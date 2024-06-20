@@ -14,8 +14,10 @@
   :ensure t
   ;; :ensure-system-package (("hoogle" . "cabal install hoogle"))
   :hook ((haskell-mode-hook . haskell-indent-mode)
-         (haskell-mode-hook . interactive-haskell-mode)
-         (haskell-mode-hook . my-lsp-ensure)))
+         (haskell-mode-hook . interactive-haskell-mode))
+  :config
+  (leaf eglot
+    :hook (haskell-mode-hook . my-lsp-ensure)))
 
 (provide 'my-haskell)
 ;;; my-haskell.el ends here

@@ -20,3 +20,4 @@
 
 
 ;;; my-kinopoisk.el ends here
+(provide 'my-kinopoisk)

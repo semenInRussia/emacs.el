@@ -31,10 +31,12 @@
 
 (leaf js
   :defvar lsp-bridge-single-lang-server-mode-list
-  :hook (js-mode-hook . my-lsp-ensure)
   ;; :defvar lsp-bridge-multi-lang-server-mode-list
   :mode "\\.js$"
   :config
+  (leaf eglot
+    :hook (js-mode-hook . my-lsp-ensure))
+
   ;; (if (not (require 'lsp-bridge nil :noerror))
   ;;     (ignore-errors
   ;;       (user-error "`lsp-bridge' didn't installed!!!  LSPs for JS can't work"))
@@ -46,7 +48,6 @@
 
 (leaf typescript-mode
   :ensure (typescript-mode :repo "emacs-typescript/typescript.el" :host github)
-  :hook (typescript-mode-hook . my-lsp-ensure)
   :custom (typescript-indent-level . 2)
   :config
   ;; (if (not (require 'lsp-bridge nil :noerror))
@@ -54,7 +55,8 @@
   ;;   (add-to-list 'lsp-bridge-multi-lang-server-mode-list
   ;;                '((typescript-mode js-mode)
   ;;                  . "typescript_rome")))
-  )
+  (leaf eglot
+    :hook (typescript-mode-hook . my-lsp-ensure)))
 
 (provide 'my-js)
 ;;; my-js.el ends here

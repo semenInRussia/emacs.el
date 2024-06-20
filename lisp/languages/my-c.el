@@ -29,7 +29,7 @@ Back end is either symbol tags or LSP"
   (leaf citre
     :when (equal backend 'tags)
     :remove-hook ((c++-mode-hook c-mode-hook) . my-lsp-ensure)
-    :hook (c++-mode-hook c-mode-hook))
+    :hook c++-mode-hook c-mode-hook)
 
   (leaf eglot
     :when (equal backend 'lsp)

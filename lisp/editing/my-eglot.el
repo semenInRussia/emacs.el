@@ -37,11 +37,11 @@ Rename variable which is symbol ID"
             (eglot-auto-display-help-buffer . nil))
   :defun eglot-inlay-hints-mode eglot-code-actions jsonrpc--log-event
   :bind ((:eglot-mode-map
-          ("C-c lr" . 'eglot-rename)
-          ("<f6>"   . 'eglot-rename)
-          ("C-c la"  . 'eglot-code-actions)
-          ("C-c ll"  . 'eglot-code-actions)
-          ([remap my-format-expression] . 'eglot-format))
+          ("C-c lr" . eglot-rename)
+          ("<f6>"   . eglot-rename)
+          ("C-c la"  . eglot-code-actions)
+          ("C-c ll"  . eglot-code-actions)
+          ([remap my-format-expression] . eglot-format))
          (:embark-identifier-map
           :package embark
           ("r" . my-interactive-eglot-rename)))

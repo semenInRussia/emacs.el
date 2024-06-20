@@ -19,26 +19,15 @@
 (require 'just)
 (require 'f)
 
-
-;; the most heavy functions placed at the `my-dired-commands'
-;; and will be evaluated when really needed (autoloading)
-(declare-function my-dired-save-excursion "my-dired-commands.el")
-(declare-function embark-open-externally "embark")
-
-
 (leaf dired
   ;; don't show extra info about files like:
   ;; - owner
   ;; - group
   ;; - last modified time
-  ;; but u can show it with ")"
+  ;; but u can show it with "("
   :hook (dired-mode-hook . dired-hide-details-mode)
-  :defvar dired-dwim-target
   :custom ((dired-dwim-target . t)
            (delete-by-moving-to-trash . t))
-  :defun ((my-dired-save-excursion . my-dired-commands)
-          (embark-open-externally . embark)
-          dired-get-file-for-visit)
   :bind (:dired-mode-map
          ;; i'm the user of `meow' with hjkl, where "h" is right, so i press
          ;; right to go the "back" directory

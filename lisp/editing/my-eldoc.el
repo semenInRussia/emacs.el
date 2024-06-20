@@ -1,5 +1,4 @@
 ;;; my-eldoc.el --- My configuration of the `eldoc'
-
 ;; Copyright (C) 2022-2024 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
@@ -7,27 +6,25 @@
 ;; URL: https://github.com/semenInRussia/emacs.el
 
 ;;; Commentary:
-
 ;; My configuration of the `eldoc': show documentation for symbol
 
 ;;; Code:
-
 (require 'my-leaf)
 
 ;; use `eldoc' with `flycheck' instead of echo area
 (leaf flycheck
-  :after (eldoc eldoc-box)
+  :after eldoc eldoc-box
   ;; some things for byte-compiler
   :defvar
-  (flycheck-mode
-   flycheck-display-errors-function
-   flycheck-help-echo-function)
+  flycheck-mode
+  flycheck-display-errors-function
+  flycheck-help-echo-function
   :defun
-  (flycheck-error-group
-   flycheck-error-id
-   flycheck-error-message
-   flycheck-error-level
-   flycheck-overlay-errors-at)
+  flycheck-error-group
+  flycheck-error-id
+  flycheck-error-message
+  flycheck-error-level
+  flycheck-overlay-errors-at
   :defer-config
   (add-hook 'flycheck-mode-hook #'my-flycheck-prefer-eldoc)
   (when flycheck-mode (my-flycheck-prefer-eldoc)))

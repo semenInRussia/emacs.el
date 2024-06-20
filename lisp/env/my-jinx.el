@@ -18,10 +18,9 @@
 
 (leaf jinx
   :ensure t
+  :when (and (executable-find "enchant-2")
+             (seq-find #'executable-find '("gcc" "clang" "cc")))
   :custom (jinx-languages . "ru_RU en")
-  :when (and
-         (executable-find "enchant-2")
-         (seq-find #'executable-find '("gcc" "clang" "cc")))
   :bind (("M-$" . jinx-correct)
          (:meow-normal-state-keymap
           :package meow-core
@@ -29,3 +28,4 @@
   :hook text-mode-hook prog-mode-hook)
 
 ;;; my-jinx.el ends here
+(provide 'my-jinx)

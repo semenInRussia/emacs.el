@@ -34,7 +34,7 @@
 
 (leaf go-mode
   :ensure t
-  :hook (go-mode-hook . my-lsp-ensure))
+  :config (add-hook 'go-mode-hook #'my-lsp-ensure))
 
 (provide 'my-go)
 ;;; my-go.el ends here

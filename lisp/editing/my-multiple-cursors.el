@@ -19,10 +19,10 @@
 
 
 (leaf multiple-cursors
-  :ensure (multiple-cursors :repo "magnars/multiple-cursors.el" :host github)
-  :bind (("M-i"       . mc/edit-lines)
-         ("C-,"       . mc/mark-next-like-this-word)
-         ("C-<"       . mc/mark-previous-like-this-word)))
+  :ensure t
+  :bind (("M-i" . mc/edit-lines)
+         ("C-," . mc/mark-next-like-this-word)
+         ("C-<" . mc/mark-previous-like-this-word)))
 
 (provide 'my-multiple-cursors)
 ;;; my-multiple-cursors.el ends here

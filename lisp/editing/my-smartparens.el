@@ -15,29 +15,17 @@
 (leaf smartparens
   :ensure (smartparens :repo "Fuco1/smartparens" :host github)
   :global-minor-mode smartparens-global-mode
-  :defun (sp-clone-sexp sp-use-paredit-bindings)
-  :defvar sp-lisp-modes
+  :defun sp-clone-sexp sp-use-paredit-bindings
   :bind (:smartparens-mode-map
          ("C-k" . 'sp-kill-hybrid-sexp)
          ("C-c DEL" . 'sp-change-enclosing))
   :config
   ;; emacs is lisp hacking environment, so we set up some most common
   ;; lisp modes too
-  (sp-use-paredit-bindings)
-
-  (defun my-sp-clone ()
-    (interactive)
-    (sp-clone-sexp)
-    (repeat-at-last-keystroke))
-
-  (defun delete-only-1-char ()
-    "Delete only 1 character before point."
-    (interactive)
-    (backward-char)
-    (delete-char 1)))
+  (sp-use-paredit-bindings))
 
 (leaf smartparens
-  :defvar (sp--html-modes sp-lisp-modes)
+  :defvar sp--html-modes
   :config
   (eval-after-load 'cc-mode                  '(require 'smartparens-c))
   (eval-after-load 'clojure-mode             '(require 'smartparens-clojure))

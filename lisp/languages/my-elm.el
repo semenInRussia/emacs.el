@@ -29,9 +29,11 @@
 
 (leaf elm-mode
   :ensure t
-  :hook (elm-mode-hook . my-lsp-ensure)
   :bind (:elm-mode-map
-         ([remap my-format-expression] . elm-format)))
+         ([remap my-format-expression] . elm-format))
+  :config
+  (leaf eglot
+    :hook (elm-mode-hook . my-lsp-ensure)))
 
 (provide 'my-elm)
 ;;; my-elm.el ends here

@@ -9,7 +9,6 @@
 ;;; Code:
 (require 'my-leaf)
 (require 'just)
-(require 'my-autoformat)
 
 (leaf markdown-mode
   :ensure t
