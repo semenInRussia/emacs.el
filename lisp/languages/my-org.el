@@ -123,6 +123,7 @@
 
 (leaf org-download
   :ensure (org-download :repo "abo-abo/org-download" :host github)
+  :after org
   :hook (dired-mode-hook . org-download-enable))
 
 (provide 'my-org)
