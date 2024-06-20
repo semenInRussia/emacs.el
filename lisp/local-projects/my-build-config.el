@@ -34,6 +34,7 @@
 
 (defvar my-modules-order
   (list
+   "my-bench.el"
    "package-management/my-pam.el"
    "package-management/my-leaf.el"
    "package-management"

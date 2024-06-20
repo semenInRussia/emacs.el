@@ -28,7 +28,7 @@
   :bind ("C-x M-f" . 'leaf-find))
 
 ;; (add-hook 'after-save-hook 'my-do-autoload-for-local-projects-files)
-(add-hook 'emacs-lisp-mode #'my-autoautoload-local-mode)
+(add-hook 'emacs-lisp-mode-hook #'my-autoautoload-local-mode)
 
 (defvar-keymap my-config-map
   ;; Build and Restart

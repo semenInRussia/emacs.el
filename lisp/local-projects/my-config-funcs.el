@@ -26,7 +26,7 @@ Will be changed automatically if you use
   "A minor mode which update autoloads for local-projects on save.
 
 After before kill try to byte-compile this autoloads"
-  :group 'me
+  :group 'me :init-value t
   (if my-autoautoload-local-mode
       (progn (add-hook 'after-save-hook #'my-do-autoload-for-local-projects-files nil 'local)
              (add-hook 'kill-emacs-hook #'my-maybe-byte-compile-local-projects-autoloads))
