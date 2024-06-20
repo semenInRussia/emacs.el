@@ -104,6 +104,19 @@
     (with-eval-after-load 'marginalia
       (add-to-list 'marginalia-prompt-categories '("recipe\\|package" . straight)))))
 
+(leaf minibuffer
+  :bind (:minibuffer-local-map
+         ("M-." . #'my-embark-preview))
+  :defvar embark-quit-after-action
+  :config
+  (defun my-embark-preview ()
+    "Previews candidate in `vertico' buffer, unless it's a consult command."
+    (interactive)
+    (unless (bound-and-true-p consult--preview-function)
+      (save-selected-window
+        (let ((embark-quit-after-action nil))
+          (embark-dwim))))))
+
 ;; support of agnifize.el: my small Emacs package
 ;; to make a regular Python code into bad code (my sister agnia write bad code)
 (leaf agnifize

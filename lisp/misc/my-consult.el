@@ -11,7 +11,6 @@
 ;; other useful things.
 
 ;;; Code:
-
 (require 'my-leaf)
 (require 'dash)
 
@@ -124,6 +123,7 @@
 
     (plist-put consult--source-recent-file
                :items 'my-consult--source-recentf-items)))
+
 
 ;; support of `consult-flycheck' navigate with errors, warnings and ...
 (leaf consult-flycheck
