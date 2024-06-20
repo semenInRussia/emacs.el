@@ -41,9 +41,16 @@
                                      (:ensure . :pam)
                                      ;; I prefer use `setq' over `custom-set'
                                      ;;
-                                     ;; the main reason is speed, it speed up my
-                                     ;; config in 2.4 times!!! (17secs => 7secs)
-                                     (:custom . :pre-setq)))
+                                     ;; the main reason is speed, it
+                                     ;; speed up my config in 2.4
+                                     ;; times!!! (17secs => 7secs)
+                                     (:custom . :pre-setq)
+                                     ;; when the package reason why
+                                     ;; load it, then `leaf' load
+                                     ;; :config code instantly (:.. I
+                                     ;; disable it, load only after
+                                     ;; package is load
+                                     (:config . :defer-config)))
 
     (setq leaf-system-defaults (plist-put leaf-system-defaults
                                           :leaf-protect nil))
@@ -83,14 +90,15 @@
                 (eval
                  (car leaf--value))
               `(,@leaf--body))
-            :leaf-path
-            (if
-                (and leaf--body
-                     (eval
-                      (car leaf--value)))
-                `((leaf-handler-leaf-path ,leaf--name)
-                  ,@leaf--body)
-              `(,@leaf--body))
+            :leaf-path  ; leaf-path needed for navigation between leafs, but I don't use it
+            `(,@leaf--body)
+            ;; (if
+            ;;     (and leaf--body
+            ;;          (eval
+            ;;           (car leaf--value)))
+            ;;     `((leaf-handler-leaf-path ,leaf--name)
+            ;;       ,@leaf--body)
+            ;;   `(,@leaf--body))
             :leaf-protect
             (if
                 (and leaf--body
