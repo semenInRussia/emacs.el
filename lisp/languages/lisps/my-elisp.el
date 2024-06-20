@@ -40,12 +40,7 @@
 
   ;; from local-projects
   (leaf my-elisp-smartparens
-    :after elisp-mode
-    :config
-    (add-hook 'emacs-lisp-mode-hook
-              (defun my-rq-elisp-sp ()
-                "Require `my-elisp-smartparens'."
-                (require 'my-elisp-smartparens)))))
+    :hook (emacs-lisp-mode-hook . (lambda () (require 'my-elisp-smartparens)))))
 
 (leaf suggest
   :ensure (suggest :repo "Wilfred/suggest.el" :host github))
