@@ -56,8 +56,9 @@
   (find-file (my-rust-find-Cargo.toml-in-directory)))
 
 (defun my-rust-embrace-hook ()
-    "Add parens to `embrace' parens for `rust-mode'."
-    (interactive)
+  "Add parens to `embrace' parens for `rust-mode'."
+  (interactive)
+  (with-eval-after-load 'embrace
     (embrace-add-pair ?v "Vec<" ">")
     (embrace-add-pair ?d "dbg!(" ")")
     (embrace-add-pair ?b "Box<" ">")
@@ -74,7 +75,7 @@
                                   "Template to format string: "
                                   "\"{}\"")
                                  ", ")
-                                ");"))))
+                                ");")))))
 
 (provide 'my-rust-editing)
 ;;; my-rust-editing.el ends here
