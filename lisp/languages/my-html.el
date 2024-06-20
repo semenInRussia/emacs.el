@@ -63,7 +63,7 @@
 
   ;;; DEPRECATED: I don't use it
   (leaf impatient-mode
-    :disabled
+    :disabled t
     :ensure (impatient-mode :repo "skeeto/impatient-mode" :host github)
     :defun (imp-visit-buffer impatient-mode)
     :bind (:html-mode-map
