@@ -7,7 +7,7 @@
 ;; My configuration for the custom editing
 
 ;;; Code:
-
+(require 'my-leaf)
 (require 'dash)
 (require 's)
 
@@ -21,26 +21,6 @@
   (forward-line -1)
   (end-of-line)
   (delete-horizontal-space t))
-
-(setf
- ;; Don't resize the frames in steps; it looks weird, especially in tiling window
- ;; managers, where it can leave unseemly gaps.
- frame-resize-pixelwise t
- ;; Inhibit resizing frame
- frame-inhibit-implied-resize t
- ;; But do not resize windows pixelwise, this can cause crashes in some cases
- ;; when resizing too many windows at once or rapidly.
- window-resize-pixelwise nil
- (alist-get 'width default-frame-alist) (car my-layout-size)
- (alist-get 'height default-frame-alist) (cdr my-layout-size)
- (alist-get 'width initial-frame-alist) (car my-layout-size)
- (alist-get 'height initial-frame-alist) (cdr my-layout-size)
-
- ;; don't use the system title bar
- frame-title-format '(buffer-file-name "%f" ("%b"))
- (alist-get 'undecorated default-frame-alist) t
- (alist-get 'drag-internal-border default-frame-alist) 1
- (alist-get 'internal-border-width default-frame-alist) 5)
 
 (leaf yank-indent
   :ensure (yank-indent :repo "jimeh/yank-indent" :host github))
@@ -78,15 +58,17 @@
           (beginning-of-visual-line)
           (point)))))
 
-;; PERF,HACK: don't call `repeat-mode', cause it do extra work, like
-;;   counting their commands + do stuoid message'
-
-;; (repeat-mode)
-(require 'repeat)
+;; PERF,HACK: don't call `repeat-mode' and require it, cause it do
+;;   extra work, require it only when the called command have
+;;   repeat-map property
 (setq repeat-mode t)
-(when repeat-keep-prefix
-  (add-hook 'pre-command-hook 'repeat-pre-hook))
-(add-hook 'post-command-hook 'repeat-post-hook)
+(autoload 'repeat-post-hook "repeat")
+(add-hook 'post-command-hook
+          (defun my--repeat-post-hook ()
+            (and
+             (or (get this-command 'repeat-map)
+                 (get real-this-command 'repeat-map))
+             (repeat-post-hook))))
 
 (--each
     '(("M-y" . consult-yank-from-kill-ring)
