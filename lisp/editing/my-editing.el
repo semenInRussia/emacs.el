@@ -66,8 +66,10 @@
 (add-hook 'post-command-hook
           (defun my--repeat-post-hook ()
             (and
-             (or (get this-command 'repeat-map)
-                 (get real-this-command 'repeat-map))
+             (or (and (symbolp this-command)
+                      (get this-command 'repeat-map))
+                 (and (symbolp real-this-command)
+                      (get real-this-command 'repeat-map)))
              (repeat-post-hook))))
 
 (--each
