@@ -42,14 +42,16 @@
 				                         (buffer-file-name)
                                  byte-compile-current-file))))
 
+(declare-function my-byte-compile-local-projects-autoloads "my-config-funcs.el")
 ;;; Handle --local-projects flag
-
 ;; byte-compile local-projects and generate autoloads
 (when (member "--local-projects" command-line-args)
   ;; generate autoloads
   (loaddefs-generate (locate-user-emacs-file "lisp/local-projects")
                      (locate-user-emacs-file "lisp/local-projects/my-autoload.el"))
-  ;; also I byte-compile them after load `my-modules'
+  (my-byte-compile-local-projects-autoloads)
+  ;; also I byte-compile EACH of local projects them after load
+  ;; `my-modules'
   )
 
 ;;; Local Projects
@@ -95,6 +97,11 @@
   (require 'my-build-config)
   (my-build-config))
 
+(when (member "--bcompile" command-line-args)
+  (byte-compile (locate-user-emacs-file "init.el"))
+  (byte-compile (locate-user-emacs-file "early-init.el"))
+  (pam-byte-compile-pkg-autoloads))
+
 ;;; don't use init.el for custom.el which I don't use
 ;;
 ;; in the most of configurations, after it Emacs load custom.el, but I
@@ -131,6 +138,15 @@ This is function for `command-line-functions'."
      (when (string-equal argi "--modules")
        ;; it was handled above
        t)))
+
+ ;; --bcompile
+ (defun my-bcompile-cli-handle-arg ()
+   "Handle --bcompile command-line argument.
+
+This is function for `command-line-functions'."
+   (when (string-equal argi "--bcompile")
+     ;; it was handled above
+     t))
 
  ;; --local-projects
  (defun my-local-projects-cli-handle-arg ()
