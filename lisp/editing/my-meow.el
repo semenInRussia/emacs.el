@@ -30,7 +30,7 @@
 ;;; Code:
 
 (require 'my-leaf)
-
+(declare-function my-meow-setup "init")
 
 (leaf meow
   :ensure (meow :repo "meow-edit/meow" :host github))
