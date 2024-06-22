@@ -28,6 +28,7 @@
 ;; - `flatland'
 ;; - `chery-blossom'
 ;; - `gruvbox'
+;; - `modus-vivendi'
 ;; - `solarized'
 ;;
 ;; Classic Style:
@@ -41,9 +42,10 @@
 (leaf gruber-darker-theme :ensure t)
 (leaf monokai-theme :ensure t)
 
-;; (leaf modus-themes
-;;   :custom ((modus-themes-bold-constructs . t)
-;;            (modus-themes-italic-constructs . t)))
+(leaf modus-themes
+  :custom ((modus-themes-bold-constructs . t)
+           (modus-themes-italic-constructs . t)
+           (modus-themes-region . '(accent))))
 
 (leaf ef-themes :ensure t)
 (leaf flatland-theme :ensure t)
@@ -65,7 +67,8 @@
 (defvar my-theme-func)
 ;; or (setq my-theme-func 'my-light-theme)
 ;; or (setq my-theme-func 'my-dark-theme)
-(setq my-theme-func 'my-dark-theme)
+;; or (setq my-theme-func (lambda () (load-theme 'modus-vivendi)))
+(setq my-theme-func (lambda () (load-theme 'modus-vivendi)))
 
 (add-hook 'after-init-hook my-theme-func -90)
 (add-hook 'after-init-hook 'global-hl-line-mode)
