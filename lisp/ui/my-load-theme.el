@@ -68,7 +68,7 @@
 ;; or (setq my-theme-func 'my-light-theme)
 ;; or (setq my-theme-func 'my-dark-theme)
 ;; or (setq my-theme-func (lambda () (load-theme 'modus-vivendi)))
-(setq my-theme-func (lambda () (load-theme 'modus-vivendi)))
+(setq my-theme-func 'my-dark-theme)
 
 (add-hook 'after-init-hook my-theme-func -90)
 (add-hook 'after-init-hook 'global-hl-line-mode)
