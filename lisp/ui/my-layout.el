@@ -14,12 +14,6 @@
       use-file-dialog nil
       use-dialog-box nil)
 
-;; UX: GUIs are inconsistent across systems, desktop environments, and themes,
-;;   and don't match the look of Emacs. They also impose inconsistent shortcut
-;;   key paradigms. I'd rather Emacs be responsible for prompting.
-(when (bound-and-true-p tooltip-mode)
-  (tooltip-mode -1))
-
 (defcustom my-layout-size '(72 . 22)
   "Cons of width and height of editor window."
   :group 'my
