@@ -638,148 +638,148 @@
                                                             ,@(cadr elm)))
                         leaf--value)
               ,@leaf--body)
-          :require
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(require ',elm))
-               leaf--value)
-            ,@leaf--body)
-          :global-minor-mode
-          (progn
-            (mapc
-             (lambda
-               (elm)
-               (leaf-register-autoload
-                (car elm)
-                (cdr elm)))
-             leaf--value)
+            :require
             `(,@(mapcar
                  (lambda
                    (elm)
-                   `(,(car elm)
-                     1))
+                   `(require ',elm))
                  leaf--value)
-              ,@leaf--body))
-          ;; :delight
-          ;; `(,@(mapcar
-          ;;      (lambda
-          ;;        (elm)
-          ;;        `(delight ,@elm))
-          ;;      leaf--value)
-          ;;   ,@leaf--body)
-          ;; :diminish
-          ;; `((with-eval-after-load ',leaf--name ,@(mapcar
-          ;;                                         (lambda
-          ;;                                           (elm)
-          ;;                                           `(diminish ',(car elm)
-          ;;                                                      ,(cdr elm)))
-          ;;                                         leaf--value))
-          ;;   ,@leaf--body)
-          ;; :blackout
-          ;; `((with-eval-after-load ',leaf--name ,@(mapcar
-          ;;                                         (lambda
-          ;;                                           (elm)
-          ;;                                           `(blackout ',(car elm)
-          ;;                                                      ,(cdr elm)))
-          ;;                                         leaf--value))
-          ;;   ,@leaf--body)
-          ;; :grugru
-          ;; `((grugru-define-multiple ,@leaf--value)
-          ;;   ,@leaf--body)
-          :leaf-defer
-          (let*
-              ((eval-after-p
-                (and leaf--body
-                     (eval
-                      (car leaf--value))
-                     (leaf-list-memq leaf-defer-keywords
-                                     (leaf-plist-keys leaf--raw))))
-               (file
-                (leaf-this-file))
-               (let-or-progn
-                (if file
-                    `(let
-                         ((leaf--load-file-name ,file)))
-                  '(progn))))
-            (if eval-after-p
-                `((eval-after-load ',leaf--name
-                    '(,@let-or-progn ,@leaf--body)))
-              `(,@leaf--body)))
-          :setq
-          `(,@(mapcar
+              ,@leaf--body)
+            :global-minor-mode
+            (progn
+              (mapc
                (lambda
                  (elm)
-                 `(setq ,(car elm)
-                        ,(cdr elm)))
+                 (leaf-register-autoload
+                  (car elm)
+                  (cdr elm)))
                leaf--value)
-            ,@leaf--body)
-          :setq-default
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(setq-default ,(car elm)
-                                ,(cdr elm)))
-               leaf--value)
-            ,@leaf--body)
-          :setf
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(setf ,(car elm)
-                        ,(cdr elm)))
-               leaf--value)
-            ,@leaf--body)
-          :push
-          `(,@(mapcar
-               (lambda
-                 (elm)
-                 `(push ,(cdr elm)
-                        ,(car elm)))
-               leaf--value)
-            ,@leaf--body)
-          ;; :pl-setq
-          ;; `(,@(mapcar
-          ;;      (lambda
-          ;;        (elm)
-          ;;        `(setq ,(car elm)
-          ;;               (leaf-handler-auth ,leaf--name ,(car elm)
-          ;;                                  ,(cdr elm))))
-          ;;      leaf--value)
-          ;;   ,@leaf--body)
-          ;; :auth-setq
-          ;; `(,@(mapcar
-          ;;      (lambda
-          ;;        (elm)
-          ;;        `(setq ,(car elm)
-          ;;               (leaf-handler-auth ,leaf--name ,(car elm)
-          ;;                                  ,(cdr elm))))
-          ;;      leaf--value)
-          ;;   ,@leaf--body)
-          ;; :pl-setq-default
-          ;; `(,@(mapcar
-          ;;      (lambda
-          ;;        (elm)
-          ;;        `(setq-default ,(car elm)
-          ;;                       (leaf-handler-auth ,leaf--name ,(car elm)
-          ;;                                          ,(cdr elm))))
-          ;;      leaf--value)
-          ;;   ,@leaf--body)
-          ;; :auth-setq-default
-          ;; `(,@(mapcar
-          ;;      (lambda
-          ;;        (elm)
-          ;;        `(setq-default ,(car elm)
-          ;;                       (leaf-handler-auth ,leaf--name ,(car elm)
-          ;;                                          ,(cdr elm))))
-          ;;      leaf--value)
-          ;;   ,@leaf--body)
-          :config
-          `(,@leaf--value ,@leaf--body)
-          :defer-config
-          `((eval-after-load ',leaf--name
-              '(progn ,@leaf--value))
-            ,@leaf--body))))
+              `(,@(mapcar
+                   (lambda
+                     (elm)
+                     `(,(car elm)
+                       1))
+                   leaf--value)
+                ,@leaf--body))
+            ;; :delight
+            ;; `(,@(mapcar
+            ;;      (lambda
+            ;;        (elm)
+            ;;        `(delight ,@elm))
+            ;;      leaf--value)
+            ;;   ,@leaf--body)
+            ;; :diminish
+            ;; `((with-eval-after-load ',leaf--name ,@(mapcar
+            ;;                                         (lambda
+            ;;                                           (elm)
+            ;;                                           `(diminish ',(car elm)
+            ;;                                                      ,(cdr elm)))
+            ;;                                         leaf--value))
+            ;;   ,@leaf--body)
+            ;; :blackout
+            ;; `((with-eval-after-load ',leaf--name ,@(mapcar
+            ;;                                         (lambda
+            ;;                                           (elm)
+            ;;                                           `(blackout ',(car elm)
+            ;;                                                      ,(cdr elm)))
+            ;;                                         leaf--value))
+            ;;   ,@leaf--body)
+            ;; :grugru
+            ;; `((grugru-define-multiple ,@leaf--value)
+            ;;   ,@leaf--body)
+            :leaf-defer
+            (let*
+                ((eval-after-p
+                  (and leaf--body
+                       (eval
+                        (car leaf--value))
+                       (leaf-list-memq leaf-defer-keywords
+                                       (leaf-plist-keys leaf--raw))))
+                 (file
+                  (leaf-this-file))
+                 (let-or-progn
+                  (if file
+                      `(let
+                           ((leaf--load-file-name ,file)))
+                    '(progn))))
+              (if eval-after-p
+                  `((eval-after-load ',leaf--name
+                      '(,@let-or-progn ,@leaf--body)))
+                `(,@leaf--body)))
+            :setq
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(setq ,(car elm)
+                          ,(cdr elm)))
+                 leaf--value)
+              ,@leaf--body)
+            :setq-default
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(setq-default ,(car elm)
+                                  ,(cdr elm)))
+                 leaf--value)
+              ,@leaf--body)
+            :setf
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(setf ,(car elm)
+                          ,(cdr elm)))
+                 leaf--value)
+              ,@leaf--body)
+            :push
+            `(,@(mapcar
+                 (lambda
+                   (elm)
+                   `(push ,(cdr elm)
+                          ,(car elm)))
+                 leaf--value)
+              ,@leaf--body)
+            ;; :pl-setq
+            ;; `(,@(mapcar
+            ;;      (lambda
+            ;;        (elm)
+            ;;        `(setq ,(car elm)
+            ;;               (leaf-handler-auth ,leaf--name ,(car elm)
+            ;;                                  ,(cdr elm))))
+            ;;      leaf--value)
+            ;;   ,@leaf--body)
+            ;; :auth-setq
+            ;; `(,@(mapcar
+            ;;      (lambda
+            ;;        (elm)
+            ;;        `(setq ,(car elm)
+            ;;               (leaf-handler-auth ,leaf--name ,(car elm)
+            ;;                                  ,(cdr elm))))
+            ;;      leaf--value)
+            ;;   ,@leaf--body)
+            ;; :pl-setq-default
+            ;; `(,@(mapcar
+            ;;      (lambda
+            ;;        (elm)
+            ;;        `(setq-default ,(car elm)
+            ;;                       (leaf-handler-auth ,leaf--name ,(car elm)
+            ;;                                          ,(cdr elm))))
+            ;;      leaf--value)
+            ;;   ,@leaf--body)
+            ;; :auth-setq-default
+            ;; `(,@(mapcar
+            ;;      (lambda
+            ;;        (elm)
+            ;;        `(setq-default ,(car elm)
+            ;;                       (leaf-handler-auth ,leaf--name ,(car elm)
+            ;;                                          ,(cdr elm))))
+            ;;      leaf--value)
+            ;;   ,@leaf--body)
+            :config
+            `(,@leaf--value ,@leaf--body)
+            :defer-config
+            `((eval-after-load ',leaf--name
+                '(progn ,@leaf--value))
+              ,@leaf--body))))
 
   (my-leaf-keywords-init))
 

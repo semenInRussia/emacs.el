@@ -33,7 +33,7 @@
     :ensure t)
 
   ;; my small package to insert a new struct field at M-ret
-  (leaf my-elisp-class-bindings
+  (leaf my-elisp-class-fields
     :bind (:emacs-lisp-mode-map
            :package elisp-mode
            ("M-RET" . my-elisp-new-field-of-class)))

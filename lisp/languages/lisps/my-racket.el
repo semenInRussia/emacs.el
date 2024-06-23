@@ -13,13 +13,12 @@
 (require 'my-lib)
 (require 'smartparens)
 
-
+;; `flycheck' is enough slow plus `racket-xp-mode' highlight
+;; errors too, so i disable `flycheck' for Racket
+(add-hook 'racket-mode-hook #'turn-off-flycheck)
 (leaf racket-mode
   :ensure (racket-mode :repo "greghendershott/racket-mode" :host github)
-  :hook ((racket-mode-hook . racket-xp-mode)
-         ;; `flycheck' is enough slow plus `racket-xp-mode' highlight
-         ;; errors too, so i disable `flycheck' for Racket
-         (racket-mode-hook . turn-off-flycheck))
+  :hook ((racket-mode-hook . racket-xp-mode))
   :defun racket-xp-rename
   :bind (:racket-xp-mode-map
          ([remap racket-xp-rename] . eglot-rename)
