@@ -8,7 +8,6 @@
 
 (require 'my-leaf)
 (require 's)
-(require 'just)
 (require 'my-lib)
 (require 'dash)
 

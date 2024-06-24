@@ -9,8 +9,6 @@
 (require 'dash)
 (require 'f)
 (require 's)
-(require 'just)
-
 
 (defun my-symbol-append (&rest symbols)
   "Get symbol which has `symbol-name' as concatenation of the each of SYMBOLS."

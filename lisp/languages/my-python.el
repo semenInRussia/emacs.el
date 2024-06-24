@@ -9,7 +9,6 @@
 ;;; Code:
 
 (require 'dash)
-(require 'just)
 (require 'my-leaf)
 (require 's)
 

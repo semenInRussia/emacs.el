@@ -16,7 +16,6 @@
 (require 'my-leaf)
 (require 'dash)
 (require 's)
-(require 'just)
 (require 'f)
 
 (leaf dired

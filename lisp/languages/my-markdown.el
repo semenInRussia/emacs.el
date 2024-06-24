@@ -8,7 +8,6 @@
 
 ;;; Code:
 (require 'my-leaf)
-(require 'just)
 
 (leaf markdown-mode
   :ensure t

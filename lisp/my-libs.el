@@ -34,8 +34,7 @@
     :require t)
 
   (leaf just
-    :ensure (just :host github :repo "semenInRussia/just.el")
-    :require t)
+    :ensure (just :host github :repo "semenInRussia/just.el"))
 
   (leaf svg-lib :ensure t))
 

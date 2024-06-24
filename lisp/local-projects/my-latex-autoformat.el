@@ -15,7 +15,7 @@
 
 (require 'my-autoformat)
 (require 'my-lib)
-
+(require 'just)
 (require 'latex)
 (require 'dash)
 
