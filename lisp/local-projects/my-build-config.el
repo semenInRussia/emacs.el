@@ -39,7 +39,6 @@
    "package-management/my-leaf.el"
    "package-management"
    "my-libs.el"
-   "my-lib.el"
    "my-fonts.el"
    "ui/my-layout.el"
    "ui/my-load-theme.el"

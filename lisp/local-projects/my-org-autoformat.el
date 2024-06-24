@@ -25,6 +25,9 @@
 (require 'my-lib)
 (require 'just)
 
+(defun my-regexp-opt-of-regexp (regexps)
+  "Return the regexp, which will be match to the one of given REGEXPS."
+  (concat "\\(?:" (s-join "\\|" regexps) "\\)"))
 
 ;;;###autoload(add-hook 'org-mode-hook (lambda () (require 'my-org-autoformat)))
 (my-autoformat-bind-for-major-mode

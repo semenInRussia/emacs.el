@@ -30,6 +30,15 @@
 (require 's)
 (require 'my-lib)
 
+(defun my-alist-union (alist1 alist2 &optional testfn)
+  "Return union of ALIST1 and ALIST2, if has same keys, set to value of ALIST2.
+
+Using TESTFN in functions sush as `assoc' or `alist-get'"
+  (->>
+   alist1
+   (--remove (assoc (car it) alist2 testfn))
+   (append alist2)))
+
 (defvar my-org-options-map
   (make-sparse-keymap)
   "Map for setting `org-mode' options.")

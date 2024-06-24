@@ -10,23 +10,13 @@
 (require 'f)
 (require 's)
 
-(defun my-symbol-append (&rest symbols)
-  "Get symbol which has `symbol-name' as concatenation of the each of SYMBOLS."
-  (->> symbols (-map 'symbol-name) (apply 's-concat) (intern)))
-
-(defun my-major-mode-to-hook (mm)
-  "Return hook for major-mode (MM): `python-mode' => `python-mode-hook'."
-  (my-symbol-append mm '-hook))
-
-(defun my-major-mode-to-map (mm)
-  "Return map for major-mode (MM): `python-mode' => `python-mode-map'."
-  (my-symbol-append mm '-map))
-
+;;;###autoload
 (defun repeat-at-last-keystroke ()
   "Define in the temporary keymap at last pressed keystroke `this-command'."
   (one-shot-keybinding (char-to-string (event-basic-type last-input-event))
                        this-command))
 
+;;;###autoload
 (defun one-shot-keybinding (key command)
   "Bind KEY with COMMAND to one key hitting."
   (set-transient-map (let ((map (make-sparse-keymap)))
@@ -34,19 +24,7 @@
                        map)
                      t))
 
-(defun my-alist-union (alist1 alist2 &optional testfn)
-  "Return union of ALIST1 and ALIST2, if has same keys, set to value of ALIST2.
-
-Using TESTFN in functions sush as `assoc' or `alist-get'"
-  (->>
-   alist1
-   (--remove (assoc (car it) alist2 testfn))
-   (append alist2)))
-
-(defun my-regexp-opt-of-regexp (regexps)
-  "Return the regexp, which will be match to the one of given REGEXPS."
-  (concat "\\(?:" (s-join "\\|" regexps) "\\)"))
-
+;;;###autoload
 (defmacro time-it (form &optional iters)
   "Return the average time to evaluate FORM ITERS time.
 
@@ -56,6 +34,7 @@ ITERATIONS defaults to 1"
      (--dotimes ,iters ,form)
      (/ (float-time (time-since started)) ,iters)))
 
+;;;###autoload
 (defmacro which-faster (iters &rest things)
   "Print name of the most fast things from given THINGS.
 
