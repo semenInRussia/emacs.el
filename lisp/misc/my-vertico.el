@@ -40,7 +40,7 @@
 
   ;; scroll, mouse inside the `vertico' buffer
   (leaf vertico-mouse
-    :global-minor-mode vertico-mouse-mode)
+    :global-minor-mode t)
 
   (leaf nerd-icons
     :ensure t)
@@ -56,7 +56,7 @@
 
   (leaf marginalia
     :ensure t
-    :global-minor-mode marginalia-mode)
+    :global-minor-mode t)
 
   ;; when I type "~/", the rest text is deleted
   (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)

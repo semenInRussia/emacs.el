@@ -52,7 +52,7 @@
 
   (leaf dired-async
     :ensure async
-    :global-minor-mode dired-async-mode)
+    :global-minor-mode t)
 
   (leaf dired-hacks-utils
     :ensure t)
