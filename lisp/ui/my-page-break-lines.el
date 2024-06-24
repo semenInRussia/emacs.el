@@ -29,8 +29,7 @@
 (require 'my-leaf)
 
 (leaf page-break-lines
-  :ensure t
-  :global-minor-mode global-page-break-lines-mode)
+  :ensure t)
 
 (provide 'my-page-break-lines)
 ;;; my-page-break-lines.el ends here
