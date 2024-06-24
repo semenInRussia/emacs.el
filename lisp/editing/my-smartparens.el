@@ -54,7 +54,7 @@
   (eval-after-load 'scala-mode               '(require 'smartparens-scala))
   ;; (eval-after-load 'swift-mode               '(require 'smartparens-swift))
   (eval-after-load 'tex-mode                 '(require 'smartparens-latex))
-  (eval-after-load 'text-mode                '(require 'smartparens-text))
+  ;; (eval-after-load 'text-mode                '(require 'smartparens-text))
   ;; (eval-after-load 'tuareg                   '(require 'smartparens-ml))
   (eval-after-load 'fsharp-mode              '(require 'smartparens-ml))
   (eval-after-load 'unisonlang-mode          '(require 'smartparens-unison))
