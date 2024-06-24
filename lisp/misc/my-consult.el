@@ -27,6 +27,8 @@
 (leaf consult
   :ensure t
   :commands (consult--buffer-file-hash
+             consult-fd
+             consult-find
              consult-flymake
              consult-register-format
              consult-register-window
@@ -67,7 +69,8 @@
          ("M-g I" . consult-imenu-multi)
          ("M-g i" . consult-imenu))
 
-  :custom (;; Idk what is it
+  :custom ((consult-async-min-input . 1)
+           ;; Idk what is it
            (register-preview-delay  . 0.5)
            (register-preview-function . #'consult-register-format))
 
@@ -149,7 +152,16 @@
    (--replace-where
     (equal (-second-item it) "Find regexp")
     '(consult-ripgrep "Find regexp"))
-   (setq project-switch-commands)))
+   (setq project-switch-commands))
+  (cond
+   ((executable-find "fd")
+    (keymap-substitute project-prefix-map
+                       #'project-or-external-find-file
+                       #'consult-fd))
+   ((executable-find "find")
+    (keymap-substitute project-prefix-map
+                       #'project-or-external-find-file
+                       #'consult-find))))
 
 (leaf consult-dir
   :ensure t)
