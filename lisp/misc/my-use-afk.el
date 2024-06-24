@@ -130,8 +130,9 @@ of this counter and run timer to load itself after the seconds of AFK"
        my-use-afk-timeout-between-loads
        nil
        (lambda ()
-         ;; this code will runned after `my-use-afk-timeout-between-loads'
-         ;; seconds after loading a heavy thing.
+         ;; this code will ran after
+         ;; `my-use-afk-timeout-between-loads' seconds after loading a
+         ;; heavy thing.
          ;;
          ;; here check that all time before load a heavy thing, the user wasn't
          ;; doing anything, in this case users still in AFK, so load the next
