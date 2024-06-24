@@ -11,7 +11,7 @@
 
 (leaf whitespace-cleanup-mode
   :ensure t
-  :hook prog-mode-hook text-mode-hook)
+  :hook (write-file-functions . whitespace-cleanup-mode-write-file))
 
 (provide 'my-whitespace-cleanup-mode)
 ;;; my-whitespace-cleanup-mode.el ends here
