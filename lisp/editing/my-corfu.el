@@ -150,10 +150,13 @@ auto-completion popup with this capf")
   ;; prefer a `cape' one, so disable `ispell'
   (advice-add 'ispell-complete-word :override 'ignore))
 
+(setq straight-makeinfo-executable)
+
 (leaf corfu-terminal
   :ensure (corfu-terminal
            :type git
-           :repo "https://codeberg.org/akib/emacs-corfu-terminal.git")
+           :host codeberg
+           :repo "akib/emacs-corfu-terminal")
   :unless (display-graphic-p)
   :hook corfu-mode-hook
   :config (corfu-terminal-mode +1))
