@@ -150,8 +150,6 @@ auto-completion popup with this capf")
   ;; prefer a `cape' one, so disable `ispell'
   (advice-add 'ispell-complete-word :override 'ignore))
 
-(setq straight-makeinfo-executable)
-
 (leaf corfu-terminal
   :ensure (corfu-terminal
            :type git
