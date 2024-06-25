@@ -44,7 +44,7 @@
 
 (leaf modus-themes
   :custom ((modus-themes-bold-constructs . t)
-           (modus-themes-italic-constructs . t)
+           (modus-themes-italic-constructs . nil)
            (modus-themes-region . '(accent))))
 
 (leaf ef-themes :ensure t)
@@ -67,7 +67,8 @@
 (defvar my-theme-func)
 ;; or (setq my-theme-func 'my-light-theme)
 ;; or (setq my-theme-func 'my-dark-theme)
-;; or (setq my-theme-func (lambda () (load-theme 'modus-vivendi)))
+;; or (setq my-theme-func (lambda () (load-theme 'modus-vivendi))
+
 (setq my-theme-func 'my-dark-theme)
 
 (add-hook 'after-init-hook my-theme-func -90)

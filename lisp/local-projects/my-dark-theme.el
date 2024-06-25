@@ -43,8 +43,18 @@
    '(eglot-highlight-symbol-face ((t :background "#333"
                                      :bold t)))
 
+   '(embark-target ((t :background "#779")))
+
    ;; highlight TODO with red background, italic black text
-   '(hl-todo ((t :backgorund "#FF5E5E" :foreground "black" :italic t)))))
+   '(hl-todo ((t :backgorund "#FF5E5E" :foreground "black" :italic t))))
+
+  (defvar hi-lock-face-defaults)
+  (setq hi-lock-face-defaults
+        (list "mode-line"
+              "hi-green"
+              "shr-mark"
+              "dired-marked"
+              "isearch-fail")))
 
 (provide 'my-dark-theme)
 ;;; my-dark-theme.el ends here
