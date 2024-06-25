@@ -7,6 +7,8 @@
 ;;; Code:
 (require 'dash)
 (require 'my-leaf)
+(autoload 'persp-names-current-frame-fast-ordered "persp-mode")
+(autoload 'persp-switch "persp-mode")
 
 
 (defun my-persp-switch-by-number (num)
