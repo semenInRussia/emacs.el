@@ -151,7 +151,9 @@ auto-completion popup with this capf")
   (advice-add 'ispell-complete-word :override 'ignore))
 
 (leaf corfu-terminal
-  :ensure t
+  :ensure (corfu-terminal
+           :type git
+           :repo "https://codeberg.org/akib/emacs-corfu-terminal.git")
   :unless (display-graphic-p)
   :hook corfu-mode-hook
   :config (corfu-terminal-mode +1))
