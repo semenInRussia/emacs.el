@@ -77,7 +77,8 @@
 ;;; use beautiful documentation popup
 (leaf eldoc
   :ensure (eldoc :type built-in)
-  :custom (eldoc-idle-delay . 0.5))
+  :custom ((eldoc-echo-area-display-truncation-message . nil)
+           (eldoc-idle-delay . 0.5)))
 
 (leaf eldoc-box
   :ensure (eldoc-box
