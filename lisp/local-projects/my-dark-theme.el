@@ -19,9 +19,11 @@
   (custom-set-faces
    ;; 'doom-1337
    ;; selected text with more light bg
-   '(region ((t :background "#557")))
-   '(secondary-selection ((t :background "#337")))
    '(cursor ((t :background "#fff")))
+   '(region ((t :background "#333")))
+   '(secondary-selection ((t :background "#337")))
+
+   '(embark-target ((t :background "#335")))
 
    ;; Selection Popup (a `vertico' package)
 
@@ -42,8 +44,6 @@
    ;; highlight current symbol with nice background background
    '(eglot-highlight-symbol-face ((t :background "#333"
                                      :bold t)))
-
-   '(embark-target ((t :background "#555")))
 
    ;; highlight TODO with red background, italic black text
    '(hl-todo ((t :backgorund "#FF5E5E" :foreground "black" :italic t))))
