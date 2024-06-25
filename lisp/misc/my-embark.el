@@ -35,6 +35,8 @@
           (">" . embark-become))
          (:embark-general-map
           ("." . my-embark-google-search))
+         (:embark-region-map
+          ("j" . join-line))
          (:embark-file-map
           ("2" . my-find-file-below)
           ("3" . my-find-file-right)
