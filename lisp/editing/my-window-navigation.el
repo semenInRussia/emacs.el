@@ -44,6 +44,7 @@
 
 (leaf ace-window
   :ensure t
+  :custom (aw-scope . 'frame)
   :bind ("M-o" . ace-window))
 
 (declare-function my-split-below "my-window-funcs")
