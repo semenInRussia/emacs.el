@@ -43,7 +43,7 @@
    '(eglot-highlight-symbol-face ((t :background "#333"
                                      :bold t)))
 
-   '(embark-target ((t :background "#779")))
+   '(embark-target ((t :background "#555")))
 
    ;; highlight TODO with red background, italic black text
    '(hl-todo ((t :backgorund "#FF5E5E" :foreground "black" :italic t))))
