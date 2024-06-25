@@ -53,6 +53,7 @@ which should be evaluated"
        (message "Thing `%s' took `%s's" (car it) (cdr it)))
      (--sort (< (cdr it) (cdr other)) times)))
 
+;;;###autoload
 (defun my-current-year ()
   "Return the current year."
   (format-time-string "%Y"))
