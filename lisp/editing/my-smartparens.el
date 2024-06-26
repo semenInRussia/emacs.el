@@ -26,6 +26,7 @@
 
 (leaf smartparens
   :defvar sp--html-modes
+  :defun sp-local-pair
   :config
   (eval-after-load 'cc-mode                  '(require 'smartparens-c))
   (eval-after-load 'clojure-mode             '(require 'smartparens-clojure))
@@ -45,7 +46,10 @@
   (eval-after-load 'markdown-mode            '(require 'smartparens-markdown))
   (--each '(python-mode python)
     (eval-after-load it                      '(require 'smartparens-python)))
-  (eval-after-load 'org                      '(require 'smartparens-org))
+  (eval-after-load 'org
+    '(progn
+       (require 'smartparens-org)
+       (sp-local-pair 'org-mode "$" "$")))
   (eval-after-load 'racket-mode              '(require 'smartparens-racket))
   (eval-after-load 'rst                      '(require 'smartparens-rst))
   (eval-after-load 'ruby-mode                '(require 'smartparens-ruby))
