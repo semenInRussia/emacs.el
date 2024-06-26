@@ -1,11 +1,10 @@
 ;;; my-org.el --- My configuration for `org-mode'
 ;; Copyright (C) 2022-2024 semenInRussia
 ;; Author: semenInRussia <hrams205@gmail.com>
-
 ;;; Commentary:
 ;; My configuration for `org-mode'
-;;; Code:
 
+;;; Code:
 (require 'my-leaf)
 (require 's)
 (require 'my-lib)
@@ -15,12 +14,7 @@
 (leaf org
   ;; :ensure t
   :defun (meow-insert . meow-command)
-  :custom ((org-file-apps
-            . '(("\\.\\'" . default)
-                ("\\.pdf\\'" . "start %s")
-                ("\\.png\\'" . "start %s")
-                ("\\.jpg\\'" . "start %s")))
-           ;; `org-refile'
+  :custom (;; `org-refile'
            (org-refile-use-outline-path . 'file)
            (org-outline-path-complete-in-steps . nil)
            ;; `org' startup
@@ -42,7 +36,6 @@
            :package org
            ("C-c M-i"   . my-org-insert-image)
            ("C-c M-u"   . my-org-insert-img-at-url)
-           ("C-c C-M-w" . my-org-clear-subtree)
            ("C-c C-t"   . my-org-todo)))
 
   (leaf org-preview
@@ -67,20 +60,6 @@
            :package org
            ([remap consult-imenu] . consult-outline)))
 
-  ;; `org-mode' exporter
-  (leaf ox
-    :custom ((org-export-coding-system . 'utf-8)
-             (org-export-with-smart-quotes . t)
-             (org-latex-caption-above . '(table))
-             (org-latex-default-figure-position . "H")
-             (org-latex-image-default-width . "5cm")
-             (org-latex-packages-alist .
-                                       '(("AUTO" "babel" nil ("pdflatex"))
-                                         ("AUTO" "polyglossia" t ("xelatex"))
-                                         ("" "cmap" nil ("pdflatex"))
-                                         ("" "float" nil
-                                          ("pdflatex" "xelatex"))))))
-
   ;; remove some useless things from the current `org-mode' buffer
   (leaf my-org-do-tidy
     :bind (:org-mode-map
@@ -90,10 +69,10 @@
   ;; transient to change values of #+OPTIONS and other #+<THINGS>
   ;;
   ;; (Info-goto-node "(org)Export Settings")
-  (leaf my-org-options
-    :bind (:org-mode-map
-           :package org
-           ("C-c C-." . my-org-options-transient)))
+  ;; (leaf my-org-options
+  ;;   :bind (:org-mode-map
+  ;;          :package org
+  ;;          ("C-c C-." . my-org-options-transient)))
 
   ;; very beautiful `org'
   ;;
@@ -122,8 +101,22 @@
 
 (leaf org-download
   :ensure (org-download :repo "abo-abo/org-download" :host github)
-  :after org
+  :after org dired
   :hook (dired-mode-hook . org-download-enable))
+
+;; `org-mode' exporter
+(leaf ox
+  :custom ((org-export-coding-system . 'utf-8)
+           (org-export-with-smart-quotes . t)
+           (org-latex-caption-above . '(table))
+           (org-latex-default-figure-position . "H")
+           (org-latex-image-default-width . "5cm")
+           (org-latex-packages-alist .
+                                     '(("AUTO" "babel" nil ("pdflatex"))
+                                       ("AUTO" "polyglossia" t ("xelatex"))
+                                       ("" "cmap" nil ("pdflatex"))
+                                       ("" "float" nil
+                                        ("pdflatex" "xelatex"))))))
 
 (provide 'my-org)
 ;;; my-org.el ends here
