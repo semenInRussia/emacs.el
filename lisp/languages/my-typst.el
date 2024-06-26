@@ -14,9 +14,21 @@
   :bind (:typst-ts-mode-map
          ("C-m" . typst-ts-mode-return))
   :custom (typst-ts-mode-indent-offset . 2)
+  :defun (texmathp . texmathp)
   :defer-config
   (add-hook 'typst-ts-mode-hook 'visual-line-mode)
   (add-hook 'typst-ts-mode-hook 'my-lsp-ensure)
+
+  (leaf laas
+    :ensure t
+    :hook typst-ts-mode-hook
+    :config
+    (advice-add 'laas-mathp
+                :around
+                (defun my-typst--mathp (&rest r)
+                  (if (derived-mode-p 'typst-ts-mode)
+                      (texmathp)
+                    (apply r)))))
 
   (require 'my-autoformat)
   (declare-function my-autoformat-bind-for-major-mode "my-autoformat")
