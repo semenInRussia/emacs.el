@@ -25,11 +25,9 @@
 (leaf tex-mode
   :defun (texmathp
           ((er/mark-LaTeX-math er/mark-LaTeX-inside-environment) . expand-region))
-  :bind (:latex-mode-map
+  :bind (:LaTeX-mode-map
          :package tex-mode
-         ("C-c C-@"  . my-latex-mark-inside-environment-or-math)
-         ("C-c C-\\" . my-latex-equation-to-split)
-         ("C-c C-w"  . my-latex-kill-section))
+         ("C-y" . yank))
   :config
   (leaf xenops
     :ensure t
@@ -64,8 +62,7 @@
     :ensure (cdlatex :repo "cdominik/cdlatex" :host github)
     :hook (LaTeX-mode-hook . turn-on-cdlatex)
     :bind (:cdlatex-mode-map
-           ("<tab>" . cdlatex-tab)
-           (";" . my-latex-dollar))
+           ("<tab>" . cdlatex-tab))
     :custom ((cdlatex-math-modify-alist
               . '((?q "\\sqrt" nil t nil nil)
                   (?u "\\breve" "\\uline" t nil nil)
