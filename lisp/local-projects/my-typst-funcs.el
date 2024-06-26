@@ -26,6 +26,7 @@ See `imenu-generic-expression'"
     (skip-chars-backward " =")
     (bolp)))
 
+;;;###autoload
 (defun autoformat-typst-capitalize-heading-line ()
   "Capitalize first letter of a heading line (lines which started with =).
 
@@ -35,6 +36,7 @@ It's working for typst."
    (my-typst-first-letter-of-heading-p)
    (upcase-char -1)))
 
+;;;###autoload
 (defun autoformat-typst-capitalize-list-item ()
   "Capitalize first letter of a list item line."
   (interactive)

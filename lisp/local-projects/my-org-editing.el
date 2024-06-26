@@ -87,12 +87,6 @@ Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
                       inherit-input-method)))
     (unless (s-blank-p input) input)))
 
-;;;###autoload
-(defun my-org-clear-subtree ()
-  "Kill subtree at the position, and activate insertion mode."
-  (org-cut-subtree)
-  (meow-insert-mode))
-
 (defun my-org-table-eval-formula-in-field ()
   "Eval formula with `orgtbl' syntax for the current field of the table."
   (interactive)
