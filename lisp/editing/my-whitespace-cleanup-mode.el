@@ -10,8 +10,8 @@
 (require 'my-leaf)
 
 (leaf whitespace-cleanup-mode
-  :ensure t
-  :hook (write-file-functions . whitespace-cleanup-mode-write-file))
+  ;; :ensure t
+  :hook (write-file-functions . delete-trailing-whitespace))
 
 (provide 'my-whitespace-cleanup-mode)
 ;;; my-whitespace-cleanup-mode.el ends here
