@@ -34,7 +34,7 @@ Rename variable which is symbol ID"
                  ;; disable inlay hints
                  :inlayHintProvider))
             (eglot-events-buffer-config . 0)
-            (eglot-auto-display-help-buffer . nil))
+            (eglot-report-progress . nil))
   :defun eglot-inlay-hints-mode eglot-code-actions jsonrpc--log-event
   :bind ((:eglot-mode-map
           ("C-c lr" . eglot-rename)
