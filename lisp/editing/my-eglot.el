@@ -21,7 +21,7 @@
 Rename variable which is symbol ID"
   (eglot-rename
    (read-from-minibuffer (format "Rename `%s' to: "  id)
-                         nil nil nil nil
+                         (format "%s" id) nil nil nil
                          (format "%s" id))))
 
 (leaf eglot
