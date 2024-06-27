@@ -20,5 +20,28 @@
   :hook ((latex-mode-hook . aas-mode)
          (TeX-latex-mode-hook . aas-mode)))
 
+(leaf laas
+  :ensure t
+  :hook LaTeX-mode-hook
+  :defun ((aas-set-snippets . aas)
+          (texmathp . texmathp))
+  :config
+  (aas-set-snippets 'laas-mode
+    :cond #'texmathp
+    ;; Some Physics Units
+    ;; "As" "\\mathrm{А}"
+    ;; "Vs"  "\\mathrm{В}"
+    ;; "Oms"  "\\mathrm{Ом}"
+    "cls" "^\\circ C"
+
+    ;; Some Physics Sheet
+    ;; "eqv" "\\mathrm{Экв.}"
+
+    ;; Some Cool Symbols
+    "trg" "\\triangle"
+    "agl" "\\angle"
+    "grd" "^\\circ"
+    "xor" "\\oplus"))
+
 (provide 'my-aas)
 ;;; my-aas.el ends here

@@ -6,7 +6,6 @@
 
 ;;; Code:
 (require 'f)
-(require 'my-lib)
 
 (defvar my-local-project-was-updated nil
   "Variable is non-nil if one of my \"local-project\" was edited.
@@ -193,6 +192,8 @@ After before kill try to byte-compile this autoloads"
   (interactive)
   (my-build-config)
   (restart-emacs))
+
+(autoload 'my-current-year "my-lib")
 
 ;;;###autoload
 (defun my-new-config-module (module-name &optional directory)

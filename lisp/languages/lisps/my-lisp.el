@@ -8,7 +8,6 @@
 
 (require 'my-leaf)
 (require 'dash)
-(require 'my-lib)
 
 (declare-function meow-insert "meow-commands.el")
 

@@ -7,7 +7,6 @@
 
 ;;; Code:
 (require 'my-leaf)
-(require 'my-lib)
 
 
 (leaf outline

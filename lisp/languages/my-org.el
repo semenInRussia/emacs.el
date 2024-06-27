@@ -7,7 +7,6 @@
 ;;; Code:
 (require 'my-leaf)
 (require 's)
-(require 'my-lib)
 (require 'dash)
 
 
@@ -22,6 +21,7 @@
            (org-startup-folded . t)
            (org-startup-indented . t)
            (org-startup-with-inline-images . t))
+  :hook (org-mode-hook . org-toggle-pretty-entities)
   :bind (;; NOTE: `org-capture' and `org-agenda' in the my-organization.el file
          ;; ("C-c z c" . org-capture)
          (:org-mode-map
@@ -45,6 +45,9 @@
 
   (leaf xenops
     :ensure t
+    :bind (:org-mode-map
+           :package org
+           ("C-c C-x C-l" . xenops-mode))
     :custom (xenops-math-image-scale-factor . 2))
 
   (leaf laas
@@ -83,7 +86,11 @@
 
   (leaf org-autolist
     :ensure t
-    :hook org-mode-hook)
+    ;; :hook org-mode-hook
+    :commands org-autolist-mode
+    :config
+    (run-with-idle-timer 3 nil (lambda () (require 'org-autolist)))
+    (add-hook 'org-mode-hook 'org-autolist-mode))
 
   (leaf rorg
     :ensure (rorg :host github :repo "semenInRussia/rorg")

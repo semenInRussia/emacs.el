@@ -10,12 +10,12 @@
 ;;; Code:
 (require 'dash)
 (require 'my-leaf)
-(require 'my-lib)
 (require 'smartparens)
 
 ;; `flycheck' is enough slow plus `racket-xp-mode' highlight
 ;; errors too, so i disable `flycheck' for Racket
 (add-hook 'racket-mode-hook #'turn-off-flycheck)
+(autoload 'turn-off-flycheck "init.el")
 (leaf racket-mode
   :ensure (racket-mode :repo "greghendershott/racket-mode" :host github)
   :hook ((racket-mode-hook . racket-xp-mode))

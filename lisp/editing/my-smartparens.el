@@ -9,8 +9,7 @@
 ;;; Code:
 
 (require 'my-leaf)
-(require 'my-lib)
-
+(require 'dash)
 
 (leaf smartparens
   :ensure (smartparens :repo "Fuco1/smartparens" :host github)

@@ -69,7 +69,7 @@
 (leaf eldoc
   :ensure (eldoc :type built-in)
   :custom ((eldoc-echo-area-display-truncation-message . nil)
-           (eldoc-idle-delay . 0.5)))
+           (eldoc-idle-delay . 0.7)))
 
 (leaf eldoc-box
   :ensure (eldoc-box

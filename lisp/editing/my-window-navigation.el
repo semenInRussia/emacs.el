@@ -138,252 +138,254 @@ If buffer-or-name is nil return current buffer's mode."
                           (get-buffer buffer-or-name)
                         (current-buffer))))
 
-(setq display-buffer-alist
-      '(
+(setq display-buffer-alist nil)
 
-        ;; ("^\\*[Ee]shell [Ee]xport: .*\\*$"
-        ;;  (display-buffer-reuse-window display-buffer-use-some-window))
+;; (setq display-buffer-alist
+;;       '(
 
-        ;; ----------------------------------------------------------------
-        ;; Windows on top
-        ;; ----------------------------------------------------------------
+;;         ;; ("^\\*[Ee]shell [Ee]xport: .*\\*$"
+;;         ;;  (display-buffer-reuse-window display-buffer-use-some-window))
 
-        ("\\*\\(?:Org Select\\|Agenda Commands\\)\\*"
-         (display-buffer-below-selected
-          display-buffer-in-side-window)
-         (body-function . select-window)
-         (window-height . (lambda (win) (fit-window-to-buffer win nil 12)))
-         (side . top)
-         (slot . -2)
-         (preserve-size . (nil . t))
-         (window-parameters . ((mode-line-format . nil))))
+;;         ;; ----------------------------------------------------------------
+;;         ;; Windows on top
+;;         ;; ----------------------------------------------------------------
 
-        ("\\*Buffer List\\*" (display-buffer-in-side-window)
-         (side . top)
-         (slot . 0)
-         (window-height . shrink-window-if-larger-than-buffer))
+;;         ("\\*\\(?:Org Select\\|Agenda Commands\\)\\*"
+;;          (display-buffer-below-selected
+;;           display-buffer-in-side-window)
+;;          (body-function . select-window)
+;;          (window-height . (lambda (win) (fit-window-to-buffer win nil 12)))
+;;          (side . top)
+;;          (slot . -2)
+;;          (preserve-size . (nil . t))
+;;          (window-parameters . ((mode-line-format . nil))))
 
-        ;; ((lambda (buf act) (member (buffer-mode buf) my/occur-grep-modes-list))
-        ;;  (display-buffer-reuse-mode-window
-        ;;   display-buffer-in-direction
-        ;;   display-buffer-in-side-window)
-        ;;  (side . top)
-        ;;  (slot . 5)
-        ;;  (window-height . (lambda (win) (fit-window-to-buffer win 20 10)))
-        ;;  (direction . above)
-        ;;  (body-function . select-window))
+;;         ("\\*Buffer List\\*" (display-buffer-in-side-window)
+;;          (side . top)
+;;          (slot . 0)
+;;          (window-height . shrink-window-if-larger-than-buffer))
 
-        ("\\*\\(Flycheck\\|Package-Lint\\).*"
-         (display-buffer-in-direction display-buffer-in-side-window)
-         (direction . above)
-         (window-height . shrink-window-if-larger-than-buffer)
-         ;; (window-height . 0.16)
-         (side . top)
-         (slot . 1)
-         (window-parameters . (;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
-                               (no-other-window . t))))
+;;         ;; ((lambda (buf act) (member (buffer-mode buf) my/occur-grep-modes-list))
+;;         ;;  (display-buffer-reuse-mode-window
+;;         ;;   display-buffer-in-direction
+;;         ;;   display-buffer-in-side-window)
+;;         ;;  (side . top)
+;;         ;;  (slot . 5)
+;;         ;;  (window-height . (lambda (win) (fit-window-to-buffer win 20 10)))
+;;         ;;  (direction . above)
+;;         ;;  (body-function . select-window))
 
-        ;; ----------------------------------------------------------------
-        ;; Windows on the side
-        ;; ----------------------------------------------------------------
+;;         ("\\*\\(Flycheck\\|Package-Lint\\).*"
+;;          (display-buffer-in-direction display-buffer-in-side-window)
+;;          (direction . above)
+;;          (window-height . shrink-window-if-larger-than-buffer)
+;;          ;; (window-height . 0.16)
+;;          (side . top)
+;;          (slot . 1)
+;;          (window-parameters . (;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
+;;                                (no-other-window . t))))
 
-        ;; ((lambda (buf act) (member (buffer-mode buf) my/man-modes-list))
-        ;;  ;; "^\\*\\(?:Wo\\)?Man"
-        ;;  (display-buffer-in-side-window)
-        ;;  (body-function . select-window)
-        ;;  (window-width . 76)       ; See the :hook
-        ;;  (side . left)
-        ;;  (slot . 9))
+;;         ;; ----------------------------------------------------------------
+;;         ;; Windows on the side
+;;         ;; ----------------------------------------------------------------
 
-        ("\\*Faces\\*" (display-buffer-in-side-window)
-         (window-width . 0.25)
-         (side . right)
-         (slot . -2)
-         (window-parameters . ((no-other-window . t)
-                               ;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
-                               )))
+;;         ;; ((lambda (buf act) (member (buffer-mode buf) my/man-modes-list))
+;;         ;;  ;; "^\\*\\(?:Wo\\)?Man"
+;;         ;;  (display-buffer-in-side-window)
+;;         ;;  (body-function . select-window)
+;;         ;;  (window-width . 76)       ; See the :hook
+;;         ;;  (side . left)
+;;         ;;  (slot . 9))
 
-        ;; ((lambda (buf act) (or (equal (buffer-mode buf) 'Custom-mode)
-        ;;                   (string-match-p "^\\*Customize" (buffer-name))))
-        ;;  (display-buffer-in-side-window)
-        ;;  (body-function . select-window)
-        ;;  (window-width . 74)
-        ;;  (side . right)
-        ;;  (slot . 5))
+;;         ("\\*Faces\\*" (display-buffer-in-side-window)
+;;          (window-width . 0.25)
+;;          (side . right)
+;;          (slot . -2)
+;;          (window-parameters . ((no-other-window . t)
+;;                                ;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
+;;                                )))
 
-        ("\\*undo-tree\\*" ;; (lambda (buf act) (equal (buffer-mode buf) 'undo-tree-visualizer-mode))
-         (display-buffer-in-direction)
-         (window-width . 35) ;; (lambda (win) (fit-window-to-buffer win nil nil 65 40 t)))
-         (direction . right)
-         (side . right)
-         (slot . -5))
+;;         ;; ((lambda (buf act) (or (equal (buffer-mode buf) 'Custom-mode)
+;;         ;;                   (string-match-p "^\\*Customize" (buffer-name))))
+;;         ;;  (display-buffer-in-side-window)
+;;         ;;  (body-function . select-window)
+;;         ;;  (window-width . 74)
+;;         ;;  (side . right)
+;;         ;;  (slot . 5))
 
-        ;; ----------------------------------------------------------------
-        ;; Windows at the bottom
-        ;; ----------------------------------------------------------------
+;;         ("\\*undo-tree\\*" ;; (lambda (buf act) (equal (buffer-mode buf) 'undo-tree-visualizer-mode))
+;;          (display-buffer-in-direction)
+;;          (window-width . 35) ;; (lambda (win) (fit-window-to-buffer win nil nil 65 40 t)))
+;;          (direction . right)
+;;          (side . right)
+;;          (slot . -5))
 
-        ("\\*Backtrace\\*" (display-buffer-in-side-window)
-         (window-height . 0.20)
-         (side . bottom)
-         (slot . -9)
-         ;; (preserve-size . (nil . t))
-         ;; (window-parameters . (;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
-         ;;                       ))
-         )
+;;         ;; ----------------------------------------------------------------
+;;         ;; Windows at the bottom
+;;         ;; ----------------------------------------------------------------
 
-        ;; ("\\*RefTex" (display-buffer-in-side-window)
-        ;;  (window-height . 0.25)
-        ;;  (side . bottom)
-        ;;  (slot . -9)
-        ;;  ;; (preserve-size . (nil . t))
-        ;;  ;; (window-parameters . (;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
-        ;;  ;;                       ))
-        ;;  )
+;;         ("\\*Backtrace\\*" (display-buffer-in-side-window)
+;;          (window-height . 0.20)
+;;          (side . bottom)
+;;          (slot . -9)
+;;          ;; (preserve-size . (nil . t))
+;;          ;; (window-parameters . (;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
+;;          ;;                       ))
+;;          )
 
-        ((lambda (buf act) (member (buffer-mode buf) my/message-modes-list))
-         (display-buffer-at-bottom display-buffer-in-side-window)
-         (window-height . 0.25)
-         (side . bottom)
-         (slot . -6)
-         ;; (preserve-size . (nil . t))
-         ;; (window-parameters . ((no-other-window . #'ignore)
-         ;;                       ;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
-         ;;                       ))
-         )
+;;         ;; ("\\*RefTex" (display-buffer-in-side-window)
+;;         ;;  (window-height . 0.25)
+;;         ;;  (side . bottom)
+;;         ;;  (slot . -9)
+;;         ;;  ;; (preserve-size . (nil . t))
+;;         ;;  ;; (window-parameters . (;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
+;;         ;;  ;;                       ))
+;;         ;;  )
 
-        ("\\*\\(?:Warnings\\|Compile-Log\\|Messages\\)\\*" ;\\|Tex Help\\|TeX errors
-         (display-buffer-at-bottom display-buffer-in-side-window display-buffer-in-direction)
-         (window-height . (lambda (win) (fit-window-to-buffer
-                                         win
-                                         (floor (frame-height) 5))))
-         (side . bottom)
-         (direction . below)
-         (slot . -5)
-         ;; (preserve-size . (nil . t))
-         (window-parameters . ((split-window . #'ignore)
-                               ;; (no-other-window . t)
-                               ;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
-                               )))
+;;         ((lambda (buf act) (member (buffer-mode buf) my/message-modes-list))
+;;          (display-buffer-at-bottom display-buffer-in-side-window)
+;;          (window-height . 0.25)
+;;          (side . bottom)
+;;          (slot . -6)
+;;          ;; (preserve-size . (nil . t))
+;;          ;; (window-parameters . ((no-other-window . #'ignore)
+;;          ;;                       ;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
+;;          ;;                       ))
+;;          )
 
-        ("[Oo]utput\\*" display-buffer-in-side-window
-         (window-height . (lambda (win)
-                            (fit-window-to-buffer win (floor (frame-height) 2.5))))
-         (side . bottom)
-         (slot . -4)
-         ;; (preserve-size . (nil . t))
-         ;; (window-parameters . ((no-other-window . t)
-         ;;                       ;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
-         ;;                       ))
-         )
+;;         ("\\*\\(?:Warnings\\|Compile-Log\\|Messages\\)\\*" ;\\|Tex Help\\|TeX errors
+;;          (display-buffer-at-bottom display-buffer-in-side-window display-buffer-in-direction)
+;;          (window-height . (lambda (win) (fit-window-to-buffer
+;;                                          win
+;;                                          (floor (frame-height) 5))))
+;;          (side . bottom)
+;;          (direction . below)
+;;          (slot . -5)
+;;          ;; (preserve-size . (nil . t))
+;;          (window-parameters . ((split-window . #'ignore)
+;;                                ;; (no-other-window . t)
+;;                                ;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
+;;                                )))
 
-        ("\\*Async Shell Command\\*" display-buffer-in-side-window
-         (window-height . 0.20)
-         (side . bottom)
-         (slot . -4)
-         ;; (preserve-size . (nil . t))
-         (window-parameters . ((no-other-window . t)
-                               ;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
-                               )))
+;;         ("[Oo]utput\\*" display-buffer-in-side-window
+;;          (window-height . (lambda (win)
+;;                             (fit-window-to-buffer win (floor (frame-height) 2.5))))
+;;          (side . bottom)
+;;          (slot . -4)
+;;          ;; (preserve-size . (nil . t))
+;;          ;; (window-parameters . ((no-other-window . t)
+;;          ;;                       ;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
+;;          ;;                       ))
+;;          )
 
-        ("\\*\\(Register Preview\\).*" (display-buffer-in-side-window)
-         (window-height . 0.20)       ; See the :hook
-         (side . bottom)
-         (slot . -3)
-         (window-parameters . ((no-other-window . t)
-                               ;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
-                               )))
+;;         ("\\*Async Shell Command\\*" display-buffer-in-side-window
+;;          (window-height . 0.20)
+;;          (side . bottom)
+;;          (slot . -4)
+;;          ;; (preserve-size . (nil . t))
+;;          (window-parameters . ((no-other-window . t)
+;;                                ;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
+;;                                )))
 
-        ("\\*Completions\\*" (display-buffer-in-side-window)
-         (window-height . 0.20)
-         (side . bottom)
-         (slot . -2)
-         ;; (window-parameters . ((no-other-window . t)
-         ;;                       ;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
-         ;;                       ))
-         )
+;;         ("\\*\\(Register Preview\\).*" (display-buffer-in-side-window)
+;;          (window-height . 0.20)       ; See the :hook
+;;          (side . bottom)
+;;          (slot . -3)
+;;          (window-parameters . ((no-other-window . t)
+;;                                ;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
+;;                                )))
 
-        ("\\*Apropos\\*" (display-buffer-in-side-window)
-         ;; (window-height . 0.40)
-         (window-width . 65)
-         (side . right)
-         (slot . -2)
-         (window-parameters . (;; (no-other-window . t)
-                               ;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
-                               )))
+;;         ("\\*Completions\\*" (display-buffer-in-side-window)
+;;          (window-height . 0.20)
+;;          (side . bottom)
+;;          (slot . -2)
+;;          ;; (window-parameters . ((no-other-window . t)
+;;          ;;                       ;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
+;;          ;;                       ))
+;;          )
 
-
-        ((lambda (buf act) (or (seq-some (lambda (regex) (string-match-p regex buf))
-                                    my/repl-names-list)
-                          (seq-some (lambda (mode)
-                                      (equal
-                                       (buffer-mode buf)
-                                       mode))
-                                    my/repl-modes-list)))
-         (display-buffer-reuse-window
-          display-buffer-in-direction
-          display-buffer-in-side-window)
-         (body-function . select-window)
-         ;; display-buffer-at-bottom
-         (window-height . .35)
-         (window-width .  .40)
-         ;; (preserve-size . (nil . t))
-         (direction . below)
-         (side . bottom)
-         (slot . 1))
-
-        ;; ((lambda (buf act) (member (buffer-mode buf) my/help-modes-list))
-        ;;  (display-buffer-reuse-window
-        ;;   display-buffer-in-direction
-        ;;   display-buffer-in-side-window)
-        ;;  (body-function . select-window)
-        ;;  ;; (direction . bottom)
-        ;;  ;; (window-height . (lambda (win) (fit-window-to-buffer win 25 14)))
-        ;;  (window-width . 77 ;; (lambda (win) (fit-window-to-buffer win nil nil 75 65))
-        ;;                )
-        ;;  (direction . below)
-        ;;  (side . right)
-        ;;  (slot . 2)
-        ;;  (window-parameters . ((split-window . #'ignore)
-        ;;                        ;; (no-other-window . t)
-        ;;                        ;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
-        ;;                        )))
-
-        ;; ("^\\*eldoc.*\\*$"
-        ;;  (display-buffer-reuse-window
-        ;;   display-buffer-in-direction
-        ;;   display-buffer-in-side-window)
-        ;;  ;; (body-function . select-window)
-        ;;  ;; (direction . bottom)
-        ;;  ;; (window-height . (lambda (win) (fit-window-to-buffer win 25 14)))
-        ;;  (window-width . 82 ;; (lambda (win) (fit-window-to-buffer win nil nil 75 65))
-        ;;                )
-        ;;  (direction . below)
-        ;;  (side . below)
-        ;;  (slot . 2)
-        ;;  (window-parameters . ((dedicated . t)
-        ;;                        (split-window . #'ignore)
-        ;;                        (no-other-window . t)
-        ;;                        (mode-line-format . none))))
-
-        ;; ((lambda (buf act) (with-current-buffer buf view-mode))
-        ;;  (display-buffer-in-side-window)
-        ;;  (window-height . (/ (frame-height) 3))
-        ;;  (side . bottom)
-        ;;  (slot . 10)
-        ;;  ;; (window-parameters . (;; (no-other-window . t)
-        ;;  ;;                       ;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
-        ;;  ;;                       ))
-        ;;  )
+;;         ("\\*Apropos\\*" (display-buffer-in-side-window)
+;;          ;; (window-height . 0.40)
+;;          (window-width . 65)
+;;          (side . right)
+;;          (slot . -2)
+;;          (window-parameters . (;; (no-other-window . t)
+;;                                ;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
+;;                                )))
 
 
-        ;; ("\\*elfeed-entry\\*" (lambda (buf act) (let ((parent-win (get-buffer-window)))
-        ;;                                      (display-buffer-in-direction buf act)
-        ;;                                      (select-window parent-win)
-        ;;                                      ))
-        ;;  (direction . below)
-        ;;  (window-height . 0.5)
-        ;;  )
-        ))
+;;         ((lambda (buf act) (or (seq-some (lambda (regex) (string-match-p regex buf))
+;;                                     my/repl-names-list)
+;;                           (seq-some (lambda (mode)
+;;                                       (equal
+;;                                        (buffer-mode buf)
+;;                                        mode))
+;;                                     my/repl-modes-list)))
+;;          (display-buffer-reuse-window
+;;           display-buffer-in-direction
+;;           display-buffer-in-side-window)
+;;          (body-function . select-window)
+;;          ;; display-buffer-at-bottom
+;;          (window-height . .35)
+;;          (window-width .  .40)
+;;          ;; (preserve-size . (nil . t))
+;;          (direction . below)
+;;          (side . bottom)
+;;          (slot . 1))
+
+;;         ;; ((lambda (buf act) (member (buffer-mode buf) my/help-modes-list))
+;;         ;;  (display-buffer-reuse-window
+;;         ;;   display-buffer-in-direction
+;;         ;;   display-buffer-in-side-window)
+;;         ;;  (body-function . select-window)
+;;         ;;  ;; (direction . bottom)
+;;         ;;  ;; (window-height . (lambda (win) (fit-window-to-buffer win 25 14)))
+;;         ;;  (window-width . 77 ;; (lambda (win) (fit-window-to-buffer win nil nil 75 65))
+;;         ;;                )
+;;         ;;  (direction . below)
+;;         ;;  (side . right)
+;;         ;;  (slot . 2)
+;;         ;;  (window-parameters . ((split-window . #'ignore)
+;;         ;;                        ;; (no-other-window . t)
+;;         ;;                        ;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
+;;         ;;                        )))
+
+;;         ;; ("^\\*eldoc.*\\*$"
+;;         ;;  (display-buffer-reuse-window
+;;         ;;   display-buffer-in-direction
+;;         ;;   display-buffer-in-side-window)
+;;         ;;  ;; (body-function . select-window)
+;;         ;;  ;; (direction . bottom)
+;;         ;;  ;; (window-height . (lambda (win) (fit-window-to-buffer win 25 14)))
+;;         ;;  (window-width . 82 ;; (lambda (win) (fit-window-to-buffer win nil nil 75 65))
+;;         ;;                )
+;;         ;;  (direction . below)
+;;         ;;  (side . below)
+;;         ;;  (slot . 2)
+;;         ;;  (window-parameters . ((dedicated . t)
+;;         ;;                        (split-window . #'ignore)
+;;         ;;                        (no-other-window . t)
+;;         ;;                        (mode-line-format . none))))
+
+;;         ;; ((lambda (buf act) (with-current-buffer buf view-mode))
+;;         ;;  (display-buffer-in-side-window)
+;;         ;;  (window-height . (/ (frame-height) 3))
+;;         ;;  (side . bottom)
+;;         ;;  (slot . 10)
+;;         ;;  ;; (window-parameters . (;; (no-other-window . t)
+;;         ;;  ;;                       ;; (mode-line-format . (:eval (my/helper-window-mode-line-format)))
+;;         ;;  ;;                       ))
+;;         ;;  )
+
+
+;;         ;; ("\\*elfeed-entry\\*" (lambda (buf act) (let ((parent-win (get-buffer-window)))
+;;         ;;                                      (display-buffer-in-direction buf act)
+;;         ;;                                      (select-window parent-win)
+;;         ;;                                      ))
+;;         ;;  (direction . below)
+;;         ;;  (window-height . 0.5)
+;;         ;;  )
+;;         ))
 
 
 (provide 'my-window-navigation)
