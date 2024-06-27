@@ -20,7 +20,7 @@
    ;; 'doom-1337
    ;; selected text with more light bg
    '(cursor ((t :background "#fff")))
-   '(region ((t :background "#333")))
+   '(region ((t :background "#3F3F3F")))
    '(secondary-selection ((t :background "#337")))
 
    '(embark-target ((t :background "#335")))
@@ -42,7 +42,7 @@
    '(corfu-current ((t :background "#252526" :bold t)))
 
    ;; highlight current symbol with nice background background
-   '(eglot-highlight-symbol-face ((t :background "#333"
+   '(eglot-highlight-symbol-face ((t :underline t
                                      :bold t)))
 
    ;; highlight TODO with red background, italic black text
