@@ -55,8 +55,8 @@
            meow-replace-state-name-list)
   :require meow-helpers
   :custom (;; for me this is must-have, without it I looks like a
-           ;; noob, but some men thinks that divide system clipboard and editor is
-           ;; a cool idea, (they are stranger)
+           ;; noob, but some men thinks that divide system clipboard
+           ;; and editor is a cool idea, (they are stranger)
            (meow-use-clipboard . t))
   :config
   (defun my-meow-setup ()

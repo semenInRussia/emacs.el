@@ -25,7 +25,7 @@
   (interactive)
   ;; run it with idle timer.  It's useful, because in this case Emacs
   ;; don't need to load `eglot' instantly after somebody open a file,
-  ;; so file will be opened more quickly, and lsp will be activated
+  ;; so file will be opened more quickly and lsp will be activated
   ;; after some time
   (let ((buf (current-buffer)))
     (run-with-idle-timer 1 nil

@@ -39,18 +39,9 @@
                   (format "%s:  %s"
                           (propertize
                            (pcase level
-                             ('info
-                              "I"
-                              ;; (nerd-icons-codicon "nf-cod-info")
-                              )
-                             ('error
-                              "E"
-                              ;; (nerd-icons-codicon "nf-cod-error")
-                              )
-                             ('warning
-                              "W"
-                              ;; (nerd-icons-codicon "nf-cod-warning")
-                              )
+                             ('info "I")
+                             ('error "E")
+                             ('warning "W")
                              (_ level))
                            'face (pcase level
                                    ('info
