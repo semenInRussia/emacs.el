@@ -18,7 +18,7 @@
     :ensure t
     :bind (:markdown-mode-map
            :package markdown-mode
-           ("C-T" . markdown-toc-generate-or-refresh-toc)))
+           ("C-c C-t" . markdown-toc-generate-or-refresh-toc)))
 
   (leaf edit-indirect
     :ensure (edit-indirect :repo "Fanael/edit-indirect" :host github))
