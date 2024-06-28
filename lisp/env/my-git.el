@@ -24,6 +24,12 @@
                 magit-insert-tags-header)))
   :init
   (fset 'magit-version #'ignore)
+  (advice-add 'transient--post-command
+              :around
+              (defun my-oref-for-nils (&rest r)
+                (ignore-errors
+                  (apply r))))
+
   (with-eval-after-load 'project
     (add-to-list 'project-switch-commands '(magit-project-status "Magit") t)
     (keymap-set project-prefix-map "m" 'magit-project-status)))
