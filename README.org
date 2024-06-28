@@ -152,8 +152,8 @@ So you can test it without ~chemacs~ and other stupid things, you even not need 
     mv en_US.aff en.aff
     mv en_US.dic en.dic
     mkdir hunspell
-    cp *dic hunspell
-    cp *aff hunspell
+    mv *dic hunspell
+    mv *aff hunspell
   #+end_src
 
 - Fonts (better [[https://www.jetbrains.com/lp/mono/][JetBrains Mono]] and Symbols Nerd Font Mono : [[https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/NerdFontsSymbolsOnly.zip][link to zip archive]])
