@@ -97,8 +97,8 @@
   (my-build-config))
 
 (when (member "--bcompile" command-line-args)
-  (byte-compile (locate-user-emacs-file "init.el"))
-  (byte-compile (locate-user-emacs-file "early-init.el"))
+  (byte-compile-file (locate-user-emacs-file "init.el"))
+  (byte-compile-file (locate-user-emacs-file "early-init.el"))
   (pam-byte-compile-pkg-autoloads))
 
 ;;; don't use init.el for custom.el which I don't use
