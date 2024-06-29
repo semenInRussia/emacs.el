@@ -14,6 +14,7 @@
   "A list of (FEATURE LOAD-START-TIME LOAD-DURATION).
 LOAD-DURATION is the time taken in milliseconds to load FEATURE.")
 
+
 (defun my-require-times-wrapper (orig feature &rest args)
   "Note in `my-require-times' the time taken to require each feature.
 
@@ -26,9 +27,8 @@ Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
              (let ((time
                     (* 1000.0 (float-time (time-subtract (current-time)
                                                          require-start-time)))))
-               (add-to-list 'my-require-times
-                            (list (intern (format "%s" feature)) require-start-time time)
-                            t)))))))
+               (push (list (intern (format "%s" feature)) require-start-time time)
+                     my-require-times)))))))
 
 (advice-add 'require :around 'my-require-times-wrapper)
 
