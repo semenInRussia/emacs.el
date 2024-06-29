@@ -1,4 +1,4 @@
-;;; init.el --- Load my configuration
+;;; init.el --- Load my configuration -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
 

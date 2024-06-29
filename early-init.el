@@ -1,3 +1,4 @@
+;;; early-init.el -*- lexical-binding: t -*-
 (message "Make emacs fast again!!")
 ;; --- Donald TrAmp
 
