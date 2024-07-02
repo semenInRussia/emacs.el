@@ -42,8 +42,10 @@
    '(corfu-current ((t :background "#252526" :bold t)))
 
    ;; highlight current symbol with nice background background
-   '(eglot-highlight-symbol-face ((t :underline t
-                                     :bold t)))
+   '(eglot-highlight-symbol-face ((t
+                                   ;; :background "#333"
+                                   ;; :foreground "#000"
+                                   )))
 
    ;; highlight TODO with red background, italic black text
    '(hl-todo ((t :backgorund "#FF5E5E" :foreground "black" :italic t))))
