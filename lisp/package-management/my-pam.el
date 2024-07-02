@@ -43,13 +43,15 @@
         (setq xs (cdr xs)))))
 
   (with-eval-after-load 'pam
+    (defun my-pam-maybe-mark-built-ins (&rest args)
+      (let ((need-p (not pam-straight-already-loaded-p)))
+        (apply args)
+        (and need-p
+             (my-pam-mark-built-ins))))
+
     (advice-add 'pam--load-straight
                 :around
-                (defun my-pam-maybe-mark-built-ins (&rest args)
-                  (let ((need-p (not pam-straight-already-loaded-p)))
-                    (apply args)
-                    (and need-p
-                         (my-pam-mark-built-ins)))))))
+                #'my-pam-maybe-mark-built-ins)))
 
 ;;; my-pam.el ends here
 (provide 'my-pam)
