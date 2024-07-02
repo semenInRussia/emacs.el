@@ -176,8 +176,7 @@ Byte-compile every file of install and generate autoloads file"
 (add-to-list 'load-path (file-name-directory my-modules-el-file))
 
 (let ((file-name-handler-alist nil)
-      (load-suffixes '(".elc" ".el"))
-      (load-rep-load-file-rep-suffixes '("")))
+      (load-suffixes '(".elc" ".el")))
   (require 'my-modules))
 
 
