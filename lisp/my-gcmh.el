@@ -8,14 +8,11 @@
 
 ;;; Code:
 
-(require 'leaf)
+(require 'my-leaf)
 
 (leaf gcmh
   :ensure t
-  :hook emacs-startup-hook
-  :custom ((gcmh-idle-delay . 'auto)
-           (gcmh-auto-idle-delay-factor . 10)
-           (gcmh-high-cons-threshold . #x1000000)))
+  :hook emacs-startup-hook)
 
 ;;; my-gcmh.el ends here
 (provide 'my-gcmh)

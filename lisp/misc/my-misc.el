@@ -52,6 +52,8 @@
     (float-time (time-subtract after-init-time before-init-time)))
    gcs-done))
 
+(auto-save-mode -1)
+
 (add-hook 'emacs-startup-hook #'my-display-startup-time)
 
 ;;; smooth scrolling

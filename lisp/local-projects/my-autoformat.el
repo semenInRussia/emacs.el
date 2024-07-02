@@ -134,7 +134,5 @@ MM defaults to value of the `major-mode'"
    (cons (cons mode functions))
    (setq my-autoformat-functions-of-major-modes)))
 
-(my-autoformat-global-mode t)
-
 (provide 'my-autoformat)
 ;;; my-autoformat.el ends here

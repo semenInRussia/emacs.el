@@ -12,9 +12,9 @@
 
 (require 'my-leaf)
 
-(leaf files
-  :hook ((text-mode-hook prog-mode-hook) . auto-save-visited-mode)
-  :custom (auto-save-interval . 5)) ;; default is 3
+;; (leaf files
+;;   :hook ((text-mode-hook prog-mode-hook) . auto-save-visited-mode)
+;;   :custom (auto-save-interval . 5)) ;; default is 3
 
 ;;; my-autosave.el ends here
 (provide 'my-autosave)
