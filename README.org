@@ -151,7 +151,6 @@ So you can test it without ~chemacs~ and other stupid things, you even not need 
     mkdir hunspell
     mv en_US.aff en.aff
     mv en_US.dic en.dic
-    mkdir hunspell
     mv *dic hunspell
     mv *aff hunspell
   #+end_src
