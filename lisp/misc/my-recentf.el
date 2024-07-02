@@ -36,5 +36,11 @@
   (advice-add 'consult-buffer :before #'my-recentf-load)
   (run-with-idle-timer 3 nil #'my-recentf-load))
 
+
+(with-eval-after-load 'server
+  (advice-add #'server-force-delete
+              :before
+              #'recentf-save-list))
+
 (provide 'my-recentf)
 ;;; my-recentf.el ends here

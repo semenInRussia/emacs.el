@@ -13,7 +13,8 @@
 ;; a bit cooler `isearch'
 (leaf ctrlf
   :ensure (ctrlf :repo "radian-software/ctrlf" :host github)
-  :bind ("C-s" . ctrlf-forward-default))
+  :bind (("C-s" . ctrlf-forward-default)
+         ("C-r" . ctrlf-backward-default)))
 
 ;; a bit cooller `query-replace'
 (leaf visual-regexp

@@ -69,10 +69,16 @@
          ("M-g I" . consult-imenu-multi)
          ("M-g i" . consult-imenu))
 
-  :custom ((consult-async-min-input . 1)
-           ;; Idk what is it
-           (register-preview-delay  . 0.5)
-           (register-preview-function . #'consult-register-format))
+  :custom `((consult-async-min-input . 1)
+            (consult-ripgrep-args
+             . ,(concat
+                 "rg --null --line-buffered --color=never"
+                 " --max-columns=1000 --path-separator /  "
+                 " --smart-case --no-heading --with-filename"
+                 " --line-number --search-zip --hidden"))
+            ;; Idk what is it
+            (register-preview-delay  . 0.5)
+            (register-preview-function . #'consult-register-format))
 
   ;; i don't know what does the next line
   :hook ((completion-list-mode-hook . consult-preview-at-point-mode))
