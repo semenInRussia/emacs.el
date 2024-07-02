@@ -26,13 +26,16 @@ Rename variable which is symbol ID"
 
 (leaf eglot
   :ensure (eglot :type built-in)
-  :custom `((eglot-sync-connect . 1)
+  :custom `(;; (eglot-sync-connect . 1)
+            (eglot-events-buffer-size . 0)
             (eglot-autoshutdown . t)
             (eglot-ignored-server-capabilities
              . '(;; disable code lens
                  :codeLensProvider
                  ;; disable inlay hints
-                 :inlayHintProvider))
+                 :inlayHintProvider
+                 ;; dont higlight symbol
+                 :documentHighlightProvider))
             (eglot-events-buffer-config . 0)
             (eglot-report-progress . nil))
   :defun eglot-inlay-hints-mode eglot-code-actions jsonrpc--log-event
