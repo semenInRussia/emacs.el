@@ -28,7 +28,8 @@
                          (lambda ()
                            (when (buffer-live-p buf)
                              (with-current-buffer buf
-                               (message "Loaded `jinx-mode'...")
+                               (when init-file-debug  ; --debug-init
+                                 (message "Loaded `jinx-mode'..."))
                                (jinx-mode +1)))))))
 
 (leaf jinx
