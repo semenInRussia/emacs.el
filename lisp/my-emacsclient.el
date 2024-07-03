@@ -21,7 +21,7 @@
 
 (with-eval-after-load 'server
   (defvar server-mode-map)
-  (keymap-set server-mode-map "C-x C-S-c" 'server-force-delete))
+  (keymap-global-set "C-x C-S-c" 'server-force-delete))
 
 (provide 'my-emacsclient)
 ;;; my-emacsclient.el ends here
