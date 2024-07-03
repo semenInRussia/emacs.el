@@ -14,7 +14,7 @@
 
 (require 'my-leaf)
 
-(defvar my-enchant-executable "enchant" "A path to executable of the Enchant program.")
+(defvar my-enchant-executable "enchant-2" "A path to executable of the Enchant program.")
 
 (defun my-jinx-ensure ()
   "Load `jinx' for current buffer."
@@ -28,7 +28,8 @@
                          (lambda ()
                            (when (buffer-live-p buf)
                              (with-current-buffer buf
-                               (jinx-mode)))))))
+                               (message "Loaded `jinx-mode'...")
+                               (jinx-mode +1)))))))
 
 (leaf jinx
   :ensure t
