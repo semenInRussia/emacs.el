@@ -2,4 +2,4 @@
 # name: maxn
 # key: maxn
 # --
-const int maxn = $0;
+const int ${1:maxn} = $0;
