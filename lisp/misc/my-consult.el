@@ -53,6 +53,7 @@
           :package meow
           ("X" . consult-line)
           ("Q" . consult-goto-line))
+         ("M-g l" . consult-line)
          ("M-g g" . consult-goto-line)
          ;; C-c bindings in `mode-specific-map'
          ("C-c s" . consult-ripgrep)
