@@ -38,6 +38,8 @@
            ("C-c M-u"   . my-org-insert-img-at-url)
            ("C-c C-t"   . my-org-todo)))
 
+  (leaf toc-org :ensure t)
+
   (leaf org-preview
     :ensure (org-preview :repo "karthink/org-preview"
                          :host github)
