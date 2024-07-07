@@ -32,26 +32,22 @@
          ;; right to go the "back" directory
          ("h" . dired-up-directory)
          ("A" . agnifize-dwim))
- :config
- ;; I use `repeat-mode' which have a stupid default option:
- ;; when I hit C-x C-j (`dired-jump') and press j, it another time
- ;; call `dired-jump'.
- ;;
- ;; disable it
- (put 'dired-jump 'repeat-map nil)
+  :config
+  ;; I use `repeat-mode' which have a stupid default option:
+  ;; when I hit C-x C-j (`dired-jump') and press j, it another time
+  ;; call `dired-jump'.
+  ;;
+  ;; disable it
+  (put 'dired-jump 'repeat-map nil)
 
- ;; some my commands for `dired'
- (leaf my-dired-commands
-   :bind (:dired-mode-map
-          :package dired
-          ("~" . my-dired-jump-to-home)
-          ("C-x h" . my-dired-mark-all-files)
-          ("C-y" . my-dired-duplicate)
-          ("C-o" . my-dired-new-file)))
-
-  (leaf dired-async
-    :ensure async
-    :global-minor-mode t)
+  ;; some my commands for `dired'
+  (leaf my-dired-commands
+    :bind (:dired-mode-map
+           :package dired
+           ("~" . my-dired-jump-to-home)
+           ("C-x h" . my-dired-mark-all-files)
+           ("C-y" . my-dired-duplicate)
+           ("C-o" . my-dired-new-file)))
 
   (leaf dired-hacks-utils
     :ensure t)

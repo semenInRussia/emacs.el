@@ -14,15 +14,14 @@
 
 (require 'f)
 
-(declare-function async-byte-compile-file "async-bytecomp.el")
-
-
 (defun my--maybe-compile-cur-buf ()
   "If the opened buffer is an Elisp file and it was be compiled, recompile it."
   (and (buffer-file-name)
        (derived-mode-p 'emacs-lisp-mode)
        (f-exists-p (f-swap-ext (buffer-file-name) "elc"))
-       (async-byte-compile-file (buffer-file-name))))
+       (make-thread #'elisp-byte-compile-file
+                    (format "byte-auto-compile-%s"
+                            (buffer-file-name)))))
 
 (define-minor-mode my-recompile-mode
   "After each save of an Elisp file that was be compiled, recompile it.
