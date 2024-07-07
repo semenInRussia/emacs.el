@@ -22,10 +22,13 @@
   (advice-add 'run-command-core-run :before #'my-run-command--run--set-last-recipe)
 
   (leaf run-command-recipes
-    :ensure t
+    :ensure (run-command-recipes :repo "semenInRussia/emacs-run-command-recipes"
+                                 :host github)
     :require t
     :commands run-command-recipes-use-all
-    :config (run-command-recipes-use-all)))
+    :config (run-command-recipes-use-all)
+    :advice ((:around run-command-recipes-cpp-gcc ignore)
+             (:around run-command-recipes-c-gcc ignore))))
 
 (leaf compile
   :bind (:compilation-mode-map
