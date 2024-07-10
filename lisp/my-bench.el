@@ -19,16 +19,15 @@ LOAD-DURATION is the time taken in milliseconds to load FEATURE.")
   "Note in `my-require-times' the time taken to require each feature.
 
 Pass FEATURE with ARGS to `require'.  ORIG is the original `require' function"
-  (and (not (eq feature 'cus-load))
-       (let* ((already-loaded (memq feature features))
-              (require-start-time (and (not already-loaded) (current-time))))
-         (prog1 (apply orig feature args)
-           (when (and (not already-loaded) (memq feature features))
-             (let ((time
-                    (* 1000.0 (float-time (time-subtract (current-time)
-                                                         require-start-time)))))
-               (push (list (intern (format "%s" feature)) require-start-time time)
-                     my-require-times)))))))
+  (let* ((already-loaded (memq feature features))
+         (require-start-time (and (not already-loaded) (current-time))))
+    (prog1 (apply orig feature args)
+      (when (and (not already-loaded) (memq feature features))
+        (let ((time
+               (* 1000.0 (float-time (time-subtract (current-time)
+                                                    require-start-time)))))
+          (push (list (intern (symbol-name feature)) require-start-time time)
+                my-require-times))))))
 
 (advice-add 'require :around 'my-require-times-wrapper)
 
