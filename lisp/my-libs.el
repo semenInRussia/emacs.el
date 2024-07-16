@@ -21,17 +21,9 @@
 (eval-and-compile
   ;; `eval-and-compile' installs all libraries in compile-time
   ;; , so "(require \\='dash)" compiles successufelly
-  (leaf dash
-    :ensure t
-    :require t)
-
-  (leaf s
-    :ensure t
-    :require t)
-
-  (leaf f
-    :ensure t
-    :require t)
+  (leaf dash :ensure t)
+  (leaf s :ensure t)
+  (leaf f :ensure t)
 
   (leaf just
     :ensure (just :host github :repo "semenInRussia/just.el"))

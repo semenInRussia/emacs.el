@@ -40,7 +40,6 @@
 (setq font-lock-maximum-decoration t)
 (leaf doom-themes :ensure t)
 (leaf gruber-darker-theme :ensure t)
-(leaf monokai-theme :ensure t)
 
 (leaf modus-themes
   :custom ((modus-themes-bold-constructs . t)
@@ -48,16 +47,7 @@
            (modus-themes-region . '(accent))))
 
 (leaf ef-themes :ensure t)
-(leaf flatland-theme :ensure t)
 (leaf gruvbox-theme :ensure t)
-
-(leaf os1-theme
-  :ensure (os1-theme
-           :host github
-           :repo "sashimacs/os1-theme")
-  :custom ((os1-modeline-padding . 8)
-           (os1-use-variable-pitch . nil)
-           (os1-use-more-italic . t)))
 
 ;; just load theme, the respective autloads and settings (see above)
 ;; will be loaded

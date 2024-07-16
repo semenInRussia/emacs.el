@@ -10,14 +10,14 @@
 
 ;; I don't use `doom-modeline-env'
 (add-hook 'after-init-hook 'doom-modeline-mode -100)
-(advice-add 'require
-            :around
-            (defun my-dont-modeline-env (&rest r)
-              "Don't load `doom-modeline-env'."
-              (interactive "P")
-              (if (eq (nth 1 r) 'doom-modeline-env)
-                  t
-                (apply r))))
+(defun my-dont-modeline-env (&rest r)
+  "Don't load `doom-modeline-env'."
+  (interactive "P")
+  (if (eq (nth 1 r) 'doom-modeline-env)
+      t
+    (apply r)))
+
+(advice-add #'require :around #'my-dont-modeline-env)
 
 
 (leaf doom-modeline

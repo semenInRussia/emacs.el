@@ -43,6 +43,7 @@
 
 (leaf spacious-padding
   :ensure t
+  :when (display-graphic-p)
   ;; :global-minor-mode t
   :hook after-init-hook)
 

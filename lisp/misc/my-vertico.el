@@ -59,15 +59,15 @@
     :global-minor-mode t)
 
   ;; when I type "~/", the rest text is deleted
-  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
+  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy))
 
-  ;; don't view long items on several lines
-  (defun my-truncate-lines ()
-    "Now truncate lines inside the buffer."
-    (interactive)
-    (visual-line-mode -1))
+;; don't view long items on several lines
+(defun my-truncate-lines ()
+  "Now truncate lines inside the buffer."
+  (interactive)
+  (visual-line-mode -1))
 
-  (add-hook 'minibuffer-mode-hook #'my-truncate-lines))
+(add-hook 'minibuffer-mode-hook #'my-truncate-lines)
 
 (provide 'my-vertico)
 ;;; my-vertico.el ends here
