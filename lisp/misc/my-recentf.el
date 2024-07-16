@@ -38,6 +38,7 @@
 
 (declare-function recentf-save-list "recentf")
 (with-eval-after-load 'server
+  (autoload #'recentf-save-list "recentf")
   (advice-add #'server-force-delete
               :before
               #'recentf-save-list))
