@@ -73,9 +73,8 @@ Back end is either symbol tags or LSP"
       :display "Sport: execute only [all flags]"
       :command-name "sport-execute"
       :command-line
-      (format
-       "g++ %s -Wdisabled-optimization -Werror -g && ./a.out"
-       (buffer-file-name)))
+      (format "g++ %s -Wdisabled-optimization -Werror -g && ./a.out"
+              (buffer-file-name)))
      (list
       :display "Sport: compile only [all flags]"
       :command-name "sport-compile"
