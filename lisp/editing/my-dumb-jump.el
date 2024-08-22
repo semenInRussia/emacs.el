@@ -16,6 +16,7 @@
 
 (leaf dumb-jump
   :ensure t
+  :disabled t
   :custom ((dumb-jump-prefer-searcher dumb-jump-force-searcher)
            . 'rg)
   :hook (xref-backend-functions . dumb-jump-xref-activate))

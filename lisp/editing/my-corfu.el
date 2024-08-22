@@ -46,11 +46,11 @@
            (corfu-count . 7))
   :config
   ;; show documentation of every auto-completion item
-  (leaf corfu-popupinfo
-    :global-minor-mode t
-    :bind (:corfu-map
-           :package corfu
-           ("C-h" . 'corfu-popupinfo-toggle)))
+  ;; (leaf corfu-popupinfo
+  ;;   :global-minor-mode t
+  ;;   :bind (:corfu-map
+  ;;          :package corfu
+  ;;          ("C-h" . 'corfu-popupinfo-toggle)))
 
   ;; show icons inside auto-completion popup
   (leaf kind-icon

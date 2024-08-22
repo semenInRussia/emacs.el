@@ -11,8 +11,7 @@
 
 ;; don't load anything useless at the startup (like `emacs-lisp-mode' for
 ;; *Scratch* or `dashboard')
-(setq initial-major-mode 'fundamental-mode
-      initial-scratch-message "Good Luck!\n: you can start")
+(setq initial-major-mode 'fundamental-mode)
 
 ;; PERF,UX: Remove "For information about GNU Emacs..." message at startup.
 ;;   It's redundant with our dashboard and incurs a premature redraw.

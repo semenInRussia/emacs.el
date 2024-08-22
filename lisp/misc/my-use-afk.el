@@ -50,9 +50,9 @@
     transient
     magit-base
     magit-git
-    pcvs-util
-    gmm-utils
-    mail-utils
+    ;; pcvs-util
+    ;; gmm-utils
+    ;; mail-utils
     mm-util
     mailabbrev
     mail-parse
