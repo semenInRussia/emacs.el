@@ -136,6 +136,21 @@ You can extract an archive into any directory, and run emacs using ~--init-direc
 
 So you can test it without ~chemacs~ and other stupid things, you even not need in emacs29 --init-directory, but you still needed in emacs29
 
+** Command Line Arguments
+
+Also how you can see above, this configuration provide some additional options you can use when run emacs in terminal, here the list:
+
+- `--modules`. Build `my-modules.el` - file that contains all configuration and will be built from them. (see `my-build-config`)
+
+- `--install`. Install every package I use via `straight`. (it can take long time)
+
+- `--local-projects`. Byte-compile `local-projects` and generate autoloads. "Local projects" are Elisp files, that Emacs don't load instantly after run. You can consider it like your own extensions to Emacs
+
+- `--bcompile`. Byte-compile `init.el`, `early-init.el`
+
+- `--kill`. Instantly after init.el was loaded, kill emacs session. It's useful, if you need only to use other CLI flags actions, but don't need in editor
+
+
 ** Requirements
 
 - *Emacs 29.1+* (check [[https://www.gnu.org/software/emacs/][here]])
