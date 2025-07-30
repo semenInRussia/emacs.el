@@ -137,7 +137,6 @@ You can extract an archive into any directory, and run emacs using ~--init-direc
 So you can test it without ~chemacs~ and other stupid things, you even not need in emacs29 --init-directory, but you still needed in emacs29
 
 ** Command Line Arguments
-
 Also how you can see above, this configuration provide some additional options you can use when run emacs in terminal, here the list:
 
 - `--modules`. Build `my-modules.el` - file that contains all configuration and will be built from them. (see `my-build-config`)
