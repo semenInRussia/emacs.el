@@ -100,7 +100,7 @@
      '("1" . meow-expand-1)
      '("0" . meow-expand-0)
      '("-" . negative-argument)
-     ;;
+     '("_" . goto-last-change)
      '(";" . meow-reverse)
      '("," . meow-inner-of-thing)
      '("." . meow-bounds-of-thing)
