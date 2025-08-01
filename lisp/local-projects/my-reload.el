@@ -14,7 +14,7 @@
 ;;; Code:
 
 (defcustom my-reload-config-directory
-  "~/.config/emacs/"
+  user-emacs-directory
   "Path to the dir where located config files on which it will work."
   :group 'my
   :type 'string)
