@@ -1,13 +1,10 @@
 ;;; my-eglot.el --- My configuration for lsp -*- lexical-binding: t; -*-
-
 ;; Copyright (C) 2022-2024 semenInRussia
 
 ;;; Commentary:
-
 ;; My configuration of lsp.  I am use `eglot'
 
 ;;; Code:
-
 (require 'my-leaf)
 (require 'dash)
 

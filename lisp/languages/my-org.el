@@ -1,6 +1,6 @@
-;;; my-org.el --- My configuration for `org-mode'
-;; Copyright (C) 2022-2024 semenInRussia
-;; Author: semenInRussia <hrams205@gmail.com>
+;;; my-org.el --- My configuration for `org-mode' -*- lexical-binding: t -*-
+;; Copyright (C) 2022-2025 semenInRussia
+
 ;;; Commentary:
 ;; My configuration for `org-mode'
 

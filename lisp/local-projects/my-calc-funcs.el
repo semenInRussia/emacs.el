@@ -1,5 +1,5 @@
 ;;; my-calc-funcs.el --- Some functions for `calc' -*- lexical-binding: t; -*-
-;; Copyright (C) 2024 semenInRuddia
+;; Copyright (C) 2024-2025 semenInRuddia
 
 ;;; Commentary:
 ;; Some functions for `calc'.
@@ -10,6 +10,7 @@
 (require 's)
 
 (declare-function calc-vector-mean "calc-stat")
+(declare-function calc-pack "calc-vec")
 
 ;;;###autoload
 (defun my-calc-mean-yank (vec)

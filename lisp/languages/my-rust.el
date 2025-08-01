@@ -1,13 +1,7 @@
-;;; my-rust.el --- My configuration for rust
-
-;; Copyright (C) 2022, 2023 semenInRussia
-
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
+;;; my-rust.el --- My configuration for rust -*- lexical-binding: t -*-
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
-
 ;; My configuration for rust
 
 ;;; Code:

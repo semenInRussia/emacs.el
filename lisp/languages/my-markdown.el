@@ -1,6 +1,6 @@
-;;; my-markdown.el --- My configuration for `markdown-mode'
+;;; my-markdown.el --- My configuration for `markdown-mode' -*- lexical-binding: t -*-
 
-;; Copyright (C) 2022-2024 semenInRussia
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 

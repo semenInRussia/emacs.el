@@ -1,6 +1,6 @@
 ;;; my-lua.el --- My configuration for the Lua Language -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2024 semenInRussia
+;; Copyright (C) 2024-2025 semenInRussia
 
 ;;; Commentary:
 

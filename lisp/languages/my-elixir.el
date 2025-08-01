@@ -1,10 +1,10 @@
-;;; my-elixir.el --- My configuration of `elixir' -*- lexical-binding: t; -*-
+;;; my-elixir.el --- My configuration of Elixir -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023 semenInRussia
+;; Copyright (C) 2023-2025 semenInRussia
 
 ;;; Commentary:
 
-;; My configuration of `elixir'.
+;; My configuration of Elixir.
 
 ;;; Code:
 

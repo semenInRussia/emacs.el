@@ -1,19 +1,12 @@
 ;;; my-corfu.el.el --- My configuration of `corfu' -*- lexical-binding: t; -*-
-
-;; Copyright (C) 2023-2024 semenInRussia
-
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; Homepage: https://github.com/semeninrussia/emacs.el
+;; Copyright (C) 2023-2025 semenInRussia
 
 ;;; Commentary:
-
 ;; My configuration of `corfu'.  I choose `corfu' over `company'
 ;; because `company' have a big load time (about 9 secs on my old
 ;; windows computer) while `corfu' some milliseconds
 
 ;;; Code:
-
 (require 'my-leaf)
 (require 'f)   ; for `f-full'
 

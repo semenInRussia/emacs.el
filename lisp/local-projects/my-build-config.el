@@ -1,11 +1,6 @@
 ;;; my-build-config.el --- Join all my config files into one init.el -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023-2024 semenInRussia
-
-;; Author: semenInRussia <hrams205@gmail.com>
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+;; Copyright (C) 2023-2025 semenInRussia
 
 ;;; Commentary:
 

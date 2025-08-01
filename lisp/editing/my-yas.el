@@ -1,13 +1,7 @@
 ;;; my-yas.el --- My configuration for the `yasnippet' -*- lexical-binding: t -*-
-
-;; Copyright (C) 2022-2024 semenInRussia
-;; Author: semenInRussia <hrams205@gmail.com>
-;; URL: https://github.com/semenInRussia/emacs.el
-
-;; This file is not part of GNU Emacs.
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
-
 ;; My configuration for the `yasnippet'
 
 ;;; Code:

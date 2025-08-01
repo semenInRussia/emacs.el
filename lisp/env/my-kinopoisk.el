@@ -1,10 +1,11 @@
 ;;; my-kinopoisk.el --- My configuration of `kinopoisk' -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023-2024 semenInRussia
+;; Copyright (C) 2023-2025 semenInRussia
 
 ;;; Commentary:
 
-;; My configuration of `kinopoisk'.
+;; My configuration of client to kinopoisk: my package. Kinopoisk is
+;; russian cinema service
 
 ;;; Code:
 

@@ -1,12 +1,13 @@
 ;;; my-register.el --- Configuration of Emacs registers -*- lexical-binding: t -*-
 
-;; Copyright (C) 2023
+;; Copyright (C) 2023-2025
 
 ;;; Commentary:
 
-;; Configuration of Emacs registers.  I use Emacs registers really often: I use
-;; both point, number, file and text registers it's really useful, I set some
-;; registers at the startup to some constant values
+;; Configuration of Emacs registers.  I use Emacs registers really
+;; often: I use both point, number, file and text registers it's
+;; really useful, I set some registers at the startup to some constant
+;; values
 
 ;;; Code:
 

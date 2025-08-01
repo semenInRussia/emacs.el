@@ -1,9 +1,9 @@
-;;; my-docker.el --- My configuration of `docker' -*- lexical-binding: t; -*-
+;;; my-docker.el --- My configuration of Docker -*- lexical-binding: t; -*-
+;; Copyright (C) 2022-2025 semenInRussia
 
-;; Copyright (C) 2022-2024 semenInRussia
 ;;; Commentary:
+;; My configuration of Docker
 
-;; My configuration of `docker'.
 ;;; Code:
 (require 'my-leaf)
 

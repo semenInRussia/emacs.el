@@ -1,6 +1,6 @@
 ;;; my-elisp-smartparens.el --- Some configuration for parens insertion with `smartparens` for Emacs Lisp -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2024 semenInRussia
+;; Copyright (C) 2024-2025 semenInRussia
 
 ;;; Commentary:
 

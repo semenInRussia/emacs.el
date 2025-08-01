@@ -1,9 +1,7 @@
-;;; my-aas.el --- My configuration of the `auto-activating-snippets'
-
-;; Copyright (C) 2022-2024 semenInRussia
+;;; my-aas.el --- My configuration of the `auto-activating-snippets' -*- lexical-binding: t -*-
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
-
 ;; My configuration of the `auto-activating-snippets'
 
 ;;; Code:

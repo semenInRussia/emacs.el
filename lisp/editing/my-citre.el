@@ -1,18 +1,14 @@
-;;; my-citre.el --- Support of citre: the full ide which is built over `ctags' -*- lexical-bindings: t -*-
-
-;; Copyright (C) 2023
+;;; my-citre.el --- Support of citre: the full ide which is built over `ctags' -*- lexical-binding: t -*-
+;; Copyright (C) 2023-2025
 
 ;;; Commentary:
-
 ;; Support of citre: the full ide which is built over `ctags'.
 ;;
 ;; It provides auto-completion, find definition and other features like the
 ;; modern LSPs
 
 ;;; Code:
-
 (require 'my-leaf)
-
 
 (leaf citre
   :ensure t

@@ -1,5 +1,5 @@
 ;;; my-config-funcs.el --- Some commands which are help me to write this config -*- lexical-binding: t -*-
-;;; semenInRussia 2024
+;;; semenInRussia 2024-2025
 
 ;;; Commentary:
 ;; Some commands which are help me to write this config

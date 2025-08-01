@@ -1,6 +1,5 @@
-;;; my-apheleia.el --- My configuration of the `apheleia': auto format of source code after save
-;; Copyright (C) 2022-2024 semenInRussia
-;; Author: semenInRussia <hrams205@gmail.com>
+;;; my-apheleia.el --- My configuration of the `apheleia': auto format of source code after save -*- lexical-binding: t -*-
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 ;; My configuration of the `apheleia': format source on save.

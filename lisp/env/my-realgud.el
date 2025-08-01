@@ -1,6 +1,6 @@
 ;;; my-realgud.el --- My configuration of `realgud': debugging -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023 semenInRussia
+;; Copyright (C) 2023-2025 semenInRussia
 
 ;;; Commentary:
 

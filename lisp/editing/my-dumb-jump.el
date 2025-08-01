@@ -1,13 +1,10 @@
-;;; my-dumb-jump.el --- My configuration of the `dumb-jump'
-
-;; Copyright (C) 2022-2024 semenInRussia
+;;; my-dumb-jump.el --- My configuration of the `dumb-jump' -*- lexical-binding: t -*-
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
-
 ;; My configuration of the `dumb-jump'
 
 ;;; Code:
-
 (require 'my-leaf)
 
 (leaf rg

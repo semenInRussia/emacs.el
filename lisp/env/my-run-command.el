@@ -1,8 +1,9 @@
 ;;; my-run-command.el --- My configuration for `run-command'
-;; Copyright (C) 2022-2024 semenInRussia
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
-;; My configuration for `run-command'
+;; My configuration for `run-command': a tool to run some commands
+;; depends on file I edit
 
 ;;; Code:
 (require 'my-leaf)

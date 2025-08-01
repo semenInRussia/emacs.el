@@ -1,13 +1,12 @@
 ;;; my-flymake.el --- my `flymake' settings -*- lexical-binding: t -*-
-;;; Commentary:
 
+;;; Commentary:
 ;; My settings for `flymake'.  `flymake' is built-in solution to
 ;; highlight errors and warnings (diagnostics) in the buffer
 
 ;; `flymake' is choice of `eglot', but now `flycheck' is more popular
 
 ;;; Code:
-
 (require 'my-leaf)
 
 

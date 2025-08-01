@@ -1,5 +1,5 @@
 ;;; my-yaml.el --- My configuration of yaml -*- lexical-binding: t; -*-
-;; Copyright (C) 2024 semenInRussia
+;; Copyright (C) 2024-2025 semenInRussia
 
 ;;; Commentary:
 ;; My configuration of yaml: markup language

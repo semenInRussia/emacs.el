@@ -1,6 +1,5 @@
 ;;; my-bib.el --- My configuration for bibliography management -*- lexical-binding: t; -*-
-;; Copyright (C) 2022-2023 semenInRussia
-;; Author: semenInRussia <hrams205@gmail.com>
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 ;; My configuration for bibliography management.

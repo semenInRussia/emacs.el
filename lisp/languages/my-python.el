@@ -1,6 +1,6 @@
 ;;; my-python.el --- My configuration for Python -*- lexical-binding: t -*-
 
-;; Copyright (C) 2022-2024 semenInRussia
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 

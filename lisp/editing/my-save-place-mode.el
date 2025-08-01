@@ -1,13 +1,6 @@
 ;;; my-save-place-mode.el --- My configuration of `save-place-mode' -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022-2024 semenInRussia
-
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; Homepage: https://github.com/semeninrussia/emacs.el
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 

@@ -1,9 +1,5 @@
-;;; my-eldoc.el --- My configuration of the `eldoc'
-;; Copyright (C) 2022-2024 semenInRussia
-
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
+;;; my-eldoc.el --- My configuration of the `eldoc' -*- lexical-binding: t -*-
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 ;; My configuration of the `eldoc': show documentation for symbol

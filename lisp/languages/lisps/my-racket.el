@@ -1,8 +1,5 @@
-;;; my-racket.el --- My Configuration For The Lanugage `racket'
-;; Copyright (C) 2022-2024 semenInRussia
-;; Author: semenInRussia <hrams205@gmail.com>
-
-;; This file is not part of GNU Emacs.
+;;; my-racket.el --- My Configuration For The Lanugage `racket' -*- lexical-binding: t -*-
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 ;; My Configuration for the Lanugage `racket'

@@ -1,10 +1,7 @@
 ;;; my-fish.el --- My configuration for fish language: language to configure fish shell -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023 semenInRussia
+;; Copyright (C) 2023-2025 semenInRussia
 
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; Homepage: https://github.com/semeninrussia/emacs.el
 ;;; Commentary:
 
 ;; My configuration for fish language.

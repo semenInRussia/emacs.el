@@ -1,20 +1,12 @@
-;;; my-feature.el --- My configuration of `feature' -*- lexical-binding: t; -*-
-
-;; Copyright (C) 2022 semenInRussia
-
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; Homepage: https://github.com/semeninrussia/emacs.el
-
+;;; my-feature.el --- My configuration of feature -*- lexical-binding: t; -*-
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
-
-;; My configuration of `feature-mode'.
+;; My configuration of `feature-mode'.  Feature - language to testing.
 
 ;;; Code:
 
 (require 'my-leaf)
-
 
 ;; NOTE that here support only `ecukes' now.
 ;; `ecukes' is cucumber for `emacs-lisp-mode'

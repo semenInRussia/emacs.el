@@ -1,8 +1,10 @@
-;;; my-lisp.el --- my-lisp
+;;; my-lisp.el --- General configuration for all Lisp languages -*- lexical-binding: t -*-
 
-;; Copyright (C) 2022-2024 semenInRussia
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
+
+;; General configuration for all Lisp languages.
 
 ;;; Code:
 

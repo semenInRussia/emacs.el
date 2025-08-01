@@ -1,5 +1,5 @@
-;;; my-indent.el --- My configuration for the indentation
-;; Copyright (C) 2022-2024 semenInRussia
+;;; my-indent.el --- My configuration for the indentation -*- lexical-binding: t -*-
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 ;; My configuration for the indentation

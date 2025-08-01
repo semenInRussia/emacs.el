@@ -1,6 +1,6 @@
 ;;; my-c.el --- My configuration of c and c++ languages -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023, 2024 semenInRussia
+;; Copyright (C) 2023-2025 semenInRussia
 
 ;;; Commentary:
 

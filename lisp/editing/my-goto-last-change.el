@@ -1,13 +1,10 @@
 ;;; my-goto-last-change.el --- My configuration of `goto-last-change' -*- lexical-binding: t; -*-
-
-;; Copyright (C) 2022-2024 semenInRussia
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
-
 ;; My configuration of `goto-last-change'.
 
 ;;; Code:
-
 (require 'my-leaf)
 
 

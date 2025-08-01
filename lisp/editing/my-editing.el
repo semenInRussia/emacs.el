@@ -1,9 +1,7 @@
-;;; my-editing.el --- My configuration for the custom editing
-
-;; Copyright (C) 2022-2023 semenInRussia
+;;; my-editing.el --- My configuration for the custom editing -*- lexical-binding: t -*-
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
-
 ;; My configuration for the custom editing
 
 ;;; Code:

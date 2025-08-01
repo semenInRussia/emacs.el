@@ -1,8 +1,8 @@
 ;;; my-window-navigation.el --- My config for navigation beetween buffers -*- lexical-binding: t -*-
-;; Copyright (C) 2022-2024 semenInRussia
-;; Author: semenInRussia <hrams205@gmail.com>
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
+
 ;; My config for navigation between buffers.
 ;;
 ;; check this article of @karthinks

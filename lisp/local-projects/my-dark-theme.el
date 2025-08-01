@@ -1,7 +1,6 @@
 ;;; my-dark-theme.el --- Configuration for the editor view (dark theme) -*- lexical-binding: t -*-
 
-;; Copyright (C) 2024 semenInRussia
-;; Author: semenInRussia <hrams205@gmail.com>
+;; Copyright (C) 2024-2025 semenInRussia
 
 ;;; Commentary:
 

@@ -1,15 +1,10 @@
 ;;; my-dired.el --- My configuration of the `dired'
-
-;; Copyright (C) 2022-2024 semenInRussia
-
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 
-;; My configuration of the `dired': the powerful directory explorer inside of
-;; the Emacs.
+;; My configuration of the `dired': the powerful directory explorer
+;; inside of the Emacs.
 
 ;;; Code:
 

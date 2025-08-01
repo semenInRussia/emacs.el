@@ -1,6 +1,6 @@
 ;;; my-project.el --- My configration for project.el -*- lexical-binding: t -*-
 
-;; Copyright (C) 2022-2023 semenInRussia
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 

@@ -1,14 +1,13 @@
-;;; my-haskell.el --- My config for `haskell'
+;;; my-haskell.el --- My config for Haskell -*- lexical-binding: t -*-
 
-;; Copyright (C) 2022-2023 semenInRussia
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 
-;; My config for `haskell'.
+;; My config for Haskell
 
 ;;; Code:
 (require 'my-leaf)
-
 
 (leaf haskell-mode
   :ensure t

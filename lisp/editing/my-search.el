@@ -1,9 +1,8 @@
 ;;; my-search.el --- My configuration of the search -*- lexical-binding: t -*-
 
-;; Copyright (C) 2022-2024 semenInRussia
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
-
 ;; My configuration of the search
 
 ;;; Code:

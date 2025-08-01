@@ -1,8 +1,8 @@
-;;; my-typst.el --- My configuration for `typst' -*- lexical-binding: t; -*-
-;; Copyright (C) 2023-2024 semenInRussia
+;;; my-typst.el --- My configuration for Typst -*- lexical-binding: t; -*-
+;; Copyright (C) 2023-2025 semenInRussia
 
 ;;; Commentary:
-;; My configuration for `typst'.
+;; My configuration for Typst: modern alternative to LaTeX.
 
 ;;; Code:
 (require 'my-leaf)

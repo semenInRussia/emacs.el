@@ -1,14 +1,10 @@
-;;; my-sql.el --- My configuration of `sql' -*- lexical-binding: t; -*-
+;;; my-sql.el --- My configuration of SQL -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022-2024 semenInRussia
-
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; Homepage: https://github.com/semeninrussia/emacs.el
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 
-;; My configuration of `sql'.
+;; My configuration of SQL.
 
 ;;; Code:
 (require 'my-leaf)
