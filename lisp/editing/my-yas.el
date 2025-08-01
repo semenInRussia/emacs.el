@@ -15,10 +15,8 @@
 (require 's)
 (require 'dash)
 
-
 (defvar my-snippets-dir (locate-user-emacs-file "snippets")
   "The directory in which I save snippets for `yasnippet'.")
-
 
 (leaf yasnippet
   :ensure (yasnippet :repo "joaotavora/yasnippet")
@@ -45,14 +43,14 @@
   (run-with-idle-timer 1 nil #'yas-reload-all))
 
 ;; a completion for snippets with `cape' (capf)
-(leaf my-yas-capf
-  :after yasnippet corfu
-  :defun my-yas-capf
-  :init (add-hook
-         'corfu-mode-hook
-         (defun my-yas-capf-setup ()
-           "Add capf for `yasnippet'."
-           (add-hook 'completion-at-point-functions #'my-yas-capf 30 'local))))
+;; (leaf my-yas-capf
+;;   :after yasnippet corfu
+;;   :defun my-yas-capf
+;;   :init (add-hook
+;;          'corfu-mode-hook
+;;          (defun my-yas-capf-setup ()
+;;            "Add capf for `yasnippet'."
+;;            (add-hook 'completion-at-point-functions #'my-yas-capf 30 'local))))
 
 (leaf embark
   :doc "Support of `embark' for `yasnippet', for example when I hit C-=."
