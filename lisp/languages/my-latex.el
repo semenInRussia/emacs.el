@@ -52,17 +52,6 @@
            :package tex-mode
            ("C-=" . my-latex-insert-any)))
 
-  (leaf my-latex-embrace
-    :after embrace
-    :defun my-embrace-LaTeX-mode-hook
-    :defun (embrace-LaTeX-mode-hook . embrace)
-    :config
-    (add-hook 'LaTeX-mode-hook #'embrace-LaTeX-mode-hook)
-    (add-hook 'LaTeX-mode-hook #'my-embrace-LaTeX-mode-hook)
-    (when (eq major-mode 'latex-mode)
-      (embrace-LaTeX-mode-hook)
-      (my-embrace-LaTeX-mode-hook)))
-
   (leaf my-latex-math-spaces
     :hook latex-mode-hook)
 

@@ -8,9 +8,6 @@
 (require 's)
 (require 'my-lib)
 
-(declare-function embrace-add-pair-regexp "embrace.el")
-(declare-function embrace-add-pair "embrace.el")
-
 (defcustom my-rust-maybe-pub-words
   '(async fn mod struct enum type trait)
   "List of the symbols indicating words which can be public in Rust."
@@ -54,28 +51,6 @@
   "Visit Cargo.toml file of current rust crate."
   (interactive)
   (find-file (my-rust-find-Cargo.toml-in-directory)))
-
-(defun my-rust-embrace-hook ()
-  "Add parens to `embrace' parens for `rust-mode'."
-  (interactive)
-  (with-eval-after-load 'embrace
-    (embrace-add-pair ?v "Vec<" ">")
-    (embrace-add-pair ?d "dbg!(" ")")
-    (embrace-add-pair ?b "Box<" ">")
-    (embrace-add-pair ?o "Option<" ">")
-    (embrace-add-pair ?r "Result<" ">")
-    (embrace-add-pair-regexp ?p
-                             "print\\(ln\\)?!(\".*?\"," ")"
-                             (lambda ()
-                               (interactive)
-                               (cons
-                                (concat
-                                 "println!("
-                                 (read-string
-                                  "Template to format string: "
-                                  "\"{}\"")
-                                 ", ")
-                                ");")))))
 
 (provide 'my-rust-editing)
 ;;; my-rust-editing.el ends here

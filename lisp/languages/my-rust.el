@@ -24,10 +24,5 @@
   :config
   (add-hook 'rust-mode-hook #'my-lsp-ensure))
 
-(autoload 'my-rust-embrace-hook "my-rust-editing")
-(leaf embrace
-  :after embrace
-  :hook (rust-mode-hook . my-rust-embrace-hook))
-
 (provide 'my-rust)
 ;;; my-rust.el ends here

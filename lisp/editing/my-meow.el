@@ -151,7 +151,6 @@
      '("X" . consult-line)
      '("y" . meow-save)
      '("Y" . meow-sync-grab)
-     '("z" . embrace-commander)
      '("'" . repeat)
      '("%" . meow-query-replace-regexp)
      ;; my own modal state
