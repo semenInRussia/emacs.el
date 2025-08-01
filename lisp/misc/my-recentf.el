@@ -11,7 +11,7 @@
 (require 'my-leaf)
 
 
-(defun my-recentf-load ()
+(defun my-recentf-load (&optional _args)
   "Just load `recentf'."
   (interactive)
   (unless recentf-mode
