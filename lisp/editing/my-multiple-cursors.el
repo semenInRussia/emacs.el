@@ -1,4 +1,4 @@
-;;; my-multiple-cursors.el --- My configuration for the `multiple-cursors'
+;;; my-multiple-cursors.el --- My configuration for the `multiple-cursors' -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022-2024 semenInRussia
 
@@ -12,11 +12,10 @@
 
 ;; My configuration for the `multiple-cursors'.  I often use multiple
 ;; cursors, because `meow-beacon' is norm.  But when I need to select
-;; two, three words in buffer, i use C-, and C-< it's fast
+;; two , three words in buffer, i use C-, and C-< it's fast
 
 ;;; Code:
 (require 'my-leaf)
-
 
 (leaf multiple-cursors
   :ensure t

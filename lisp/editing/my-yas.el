@@ -1,4 +1,4 @@
-;;; my-yas.el --- My configuration for the `yasnippet'
+;;; my-yas.el --- My configuration for the `yasnippet' -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022-2024 semenInRussia
 ;; Author: semenInRussia <hrams205@gmail.com>

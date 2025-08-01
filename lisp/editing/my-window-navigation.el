@@ -1,4 +1,4 @@
-;;; my-window-navigation.el --- My config for navigation beetween buffers
+;;; my-window-navigation.el --- My config for navigation beetween buffers -*- lexical-binding: t -*-
 ;; Copyright (C) 2022-2024 semenInRussia
 ;; Author: semenInRussia <hrams205@gmail.com>
 

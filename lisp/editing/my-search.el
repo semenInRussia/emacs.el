@@ -1,4 +1,4 @@
-;;; my-search.el --- My configuration of the search
+;;; my-search.el --- My configuration of the search -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022-2024 semenInRussia
 

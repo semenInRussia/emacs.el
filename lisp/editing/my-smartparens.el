@@ -1,4 +1,4 @@
-;;; my-smartparens.el --- My configuration for the `smartparens'
+;;; my-smartparens.el --- My configuration for the `smartparens' -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022-2024 semenInRussia
 
