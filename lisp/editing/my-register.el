@@ -20,9 +20,6 @@
 (set-register ?m '(buffer . "*Messages*"))
 
 
-;;; "C-x r j c" to jump to my Codeforces solutions folder
-(set-register ?c '(file . "~/cf/"))
-
 ;;; registers to jump to some config directories
 ;;
 ;; also I have some bookmarks (also to these directories or files)
