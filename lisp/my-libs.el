@@ -1,4 +1,4 @@
-;;; my-libs.el --- Some libraries
+;;; my-libs.el --- Some libraries -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022-2023 semenInRussia
 
@@ -27,6 +27,9 @@
 
   (leaf just
     :ensure (just :host github :repo "semenInRussia/just.el"))
+
+  (leaf compat
+    :ensure t)
 
   (leaf svg-lib :ensure t))
 
