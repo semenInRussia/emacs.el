@@ -58,28 +58,28 @@
   ;;        my-citar-indicator-notes-nerd-icons))
 
   (with-eval-after-load 'org
-    (setq citar-bibliography org-cite-global-bibliography))
+    (setq citar-bibliography org-cite-global-bibliography)))
 
-  ;; `citar' + `embark'
-  (leaf citar-embark
-    :ensure t
-    :after (citar embark)
-    :global-minor-mode citar-embark-mode)
+;; `citar' + `embark'
+(leaf citar-embark
+  :ensure t
+  :after (citar embark)
+  :global-minor-mode citar-embark-mode)
 
-  ;; `org-roam' + `citar':
-  (leaf parsebib :ensure t)
+;; `org-roam' + `citar':
+(leaf parsebib :ensure t)
 
-  (leaf citar-org-roam
-    :disabled t  ; im not use `org-roam' yet
-    :ensure t
-    :after org-roam
-    :global-minor-mode citar-org-roam-mode
-    :config
-    ;; `org-roam' has your own the bibliography.bib file
-    ;; -- (in my config)
-    (with-eval-after-load 'org-roam
-      (add-to-list 'org-cite-global-bibliography (f-join org-roam-directory "bibliography.bib"))
-      (add-to-list 'citar-bibliography (f-join org-roam-directory "bibliography.bib")))))
+(leaf citar-org-roam
+  :disabled t                           ; im not use `org-roam' yet
+  :ensure t
+  :after org-roam
+  :global-minor-mode citar-org-roam-mode
+  :config
+  ;; `org-roam' has your own the bibliography.bib file
+  ;; -- (in my config)
+  (with-eval-after-load 'org-roam
+    (add-to-list 'org-cite-global-bibliography (f-join org-roam-directory "bibliography.bib"))
+    (add-to-list 'citar-bibliography (f-join org-roam-directory "bibliography.bib"))))
 
 (provide 'my-bib)
 ;;; my-bib.el ends here
