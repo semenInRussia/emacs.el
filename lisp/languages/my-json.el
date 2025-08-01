@@ -20,7 +20,6 @@
   :bind (:json-mode-map
          ([:remap my-format-expression] . json-pretty-print-buffer))
   :setq-default (js-indent-level . 2)
-  :hook (json-mode-hook . my-json-fix-indent-funcs)
   :config
   (leaf json-snatcher
     :ensure (json-snatcher :repo "Sterlingg/json-snatcher" :host github)
