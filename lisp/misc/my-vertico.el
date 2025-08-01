@@ -50,7 +50,10 @@
     :commands nerd-icons-completion-mode
     ;; `marginalia' and this both use the same way to display info inside `vertico',
     ;; if i load it before `marginalia', then it wasn't working
-    :hook marginalia-mode-hook)
+    :hook marginalia-mode-hook
+    :config (add-to-list
+             'nerd-icons-completion-category-icons
+             '(snippet nerd-icons-octicon "nf-oct-copy" nerd-icons-lred)))
 
   ;; show a bit of additional info inside the `vertico' `minibuffer'
 
