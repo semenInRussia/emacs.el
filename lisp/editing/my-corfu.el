@@ -67,8 +67,7 @@
              ;; (default is to show ??? with the red background)
              (kind-icon--unknown . "  ")
              ;; use the same as a symbol size for icons
-             (kind-icon-default-style . `(
-                                          :padding 0
+             (kind-icon-default-style . `(:padding -1
                                           :stroke 0
                                           :margin 0
                                           :radius 0
