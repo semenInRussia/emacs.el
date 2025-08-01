@@ -41,7 +41,7 @@
           meow-global-mode
           ;; some things to define new keys
           ;; - motion
-          meow-motion-overwrite-define-key
+          meow-motion-define-key
           ;; - normal
           meow-normal-define-key
           ;; - leader
@@ -65,7 +65,7 @@
 
     ;; motion mode is modes which provide own modal editing.  For
     ;; example `dired' and `magit', use j and k in them as arrows
-    (meow-motion-overwrite-define-key
+    (meow-motion-define-key
      '("j" . meow-next)
      '("k" . meow-prev)
      '("<escape>" . ignore))
@@ -160,10 +160,10 @@
 
   (my-meow-setup)
 
-  (advice-add #'meow--fix-thing-selection-mark
-              :override
-              (defun my-meow--selmark (_thing _pos mark)
-                mark))
+  ;; (advice-add #'meow--fix-thing-selection-mark
+  ;;             :override
+  ;;             (defun my-meow--selmark (_thing _pos mark)
+  ;;               mark))
 
   ;; jump to source
   ;;
