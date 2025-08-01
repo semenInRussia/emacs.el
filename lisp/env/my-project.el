@@ -1,4 +1,4 @@
-;;; my-project.el --- My configration for project.el
+;;; my-project.el --- My configration for project.el -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022-2023 semenInRussia
 

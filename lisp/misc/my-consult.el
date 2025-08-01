@@ -1,9 +1,6 @@
-;;; my-consult.el --- My config for `consult'
+;;; my-consult.el --- My config for `consult' -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022-2024 semenInRussia
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
 
 ;;; Commentary:
 
@@ -78,7 +75,6 @@
   ;; i don't know what does the next line
   :hook ((completion-list-mode-hook . consult-preview-at-point-mode))
   :config
-
   (defun my-consult-flymake-or-flycheck ()
     "Run either `consult-flymake' or `consult-flycheck'."
     (interactive)
@@ -107,26 +103,27 @@
 
   ;; don't suggest `recentf' files in `consult-buffer', because on
   ;; Windows10 it can crush the Emacs :oops
-  (if (equal system-type 'windows-nt)
-      (remove-from-list! consult-buffer-sources
-                         'consult--source-recent-file)
-    (defun my-consult--source-recentf-items ()
-      (let ((ht (consult--buffer-file-hash))
-            file-name-handler-alist ;; No Tramp slowdown please.
-            items)
-        (dolist (file recentf-list (nreverse items))
-          ;; Emacs 29 abbreviates file paths by default, see
-          ;; `recentf-filename-handlers'.
-          (unless (eq (aref file 0) ?/)
-            (setq file (expand-file-name file)))
-          (unless (gethash file ht)
-            (push (propertize
-                   (file-name-nondirectory file)
-                   'multi-category `(file . ,file))
-                  items)))))
+  ;; (if (equal system-type 'windows-nt)
+  ;;     (remove-from-list! consult-buffer-sources
+  ;;                        'consult--source-recent-file)
+  ;;   (defun my-consult--source-recentf-items ()
+  ;;     (let ((ht (consult--buffer-file-hash))
+  ;;           file-name-handler-alist ;; No Tramp slowdown please.
+  ;;           items)
+  ;;       (dolist (file recentf-list (nreverse items))
+  ;;         ;; Emacs 29 abbreviates file paths by default, see
+  ;;         ;; `recentf-filename-handlers'.
+  ;;         (unless (eq (aref file 0) ?/)
+  ;;           (setq file (expand-file-name file)))
+  ;;         (unless (gethash file ht)
+  ;;           (push (propertize
+  ;;                  (file-name-nondirectory file)
+  ;;                  'multi-category `(file . ,file))
+  ;;                 items)))))
 
-    (plist-put consult--source-recent-file
-               :items 'my-consult--source-recentf-items)))
+  ;;   (plist-put consult--source-recent-file
+  ;;              :items 'my-consult--source-recentf-items))
+  )
 
 
 ;; support of `consult-flycheck' navigate with errors, warnings and ...

@@ -14,7 +14,7 @@
       use-file-dialog nil
       use-dialog-box nil)
 
-(defcustom my-layout-size '(72 . 22)
+(defcustom my-layout-size '(72 . 20)
   "Cons of width and height of editor window."
   :group 'my
   :type '(cons number number))
@@ -35,7 +35,7 @@
 
  ;; don't use the system title bar
  frame-title-format '(buffer-file-name "%f" ("%b"))
- (alist-get 'undecorated default-frame-alist) t
+ ;; (alist-get 'undecorated default-frame-alist) t
  (alist-get 'drag-internal-border default-frame-alist) 1
  (alist-get 'internal-border-width default-frame-alist) 5)
 

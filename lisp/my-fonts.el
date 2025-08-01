@@ -22,7 +22,7 @@
   :group 'my
   :type 'string)
 
-(defcustom my-fonts-size 20
+(defcustom my-fonts-size 17
   "Size of font in editor."
   :group 'my
   :type 'number)
