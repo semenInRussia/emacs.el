@@ -58,30 +58,30 @@ Back end is either symbol tags or LSP"
   (defun run-command-sportprog-recipe ()
     "A recipe for `run-command' useful to sport programming."
     (when (and (buffer-file-name)
-               (eq major-mode 'emacs-lisp-mode)))
-    (list
-     (and
-      (file-exists-p "input.txt")
+               (eq major-mode 'c++-mode))
       (list
-       :display "Sport: compile, execute with input.txt [all flags]"
-       :command-name "sport-execute-sample"
-       :command-line
-       (format
-        "g++ %s -Wdisabled-optimization -Werror -g && cat input.txt | ./a.out"
-        (buffer-file-name))))
-     (list
-      :display "Sport: execute only [all flags]"
-      :command-name "sport-execute"
-      :command-line
-      (format "g++ %s -Wdisabled-optimization -Werror -g && ./a.out"
-              (buffer-file-name)))
-     (list
-      :display "Sport: compile only [all flags]"
-      :command-name "sport-compile"
-      :command-line
-      (format
-       "g++ %s -Wdisabled-optimization -Werror -g"
-       (buffer-file-name)))))
+       (and
+        (file-exists-p "input.txt")
+        (list
+         :display "Sport: compile, execute with input.txt [all flags]"
+         :command-name "sport-execute-sample"
+         :command-line
+         (format
+          "g++ %s -Wdisabled-optimization -Werror -g && cat input.txt | ./a.out"
+          (buffer-file-name))))
+       (list
+        :display "Sport: execute only [all flags]"
+        :command-name "sport-execute"
+        :command-line
+        (format "g++ %s -Wdisabled-optimization -Werror -g && ./a.out"
+                (buffer-file-name)))
+       (list
+        :display "Sport: compile only [all flags]"
+        :command-name "sport-compile"
+        :command-line
+        (format
+         "g++ %s -Wdisabled-optimization -Werror -g"
+         (buffer-file-name))))))
   (add-to-list 'run-command-recipes 'run-command-sportprog-recipe))
 
 (provide 'my-c)
