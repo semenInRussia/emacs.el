@@ -1,5 +1,5 @@
 ;;; my-run-command-funcs.el --- Some helper commands for `run-command' -*- lexical-binding: t -*-
-;;; semenInRussia 2024
+;;; semenInRussia 2024-2025
 
 ;;; Commentary:
 ;; Some helper commands for `run-command'.

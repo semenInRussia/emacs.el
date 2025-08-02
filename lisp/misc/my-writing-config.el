@@ -1,17 +1,14 @@
-;;; my-writing-config.el --- My configuration for the writing other configuration -*- lexical-binding: t; -*-
-;; Copyright (C) 2022-2024 semenInRussia
-;; Author: semenInRussia <hrams205@gmail.com>
+;;; my-writing-config.el --- My configuration for the writing configuration -*- lexical-binding: t; -*-
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
-;; My configuration for the writing other configuration.
+;; My configuration for the writing configuration.
 
 ;;; Code:
 (require 'my-leaf)
 
-(declare-function inspector-inspect "inspector.el")
 (declare-function my-autoautoload-local-mode "my-config-funcs")
 (declare-function my-build-config "my-config-funcs.el")
-(declare-function my-byte-compile-local-projects-autoloads "my-config-funcs.el")
 (declare-function my-new-config-module "my-config-funcs")
 (declare-function my-restart-build "my-config-funcs")
 
@@ -36,7 +33,6 @@
   "r" #'restart-emacs
   "R" #'my-restart-build
   "B" #'my-restart-build
-
   "n" #'my-new-config-module
   "t" 'my-require-times)
 (global-set-key (kbd "C-c e") my-config-map)

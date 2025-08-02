@@ -1,8 +1,11 @@
-;;; my-info.el --- Info about me
+;;; my-info.el --- Info about me -*- lexical-binding: t -*-
+
+;;; Commentary:
 
 ;; Info about me
 
-(setq user-full-name    "semenInRussia"
+;;; Code:
+(setq user-full-name "semenInRussia"
       user-mail-address "hrams205@gmail.com")
 
 (provide 'my-info)

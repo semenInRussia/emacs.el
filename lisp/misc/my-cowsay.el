@@ -1,12 +1,10 @@
-;;; my-cowsay.el --- My config of `cowsay'
+;;; my-cowsay.el --- My config of `cowsay' -*- lexical-binding: t -*-
 
-;; Copyright (C) 2022 semenInRussia
-;; Author: semenInRussia <hrams205@gmail.com>
-;; URL: https://github.com/semenInRussia/emacs.el
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 
-;; My config of `cowsay'
+;; My config of `cowsay': cow can say
 
 ;;; Code:
 

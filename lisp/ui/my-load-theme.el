@@ -1,12 +1,6 @@
 ;;; my-load-theme --- Load the current theme
 
-;; Copyright (C) 2022-2024 semenInRussia
-
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
-
-;; This file is not part of GNU Emacs.
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 

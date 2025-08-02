@@ -2,7 +2,7 @@
 
 ;;; Commentary:
 
-;; My small library
+;; My small library for Emacs.
 
 ;;; Code:
 

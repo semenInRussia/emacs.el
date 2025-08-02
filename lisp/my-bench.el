@@ -1,6 +1,6 @@
 ;;; my-bench.el --- My a small package to provide a cool config benchmarks -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2024 semenInRussia
+;; Copyright (C) 2024-2025 semenInRussia
 
 ;;; Commentary:
 

@@ -1,22 +1,6 @@
 ;;; my-org-editing.el --- Some commands to edit an `org-mode' source -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023-2024 semenInRussia
-
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.0.1
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+;; Copyright (C) 2023-2025 semenInRussia
 
 ;;; Commentary:
 
@@ -91,20 +75,6 @@ Pass PROMPT, INITIAL-INPUT, HISTORY, DEFAULT-VALUE, INHERIT-INPUT-METHOD to
   "Eval formula with `orgtbl' syntax for the current field of the table."
   (interactive)
   (org-table-eval-formula '(4)))
-
-;;;###autoload
-(defun my-org-schedule-to-today ()
-  "Scheduale a `org-mode' heading to today."
-  (interactive)
-  (org-schedule t (format-time-string "%Y-%m-%d")))
-
-;;;###autoload
-(defun my-org-indent-subtree ()
-  "Indent current the `org-mode' subtree at current position."
-  (interactive)
-  (save-excursion
-    (org-mark-subtree)
-    (indent-region (region-beginning) (region-end))))
 
 ;;;###autoload
 (defun my-org-insert-image (filename &optional caption)
@@ -188,26 +158,6 @@ If caption isn't empty string, then insert image with the caption CAPTION."
   "Download file at URL as file with NEW-FILENAME."
   (make-directory (f-dirname new-filename) t)
   (url-copy-file url new-filename t))
-
-;;;###autoload
-(defun my-org-toggle-checkbox ()
-  "My version of `org-toggle-checkbox'.
-
-The difference is that after this function you can hit the last hitted keystroke
-and it calls function again."
-  (interactive)
-  (call-interactively #'org-toggle-checkbox)
-  (repeat-at-last-keystroke))
-
-;;;###autoload
-(defun my-org-todo ()
-  "My version of `org-todo'.
-
-The difference is that after this function you can hit the last hitted keystroke
-and it calls function again."
-  (interactive)
-  (call-interactively #'org-todo)
-  (repeat-at-last-keystroke))
 
 (provide 'my-org-editing)
 ;;; my-org-editing.el ends here

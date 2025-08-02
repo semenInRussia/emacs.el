@@ -1,8 +1,8 @@
-;;; my-require-times.el --- A mode to see time which every Emacs module took -*- lexical-binding: t -*-
-;; semenInRussia 2024
+;;; my-require-times.el --- A mode to see time which every Emacs module took to load -*- lexical-binding: t -*-
+;; semenInRussia 2024-2025
 
 ;;; Commentary:
-;; A mode to see time which every Emacs module took
+;; A mode to see time which every Emacs module took to load
 
 ;;; Code:
 (require 'cl-lib)

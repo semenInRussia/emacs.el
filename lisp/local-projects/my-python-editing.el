@@ -2,8 +2,9 @@
 
 ;;; Commentary:
 
-;; Here are defined some useful for me functions to *edit* a Python source code.
-;; NOTE: that binding of these functions are located inside my-python.el
+;; Here are defined some useful for me functions to *edit* a Python
+;; source code.  NOTE: that binding of these functions are located
+;; inside my-python.el
 
 ;;; Code:
 

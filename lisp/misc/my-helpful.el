@@ -1,9 +1,6 @@
 ;;; my-helpful.el --- My config for `helpful'
 
-;; Copyright (C) 2022 semenInRussia
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 

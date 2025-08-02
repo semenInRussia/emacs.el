@@ -1,5 +1,5 @@
 ;;; my-layout.el --- My settings to layout -*- lexical-binding: t; -*-
-;; Copyright (C) 2023-2024 semenInRussia
+;; Copyright (C) 2023-2025 semenInRussia
 ;;; Commentary:
 
 ;; My settings to layout: padding, window size

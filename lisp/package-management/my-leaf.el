@@ -1,6 +1,6 @@
 ;;; my-leaf.el --- My config for `leaf' -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022-2023 semenInRussia
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 

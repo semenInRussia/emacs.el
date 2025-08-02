@@ -1,5 +1,5 @@
 ;;; my-which-key.el --- My config for `which-key'
-;; Copyright (C) 2022-2023 semenInRussia
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 

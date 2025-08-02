@@ -1,6 +1,6 @@
-;;; my-reload.el --- Load Emacs config when edit it and save -*- lexical-binding: t -*-
+;;; my-reload.el --- Load Emacs config file when edit it and save -*- lexical-binding: t -*-
 
-;; Copyright (C) 2024 by semenInRussia
+;; Copyright (C) 2024-2025 by semenInRussia
 
 ;;; Commentary:
 

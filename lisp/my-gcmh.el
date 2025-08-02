@@ -1,6 +1,6 @@
 ;;; my-gcmh.el --- My configuration for garbage collection hacks -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2024 semenInRussia
+;; Copyright (C) 2024-2025 semenInRussia
 
 ;;; Commentary:
 

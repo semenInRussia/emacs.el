@@ -1,10 +1,6 @@
 ;;; my-latex-insert.el --- LaTeX-insert module which expand words with . to latex fragments  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022 semenInRussia
-
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; Homepage: https://github.com/semeninrussia/emacs.el
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 

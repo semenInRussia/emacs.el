@@ -1,4 +1,6 @@
 ;;; my-racket-funcs.el --- Some functions for racket language -*- lexical-binding: t -*-
+;;; Commentary:
+;; Some functions for racket language
 
 ;;; Code:
 (require 'my-parens)

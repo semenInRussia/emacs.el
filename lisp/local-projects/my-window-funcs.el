@@ -1,5 +1,5 @@
 ;;; my-window-funcs.el --- Some funcs and commands for navigating windows and buffers -*- lexical-binding: t -*-
-;; semenInRussia 2024
+;; semenInRussia 2024-2025
 ;;; Commentary:
 ;; Some funcs and commands for navigating windows and buffers.
 

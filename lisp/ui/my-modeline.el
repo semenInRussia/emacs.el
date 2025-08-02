@@ -1,6 +1,5 @@
-;;; my-modeline.el --- My configuration for modeline
-;; Copyright (C) 2022-2024 semenInRussia
-;; Author: semenInRussia <hrams205@gmail.com>
+;;; my-modeline.el --- My configuration for modeline -*- lexical-binding: t -*-
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 ;; My configuration for modeline
@@ -11,7 +10,9 @@
 ;; I don't use `doom-modeline-env'
 (add-hook 'after-init-hook 'doom-modeline-mode -100)
 (defun my-dont-modeline-env (&rest r)
-  "Don't load `doom-modeline-env'."
+  "Don't load `doom-modeline-env'.
+
+R."
   (interactive "P")
   (if (eq (nth 1 r) 'doom-modeline-env)
       t

@@ -12,8 +12,7 @@
 (leaf run-command
   :ensure (run-command
            :host github
-           :repo "bard/emacs-run-command"
-           :branch "develop")
+           :repo "bard/emacs-run-command")
   :defun run-command-runner-compile run-command-core-run
   :custom (run-command-default-runner . #'run-command-runner-compile)
   :bind (("<f5>" . run-command)

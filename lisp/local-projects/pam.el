@@ -1,10 +1,6 @@
 ;;; pam.el --- A fast Emacs package manager which is built over `straight' -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023-2024 semenInRussia
-
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.0.1
-;; Package-Requires: (straight)
+;; Copyright (C) 2023-2025 semenInRussia
 
 ;;; Commentary:
 

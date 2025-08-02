@@ -1,6 +1,6 @@
 ;;; my-afk.el --- Load some heavy packages after some seconds of AFK -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023-2024 semenInRussia
+;; Copyright (C) 2023-2025 semenInRussia
 
 ;;; Commentary:
 
@@ -72,8 +72,6 @@
     org-cycle
     ;; snippets
     yasnippet
-    ;; perspectives
-    persp-mode
     ;; my translator
     google-translate
     ;; run-command

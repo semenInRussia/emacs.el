@@ -1,13 +1,11 @@
 ;;; my-autoinsert.el --- My configuration of `autoinsert': automatically insert any initial text into empty files -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023 semenInRussia
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; Homepage: https://github.com/semeninrussia/emacs.el
+;; Copyright (C) 2023-2025 semenInRussia
 
 ;;; Commentary:
 
-;; My configuration of `autoinsert'.
+;; My configuration of `autoinsert': insert a template text after file
+;; is created.
 
 ;;; Code:
 

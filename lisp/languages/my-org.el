@@ -33,8 +33,7 @@
   :bind (:org-mode-map
          :package org
          ("C-c M-i"   . my-org-insert-image)
-         ("C-c M-u"   . my-org-insert-img-at-url)
-         ("C-c C-t"   . my-org-todo)))
+         ("C-c M-u"   . my-org-insert-img-at-url)))
 
 (leaf toc-org :ensure t)
 

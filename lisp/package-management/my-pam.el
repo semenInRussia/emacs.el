@@ -1,10 +1,6 @@
 ;;; my-pam.el --- My configuration of pam -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2024 semenInRussia
-
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; Homepage: https://github.com/semeninrussia/emacs.el
+;; Copyright (C) 2024-2025 semenInRussia
 
 ;;; Commentary:
 

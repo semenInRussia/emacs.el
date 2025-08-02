@@ -1,7 +1,6 @@
 ;;; my-focus.el --- My configuration of `focus' -*- lexical-binding: t; -*-
-;; Copyright (C) 2022 semenInRussia
+;; Copyright (C) 2022-2025 semenInRussia
 
-;; Author: semenInRussia <hrams205@gmail.com>
 ;;; Commentary:
 ;; My configuration of `focus'.
 

@@ -1,6 +1,6 @@
 ;;; my-recentf.el --- My configuration of `recentf' -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022-2024 semenInRussia
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 

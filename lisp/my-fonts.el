@@ -1,5 +1,5 @@
 ;;; my-fonts.el --- My configuration for fonts
-;; Copyright (C) 2022-2024 semenInRussia
+;; Copyright (C) 2022-2025 semenInRussia
 ;; Author: semenInRussia <hrams205@gmail.com>
 
 ;;; Commentary:

@@ -1,15 +1,8 @@
-;;; my-latex-autoformat.el --- autoformat for LaTeX -*- lexical-binding: t; -*-
-
-;; Copyright (C) 2023 semenInRussia
-
-;; Author: semenInRussia <hrams@DESKTOP-CQH054L>
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+;;; my-latex-autoformat.el --- Autoformat for LaTeX -*- lexical-binding: t; -*-
+;; Copyright (C) 2023-2025 semenInRussia
 
 ;;; Commentary:
-
-;; autoformat for LaTeX.
+;; Autoformat for LaTeX.
 
 ;;; Code:
 

@@ -1,14 +1,11 @@
 ;;; my-auto-compile.el --- My configuration for auto compile lisp files of config -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022 semenInRussia
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; Homepage: https://github.com/semeninrussia/emacs.el
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 
-;; My configuration of `auto-compile'.  Automatically byte-compile Emacs Lisp
-;; files after save.
+;; My configuration of `auto-compile'.  Automatically byte-compile
+;; Emacs Lisp files after save.
 
 ;;; Code:
 

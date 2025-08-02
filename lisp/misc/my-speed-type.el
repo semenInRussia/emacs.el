@@ -1,6 +1,6 @@
 ;;; my-speed-type.el --- My configuration of `speed-type' -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022-2024 semenInRussia
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 
@@ -10,8 +10,6 @@
 ;;; Code:
 
 (require 'my-leaf)
-(require 'dash)
-
 
 (leaf speed-type
   :ensure t)

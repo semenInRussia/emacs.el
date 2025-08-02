@@ -14,6 +14,7 @@
   :type '(repeat symbol)
   :group 'my)
 
+;;;###autoload
 (defun my-rust-toggle-pub ()
   "Toggle public/private scope of the current rust function/imple/struct."
   (interactive)
@@ -47,6 +48,7 @@
         cargo.toml
       (my-rust-find-Cargo.toml-in-directory (f-parent dir)))))
 
+;;;###autoload
 (defun my-rust-visit-Cargo.toml ()
   "Visit Cargo.toml file of current rust crate."
   (interactive)

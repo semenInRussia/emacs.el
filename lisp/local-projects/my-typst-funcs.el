@@ -1,5 +1,5 @@
 ;;; my-typst-funcs.el --- Some helper functions for `typst-mode' -*- lexical-binding: t -*-
-;; semenInRussia 2024
+;; semenInRussia 2024-2025
 
 ;;; Commentary:
 ;;; Code:

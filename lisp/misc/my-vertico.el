@@ -1,5 +1,5 @@
 ;;; my-vertico.el --- Settings of `vertico': the modern completion -*- lexical-binding: t -*-
-;;; Copyright (c) 2023
+;;; Copyright (c) 2023-2025
 
 ;;; Commentary:
 
@@ -21,8 +21,8 @@
   :bind (:vertico-map
          ("C-M-n" . vertico-next-group)
          ("C-M-p" . vertico-previous-group))
-  ;; it's part of `vertico-mode'
   :init
+  ;; it's part of `vertico-mode'
   (advice-add 'completing-read-default :around #'vertico--advice)
   (advice-add 'completing-read-multiple :around #'vertico--advice)
   :defun vertico-mode

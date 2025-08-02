@@ -1,13 +1,10 @@
 ;;; my-eshell.el --- My configuration of `eshell' -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022-2024 semenInRussia
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; Homepage: https://github.com/semeninrussia/emacs.el
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 
-;; My configuration of `eshell'.
+;; My configuration of `eshell': multi-platrform shell inside Emacs.
 
 ;;; Code:
 

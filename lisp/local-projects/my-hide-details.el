@@ -1,8 +1,9 @@
-;;; my-hide-details.el --- Functions to hide extra details in `compile-mode' -*- lexical-binding: t -*-
-;;; semenInRussia 2024
+;;; my-hide-details.el --- Functions to hide extra details in `compilation-mode' -*- lexical-binding: t -*-
+;;; semenInRussia 2024-2025
 
 ;;; Commentary:
-;; Functions to hide extra details in `compile-mode'.
+;; Functions to hide extra details in `compilation-mode'.  Hide
+;; complation start time, status code, duration and etc.
 
 ;;; Code:
 ;;; hide details inside `compile' buffer
