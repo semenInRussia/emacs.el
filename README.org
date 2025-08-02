@@ -1,22 +1,10 @@
-* semenInRussia Emacs config (maybe called SEMACS?)
-
-A good (I think) configuration for [[https://emacs.org][Emacs]] which have a *BIG AMOUNT* of unique features.  This config 100% not for everyone Emacs user.  I think you must have any Emacs background to use it (but maybe not)
-
-This config is *required in Emacs29.1 version*, even better if Emacs was compiled with native-compilation feature
-
-In this config you can find a big amount of new concepts for editor configs (I think).  One of the most interesting features is that you can install this config (not count installing fonts, [[https://github.com/AbiWord/enchant][enchant2]] (spell checker) and [[https://github.com/BurntSushi/ripgrep][ripgrep]]) very quickly, because all packages are built in zip archive (see releases or [[#Installation]] section)
-
-[[./doc/s1.png]]
-
-Some men asked me "So, you copied Doom. Why?".  My answer is that my config is even better than Doom (for me) + it isn't a copy of Doom, I even wasn't user of Doom never.
-
-[[./doc/s2.png]]
-[[./doc/s4.png]]
-
-#+CAPTION: on windows too
-[[./doc/s3.png]]
-
-My configuration have a big amount of interesting concepts which are unique properties.  Plus the biggest part of my config is opposite to Doom.  Things where my config is better on 100% I will tell #nodoom, where is better by my opinion (everywhere, but here diff is bit) I will tell #dddm
+* semenInRussia Emacs config (maybe called SEMACS?) :toc:
+  - [[#features][Features]]
+  - [[#extension-my-config-as-framework][Extension (my config as framework)]]
+  - [[#packager-manager][Packager Manager]]
+  - [[#installation][Installation]]
+  - [[#command-line-arguments][Command Line Arguments]]
+  - [[#requirements][Requirements]]
 
 ** Features
 
@@ -151,7 +139,6 @@ Also how you can see above, this configuration provide some additional options y
 - `--bcompile`. Byte-compile `init.el`, `early-init.el`
 
 - `--kill`. Instantly after init.el was loaded, kill emacs session. It's useful, if you need only to use other CLI flags actions, but don't need in editor
-
 
 ** Requirements
 
