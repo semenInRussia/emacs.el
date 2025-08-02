@@ -55,7 +55,7 @@
 
 ;; format `org-mode' code after every key hit
 (leaf my-org-autoformat
-  :hook (org-mode-hook . my-autoformat-mode))
+  :hook org-mode-hook)
 
 (leaf consult
   :bind (:org-mode-map
@@ -83,13 +83,13 @@
   :ensure t
   :hook org-mode-hook)
 
-(leaf org-autolist
-  :ensure t
-  ;; :hook org-mode-hook
-  :commands org-autolist-mode
-  :config
-  (run-with-idle-timer 3 nil (lambda () (require 'org-autolist)))
-  (add-hook 'org-mode-hook 'org-autolist-mode))
+;; (leaf org-autolist
+;;   :ensure t
+;;   ;; :hook org-mode-hook
+;;   :commands org-autolist-mode
+;;   :config
+;;   (run-with-idle-timer 3 nil (lambda () (require 'org-autolist)))
+;;   (add-hook 'org-mode-hook 'org-autolist-mode))
 
 (leaf rorg
   :ensure (rorg :host github :repo "semenInRussia/rorg")
@@ -105,10 +105,9 @@
 
 (defun doom-docs-org-mode () (interactive))
 
-(leaf org-download
-  :ensure (org-download :repo "abo-abo/org-download" :host github)
-  :after org dired
-  :hook (dired-mode-hook . org-download-enable))
+;; (leaf org-download
+;;   :ensure (org-download :repo "abo-abo/org-download" :host github)
+;;   :config (dired-mode-hook . org-download-enable))
 
 ;; `org-mode' exporter
 (leaf ox
