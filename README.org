@@ -6,6 +6,12 @@
   - [[#command-line-arguments][Command Line Arguments]]
   - [[#requirements][Requirements]]
 
+    [[./doc/s1.png]]
+    [[./doc/s2.png]]
+    [[./doc/s8.png]]
+
+    You can see some other screenshots in [[file:doc/][doc/]]
+
 ** Features
 
 - a beautiful design.
