@@ -55,7 +55,7 @@
 
 ;; format `org-mode' code after every key hit
 (leaf my-org-autoformat
-  :hook org-mode-hook)
+  :hook (org-mode-hook . my-autoformat-mode))
 
 (leaf consult
   :bind (:org-mode-map
@@ -102,8 +102,6 @@
          ("C-c C-}" . rorg-backward-barf-subtree)
          ("C-c {" . rorg-backward-slurp-subtree)
          ("C-c [" . rorg-forward-barf-subtree)))
-
-(defun doom-docs-org-mode () (interactive))
 
 ;; (leaf org-download
 ;;   :ensure (org-download :repo "abo-abo/org-download" :host github)
