@@ -1,6 +1,6 @@
 ;;; my-light-theme.el --- Configuration for the editor view (light theme) -*- lexical-binding: t -*-
 
-;; Copyright (C) 2024 semenInRussia
+;; Copyright (C) 2024-2025 semenInRussia
 ;; Author: semenInRussia <hrams205@gmail.com>
 
 ;;; Commentary:

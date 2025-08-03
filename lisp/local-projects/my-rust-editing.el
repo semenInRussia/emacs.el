@@ -1,5 +1,5 @@
 ;;; my-rust-editing.el --- SOme functions useful for editing Rust file -*- lexical-binding: t -*-
-;; semenInRussia 2024
+;; semenInRussia 2025
 
 ;;; Commentary:
 ;;; Code:

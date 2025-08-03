@@ -1,5 +1,5 @@
 ;;; my-macros.el --- Some useful macros which was inspide with Doomemacs -*- lexical-binding: t -*-
-;; Copyright (C) 2023 semenInRussia
+;; Copyright (C) 2023-2025 semenInRussia
 
 ;;; Commentary:
 

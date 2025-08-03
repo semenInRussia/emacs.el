@@ -1,6 +1,6 @@
 ;;; my-org-autoformat --- Format `org-mode' code after every keystroke -*- lexical-binding: t -*-
 
-;; Copyright (C) 2023 semenInRussia
+;; Copyright (C) 2023-2025 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 

@@ -1,5 +1,5 @@
 ;;; my-markdown-funcs.el --- Some helper functions for `markdown-mode' -*- lexical-binding: t -*-
-;; semenInRussia 2024
+;; semenInRussia 2025
 
 ;;; Commentary:
 ;; Some helper functions for `markdown-mode'.

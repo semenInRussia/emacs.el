@@ -1,6 +1,6 @@
 ;; ;;; my-lsp-bridge.el --- My configuration of `lsp-bridge': the fastest LSP client -*- lexical-binding: t; -*-
 
-;; ;; Copyright (C) 2022-2023 semenInRussia
+;; ;; Copyright (C) 2022-2025 semenInRussia
 
 ;; ;; Author: semenInRussia <hrams205@gmail.com>
 ;; ;; Version: 0.1

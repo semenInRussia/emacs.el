@@ -1,6 +1,6 @@
 ;;; small-init.el --- configuration file to very small minimal Emacs -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023 hrams205@gmail.com
+;; Copyright (C) 2023-2025 hrams205@gmail.com
 
 ;;; Commentary:
 

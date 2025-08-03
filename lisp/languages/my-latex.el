@@ -1,10 +1,6 @@
 ;;; my-latex.el --- My config for LaTeX
 
-;; Copyright (C) 2022-2024 semenInRussia
-
-;; Author: semenInRussia <hrams205@gmail.com>
-;; Version: 0.1
-;; URL: https://github.com/semenInRussia/emacs.el
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 

@@ -1,6 +1,6 @@
 ;;; my-merge.el --- A modal state to resolve Git conflicts using simple keystrokes -*- lexical-binding: t -*-
 
-;; Copyright (C) 2024 semenInRussia
+;; Copyright (C) 2024-2025 semenInRussia
 
 ;;; Commentary:
 

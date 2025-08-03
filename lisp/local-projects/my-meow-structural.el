@@ -1,6 +1,6 @@
 ;;; my-meow-structural.el --- Structural editing for `meow' -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023-2024 semenInRussia
+;; Copyright (C) 2023-2025 semenInRussia
 
 ;;; Commentary:
 

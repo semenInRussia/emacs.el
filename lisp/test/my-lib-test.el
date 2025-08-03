@@ -1,6 +1,6 @@
 ;;; my-lib-test.el --- Tests for `my-lib'
 
-;; Copyright (C) 2022-2023 semenInRussia
+;; Copyright (C) 2022-2025 semenInRussia
 
 ;; Author: semenInRussia <hrams205@gmail.com>
 
