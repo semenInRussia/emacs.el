@@ -10,6 +10,7 @@
 ;; disable tabs, sorry Richard
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 2)
+(setq-default fill-column 80)
 (leaf-keys (prog-mode-map ("RET" . newline-and-indent)))
 
 (provide 'my-indent)

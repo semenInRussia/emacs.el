@@ -24,7 +24,7 @@ R."
 (leaf doom-modeline
   :ensure t
   :custom (;; it looks like more nice
-           (doom-modeline-height . 35)
+           (doom-modeline-height . 45)
            ;; just fun
            ;; (mode-line-right-align-edge . 'right-margin)
            ;; encoding not useful I think.
@@ -43,9 +43,9 @@ R."
            ;; (doom-modeline-project-detection . 'project)
            (doom-modeline-buffer-file-name-style . 'buffer-name))
   :config
-  ;; I use Emacs in fullscreen mode, so I don't see time that provided
-  ;; by OS, so I need time in modeline.  EMACS IS MY OS!!!
-  ;; I need only to time (not date) in 24hour format
+  ;; I use Emacs in fullscreen mode, so I don't see time that provided by OS, so
+  ;; I need time in modeline.  EMACS IS MY OS!!!  I need only to time (not date)
+  ;; in 24hour format
   (defvar display-time-format) ;; make compile happy
   (setq display-time-format "%H:%M")
   (display-time-mode t)

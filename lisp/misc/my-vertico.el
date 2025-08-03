@@ -51,6 +51,7 @@
     ;; `marginalia' and this both use the same way to display info inside `vertico',
     ;; if i load it before `marginalia', then it wasn't working
     :hook marginalia-mode-hook
+    :defvar nerd-icons-completion-category-icons
     :config (add-to-list
              'nerd-icons-completion-category-icons
              '(snippet nerd-icons-octicon "nf-oct-copy" nerd-icons-lred)))

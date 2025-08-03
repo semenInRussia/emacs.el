@@ -11,8 +11,8 @@
 ;;; Code:
 
 (defcustom my-use-afk-modules
-  '(;; `consult' command `consult-buffer', really frequently useful by me,
-    ;; I use it in 99% of Emacs sessions, load it when in AFK
+  '(;; `consult' command `consult-buffer', really frequently useful by
+    ;; me, I use it in 99% of Emacs sessions, load it when in AFK
     consult
     vertico
     ;; auto-completion (`corfu')
@@ -23,9 +23,9 @@
     ;; a popup about info at point or function signature (it's called
     ;; hover in lsp terminology)
     eldoc-box
-    ;; my configuration really tied with `embark'.
-    ;; I use it for: change reGisTeR of the region, kill the sexp at point,
-    ;; do things on the minibuffer items, browse the URL at the cursor
+    ;; my configuration really tied with `embark'.  I use it for:
+    ;; change reGisTeR of the region, kill the sexp at point, do
+    ;; things on the minibuffer items, browse the URL at the cursor
     ffap  ; a dependency
     embark
     ;; yank-indent
@@ -78,8 +78,8 @@
     run-command)
   "This is the list of modules which should be loaded after some seconds of AFK.
 
-Emacs will load them when I am not doing anything, so I won't wait loading of
-them when they really needed"
+Emacs will load them when I am not doing anything, so I won't wait
+loading of them when they really needed"
   :group 'my
   :type '(repeat (repeat symbol)))
 
@@ -89,7 +89,7 @@ them when they really needed"
   :type 'number)
 
 (defcustom my-use-afk-timeout-between-loads 1
-  "Secs between loadidng heavy modules."
+  "Seconds between loadidng heavy modules."
   :group 'my
   :type 'number)
 
@@ -128,9 +128,8 @@ of this counter and run timer to load itself after the seconds of AFK"
        my-use-afk-timeout-between-loads
        nil
        (lambda ()
-         ;; this code will ran after
-         ;; `my-use-afk-timeout-between-loads' seconds after loading a
-         ;; heavy thing.
+         ;; this code will ran after `my-use-afk-timeout-between-loads' seconds
+         ;; after loading a heavy thing.
          ;;
          ;; here check that all time before load a heavy thing, the user wasn't
          ;; doing anything, in this case users still in AFK, so load the next

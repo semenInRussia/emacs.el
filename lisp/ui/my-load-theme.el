@@ -1,4 +1,4 @@
-;;; my-load-theme --- Load the current theme
+;;; my-load-theme --- Load the current theme -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022-2025 semenInRussia
 
