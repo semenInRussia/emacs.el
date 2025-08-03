@@ -1,3 +1,6 @@
+[[./doc/s2.png]]
+
+
 * semenInRussia Emacs config (maybe called SEMACS?) :toc:
   - [[#features][Features]]
   - [[#extension-my-config-as-framework][Extension (my config as framework)]]
@@ -6,69 +9,78 @@
   - [[#command-line-arguments][Command Line Arguments]]
   - [[#requirements][Requirements]]
 
-    [[./doc/s1.png]]
-    [[./doc/s2.png]]
-    [[./doc/s8.png]]
+  A good (I think) configuration for [[https://emacs.org][Emacs]] which have a *BIG AMOUNT* of unique features.  This config 100% not for everyone Emacs user.  I think you must have any Emacs background to use it (but maybe not)
+    
+  This config is *required in Emacs29 version* (or emacs30, but you can rebuild all emacs with =emacs --modules --install=), even better if Emacs is with native-compilation feature
 
-    You can see some other screenshots in [[file:doc/][doc/]]
+  In this config you can find a big amount of new concepts for editor configs (I think).  One of the most interesting features is that you can install this config (not count installing fonts, [[https://github.com/AbiWord/enchant][enchant2]] (spell checker) and [[https://github.com/BurntSushi/ripgrep][ripgrep]]) very quickly, because all packages are built in zip archive (see releases or [[#Installation]] section).  I hope you can be inspired by this configuration.
 
+  Some men asked me "So, you copied Doom. Why?".  My answer is that my config is even better than Doom (for me) + it isn't a copy of Doom. I even wasn't user of Doom never
+
+  [[./doc/s1.png]]
+  [[./doc/s8.png]]
+
+  You can see some other screenshots in [[file:doc/][doc/]]
+    
 ** Features
+
+
+My configuration have a big amount of interesting concepts which are unique ones.  And the biggest part of my config is opposite to Doom.  Things where my config is better on 100% I will tell #nodoom
 
 - a beautiful design.
 
   It includes
-  + a big amount of themes
-  + a big support of two themes: light and dark.  You can change it for session using =M-x my-light-theme= or =M-x my-dark-theme=.  If you need to change it forever, replace a line in =my-load-theme.el= file
-  + diagnostics and other things from echo area at the top left corner (#nodoom)
-  + amazing modeline
-  + icons everywhere (#nodoom)
+  + A big amount of themes
+  + The default ones are light and dark.  You can change it for session using =M-x my-light-theme= or =M-x my-dark-theme=.  If you need to change it forever, replace a line in =my-load-theme.el= file
+  + Diagnostics and other things from echo display in the area at the top left corner, you can see it in pictures above (or in [[file:doc/][doc/]]) (#nodoom)
+  + Amazing modeline (it is [[https://github.com/seagle0128/doom-modeline][doom-modeline]] lol)
+  + Icons everywhere (#nodoom)
+  + Small, but amazing padding around screen (#nodoom) ([[https://github.com/protesilaos/spacious-padding][spacious-padding]] by @protesilaos)
   + No to ~prettify-mode~
-  + Small, but amazing padding around screen (#nodoom)
 
 - Very (really very) fast start up. (#nodoom #nodoom)
 
   On my old computer ~doomemacs~ starts in 4+ seconds (it prints it after startup), but in fact it also wait for when themes, modeline and other things will be loaded.  My config on other side take only 2secs(sometimes even 0.9s) and almost don't take time after.
 
-- A big amount of packages (192+)
+- A big amount of packages (~200)
 
 - Reload the configuration Emacs lisp file after it saved.  Inspired by ~VSCode~ and ~NVChad~
 
-- more fast way to install
+- More fast way to install
 
-- ~meow~ over ~evil~ (#dddm)
+- [[https://github.com/meow-edit/meow][meow]] over ~evil~
 
 - Own package manager, built over ~straight.el~. (#nodoom)
 
-  The benefit is a speed, it only one time add to the a path ~load-path~.  And other times Emacs will find a package only in this directory, instead of 220+ other directories when use ~straight.el~
+  The benefit is a speed, it only one time add the path to ~load-path~.  And other times Emacs will find a package only in this directory, instead of 220+ other directories when use [[https://github.com/radian-software/straight.el][straight.el]] (it's important for Windows)
 
-  It's even better than Doom package manager, my package manager also join all autoloads file into one and byte compile it like Doom
+  It's even better than Doom package manager, my package manager also join all autoloads file into one and byte compile it like Doom (now I think I overingenered it)
 
-- Use good-practice solutions, like replace heavy things with the more light. (#nodoom)
+- Use good-practice solutions, like replace heavy things with the more light ([[https://github.com/minad/corfu][corfu]] over ~company~). (#nodoom)
 
-- Use ~perspectives~ (virtual desktops/workspaces for Emacs) with intuitive way
+- Use [[https://github.com/nex3/perspective-el][perspectives]] (virtual desktops/workspaces for Emacs) with intuitive way
 
 - Some optimizations for Windows
 
-- big usage of [[https://github.com/oantolin/embark/][embark]] (just fun)
+- Big usage of [[https://github.com/oantolin/embark/][embark]] (just fun)
 
 - Some things for sport programming
 
   + special recipes to compile and run C++ files
-  + Edit input.txt (add input samples), now you can press f5 in C++ buffer, choose run with input.txt. wkw!
-  + in gdb debugger you can just insert whole input.txt content in one line (it's useful)
-  + a big amount if helpful snippets
+  + Edit ~input.txt~ (add input samples), now you can press <kbd>f5</kbd> in C++ buffer, choose run with ~input.txt~
+  + in GDB debugger you can just insert whole ~input.txt~ content in one line (it's useful)
+  + a big amount of helpful snippets
   + insert template with snippet ! and multitester with !!
 
 ** Extension (my config as framework)
 
 Interesting way to extension, which you can call chaos.
 
-if you need use this "framework":
-You don't need my ~pam~ package manager!  You don't need any strict file system!  You don't need macros!
+If you use this "framework": You don't need in my ~pam~ package manager!  You don't need any strict file system!  You don't need macros!
 
-Every config file can be in any sub-folder of ~/lisp/~, have any name, contains any things.  Only one separation is that files which not always needed at startup you can place at ~/lisp/local-projects/~.
+Every config file can be in any sub-folder of ~/lisp/~, have any name, contains any things.  Only one separation is that files which not always needed at startup you can place at the ~/lisp/local-projects/~.
 
-You will build config ~emacs --modules~ and all files from ~/lisp/~ will be joined at ~/dist/my-modules.el~ you can see source of my-modules build inside ~local-projects/my-build-config.el~ (in this file you can also change order of including lisp files into my-modules) also you can generate autoloads files for local-projects (use ~--local-projects~ flag) after that you everywhere can use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Autoload.html][autoloaded]] functions from ~local-projects~.
+You build config (=M-x my-build-config=) and all files from ~lisp/~ will be joined into ~dist/my-modules.el~ you can see source of ~my-modules-build~ inside ~local-projects/my-build-config.el~ (in this file you can also change order of including lisp files into my-modules if it's needed) also you can generate autoloads files for local-projects (use ~--local-projects~ flag), after that you everywhere can use [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Autoload.html][autoloaded]] functions from ~local-projects~.
 
 Also you can build config with call ~emacs --modules~ in any shell
 
@@ -80,7 +92,7 @@ So main files (files of framework part) are only:
 
 ** Packager Manager
 
-this config uses a small package manager which is wrapper over straight.el.  I called it `pam`
+this config uses a small package manager which is wrapper over straight.el.  I called it ~pam~
 
 Idea is simple:
 
@@ -93,6 +105,19 @@ so there are two types of handling =(pam-use-package 'package)=:
 2. do nothing
 
 if your packages are installed choose second which is default.  If you need to install new packages choose 1, you can either use =emacs --install= or =M-x pam-install-everything-mode=
+
+** Command Line Arguments
+Also how you can see above, this configuration provide some additional options you can use when run emacs in terminal, here the list:
+
+- ~--modules~. Build ~my-modules.el~ - file that contains all configuration and will be built from them. (see ~my-build-config~)
+
+- ~--install~. Install every package I use via ~straight~. (it can take long time)
+
+- ~--local-projects~. Byte-compile ~local-projects~ and generate autoloads. "Local projects" are Elisp files, that Emacs don't load instantly after run. You can consider it like your own extensions to Emacs
+
+- ~--bcompile~. Byte-compile ~init.el~, ~early-init.el~
+
+- ~--kill~. Instantly after init.el was loaded, kill emacs session. It's useful, if you need only to use other CLI flags actions, but don't need in editor
 
 ** Installation
 
@@ -133,20 +158,7 @@ You can extract an archive into any directory, and run emacs using ~--init-direc
 
 So you can test it without ~chemacs~ and other stupid things, you even not need in emacs29 --init-directory, but you still needed in emacs29
 
-** Command Line Arguments
-Also how you can see above, this configuration provide some additional options you can use when run emacs in terminal, here the list:
-
-- `--modules`. Build `my-modules.el` - file that contains all configuration and will be built from them. (see `my-build-config`)
-
-- `--install`. Install every package I use via `straight`. (it can take long time)
-
-- `--local-projects`. Byte-compile `local-projects` and generate autoloads. "Local projects" are Elisp files, that Emacs don't load instantly after run. You can consider it like your own extensions to Emacs
-
-- `--bcompile`. Byte-compile `init.el`, `early-init.el`
-
-- `--kill`. Instantly after init.el was loaded, kill emacs session. It's useful, if you need only to use other CLI flags actions, but don't need in editor
-
-** Requirements
+** Dependencies
 
 - *Emacs 29.1+* (check [[https://www.gnu.org/software/emacs/][here]])
 - Ripgrep (check [[https://github.com/BurntSushi/ripgrep][here]])
