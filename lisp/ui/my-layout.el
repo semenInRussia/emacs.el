@@ -14,7 +14,7 @@
       use-file-dialog nil
       use-dialog-box nil)
 
-(defcustom my-layout-size '(72 . 20)
+(defcustom my-layout-size '(75 . 20)
   "Cons of width and height of editor window."
   :group 'my
   :type '(cons number number))
