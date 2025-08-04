@@ -14,7 +14,6 @@
 (require 's)
 
 (leaf calc
-  :defun calc-yank-internal calc-pack calc-vector-mean
   :custom (calc-left-label . "  ")
   :bind (:calc-edit-mode-map
          :package calc-yank

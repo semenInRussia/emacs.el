@@ -11,9 +11,6 @@
 (require 'just)
 (require 'org)
 
-(declare-function meow-insert-mode "meow")
-(declare-function repeat-at-last-keystroke "my-lib")
-
 ;;; URL functions
 
 (defvar my-url-prefixes

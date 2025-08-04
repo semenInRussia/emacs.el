@@ -117,23 +117,5 @@ Will be expanded only on matching in empty line and not in math"
   "Return point at beginning of current LaTeX environment."
   (car (my-latex-env-beg-and-end)))
 
-(defun my-latex-env-end ()
-  "Return point at end of current LaTeX environment."
-  (cdr (my-latex-env-beg-and-end)))
-
-(defun my-latex-wrap-environment (beg end environment)
-  "Wrap the region from BEG to END into ENVIRONMENT.
-
-  If the environment is not given, ask for it using completion."
-  (just-mark-region beg end)
-  (cdlatex-wrap-environment environment)
-  (indent-region (region-beginning) (region-end)))
-
-(defun my-latex-kill-section ()
-  "Kill a LaTeX section."
-  (interactive)
-  (LaTeX-mark-section)
-  (kill-region (region-beginning) (region-end)))
-
 (provide 'my-latex-autoformat)
 ;;; my-latex-autoformat.el ends here

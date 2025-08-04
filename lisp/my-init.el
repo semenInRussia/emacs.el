@@ -1,15 +1,14 @@
-;;; my-misc.el --- My some little miscellaneous features
-
-;; Copyright (C) 2022-2025 semenInRussia
+;;; my-init.el --- My init.el -*- lexical-binding: t -*-
 
 ;;; Commentary:
 
-;; My some little miscellaneous features
+;; My init.el.  Here I write some things which are can be added to other topics.
 
 ;;; Code:
 (require 'my-leaf)
-(require 'dash)
-(require 'f)
+
+(setq user-full-name "semenInRussia"
+      user-mail-address "hrams205@gmail.com")
 
 ;; Scrolling more OK
 (setq scroll-margin 0
@@ -38,6 +37,7 @@
 
 ;;; I try to decrease the Emacs startup time
 (defun my-display-startup-time ()
+  "Show the time Emacs took before view the *scratch* buffer."
   (message
    "Emacs loaded in %s with %d garbage collections."
    (format
@@ -55,5 +55,12 @@
 (leaf sudo-edit
   :ensure t)
 
-(provide 'my-misc)
-;;; my-misc.el ends here
+(leaf which-key
+  :ensure t
+  :global-minor-mode t
+  :custom ((which-key-show-transient-maps . t))
+  :defun which-key-setup-side-window-bottom
+  :config (which-key-setup-side-window-bottom))
+
+(provide 'my-init)
+;;; my-init.el ends here
