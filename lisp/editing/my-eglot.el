@@ -56,7 +56,8 @@ Rename variable which is symbol ID"
   ;; set default LSP servers for all supported languages
   (defvar eglot-server-programs)  ; make compiler happier
   ;; python (pyright)
-  (setf (alist-get '(python-mode python-ts-mode) eglot-server-programs)
+  (setf (alist-get '(python-mode python-ts-mode) eglot-server-programs
+                   nil nil 'equal)
         '("pyright-langserver" "--stdio"))
 
   (fset #'jsonrpc--log-event #'ignore))  ; massive perf boost---don't log every event
