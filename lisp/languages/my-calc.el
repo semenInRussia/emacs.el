@@ -13,7 +13,6 @@
 (require 'dash)
 (require 's)
 
-;; also see `my-calc-funcs'
 (leaf calc
   :defun calc-yank-internal calc-pack calc-vector-mean
   :custom (calc-left-label . "  ")
