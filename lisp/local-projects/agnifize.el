@@ -59,11 +59,13 @@ BUFFER defaults to the current"
 
 A region begins with BEG and ends with END"
   (interactive "r")
+  (narrow-to-region beg end)
   (agnifize--change-comments beg end)
   (agnifize--delete-empty-lines beg end)
   (agnifize--minimize-bin-ops beg end)
   (agnifize--delete-input-prompts beg end)
-  (agnifize--all-variables-to-agnia-style beg end))
+  (agnifize--all-variables-to-agnia-style beg end)
+  (widen))
 
 (defvar agnifize--one-symbol-varnames
   '("a" "b" "c" "d" "x" "y" "n" "q" "k" "l" "m" "u" "o" "p")
@@ -94,7 +96,8 @@ Each of the should be consist only one character")
   (or end (setq end (point-max)))
   (save-excursion
     (goto-char beg)
-    (replace-regexp-in-region (rx bow (literal old) eow) new beg end)))
+    (replace-regexp-in-region (rx bow (literal old) eow) new
+                              beg end)))
 
 (defvar agnfize--binary-op-regexp
   (regexp-opt
@@ -121,10 +124,11 @@ Each of the should be consist only one character")
   (or end (setq end (point-max)))
   ;; here I don't use built-in comment functions, because I should remove
   ;; dependency from `python-mode' which has a slow speed-up
-  (while (search-forward "#" nil t)
-    (backward-char)
-    (kill-line)
-    (delete-char -1)))
+  (save-excursion
+    (while (search-forward "#" nil t)
+      (backward-char)
+      (kill-line)
+      (delete-char -1))))
 
 (defun agnifize--delete-empty-lines (beg end)
   "Remove empty lines from region between BEG and END."
@@ -141,10 +145,8 @@ Each of the should be consist only one character")
    (s-match-strings-all "input(\\(\".*?\"\\))")
    (--map
     (save-excursion
-      (replace-string-in-region
-       (-second-item it)
-       "" beg
-       (min end (point-max)))))))
+      (replace-string-in-region (-second-item it) ""
+                                beg (min end (point-max)))))))
 
 (provide 'agnifize)
 ;;; agnifize.el ends here
