@@ -8,75 +8,14 @@
 
 ;;; Code:
 
-(require 'avy)
-
 (require 'dired)
 (require 'f)
-
-(defmacro my-dired-save-excursion (&rest body)
-  "Evaluate BODY without change a file/directory at point."
-  (declare (indent 0))
-  `(let ((file (f-full (dired-file-name-at-point))))
-     ,@body
-     (dired-goto-file file)))
 
 ;;;###autoload
 (defun my-dired-mark-all-files ()
   "Mark all file in `dired'."
   (interactive)
   (save-excursion (goto-char (point-min)) (dired-mark 1)))
-
-(defmacro my-define-dired-command-taking-file (name args docstring &rest body)
-  "Define the command from function which take a 1 argument: filename.
-
-Command will be called NAME and accepts ARGS.  Also pass to it DOCSTRING."
-  (declare (indent 2))
-  `(defun ,name ()
-     ,docstring
-     (interactive)
-     (funcall
-      (lambda ,args ,@body)
-      (dired-get-filename))
-     (revert-buffer)))
-
-;;;###autoload(autoload 'my-dired-rename "my-dired-commands")
-(my-define-dired-command-taking-file my-dired-rename
-    (from)
-  "Rename file at point from FROM to other name readed from the minibuffer."
-  (let ((to (my-rename-file from)))
-    (revert-buffer)
-    (dired-goto-file to)))
-
-(defun my-rename-file (file)
-  "Change name of FILE to new readed from the minibuffer name.
-
-Return new name of FILE"
-  (let* ((new-name-of-file
-          (read-string "New name, please: " (f-filename file)))
-         (to (f-join (f-dirname file) new-name-of-file)))
-    (f-move file to)
-    to))
-
-;;;###autoload
-(defun my-dired-move ()
-  "Move file of current directory of `dired' at the point."
-  (interactive)
-  (dired-do-rename))
-
-;;;###autoload(autoload 'my-dired-delete "my-dired-commands")
-(my-define-dired-command-taking-file my-dired-delete
-    (file)
-  "Delete file at dired object at current position of the cursor."
-  (f-delete file t))
-
-;;;###autoload
-(defun my-dired-goto-parent-dir ()
-  "Navigate to parent directory of current dired directory."
-  (interactive)
-  (let ((parent (f-parent (dired-current-directory))))
-    (kill-buffer)
-    (dired parent)
-    (dired-goto-file parent)))
 
 ;;;###autoload
 (defun my-dired-new-file (filename)
@@ -86,29 +25,16 @@ Return new name of FILE"
   (revert-buffer)
   (dired-goto-file (f-full filename)))
 
-;;;###autoload
-(defun my-dired-delete-all-files ()
-  "Delete all files from the directory of the `dired' buffer."
-  (interactive)
-  (my-dired-mark-all-files)
-  (dired-do-delete)
-  (revert-buffer))
-
-;;;###autoload
-(defun dired-avy ()
-  "Version of `avy' for the `dired'."
-  (interactive)
-  (avy-goto-line))
-
 ;;;###autoload(autoload 'my-dired-duplicate "my-dired-commands")
-(my-define-dired-command-taking-file my-dired-duplicate
-    (filename)
+(defun my-dired-duplicate ()
   "Make copy of the file with FILENAME in the same directory."
+  (interactive)
   (f-touch
    (f-join
     (dired-current-directory)
     (read-string "Name of the filename, please: "
-                 (f-filename filename)))))
+                 (f-filename (dired-get-filename)))))
+  (revert-buffer))
 
 ;;;###autoload
 (defun my-dired-jump-to-home ()
