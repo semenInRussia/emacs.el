@@ -7,9 +7,15 @@
 
 (setq gc-cons-threshold most-positive-fixnum)
 
-;;; Don't display native-comp warnings
+;; Don't display native-comp warnings
 (defvar native-comp-async-report-warnings-errors)
 (setq native-comp-async-report-warnings-errors nil)
+
+;; Make native compilation happens asynchronously
+(defvar native-comp-jit-compilation)
+(setq native-comp-async-query-on-exit t)
+(setq confirm-kill-processes t)
+(setq native-comp-jit-compilation t)
 
 ;; PERF: A second, case-insensitive pass over `auto-mode-alist' is time wasted.
 (setq auto-mode-case-fold nil)
@@ -108,3 +114,7 @@
 ;; Introduced in Emacs HEAD (b2f8c9f), this inhibits fontification while
 ;; receiving input, which should help a little with scrolling performance.
 (setq redisplay-skip-fontification-on-input t)
+
+;; Local Variables:
+;; eval: (my-reload-mode -1)
+;; End:
