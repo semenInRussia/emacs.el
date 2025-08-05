@@ -7,6 +7,11 @@
 ;; every custom variable of my config have the following group
 (defgroup my nil "Group for all my config files." :group 'tools)
 
+(defun my-load-small-init ()
+  "Load my minimal small init.el without dependencies."
+  (interactive)
+  (load (locate-user-emacs-file "small-init")))
+
 ;;; HACKS
 
 ;; don't load anything useless at the startup (like `emacs-lisp-mode' for
