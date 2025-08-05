@@ -1,6 +1,5 @@
-;;; my-fonts.el --- My configuration for fonts
+;;; my-fonts.el --- My configuration for fonts -*- lexical-binding: t -*-
 ;; Copyright (C) 2022-2025 semenInRussia
-;; Author: semenInRussia <hrams205@gmail.com>
 
 ;;; Commentary:
 ;; My configuration for fonts
@@ -11,8 +10,8 @@
 (require 'cl-lib)
 
 (defcustom my-fonts-main
-  '("JetBrainsMono"
-    "JetBrainsMono Nerd Font"
+  '("JetBrains Mono"
+    "JetBrains Mono Nerd Font"
     "FiraCode"
     "FiraCode Nerd Font"
     "Cascadia Code"

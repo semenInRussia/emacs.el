@@ -11,9 +11,11 @@
 
 (leaf markdown-mode
   :ensure t
+  :custom (;; hide destination of markdown links
+           ;; [web-page](https://gogle.com) => [web-page](...)
+           (markdown-hide-urls . t))
   :defer-config
   (add-hook 'markdown-mode-hook 'visual-line-mode)
-
   (leaf markdown-toc
     :ensure t
     :bind (:markdown-mode-map

@@ -1,10 +1,10 @@
-;;; my-dired.el --- My configuration of the `dired'
+;;; my-dired.el --- My configuration of the `dired' -*- lexical-binding: t -*-
 ;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 
-;; My configuration of the `dired': the powerful directory explorer
-;; inside of the Emacs.
+;; My configuration of the `dired': the powerful directory explorer inside of
+;; the Emacs.
 
 ;;; Code:
 
@@ -20,8 +20,16 @@
   ;; - last modified time
   ;; but u can show it with "("
   :hook (dired-mode-hook . dired-hide-details-mode)
-  :custom ((dired-dwim-target . t)
-           (delete-by-moving-to-trash . t))
+  :custom ((dired-mouse-drag-files . t)
+           ;; try guessing my behaviour
+           (dired-dwim-target . t)
+           (dired-recursive-copies . 'always)
+           (dired-recursive-deletes . 'always)
+           ;; don't open a lot of buffers
+           (dired-kill-when-opening-new-dired-buffer . t)
+           (delete-by-moving-to-trash . t)
+           ;; revert buffer after copy, rename, delete commands
+           (dired-do-revert-buffer . t))
   :bind (:dired-mode-map
          ;; i'm the user of `meow' with hjkl, where "h" is right, so i press
          ;; right to go the "back" directory

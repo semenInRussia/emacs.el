@@ -17,6 +17,10 @@
 ;; - `doom-monokai-classic'.  Cool
 ;; - `doom-gruvbox' (see also just `gruvbox')
 ;;
+;; The light ones:
+;; - `doom-bluloco-light'
+;; - `doom-feather-light'
+;; - `doom-one-light'
 ;; Indie:
 ;; - `gruber-darker'.  Cool, but `org-mode' and `vertico' are bad
 ;; - `flatland'
@@ -51,9 +55,9 @@
 (defvar my-theme-func)
 ;; or (setq my-theme-func 'my-light-theme)
 ;; or (setq my-theme-func 'my-dark-theme)
-;; or (setq my-theme-func (lambda () (load-theme 'modus-vivendi))
+;; or (setq my-theme-func (lambda () (load-theme 'modus-vivendi t))
 
-(setq my-theme-func #'my-light-theme)
+(setq my-theme-func 'my-light-theme)
 
 (add-hook 'after-init-hook my-theme-func -90)
 (add-hook 'after-init-hook #'global-hl-line-mode)

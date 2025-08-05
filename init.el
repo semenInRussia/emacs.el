@@ -116,9 +116,9 @@
  (defun my-kill-cli-handle-arg ()
    "Handle --kill command-line argument.
 
-Argument was named --kill, because it kill Emacs after Emacs is load.
-It useful, if you needed in only install packages, byte compile
-configuration and other these things.
+Argument was named --kill, because it kill Emacs after Emacs is load.  It
+useful, if you needed in only install packages, byte compile configuration and
+other these things.
 
 This is function for `command-line-functions'."
    (when (string-equal argi "--kill")
