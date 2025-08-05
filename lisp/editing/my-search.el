@@ -27,7 +27,7 @@
 ;; (for example "hot dog") and check every occurence
 (leaf deadgrep
   :ensure (deadgrep :repo "Wilfred/deadgrep" :host github)
-  :bind ("C-c S" . deadgrep))
+  :bind ("M-g S" . deadgrep))
 
 ;; see also `my-consult': `consult-line', `consult-ripgrep'
 

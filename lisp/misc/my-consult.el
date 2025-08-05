@@ -30,9 +30,7 @@
              consult-register-format
              consult-register-window
              consult-xref)
-  :defvar (consult-narrow-key
-           consult-project-function
-           consult-buffer-sources
+  :defvar (consult-buffer-sources
            recentf-list
            consult--source-recent-file
            project-switch-commands)
@@ -41,24 +39,23 @@
           ("M-r" . consult-history))
          ("M-'" . consult-register-store)
          ("C-M-'" . consult-register)
-         ("C-M--" . consult-mark)
-         ("C-c X" . consult-line-multi)
-         (("C-x C-b" . consult-buffer)
-          ("C-c i" . consult-imenu)
-          ("C-c n" . consult-imenu-multi))
+         ("M-g -" . consult-mark)
+         ("C-x C-b" . consult-buffer)
+         ("M-g i" . consult-imenu)
+         ("M-g I" . consult-imenu-multi)
          (:meow-normal-state-keymap
           :package meow
           ("X" . consult-line)
           ("Q" . consult-goto-line))
          ("M-g l" . consult-line)
+         ("M-g L" . consult-line-multi)
          ("M-g g" . consult-goto-line)
          ;; C-c bindings in `mode-specific-map'
-         ("C-c s" . consult-ripgrep)
-         ("C-x C-S-f" . consult-fd)
+         ("M-g s" . consult-ripgrep)
+         ("M-g d" . consult-fd)
          ;; ("C-c M-x" . consult-mode-command)
          ;; ("C-c k" . consult-kmacro)
-         ("C-c m" . consult-man)
-         ("C-c q" . consult-keep-lines)
+         ("M-g q" . consult-keep-lines)
          ([remap Info-search] . consult-info)
          ;; Other custom bindings
          ;; M-g bindings in `goto-map'
@@ -68,6 +65,13 @@
          ("M-g i" . consult-imenu))
 
   :custom `((consult-async-min-input . 1)
+            (consult-ripgrep-args
+             . ,(concat
+                 "rg --null --line-buffered --color=never --max-columns=1000"
+                 " --path-separator /   --smart-case --no-heading"
+                 " --with-filename --line-number --search-zip"
+                 ;; check also files inside hidden directories
+                 " --hidden"))
             ;; Idk what is it
             (register-preview-delay  . 0.5)
             (register-preview-function . #'consult-register-format))
