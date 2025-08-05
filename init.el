@@ -27,6 +27,8 @@
 ;;   type) that we can no-op for a free 50-100ms boost in startup time.
 (advice-add #'display-startup-screen :override #'ignore)
 
+(setq inhibit-x-resources t)
+
 ;; Increase how much is read from processes in a single chunk (default is 4kb).
 ;; This is further increased elsewhere, where needed (like our LSP module).
 (setq read-process-output-max (* 64 1024))  ; 64kb

@@ -10,8 +10,8 @@
 (require 'cl-lib)
 
 (defcustom my-fonts-main
-  '("JetBrains Mono"
-    "JetBrains Mono Nerd Font"
+  '("JetBrainsMono Nerd Font"
+    "JetBrains Mono"
     "FiraCode"
     "FiraCode Nerd Font"
     "Cascadia Code"

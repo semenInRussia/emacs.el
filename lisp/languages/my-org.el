@@ -10,24 +10,42 @@
 (require 'dash)
 
 (leaf org
-  :defun (meow-insert . meow-command)
   :custom (;; `org-refile'
            (org-refile-use-outline-path . 'file)
            (org-outline-path-complete-in-steps . nil)
            ;; `org' startup
            (org-fold-core-style . 'overlays)
+           ;; editing
+           (org-special-ctrl-a/e . t)
+           (org-special-ctrl-k . t)
+           (org-insert-heading-respect-content . t)
+           ;; apperance
+           (org-ellipsis . " ▾")
+           (org-fontify-quote-and-verse-blocks . t)
+           (org-fontify-whole-heading-line . t)
+           (org-hidden-keywords . nil)
+           (org-hide-emphasis-markers . nil)
+           (org-hide-leading-stars . t)
            (org-startup-folded . t)
-           (org-startup-indented . t)
-           (org-startup-with-inline-images . t))
+           (org-indent-mode-turns-on-hiding-stars . nil)
+           (org-pretty-entities . nil)
+           (org-image-align . 'center)
+           (org-pretty-entities-include-sub-superscripts . t)
+           (org-startup-indented . nil)
+           (org-startup-with-inline-images . t)
+           (org-auto-align-tags . nil))
   :hook (org-mode-hook . org-toggle-pretty-entities)
-  :bind (;; NOTE: `org-capture' and `org-agenda' in the my-organization.el file
-         ;; ("C-c z c" . org-capture)
+  :bind (("C-x C-," . org-capture)
          (:org-mode-map
           ("C-c tab"   . org-refile)
           ("C-c C-j"   . org-id-get-create)))
   :config
   (add-hook 'org-mode-hook 'visual-line-mode)
   (add-hook 'org-mode-hook 'aas-activate-for-major-mode))
+
+(leaf org-bullets
+  :ensure t
+  :hook org-mode-hook)
 
 (leaf my-org-editing
   :bind (:org-mode-map
@@ -81,7 +99,21 @@
 ;; for example, it show [1/3] like a pie progress. :o
 (leaf org-modern
   :ensure t
-  :hook org-mode-hook)
+  ;; :hook org-mode-hook
+  :custom ((org-modern-fold-stars . '(("▶" . "▼")
+                                      ("▷" . "▽")
+                                      ("▹" . "▿")
+                                      ("▹" . "▿")
+                                      ("▸" . "▾")))
+           (org-modern-todo . t)
+           (org-modern-hide-stars . nil)
+           (org-modern-horizontal-rule . t)
+           (org-modern-star . 'replace)
+           (org-modern-keyword . "‣ ")
+           (org-modern-table . nil))
+  :bind ((:org-mode-map
+          :package org
+          ("C-c C-x C-m" . org-modern-mode))))
 
 ;; (leaf org-autolist
 ;;   :ensure t

@@ -46,8 +46,8 @@ The name is meant to be used by the external rules of a tiling
 window manager to present the frame in a floating state."
   (interactive)
   (let ((buf (current-buffer)))
-    (if (not (one-window-p t))
-        (delete-window))
+    (when (not (one-window-p t))
+      (delete-window))
     (make-frame '((name . "dropdown_emacs-buffer")
                   (window-system . x)
                   (minibuffer . nil)))

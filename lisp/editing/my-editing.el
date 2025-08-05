@@ -5,10 +5,11 @@
 ;; My configuration for the custom editing
 
 ;;; Code:
-(require 'my-leaf)
 (require 'dash)
+(require 'my-leaf)
 (require 's)
 
+(setq delete-selection-mode t)
 
 (defun open-line-saving-indent ()
   "Inserting new line, saving position and inserting new line."

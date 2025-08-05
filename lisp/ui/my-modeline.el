@@ -33,6 +33,8 @@ R."
            (doom-modeline-k8s-show-namespace . nil)
            ;; don't show Bot, percentages and other
            (doom-modeline-percent-position . nil)
+           ;; I am use project.el
+           (doom-modeline-project-detection . 'project)
            ;; show count of Errors and Warnings with more simple way
            (doom-modeline-check-simple-format . t)
            ;; modal state (`meow')
@@ -46,28 +48,17 @@ R."
   ;; I use Emacs in fullscreen mode, so I don't see time that provided by OS, so
   ;; I need time in modeline.  EMACS IS MY OS!!!  I need only to time (not date)
   ;; in 24hour format
-  (defvar display-time-format) ;; make compile happy
+  (defvar display-time-format) ;; make compiler happy
   (setq display-time-format "%H:%M")
   (display-time-mode t)
 
   ;; disable show line and column numbers in modeline, because it only
   ;; take off extra place
-  (column-number-mode 0)
-  (line-number-mode 0)
+  (column-number-mode 0) (line-number-mode 0)
 
   ;; show size of the file.  My Emacs don't show line numbers, but know about
   ;; amount of text in the file is important
   (size-indication-mode t))
-
-;; (define-minor-mode my-modeline-at-top-mode
-;;   "Place mode-line at the top of the screen."
-;;   :value nil
-;;   (if my-modeline-at-top-mode
-;;       (progn
-;;         (setq-default header-line-format mode-line-format)
-;;         (setq-default mode-line-format nil))
-;;     (setq-default mode-line-format header-line-format)
-;;     (setq header-line-format nil)))
 
 (provide 'my-modeline)
 ;;; my-modeline.el ends here
