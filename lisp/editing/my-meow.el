@@ -4,24 +4,21 @@
 
 ;;; Commentary:
 
-;; My configuration of `meow'.  `meow' is a modal editing mode for
-;; Emacs.  It was inspired by Kakoune and has Helix-like key bindings.
-;; I don't love virgin `meow' (without any configs), because every
-;; command is "hardcoded" with contributors.  For example the
-;; keybindings "o" and "O" is hardcoded with Lisp expression and jump
-;; only around round parentheses, but can also around quotes,
-;; double-quotes, symbols, i think that use `forward-sexp',
-;; `backward-sexp' and `mark-sexp' is the better choice.  So i try to
-;; move on `boon': also modal editing mode for Emacs that was created
-;; 9 years ago, while `meow' only 3 and has by 3 times lesser stars on
-;; GitHub.  I try to fight with it using my own structural state (see
-;; `my-meow-structural')
+;; My configuration of `meow'.  `meow' is a modal editing mode for Emacs.  It
+;; was inspired by Kakoune and has Helix-like key bindings.  I don't love virgin
+;; `meow' (without any configs), because every command is "hardcoded" with
+;; contributors.  For example the keybindings "o" and "O" is hardcoded with Lisp
+;; expression and jump only around round parentheses, but can also around
+;; quotes, double-quotes, symbols, i think that use `forward-sexp',
+;; `backward-sexp' and `mark-sexp' is the better choice.  So i try to move on
+;; `boon': also modal editing mode for Emacs that was created 9 years ago, while
+;; `meow' only 3 and has by 3 times lesser stars on GitHub.  I try to fight with
+;; it using my own structural state (see `my-meow-structural')
 
-;; UPD: I have used `meow' 9 months, now i think that it's a very nice
-;; modal editing, better than the default `xah-fly-keys' and cooler
-;; than Vim (because all `meow' chooses are logical, we can do one
-;; thing with only one path of keybindings, "select mode" and "keypad
-;; mode" is wwwoooow!
+;; UPD: I have used `meow' 9 months, now i think that it's a very nice modal
+;; editing, better than the default `xah-fly-keys' and cooler than Vim (because
+;; all `meow' chooses are logical, we can do one thing with only one path of
+;; keybindings, "select mode" and "keypad mode" is wwwoooow!
 
 ;;; Code:
 
@@ -180,7 +177,14 @@
           (motion . "M")
           (keypad . "K")
           (insert . "I")
-          (beacon . "B"))))
+          (beacon . "B")))
+
+  ;; some autoloads
+  (leaf meow-cheatsheet
+    :commands meow-cheatsheet)
+
+  (leaf meow-tutor
+    :commands meow-tutor))
 
 (provide 'my-meow)
 ;;; my-meow.el ends here

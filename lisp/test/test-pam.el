@@ -29,6 +29,7 @@ NOTE that it changes the `default-directory', you can don't use full paths."
            ;; setup `pam'
            (pam-build-dir (file-name-concat test-pam-path "pam"))
            (pam-autoloads-filename "my-packages-autoloads.el")
+           (pam-straight-already-loaded-p nil)
            ;; setup `straight'
            (straight-build-cache-fixed-name (make-hash-table :test 'equal))
            (straight--recipe-cache (make-hash-table :test 'equal))
@@ -59,7 +60,7 @@ NOTE that it changes the `default-directory', you can don't use full paths."
 (ert-deftest test-pam-use-package ()
   "Test `pam-use-package'."
   (pam--with-sandbox
-    (pam-install-everything-mode 0)
+    (pam-install-everything-mode -1)
     (should
      ;; don't install anything when `pam-install-everything-mode' is disabled.
      ;; errors not expected
@@ -68,9 +69,7 @@ NOTE that it changes the `default-directory', you can don't use full paths."
     (should-error
      ;; when `pam-install-everything-mode' is enabled, install unknown packages
      ;; should raise errors
-     (should-not
-      ;; and return nil values
-      (pam-use-package 'abracadabrak)))
+     (pam-use-package 'abracadabrak))
     ;; install the most popular package on MELPA to ensure that packages are
     ;; installed right if `pam-install-everything-mode' is enabled
     (pam-use-package 'dash)

@@ -50,9 +50,9 @@ R."
   ;; I use Emacs in fullscreen mode, so I don't see time that provided by OS, so
   ;; I need time in modeline.  EMACS IS MY OS!!!  I need only to time (not date)
   ;; in 24hour format
-  (defvar display-time-format) ;; make compiler happy
-  (setq display-time-format "%H:%M")
-  (display-time-mode t)
+  ;; (defvar display-time-format) ;; make compiler happy
+  ;; (setq display-time-format "%H:%M")
+  ;; (display-time-mode t)
 
   ;; disable show line and column numbers in modeline, because it only
   ;; take off extra place

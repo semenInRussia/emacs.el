@@ -13,6 +13,7 @@
 
 (leaf breadcrumb
   :ensure t
+  :disabled t
   :hook (prog-mode-hook . breadcrumb-local-mode))
 
 (provide 'my-breadcrumb)
