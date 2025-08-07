@@ -50,5 +50,19 @@ If MSG-P is non-nil, say that content was copied."
     (s-replace "\n" " ")
     insert)))
 
+(defun my-sport-copy-filename (&optional buf inter-p)
+  "Copy absolute path of BUF's file as kill.
+
+BUF defaults to the current buffer.  INTER-P is non-nil when this functions is
+called \"interactively\""
+  (interactive (list nil t))
+  (let ((it (buffer-file-name buf)))
+    (if it
+        (progn
+         (kill-new (buffer-file-name))
+         (when inter-p
+           (message "File path `%s' copied as kill" it)))
+      (user-error "Can't copy path of non-file buffer"))))
+
 (provide 'my-sport-funcs)
 ;;; my-sport-funcs.el ends here

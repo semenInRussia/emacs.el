@@ -77,13 +77,16 @@
                       (get real-this-command 'repeat-map)))
              (repeat-post-hook))))
 
+(declare-function my-sport-copy-filename "my-sport-funcs")
+
 (--each
     '(("M-y" . consult-yank-from-kill-ring)
       ("C-a" . my-beginning-of-line-text-or-visual-line)
       ("C-d" . delete-forward-char)
       ("C-o" . open-line-saving-indent)
+      ("M-C" . my-sport-copy-filename) ; like in VSCode
       ("C-x C-y" . duplicate-line))
-  (global-set-key (kbd (car it)) (cdr it)))
+  (keymap-global-set (car it) (cdr it)))
 
 (provide 'my-editing)
 ;;; my-editing.el ends here
