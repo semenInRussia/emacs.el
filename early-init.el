@@ -78,7 +78,8 @@
       scroll-bar-mode nil)
 
 ;; Emacs "updates" its ui more often than it needs to, so slow it down slightly
-(setq idle-update-delay 1.0)  ; default is 0.5
+(defvar which-func-update-delay)
+(setq which-func-update-delay 1.0)  ; default is 0.5
 
 ;; PERF: Disabling BPA makes redisplay faster, but might produce incorrect
 ;;   reordering of bidirectional text with embedded parentheses (and other

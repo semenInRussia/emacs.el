@@ -23,8 +23,7 @@
 ;;   and other
 (leaf consult
   :ensure t
-  :commands (consult--buffer-file-hash
-             consult-fd
+  :commands (consult-fd
              consult-find
              consult-flymake
              consult-register-format

@@ -1,4 +1,4 @@
-;;; my-prettify-mode.el --- My config for `prettify-mode'
+;;; my-prettify-mode.el --- My config for `prettify-mode' -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022-2025 semenInRussia
 

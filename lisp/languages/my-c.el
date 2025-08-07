@@ -42,12 +42,13 @@ Back end is either symbol tags or LSP"
 (declare-function my-copy-whole-buffer-as-kill "my-sport-funcs")
 (declare-function my-sport-insert-samples "my-sport-funcs")
 (declare-function my-sport-find-samples-file "my-sport-funcs")
+
 (defvar-keymap my-sport-map
   "C-f" #'my-sport-find-samples-file
   "C-i" #'my-sport-insert-samples
   "C-p" #'run-python
   "C-w" #'my-copy-whole-buffer-as-kill)
-(global-set-key (kbd "C-c ;") my-sport-map)
+(keymap-global-set "C-c ;" my-sport-map)
 
 ;; some settings to compile my C++ file using certain flags,
 ;; optimizations, warnings which are useful for Olympiad programming

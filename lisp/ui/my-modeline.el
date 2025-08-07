@@ -43,7 +43,9 @@ R."
            (doom-modeline-env-version . nil)
            ;; don't show directory names in `doom-modeline'
            ;; (doom-modeline-project-detection . 'project)
-           (doom-modeline-buffer-file-name-style . 'buffer-name))
+           (doom-modeline-buffer-file-name-style . 'buffer-name)
+           ;; don't show `load-average'
+           (display-time-default-load-average . nil))
   :config
   ;; I use Emacs in fullscreen mode, so I don't see time that provided by OS, so
   ;; I need time in modeline.  EMACS IS MY OS!!!  I need only to time (not date)
