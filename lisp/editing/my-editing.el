@@ -88,5 +88,9 @@
       ("C-x C-y" . duplicate-line))
   (keymap-global-set (car it) (cdr it)))
 
+(defvar-keymap my-dupliacte-map
+  :repeat (:enter (duplicate-line))
+  "y" #'duplicate-line)
+
 (provide 'my-editing)
 ;;; my-editing.el ends here
