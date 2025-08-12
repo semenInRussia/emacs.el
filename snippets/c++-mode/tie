@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: fast IO
+# key: tie
+# --
+cin.tie(nullptr)->sync_with_stdio(false);

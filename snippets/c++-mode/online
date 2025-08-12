@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: ifdef online judge
+# key: online
+# --
+#ifdef ONLINE_JUDGE
+$0
+#endif

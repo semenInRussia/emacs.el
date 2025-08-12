@@ -1,0 +1,43 @@
+# -*- mode: snippet -*-
+# name: stress
+# key: stress
+# --
+// semenInRussia 2025
+// it's a file that stress testing your code, note that I consider your "smart solution"
+// have a type a.cpp and the stupid _a.cpp. And this file must be s_a.cpp
+// also this file generate tests
+
+#include <cstdint>
+#include <fstream>
+#include <iostream>
+
+using namespace std;
+
+void check() {
+  system("_${1:a}.exe < input.txt > output.txt");
+  system("$1.exe < input.txt > actual.txt");
+
+  if (system("fc actual.txt output.txt")) {
+    cout << "found!";
+    exit(0);
+  }
+}
+
+int main() {
+  system("g++ $1.cpp -o $1.exe");
+  system("g++ _$1.cpp -o _$1.exe");
+
+  int n = 100;
+  for (int i = 1; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      // gen tests
+      ofstream input("input.txt");
+      input << i << " " << j << endl;
+      input.flush();
+
+      check();
+    }
+  }
+
+  cout << "ok!";
+}

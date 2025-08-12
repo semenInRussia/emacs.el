@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: fname
+# key: fname
+# type: command
+# --
+(insert (buffer-file-name))

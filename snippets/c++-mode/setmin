@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: setmin
+# key: setmin
+# --
+template <typename T> T &setmin(T &v, T op) { return v = min(v, op); }

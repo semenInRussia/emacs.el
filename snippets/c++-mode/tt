@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: multitester in main
+# key: tt
+# --
+int tt = 1;
+cin >> tt;
+while (tt--) {
+  solve();
+}

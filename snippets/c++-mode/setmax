@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: setmax
+# key: setmax
+# --
+template <typename T> T &setmax(T &v, T op) { return v = max(v, op); }

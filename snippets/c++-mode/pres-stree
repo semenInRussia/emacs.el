@@ -1,0 +1,51 @@
+# -*- mode: snippet -*-
+# name: persisten segment tree
+# key: pers
+# --
+struct stree {
+  stree *lef = nullptr, *rig = nullptr;
+  int sum;
+
+  stree(int l, int r) {
+    sum = 0;
+    if (r - l > 1) {
+      int m = (l + r) / 2;
+      lef = new stree(l, m);
+      rig = new stree(m, r);
+    }
+  }
+};
+
+int sum(stree *t, int l, int r, int ql, int qr) {
+  if (ql <= l && r <= qr) {
+    return t->sum;
+  }
+  if (ql >= r || qr <= l) {
+    return 0;
+  }
+
+  int m = (l + r) / 2;
+  return sum(t->lef, l, m, ql, qr) + sum(t->rig, m, r, ql, qr);
+}
+
+stree *copy(stree *t) {
+  t = new stree(*t);
+  return t;
+}
+
+stree *inc(int j, int v, stree *t, int l, int r) {
+  t = copy(t);
+  if (r - l == 1) {
+    t->sum += v;
+    return t;
+  }
+
+  int m = (l + r) / 2;
+  if (j < m) {
+    t->lef = inc(j, v, t->lef, l, m);
+  } else {
+    t->rig = inc(j, v, t->rig, m, r);
+  }
+  t->sum = t->lef->sum + t->rig->sum;
+  return t;
+}

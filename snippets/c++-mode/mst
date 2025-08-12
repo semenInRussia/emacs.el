@@ -1,0 +1,49 @@
+# -*- mode: snippet -*-
+# name: mst
+# key: mst
+# --
+struct mst {
+  int n;
+  vector<vector<int>> t;
+
+  mst(int sz) : n(sz) { t.resize(sz + 1); }
+
+  mst(vector<int> &a) : mst(a.size()) {
+    vector<int> o(n);
+    for (int i = 0; i < n; i++) {
+      o[i] = i;
+    }
+    sort(o.begin(), o.end(), [&](auto i, auto j) { return a[i] < a[j]; });
+    for (int i = 0; i < n; i++) {
+      add(o[i], a[o[i]]);
+    }
+  }
+
+  void sync() {
+    for (int i = 0; i <= n; i++) {
+      sort(t[i].begin(), t[i].end());
+    }
+  }
+
+  void add(int l, int x) { // add x to [0; l)
+    ++l;
+    for (; l <= n; l += l & -l) {
+      t[l].push_back(x);
+    }
+  }
+
+  int count(int i, int a, int b) {
+    // count elements (a <= x <= b) on interval [0; i)
+    int ans = 0;
+    for (; i > 0; i -= i & -i) {
+      // ans += range
+      ans += upper_bound(t[i].begin(), t[i].end(), b) -
+             lower_bound(t[i].begin(), t[i].end(), a);
+    }
+    return ans;
+  }
+
+  int count(int x, int y, int k, int l) {
+    return count(y, k, l) - count(x, k, l);
+  }
+};

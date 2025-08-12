@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: sparse table
+# key: sparse
+# --
+for (int k = 0; k + 1 < ${3:L}; k++) {
+  for (int i = 0; i + (2 << k) <= ${2:n}; i++) {
+    ${1:st}[k + 1][i] = ${4:min}($1[k][i], $1[k][i + (1 << k)]);
+  }
+}

@@ -1,0 +1,46 @@
+# -*- mode: snippet -*-
+# name: annealing
+# key: anneal
+# --
+int n;
+
+int f(${1:vector<int>} &p) {
+  int s = 0;
+  return s;
+}
+
+long double rnd() { return (long double)(rand()) / RAND_MAX; }
+
+int main() {
+  mt19937 mt(900);
+  $1 v(n);
+
+  // fill v...
+
+  int ans = f(v);
+  const int k = 1e5; // amount of iterations
+
+  long double t = 1;
+  for (int i = 0; i < k; i++) {
+    t *= 0.999;
+    auto u = v;
+
+    // change u by chance...
+
+    int val = f(u);
+
+    // here it maximize value
+
+    if (val > ans || rnd() < exp((val - ans) / t)) {
+      v = u;
+      ans = val;
+    }
+  }
+
+  cerr << ans << "\n";
+  assert(ans == n);
+
+  for (int x : v) {
+    cout << x + 1 << " ";
+  }
+}

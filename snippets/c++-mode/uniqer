@@ -1,0 +1,83 @@
+# -*- mode: snippet -*-
+# name: count unique values on range
+# key: uniqer
+# --
+// Implement the following structure:
+// given array a (length=n), answer in O(log^2 n) on queries like count unique
+// elements on interval [l; r)
+
+// fenw, support:
+// 1. build
+// 2. count elements >=x
+struct mst {
+  int n;
+  vector<vector<int>> t;
+
+  mst() {}
+
+  mst(vector<int> &a) {
+    n = (int)a.size();
+    t.resize(n + 1);
+
+    vector<pair<int, int>> b(n);
+    for (int i = 0; i < n; i++) {
+      b[i] = {a[i], i};
+    }
+    sort(b.begin(), b.end());
+
+    // xs sorted, so every t[i] is sorted too
+    for (auto [x, j] : b) {
+      add(j, x);
+    }
+  }
+
+  // add x, as j'th element, note that structure is correct, only if every t[j]
+  // is sorted, for this condition you can either
+  //
+  // 1. after all add's sort every t[i]
+  // or
+  // 2. add x, only all y <= x are added, in these cases x will be added to the
+  // end of t[i]  and every t[i] will be sorted
+  void add(int j, int x) {
+    for (++j; j <= n; j += j & -j) {
+      t[j].push_back(x);
+    }
+  }
+
+  // count on [0; r) elements >= x
+  int count(int r, int x) {
+    int cnt = 0;
+    for (; r > 0; r -= r & -r) {
+      auto it = lower_bound(t[r].begin(), t[r].end(), x);
+      cnt += t[r].end() - it;
+    }
+    return cnt;
+  }
+
+  // count on [l; r) elements >= x
+  int count(int l, int r, int x) { return count(r, x) - count(l, x); }
+};
+
+// structure that can answer on queries like count unique elements on interval
+// [l; r)
+struct uniq {
+  mst t;
+
+  uniq(vector<int> a) {
+    int n = (int)a.size();
+    map<int, int> nxt;
+    for (int x : a) {
+      nxt[x] = n + 1;
+    }
+
+    for (int j = n - 1; j >= 0; j--) {
+      int x = a[j];
+      a[j] = nxt[x];
+      nxt[x] = j;
+    }
+
+    t = mst(a);
+  }
+
+  int qry(int l, int r) { return t.count(l, r, r); }
+};

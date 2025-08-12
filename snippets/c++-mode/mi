@@ -1,0 +1,36 @@
+# -*- mode: snippet -*-
+# name: mi
+# key: mi
+# --
+
+struct mi {
+  int v;
+  mi(int64_t x = 0) : v(x % mod) { v += mod * (x < 0); }
+  explicit operator int() { return v; }
+};
+
+mi operator*(mi a, mi b) { return mi(1ll * a.v * b.v); }
+mi &operator*=(mi &a, mi b) { return a = a * b; }
+
+mi operator+(mi a, mi b) { return mi(1ll * a.v + b.v); }
+mi &operator+=(mi &a, mi b) { return a = a + b; }
+
+mi operator-(mi a, mi b) { return mi(a.v - b.v); }
+mi &operator-=(mi &a, mi b) { return a = a - b; }
+mi pow(mi x, int64_t k) {
+  mi ans = 1;
+  while (k) {
+    if (k & 1) {
+      ans *= x;
+    }
+    k >>= 1;
+    x *= x;
+  }
+  return ans;
+}
+
+mi inv(mi x) { return pow(x, mod - 2); }
+mi operator/(mi a, mi b) { return a * inv(b); }
+
+istream &operator>>(istream &in, mi &v) { return in >> v.v; }
+ostream &operator<<(ostream &out, mi v) { return out << v.v; }
