@@ -50,6 +50,7 @@ If MSG-P is non-nil, say that content was copied."
     (s-replace "\n" " ")
     insert)))
 
+;;;###autoload
 (defun my-sport-copy-filename (&optional buf inter-p)
   "Copy absolute path of BUF's file as kill.
 

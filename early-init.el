@@ -2,27 +2,23 @@
 (message "Make emacs fast again!!")
 ;; --- Donald TrAmp
 
-(defvar gc-cons-threshold-original)
-(defvar file-name-handler-alist-original)
+;; Native complation : translate Emacs extension language to machine code
+(setq
+ ;; Make native compilation happens asynchronously
+ native-comp-async-query-on-exit t
+ ;; Don't display native-comp warnings
+ native-comp-async-report-warnings-errors nil
+ native-comp-jit-compilation t)
 
-(setq gc-cons-threshold most-positive-fixnum)
-
-;; Don't display native-comp warnings
-(defvar native-comp-async-report-warnings-errors)
-(setq native-comp-async-report-warnings-errors nil)
-
-;; Make native compilation happens asynchronously
-(defvar native-comp-jit-compilation)
-(setq native-comp-async-query-on-exit t)
-(setq confirm-kill-processes t)
-(setq native-comp-jit-compilation t)
-
-;; PERF: A second, case-insensitive pass over `auto-mode-alist' is time wasted.
+;; PERF: case-insensitive pass over `auto-mode-alist' is time wasted.
 (setq auto-mode-case-fold nil)
 
 ;; from https://www.reddit.com/r/emacs/comments/3kqt6e/2_easy_little_known_steps_to_speed_up_emacs_start/
+(defvar gc-cons-threshold-original)
+(defvar file-name-handler-alist-original)
 (setq file-name-handler-alist-original file-name-handler-alist
-      file-name-handler-alist nil)
+      file-name-handler-alist nil
+      gc-cons-threshold most-positive-fixnum)
 
 (add-hook
  'after-init-hook
@@ -55,8 +51,8 @@
 (setq-default bidi-display-reordering 'left-to-right
               bidi-paragraph-direction 'left-to-right)
 
-;;; Disable UI elements early
-;;;
+;; Disable UI elements early
+;;
 ;; HACK: I intentionally avoid calling `menu-bar-mode', `tool-bar-mode', and
 ;;   `scroll-bar-mode' because they do extra work to manipulate frame variables
 ;;   that isn't necessary this early in the startup process.
@@ -117,5 +113,5 @@
 (setq redisplay-skip-fontification-on-input t)
 
 ;; Local Variables:
-;; eval: (my-reload-mode -1)
+;; my-dont-reload-on-save: t
 ;; End:

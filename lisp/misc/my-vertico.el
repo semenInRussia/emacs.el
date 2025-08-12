@@ -17,8 +17,14 @@
   :commands vertico--advice
   :defun vertico-directory-tidy
   :custom ((vertico-count . 6)
-           (enable-recursive-minibuffers . t))
+           (vertico-resize . t)
+           (enable-recursive-minibuffers . t)
+           (vertico-buffer-display-action
+            . '(display-buffer-in-direction
+                (direction . right)
+                (window-height . 0.3))))
   :bind (:vertico-map
+         ("M-B" . vertico-buffer-mode)
          ("C-M-n" . vertico-next-group)
          ("C-M-p" . vertico-previous-group))
   :init

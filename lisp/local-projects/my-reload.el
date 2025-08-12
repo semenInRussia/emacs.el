@@ -22,16 +22,23 @@
 (defvar-local my-dont-reload-on-save nil
   "Non-nil if you don't need in `my-reload' feature for this file.")
 
+(add-to-list 'safe-local-variable-values '(my-dont-reload-on-save . t))
+
 ;;;###autoload
 (define-minor-mode my-reload-mode
   "Mode which will eval/load the current config file after save."
   :init-value t
-  (if (and my-reload-mode (my-reload--config-file-p)
-           (not my-dont-reload-on-save))
-      (add-hook 'after-save-hook #'eval-buffer
-                nil :local)
-    (remove-hook 'after-save-hook #'eval-buffer
-                 :local)))
+  (if (and my-reload-mode (my-reload--config-file-p))
+      (add-hook 'after-save-hook #'my-reload--eval-buffer nil :local)
+    (remove-hook 'after-save-hook #'my-reload--eval-buffer :local)))
+
+(defun my-reload--eval-buffer ()
+  "Eval current buffer like this is part of config.
+
+NOTE that if local variable `my-dont-reload-on-save' is non-nil, do nothing
+instead"
+  (unless my-dont-reload-on-save
+    (eval-buffer)))
 
 (defun my-reload--config-file-p ()
   "Return non-nil when the current opened file is a config file."

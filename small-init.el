@@ -8,6 +8,7 @@
 
 ;;; Code:
 
+;; Yes, it's me
 (setq user-full-name "semenInRussia"
       user-mail-address "hrams205@gmail.com")
 
@@ -38,6 +39,8 @@
       use-file-dialog nil
       use-dialog-box nil)
 
+(setq-default line-spacing 0.3)
+
 (let ((h 20)
       (w 75))
   (setf
@@ -66,6 +69,8 @@
 
 ;; completing read (read buffer, file, theme)
 (setq tab-always-indent 'complete)  ;; Starts completion with TAB
+(eval-when-compile
+  (require 'icomplete))
 (setq icomplete-delay-completions-threshold 0)
 (setq icomplete-compute-delay 0)
 (setq icomplete-show-matches-on-no-input t)
@@ -269,14 +274,17 @@
 
 ;; `fido-vertical-mode' as auto complete
 
+(setq display-line-numbers-type 'relative)
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
 
 ;; Theme
-(setq modus-themes-bold-constructs t)
-(setq modus-themes-italic-constructs nil)
-(setq modus-themes-region '(accent))
-(setq font-lock-maximum-decoration t)
+(eval-and-compile
+  (require-theme 'modus-themes))
 (add-hook 'after-init-hook #'global-hl-line-mode)
+(setq modus-themes-bold-constructs t
+      modus-themes-italic-constructs nil
+      modus-themes-region '(accent)
+      font-lock-maximum-decoration t)
 (load-theme 'modus-operandi-tinted :no-confirm)
 
 ;;; Editing
@@ -304,20 +312,22 @@
           (beginning-of-visual-line)
           (point)))))
 
+;; If press "C-x o" , you can hit o, to repeat this command
 (repeat-mode t)
 
 (keymap-global-set "C-a" 'my-beginning-of-line-text-or-visual-line)
 (keymap-global-set "C-o" 'open-line-saving-indent)
 
-(setq-default indent-tabs-mode nil)
-(setq-default tab-width 2)
-(setq-default fill-column 80)
+;; Configure indentation
+(setq-default indent-tabs-mode nil
+              tab-width 2
+              fill-column 80)
 (keymap-set prog-mode-map "RET" #'newline-and-indent)
 
-;; (global-whitespace-mode t)
+;; Windows management
 
 (defun my-delete-window-frame (&optional window)
-  "Delete the current window or frame if the window is one exists in frame."
+  "Delete the current WINDOW or frame if the window is one exists in frame."
   (interactive)
   (condition-case nil
       (delete-window window)
@@ -338,7 +348,7 @@
 
 ;;; Dired
 (with-eval-after-load 'dired
-  (eval-when-compile
+  (eval-and-compile
     (require 'dired))
   (add-hook 'dired-mode-hook #'dired-hide-details-mode)
   (setq dired-dwim-target t
@@ -429,7 +439,11 @@
   (server-start))
 
 ;; (add-to-list 'load-path "~/.emacs.d/pam/")
-;; (load "~/.emacs.d/pam/.el")
+;; (require 'vertico)
+;; (vertico-mode)
 
 (provide 'small-init)
 ;;; small-init.el ends here
+;; Local Variables:
+;; my-dont-reload-on-save: t
+;; End:

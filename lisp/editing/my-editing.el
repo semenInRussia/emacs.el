@@ -92,5 +92,17 @@
   :repeat (:enter (duplicate-line))
   "y" #'duplicate-line)
 
+;; disable tabs, sorry Richard
+(setq-default indent-tabs-mode nil
+              tab-width 2
+              fill-column 80)
+(keymap-set prog-mode-map "RET" #'newline-and-indent)
+
+;; delete trailing spaces, spaces at the ends of lines
+(leaf whitespace
+  :hook (write-file-functions . whitespace-write-file-hook))
+
+(delete-selection-mode 1)
+
 (provide 'my-editing)
 ;;; my-editing.el ends here

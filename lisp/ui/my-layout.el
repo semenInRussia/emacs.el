@@ -43,6 +43,8 @@ characters viewed on one line"
  (alist-get 'drag-internal-border default-frame-alist) 1
  (alist-get 'internal-border-width default-frame-alist) 5)
 
+(setq-default line-spacing 0.3)
+
 (require 'my-leaf)
 
 (leaf spacious-padding

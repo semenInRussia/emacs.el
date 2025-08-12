@@ -24,7 +24,8 @@
   (leaf compat
     :ensure t)
 
-  (leaf svg-lib :ensure t))
+  (leaf svg-lib
+    :ensure t))
 
 (provide 'my-libs)
 ;;; my-libs.el ends here

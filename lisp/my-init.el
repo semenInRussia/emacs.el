@@ -7,17 +7,23 @@
 ;;; Code:
 (require 'my-leaf)
 
+;; Info about me
 (setq user-full-name "semenInRussia"
       user-mail-address "hrams205@gmail.com")
 
-;; Scrolling more OK
+;; Make scrolling more OK
+(add-hook 'emacs-startup-hook #'pixel-scroll-precision-mode)
 (setq scroll-margin 0
       scroll-preserve-screen-position t
       next-screen-context-lines 3)
 
-(setq make-backup-files         nil)
-(setq auto-save-list-file-name  nil)
+;; yes, typical Emacs
+(auto-save-mode -1)
+(setq make-backup-files nil
+      auto-save-list-file-name nil)
+
 (defalias 'yes-or-no-p 'y-or-n-p)
+
 
 ;; Russian input method
 ;; ---
@@ -27,13 +33,6 @@
   (setq default-file-name-coding-system 'utf-8)
   (setq default-keyboard-coding-system 'utf-8)
   (setq buffer-file-coding-system 'utf-8))
-
-;;; just make PPTX (powerpoint) file that can't be read
-(defun my-new-fake-pptx-file ()
-  "Make this buffer, fake presentation with format (.pptx)."
-  (interactive)
-  (->> "~/broken.pptx" f-read insert)
-  (text-mode))
 
 ;;; I try to decrease the Emacs startup time
 (defun my-display-startup-time ()
@@ -45,12 +44,14 @@
     (float-time (time-subtract after-init-time before-init-time)))
    gcs-done))
 
-(auto-save-mode -1)
-
 (add-hook 'emacs-startup-hook #'my-display-startup-time)
 
-;;; smooth scrolling
-(add-hook 'emacs-startup-hook #'pixel-scroll-precision-mode)
+
+;; UTF-8 coding
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-language-environment 'utf-8)
+(set-selection-coding-system 'utf-8)
 
 (leaf sudo-edit
   :ensure t)

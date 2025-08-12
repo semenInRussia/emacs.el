@@ -1,10 +1,10 @@
-;;; my-emacsclient.el --- My configuration of `emacsclient' -*- lexical-binding: t; -*-
+;;; my-emacsclient.el --- My configuration of emacs client -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
 
-;; My configuration of `emacsclient'.
+;; My configuration of emacs client.
 
 ;;; Code:
 

@@ -1,4 +1,4 @@
-;;; my-run-command.el --- My configuration for `run-command'
+;;; my-run-command.el --- My configuration for `run-command' -*- lexical-binding: t -*-
 ;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:
@@ -31,8 +31,9 @@
              (:around run-command-recipes-c-gcc ignore))))
 
 (leaf compile
-  :bind (:compilation-mode-map
-         ("t" . #'my-compilation-toggle-hide-details)))
+  :bind (("C-x `" . #'recompile)
+         (:compilation-mode-map
+          ("t" . #'my-compilation-toggle-hide-details))))
 
 (provide 'my-run-command)
 ;;; my-run-command.el ends here

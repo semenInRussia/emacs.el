@@ -43,14 +43,6 @@
              (not (font-installed-p nerd-icons-font-family)))
     (nerd-icons-install-fonts t)))
 
-(setq-default line-spacing 0.3)
-
-;;; UTF-8
-(prefer-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8)
-(set-language-environment 'utf-8)
-(set-selection-coding-system 'utf-8)
-
 (leaf ligature
   :ensure t
   :when (display-graphic-p)

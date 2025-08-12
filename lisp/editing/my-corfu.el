@@ -23,8 +23,10 @@
     "Set some vars for corfu."
     (interactive)
     (setq-local completion-in-region-function 'corfu--in-region))
+
   (--each '(prog-mode-hook text-mode-hook)
     (add-hook it #'my-corfu-set))
+
   ;; `completion-in-region-function' was already changed, but
   ;; `global-corfu-mode' enable auto complete, if `corfu-auto' is
   ;; non-nil, call `corfu-mode' to enable corfu locall in this buffer

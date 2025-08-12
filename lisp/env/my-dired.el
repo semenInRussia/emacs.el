@@ -73,13 +73,22 @@
 
   ;; some `dired' add-ons which are built-in Emacs
   (leaf dired-x
-    :commands (virtual-dired
-               dired-x-hands-off-my-keys
-               dired-x-find-file-other-window)
     :bind (:dired-mode-map
            :package dired
            ("* ." . dired-mark-suffix)
            ("M-!" . dired-smart-shell-command)))
+
+  (eval-and-compile
+    (define-minor-mode my-dired-follow-mode
+      "Diplay file at point in dired after a move."
+      :lighter " dired-f"
+      :group 'my
+      :global t
+      (if my-dired-follow-mode
+          (advice-add 'dired-next-line :after (lambda (_) (dired-display-file)))
+        (advice-remove 'dired-next-line (lambda (_) (dired-display-file)))))
+
+    (keymap-set dired-mode-map "C-c C-f" #'my-dired-follow-mode))
 
   ;; ???
   (remove-hook 'dired-mode-hook 'dired-mode))

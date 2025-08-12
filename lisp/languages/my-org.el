@@ -34,7 +34,8 @@
            (org-startup-indented . nil)
            (org-startup-with-inline-images . t)
            (org-auto-align-tags . nil))
-  :hook (org-mode-hook . org-toggle-pretty-entities)
+  :hook ((org-mode-hook . org-toggle-pretty-entities)
+         (org-mode-hook . org-indent-mode))
   :bind (("C-x C-," . org-capture)
          (:org-mode-map
           ("C-c tab"   . org-refile)

@@ -36,6 +36,12 @@ Back end is either symbol tags or LSP"
     :remove-hook ((c++-mode-hook c-mode-hook) . citre-mode)
     :hook ((c++-mode-hook c-mode-hook) . my-lsp-ensure)))
 
+(defun my-make-CR-do-indent ()
+  "Bind RET with electric enter."
+  (keymap-set c-mode-base-map "C-m" 'c-context-line-break)
+  (keymap-set c-mode-base-map "C-o" 'c-context-open-line))
+(add-hook 'c-initialization-hook #'my-make-CR-do-indent)
+
 (my-c-update-backend my-c-backend)
 (add-variable-watcher 'my-c-backend #'my-c-update-backend)
 
@@ -68,7 +74,7 @@ Back end is either symbol tags or LSP"
          :command-name "sport-execute-sample"
          :command-line
          (format
-          "g++ %s -Wdisabled-optimization -Werror -g && cat input.txt | ./a.out"
+          "g++ %s -Wdisabled-optimization -Werror -g & type input.txt | a.exe"
           (buffer-file-name))))
        (list
         :display "Sport: execute only [all flags]"

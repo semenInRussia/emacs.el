@@ -12,22 +12,22 @@
   (interactive)
   (load (locate-user-emacs-file "small-init")))
 
-;;; HACKS
+;;; Performace hacks
 
 ;; don't load anything useless at the startup (like `emacs-lisp-mode' for
 ;; *Scratch* or `dashboard')
-(setq initial-major-mode 'fundamental-mode)
+(setq initial-major-mode 'fundamental-mode
+      inhibit-x-resources t)
 
 ;; PERF,UX: Remove "For information about GNU Emacs..." message at startup.
 ;;   It's redundant with our dashboard and incurs a premature redraw.
 (advice-add #'display-startup-echo-area-message :override #'ignore)
+
 ;; PERF: Suppress the vanilla startup screen completely. We've disabled it
 ;;   with `inhibit-startup-screen', but it would still initialize anyway.
 ;;   This involves some file IO and/or bitmap work (depending on the frame
 ;;   type) that we can no-op for a free 50-100ms boost in startup time.
 (advice-add #'display-startup-screen :override #'ignore)
-
-(setq inhibit-x-resources t)
 
 ;; Increase how much is read from processes in a single chunk (default is 4kb).
 ;; This is further increased elsewhere, where needed (like our LSP module).
@@ -38,7 +38,7 @@
 (defvar display-line-numbers-type)
 (setq display-line-numbers-type nil)
 
-;; change Emacs config directory depends on init file
+;;; change Emacs config directory depends on init file
 ;;
 ;; after this config you can easily run Emacs with "emacs -l init.el"
 ;; not only when init.el inside ~/.emacs.d
@@ -48,22 +48,25 @@
 				                         (buffer-file-name)
                                  byte-compile-current-file))))
 
-(declare-function my-byte-compile-local-projects-autoloads "my-config-funcs")
-;;; Handle --local-projects flag
+;;; Handle --local-projects flag (part 1)
 ;; byte-compile local-projects and generate autoloads
+;;
+;; Local Projects are my own small "packages" which aren't so big to create real
+;; packages
+;;
+;; Note that order of this load is matter, because one of local projects is
+;; `my-build-config', it's dependency for --modules
 (when (member "--local-projects" command-line-args)
   ;; generate autoloads
   (loaddefs-generate (locate-user-emacs-file "lisp/local-projects")
                      (locate-user-emacs-file "lisp/local-projects/my-autoload.el"))
   ;; also I byte-compile EACH of local projects them after load
-  ;; `my-modules'
+  ;; `my-modules' in this file
   )
 
-;;; Local Projects
-;; It is my own small "packages" which aren't so big to create real packages
+;;; add some files into the `load-path' that config files can require
+;; them and byte-compiler will be happy
 (eval-and-compile
-  ;; add some files into the `load-path' that config files can require
-  ;; them and byte-compiler will be happy
   (add-to-list 'load-path (locate-user-emacs-file "lisp/"))
   (add-to-list 'load-path (locate-user-emacs-file "lisp/package-management/"))
   (add-to-list 'load-path (locate-user-emacs-file "lisp/local-projects"))
@@ -91,7 +94,7 @@
 (require 'pam)
 (pam-activate)
 
-;;; Handle --modules
+;;; Handle all command line arguments
 
 ;; generate and byte-compile my-modules.el
 ;;
@@ -107,7 +110,7 @@
   (byte-compile-file (locate-user-emacs-file "early-init.el"))
   (pam-byte-compile-pkg-autoloads))
 
-;;; don't use init.el for custom.el which I don't use
+;; don't use init.el for custom.el which I don't use
 ;;
 ;; in the most of configurations, after it Emacs load custom.el, but I
 ;; fount it a bit useless.  I prefer `setq' over `custom'
@@ -116,6 +119,7 @@
 ;; some useful macros
 (require 'my-macros)
 
+;; parse command line arguments
 (declare-function my-require-times "my-bench")
 (add-to-list!
  'command-line-functions
@@ -187,6 +191,7 @@ Byte-compile every file of install and generate autoloads file"
 
 
 ;; Handle --local-projects flag. Part 2: byte-compile all
+(declare-function my-byte-compile-local-projects-autoloads "my-config-funcs")
 (when (member "--local-projects" command-line-args)
   ;; byte-compile every file from the "local-projects" dir (including autoloads
   ;; file)
@@ -200,3 +205,4 @@ Byte-compile every file of install and generate autoloads file"
 
 (provide 'init)
 ;;; init.el ends here
+(put 'dired-find-alternate-file 'disabled nil)
