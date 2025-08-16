@@ -65,31 +65,52 @@ Back end is either symbol tags or LSP"
   (defun run-command-sportprog-recipe ()
     "A recipe for `run-command' useful to sport programming."
     (when (and (buffer-file-name)
-               (eq major-mode 'c++-mode))
-      (list
-       (and
-        (file-exists-p "input.txt")
+               (or (eq major-mode 'c++-mode)
+                   (eq major-mode 'c-mode)))
+      (let ((compiler (if (eq major-mode 'c++-mode) "g++" "cc")))
         (list
-         :display "Sport: compile, execute with input.txt [all flags]"
-         :command-name "sport-execute-sample"
-         :command-line
-         (format
-          "g++ %s -Wdisabled-optimization -Werror -g & type input.txt | a.exe"
-          (buffer-file-name))))
-       (list
-        :display "Sport: execute only [all flags]"
-        :command-name "sport-execute"
-        :command-line
-        (format "g++ %s -Wdisabled-optimization -Werror -g && ./a.out"
-                (buffer-file-name)))
-       (list
-        :display "Sport: compile only [all flags]"
-        :command-name "sport-compile"
-        :command-line
-        (format
-         "g++ %s -Wdisabled-optimization -Werror -g"
-         (buffer-file-name))))))
+         (and
+          (file-exists-p "input.txt")
+          (list
+           :display "Sport: compile, execute with input.txt [all flags]"
+           :command-name "sport-execute-sample"
+           :command-line
+           (if (equal system-type 'windows-nt)
+               (format
+                "%s %s -Wdisabled-optimization -Werror -g & type input.txt | a.exe"
+                compiler
+                (buffer-file-name))
+             (format
+              "%s %s -Wdisabled-optimization -Werror -g && cat input.txt | ./a.out"
+              compiler
+              (buffer-file-name)))))
+         (list
+          :display "Sport: execute only [all flags]"
+          :command-name "sport-execute"
+          :command-line
+          (if (equal system-type 'windows-nt)
+              (format "%s %s -Wdisabled-optimization -Werror -g && ./a.out"
+                      compiler
+                      (buffer-file-name))
+            (format "%s %s -Wdisabled-optimization -Werror -g & a.exe"
+                    compiler
+                    (buffer-file-name))))
+         (list
+          :display "Sport: compile only [all flags]"
+          :command-name "sport-compile"
+          :command-line
+          (format "%s %s -Wdisabled-optimization -Werror -g"
+                  compiler
+                  (buffer-file-name)))))))
   (add-to-list 'run-command-recipes 'run-command-sportprog-recipe))
+
+;; debuger for C/C++
+(with-eval-after-load 'gud
+  (with-eval-after-load 'cc-mode
+    (eval-and-compile (require 'cc-mode)
+                      (require 'gud))
+    (keymap-set c-mode-map "M-<f5>" #'gud-gdb)
+    (keymap-set c++-mode-map "M-<f5>" #'gud-gdb)))
 
 (provide 'my-c)
 ;;; my-c.el ends here
