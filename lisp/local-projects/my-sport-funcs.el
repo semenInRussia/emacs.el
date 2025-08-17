@@ -57,10 +57,13 @@ If MSG-P is non-nil, say that content was copied."
 BUF defaults to the current buffer.  INTER-P is non-nil when this functions is
 called \"interactively\""
   (interactive (list nil t))
-  (let ((it (buffer-file-name buf)))
+  (let* ((it (buffer-file-name buf))
+         (it (if (equal system-type 'windows-nt)
+                 (string-replace "/" "\\" it)
+               it)))
     (if it
         (progn
-         (kill-new (buffer-file-name))
+         (kill-new it)
          (when inter-p
            (message "File path `%s' copied as kill" it)))
       (user-error "Can't copy path of non-file buffer"))))
