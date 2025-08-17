@@ -1,0 +1,40 @@
+# -*- mode: snippet -*-
+# name: sparse table STructure
+# key: sparses
+# --
+$0template <typename T> struct ST {
+  vector<vector<T>> t;
+
+  int L;
+
+  ST(int n, int l = 20) : L(l) {
+    t.resize(l);
+    for (auto &row : t) {
+      t.resize(n);
+    }
+  }
+
+  ST(vector<T> a) : ST(a.size()) {
+    int n = (int)a.size();
+    for (int i = 0; i < n; i++) {
+      t[i][0] = a[i];
+    }
+    build();
+  }
+
+  void build() {
+    int n = (int)t[0].size();
+    for (int l = 0; l + 1 < L; l++) {
+      for (int i = 0; i + (2 << l) <= n; i++) {
+        t[i][l + 1] = max(t[i][l], t[i + (1 << l)][l]);
+      }
+    }
+  }
+
+  T &operator[](int j) { return t[j][0]; }
+
+  T qry(int l, int r) {
+    int k = __lg(r - l);
+    return max(t[l][k], t[r - (1 << k)][k]);
+  }
+};

@@ -2,7 +2,6 @@
 # name: mi
 # key: mi
 # --
-
 struct mi {
   int v;
   mi(int64_t x = 0) : v(x % mod) { v += mod * (x < 0); }

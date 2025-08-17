@@ -1,0 +1,54 @@
+# -*- mode: snippet -*-
+# name: stree
+# key: stree
+# --
+struct stree {
+  int sz;
+  vector<${1:int}> t;
+
+  stree(int n) {
+    sz = 1;
+    while (sz < n) {
+      sz *= 2;
+    }
+    t.resize(2 * sz - 1, ${2:+inf});
+  }
+
+  stree(vector<$1> &a) : stree((int)a.size()) {
+    for (int i = 0; i < (int)a.size(); i++) {
+      change(i, a[i]);
+    }
+  }
+
+  $1 qry(int l, int r) { return qry(l, r, 0, 0, sz); }
+
+  $1 qry(int ql, int qr, int x, int l, int r) {
+    if (l >= qr || r <= ql) {
+      return $2;
+    }
+
+    if (ql <= l && r <= qr) {
+      return t[x];
+    }
+
+    int m = (l + r) / 2;
+    return ${3:min}(qry(ql, qr, 2 * x + 1, l, m), qry(ql, qr, 2 * x + 2, m, r));
+  }
+
+  void change(int j, $1 v) { change(j, v, 0, 0, sz); }
+
+  void change(int j, $1 v, int x, int l, int r) {
+    if (r - l == 1) {
+      t[x] = v;
+      return;
+    }
+
+    int m = (l + r) / 2;
+    if (j < m) {
+      change(j, v, 2 * x + 1, l, m);
+    } else {
+      change(j, v, 2 * x + 2, m, r);
+    }
+    t[x] = $3(t[2 * x + 1], t[2 * x + 2]);
+  }
+};

@@ -1,4 +1,4 @@
 # name: vector
 # key: v
 # --
-vector<${1:int}> ${2:a}${3:(${4:10})};
+vector<${1:int}> ${2:a}${3:(n)};

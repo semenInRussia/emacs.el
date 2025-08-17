@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# name: update in segment tree
+# key: upd
+# --
+void ${1:upd}(int j, int v, int x = 0, int l = 0, int r = SZ) {
+  if (r - l == 1) {
+    t[x] = v;
+    return;
+  }
+  int m = (l + r) / 2;
+  if (j < m) {
+    $1(j, v, 2 * x + 1, l, m);
+  } else {
+    $1(j, v, 2 * x + 2, m, r);
+  }
+  t[x] = max(t[2 * x + 1], t[2 * x + 2]);
+}

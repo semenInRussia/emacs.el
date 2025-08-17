@@ -1,5 +1,0 @@
-# -*- mode: snippet -*-
-# name: ll
-# key: ll
-# --
-using ll = long long;

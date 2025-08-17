@@ -3,5 +3,7 @@
 # key: online
 # --
 #ifdef ONLINE_JUDGE
+
 $0
+
 #endif

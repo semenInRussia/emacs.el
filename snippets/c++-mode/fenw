@@ -1,0 +1,34 @@
+# -*- mode: snippet -*-
+# name: fenw
+# key: fenw
+# --
+struct fenw {$0
+  int sz;
+  vector<ll> t;
+
+  fenw(int n) : sz(n) { t.resize(n + 1); }
+  fenw(vector<int> &a) : sz((int)a.size()) {
+    for (int i = 0; i < sz; i++) {
+      add(i, a[i]);
+    }
+  }
+
+  void add(int j, ll v) {
+    ++j;
+    for (; j <= sz; j += j & -j) {
+      t[j] += v;
+    }
+  }
+
+  // sum on [0; r)
+  ll sum(int r) {
+    ll s = 0;
+    for (; r > 0; r -= r & -r) {
+      s += t[r];
+    }
+    return s;
+  }
+
+  // sum on [l; r)
+  ll sum(int l, int r) { return sum(r) - sum(l); }
+};

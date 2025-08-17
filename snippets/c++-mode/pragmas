@@ -3,4 +3,5 @@
 # key: pragma
 # --
 #pragma GCC optimize("O3,unroll-loops")
+$0
 #pragma GCC target("avx2,popcnt,lzcnt,abm,bmi,fma,bmi2,tune=native")

@@ -2,8 +2,10 @@
 # name: multitester
 # key: !!
 # --
-// semenInRussia 2024
+// semenInRussia `(my-current-year)`
+
 #include <iostream>
+
 using namespace std;
 using ll = long long;
 
@@ -14,8 +16,9 @@ void solve() {
 }
 
 int main() {
-  int tt;
+  int tt = 1;
   cin >> tt;
-  while (tt--)
+  while (tt--) {
     solve();
+  }
 }

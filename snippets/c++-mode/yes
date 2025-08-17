@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: yes
+# key: yes
+# --
+cout << (${0:ok} ? "YES\n" : "NO\n");

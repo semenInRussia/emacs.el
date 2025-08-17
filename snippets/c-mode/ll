@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: typedef ll long long
+# key: ll
+# --
+typedef long long ll;

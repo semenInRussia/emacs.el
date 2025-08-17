@@ -1,0 +1,18 @@
+# -*- mode: snippet -*-
+# name: query in segment tree
+# key: qry
+# --
+int ${1:getmin}(int ql, int qr, int x, int l, int r) {
+  $0if (l >= qr || r <= ql) {
+    return +inf;
+  }
+
+  if (ql <= l && r <= qr) {
+    return t[x];
+  }
+
+  int m = (l + r) / 2;
+  return $1(ql, qr, 2 * x + 1, l, m)
+         $1(ql, qr, 2 * x + 2, m, r);
+}
+

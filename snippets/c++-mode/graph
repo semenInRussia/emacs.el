@@ -1,0 +1,16 @@
+# -*- mode: snippet -*-
+# name: graph reading
+# key: graph
+# --
+vector<int> g[N];
+
+int main() {
+  $0for (int i = 0; i < ${1:m}; i++) {
+    int x, y;
+    cin >> x >> y;
+    --x;
+    --y;
+    g[x].push_back(y);
+    g[y].push_back(x);
+  }
+}

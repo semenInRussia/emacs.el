@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: dfs
+# key: dfs
+# --
+void ${1:dfs}(int x) {
+  $0for (int y : g[x]) {
+    $1(y);
+  }
+}

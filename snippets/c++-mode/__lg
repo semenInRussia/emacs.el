@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: __lg
+# key: __lg
+# --
+#ifndef __GNUC__
+int __lg(int x) {
+  int cnt = 0;
+  while (x) {
+    ++cnt;
+    x >>= 1;
+  }
+  return cnt - 1;
+}
+#endif

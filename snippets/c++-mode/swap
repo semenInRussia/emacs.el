@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: swap
+# key: sw
+# --
+swap($0, )

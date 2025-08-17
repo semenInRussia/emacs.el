@@ -2,7 +2,7 @@
 # name: find in fenwick
 # key: fenwf
 # --
-struct fenw {
+struct fenw {$0
   int sz, n;
   vector<int> t;
 

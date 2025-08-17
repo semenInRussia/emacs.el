@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: remove duplicates
+# key: dups
+# --
+sort($1.begin(), $1.end());
+$1.resize(unique($1.begin(), $1.end()) - $1.begin());$0
