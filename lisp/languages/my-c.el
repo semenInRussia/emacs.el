@@ -78,11 +78,11 @@ Back end is either symbol tags or LSP"
            :command-line
            (if (equal system-type 'windows-nt)
                (format
-                "%s %s -Wdisabled-optimization -Werror -g & type input.txt | a.exe"
+                "%s %s -Wdisabled-optimization -Werror -g -Dhome & type input.txt | a.exe"
                 compiler
                 (buffer-file-name))
              (format
-              "%s %s -Wdisabled-optimization -Werror -g && cat input.txt | ./a.out"
+              "%s %s -Wdisabled-optimization -Werror -g -Dhome && cat input.txt | ./a.out"
               compiler
               (buffer-file-name)))))
          (list
@@ -90,17 +90,17 @@ Back end is either symbol tags or LSP"
           :command-name "sport-execute"
           :command-line
           (if (equal system-type 'windows-nt)
-              (format "%s %s -Wdisabled-optimization -Werror -g && ./a.out"
+              (format "%s %s -Wdisabled-optimization -Werror -g -Dhome && ./a.out"
                       compiler
                       (buffer-file-name))
-            (format "%s %s -Wdisabled-optimization -Werror -g & a.exe"
+            (format "%s %s -Wdisabled-optimization -Werror -g -Dhome & a.exe"
                     compiler
                     (buffer-file-name))))
          (list
           :display "Sport: compile only [all flags]"
           :command-name "sport-compile"
           :command-line
-          (format "%s %s -Wdisabled-optimization -Werror -g"
+          (format "%s %s -Wdisabled-optimization -Werror -g -Dhome"
                   compiler
                   (buffer-file-name)))))))
   (add-to-list 'run-command-recipes 'run-command-sportprog-recipe))
