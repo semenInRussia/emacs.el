@@ -38,6 +38,7 @@
 
 (leaf nerd-icons
   :ensure t
+  :defvar nerd-icons-font-family
   :config
   (when (and (display-graphic-p)
              (not (font-installed-p nerd-icons-font-family)))

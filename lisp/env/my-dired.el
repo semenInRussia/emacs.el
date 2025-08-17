@@ -35,6 +35,7 @@
          ;; right to go the "back" directory
          ("h" . dired-up-directory)
          ("A" . agnifize-dwim))
+  :defun dired-display-file
   :config
   ;; I use `repeat-mode' which have a stupid default option:
   ;; when I hit C-x C-j (`dired-jump') and press j, it another time
@@ -78,17 +79,17 @@
            ("* ." . dired-mark-suffix)
            ("M-!" . dired-smart-shell-command)))
 
-  (eval-and-compile
-    (define-minor-mode my-dired-follow-mode
-      "Diplay file at point in dired after a move."
-      :lighter " dired-f"
-      :group 'my
-      :global t
-      (if my-dired-follow-mode
-          (advice-add 'dired-next-line :after (lambda (_) (dired-display-file)))
-        (advice-remove 'dired-next-line (lambda (_) (dired-display-file)))))
+  (defvar my-dired-follow-mode)
+  (define-minor-mode my-dired-follow-mode
+    "Diplay file at point in dired after a move."
+    :lighter " dired-f"
+    :group 'my
+    :global t
+    (if my-dired-follow-mode
+        (advice-add 'dired-next-line :after (lambda (_) (dired-display-file)))
+      (advice-remove 'dired-next-line (lambda (_) (dired-display-file)))))
 
-    (keymap-set dired-mode-map "C-c C-f" #'my-dired-follow-mode))
+  (keymap-set dired-mode-map "C-c C-f" 'my-dired-follow-mode)
 
   ;; ???
   (remove-hook 'dired-mode-hook 'dired-mode))

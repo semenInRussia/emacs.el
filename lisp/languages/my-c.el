@@ -36,6 +36,7 @@ Back end is either symbol tags or LSP"
     :remove-hook ((c++-mode-hook c-mode-hook) . citre-mode)
     :hook ((c++-mode-hook c-mode-hook) . my-lsp-ensure)))
 
+(defvar c-mode-base-map)
 (defun my-make-CR-do-indent ()
   "Bind RET with electric enter."
   (keymap-set c-mode-base-map "C-m" 'c-context-line-break)
