@@ -58,9 +58,10 @@ BUF defaults to the current buffer.  INTER-P is non-nil when this functions is
 called \"interactively\""
   (interactive (list nil t))
   (let* ((it (buffer-file-name buf))
-         (it (if (equal system-type 'windows-nt)
-                 (string-replace "/" "\\" it)
-               it)))
+         (it (and it
+                  (if (equal system-type 'windows-nt)
+                      (string-replace "/" "\\" it)
+                    it))))
     (if it
         (progn
          (kill-new it)

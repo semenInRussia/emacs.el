@@ -17,24 +17,37 @@
 (require 's)
 
 
-(setq-default c-basic-offset 2)
+(leaf cc-mode
+  :setq-default (c-basic-offset . 2)
+  :bind (:c-mode-base-map
+         ;; `smartparens' can handle it
+         ("(" . nil) (")" . nil)
+         ("[" . nil) ("]" . nil)
+         ("{" . nil) ("}" . nil))
+  :config
+  ;; debuger for C/C++
+  (keymap-set c-mode-map "M-<f5>" 'gud-gdb)
+  (keymap-set c++-mode-map "M-<f5>" 'gud-gdb))
 
-(defvar my-c-backend 'lsp
-  "A symbol which tells to Emacs which one choose: LSP or ctags.")
+(prog1 'c-backends
+  (defvar my-c-backend 'lsp
+    "A symbol which tells to Emacs which one choose: LSP or ctags.")
 
-(defun my-c-update-backend (backend &rest _ignore)
-  "Change back end to a given BACKEND for C/C++ development.
+  (defun my-c-update-backend (backend &rest _ignore)
+    "Change back end to a given BACKEND for C/C++ development.
 
 Back end is either symbol tags or LSP"
-  (leaf citre
-    :when (equal backend 'tags)
-    :remove-hook ((c++-mode-hook c-mode-hook) . my-lsp-ensure)
-    :hook c++-mode-hook c-mode-hook)
+    (leaf citre
+      :when (equal backend 'tags)
+      :remove-hook ((c++-mode-hook c-mode-hook) . my-lsp-ensure)
+      :hook c++-mode-hook c-mode-hook)
 
-  (leaf eglot
-    :when (equal backend 'lsp)
-    :remove-hook ((c++-mode-hook c-mode-hook) . citre-mode)
-    :hook ((c++-mode-hook c-mode-hook) . my-lsp-ensure)))
+    (leaf eglot
+      :when (equal backend 'lsp)
+      :remove-hook ((c++-mode-hook c-mode-hook) . citre-mode)
+      :hook ((c++-mode-hook c-mode-hook) . my-lsp-ensure)))
+  (my-c-update-backend my-c-backend)
+  (add-variable-watcher 'my-c-backend #'my-c-update-backend))
 
 (defvar c-mode-base-map)
 (defun my-make-CR-do-indent ()
@@ -43,8 +56,7 @@ Back end is either symbol tags or LSP"
   (keymap-set c-mode-base-map "C-o" 'c-context-open-line))
 (add-hook 'c-initialization-hook #'my-make-CR-do-indent)
 
-(my-c-update-backend my-c-backend)
-(add-variable-watcher 'my-c-backend #'my-c-update-backend)
+;;; Sport (competitive) programming
 
 (declare-function my-copy-whole-buffer-as-kill "my-sport-funcs")
 (declare-function my-sport-insert-samples "my-sport-funcs")
@@ -68,7 +80,9 @@ Back end is either symbol tags or LSP"
     (when (and (buffer-file-name)
                (or (eq major-mode 'c++-mode)
                    (eq major-mode 'c-mode)))
-      (let ((compiler (if (eq major-mode 'c++-mode) "g++" "cc")))
+      (let ((compiler (if (eq major-mode 'c++-mode) "g++" "cc"))
+            (flags "-Wdisabled-optimization -Wextra -Werror -Dhome -ggdb")
+            (name (buffer-file-name)))
         (list
          (and
           (file-exists-p "input.txt")
@@ -77,41 +91,23 @@ Back end is either symbol tags or LSP"
            :command-name "sport-execute-sample"
            :command-line
            (if (equal system-type 'windows-nt)
-               (format
-                "%s %s -Wdisabled-optimization -Werror -g -Dhome & type input.txt | a.exe"
-                compiler
-                (buffer-file-name))
-             (format
-              "%s %s -Wdisabled-optimization -Werror -g -Dhome && cat input.txt | ./a.out"
-              compiler
-              (buffer-file-name)))))
+               (s-lex-format
+                "${compiler} ${name} ${flags} & type input.txt | a.exe")
+             (s-lex-format
+              "${compiler} ${name} ${flags} && cat input.txt | ./a.out"))))
          (list
           :display "Sport: execute only [all flags]"
           :command-name "sport-execute"
           :command-line
           (if (equal system-type 'windows-nt)
-              (format "%s %s -Wdisabled-optimization -Werror -g -Dhome && ./a.out"
-                      compiler
-                      (buffer-file-name))
-            (format "%s %s -Wdisabled-optimization -Werror -g -Dhome & a.exe"
-                    compiler
-                    (buffer-file-name))))
+              (s-lex-format "${compiler} ${name} ${flags} && ./a.out")
+            (s-lex-format "${compiler} ${name} ${flags} & a.exe")))
          (list
           :display "Sport: compile only [all flags]"
           :command-name "sport-compile"
           :command-line
-          (format "%s %s -Wdisabled-optimization -Werror -g -Dhome"
-                  compiler
-                  (buffer-file-name)))))))
+          (s-lex-format "${compiler} ${name} ${flags}"))))))
   (add-to-list 'run-command-recipes 'run-command-sportprog-recipe))
-
-;; debuger for C/C++
-(with-eval-after-load 'gud
-  (with-eval-after-load 'cc-mode
-    (eval-and-compile (require 'cc-mode)
-                      (require 'gud))
-    (keymap-set c-mode-map "M-<f5>" #'gud-gdb)
-    (keymap-set c++-mode-map "M-<f5>" #'gud-gdb)))
 
 (provide 'my-c)
 ;;; my-c.el ends here
