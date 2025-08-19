@@ -49,6 +49,7 @@
 ;;   `straight' will be loaded only when it's really imported.  It
 ;;   saves a little bit of time
 (autoload 'straight--build-dir "straight")
+(autoload 'straight--repos-file "straight")
 (autoload 'straight-fetch-package "straight")
 (autoload 'straight-get-recipe "straight")
 (autoload 'straight-pull-recipe-repositories "straight")
@@ -260,14 +261,18 @@ autoloads for EVERY package"
    (list
     (completing-read "Which package? " (pam--straight-packages))
     'interactive))
+  (pam--load-straight)
   (let* ((default-directory (pam--build-dir))
-         (build-dir (straight--build-dir pkg)))
+         (build-dir (straight--build-dir pkg))
+         (repo-dir (straight--repos-file pkg)))
     (thread-last
       build-dir
       (directory-files)
       ;; `cddr' skips "." and ".."
       (cddr)
       (mapc #'delete-file))
+    (when (file-exists-p repo-dir)
+      (delete-directory repo-dir :recursive))
     (when (file-exists-p build-dir)
       (delete-directory build-dir :recursive))
     ;; update the autoloads file for EVERY package, because delete

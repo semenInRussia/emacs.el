@@ -24,6 +24,7 @@
          ("(" . nil) (")" . nil)
          ("[" . nil) ("]" . nil)
          ("{" . nil) ("}" . nil))
+  :defvar c-mode-map c++-mode-map
   :config
   ;; debuger for C/C++
   (keymap-set c-mode-map "M-<f5>" 'gud-gdb)
@@ -100,8 +101,8 @@ Back end is either symbol tags or LSP"
           :command-name "sport-execute"
           :command-line
           (if (equal system-type 'windows-nt)
-              (s-lex-format "${compiler} ${name} ${flags} && ./a.out")
-            (s-lex-format "${compiler} ${name} ${flags} & a.exe")))
+              (s-lex-format "${compiler} ${name} ${flags} & a.exe")
+            (s-lex-format "${compiler} ${name} ${flags} && ./a.out")))
          (list
           :display "Sport: compile only [all flags]"
           :command-name "sport-compile"
