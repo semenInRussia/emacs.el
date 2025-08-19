@@ -102,6 +102,11 @@
 (leaf whitespace
   :hook (write-file-functions . whitespace-write-file-hook))
 
+(leaf avy
+  :ensure t
+  :bind ("C-;" . avy-goto-char)
+  :custom ((avy-keys . '(?a ?s ?d ?f ?l ?k ?j ?h ?g))))
+
 (delete-selection-mode 1)
 
 (provide 'my-editing)

@@ -75,8 +75,9 @@
   ;; Close window
   ("M-0" . my-delete-window-frame)
 
-  ("C-;" . ace-window-one-command)
-  ("C-x O" . ace-window-prefix)))
+  ("C-x O" . ace-window-prefix)
+
+  ("C-x B" . ibuffer)))
 
 (keymap-global-set "M-`"
                    (defun my-switch-to-other-buffer (&optional _arg)

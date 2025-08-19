@@ -66,17 +66,6 @@ window manager to present the frame in a floating state."
              (delete-frame)))))
 
 (declare-function aw-select "ace-window")
-;;;###autoload
-(defun ace-window-one-command ()
-  (interactive)
-  (let ((win (aw-select " ACE")))
-    (when (windowp win)
-      (with-selected-window win
-        (let* ((command (key-binding
-                         (read-key-sequence
-                          (format "Run in %s..." (buffer-name)))))
-               (this-command command))
-          (call-interactively command))))))
 
 ;;;###autoload
 (defun ace-window-prefix ()
