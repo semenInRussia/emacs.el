@@ -38,10 +38,10 @@ Rename variable which is symbol ID"
   :defun eglot-inlay-hints-mode eglot-code-actions jsonrpc--log-event
   :bind ((:eglot-mode-map
           ("C-c lr" . eglot-rename)
-          ("<f6>"   . eglot-rename)
-          ("C-c la"  . eglot-code-actions)
-          ("C-c ll"  . eglot-code-actions)
-          ([remap my-format-expression] . eglot-format))
+          ("<f6>" . eglot-rename)
+          ("C-c la" . eglot-code-actions)
+          ("C-c lg" . eglot-reconnect)
+          ("M-q" . eglot-format))
          (:embark-identifier-map
           :package embark
           ("r" . my-interactive-eglot-rename)))
@@ -54,7 +54,7 @@ Rename variable which is symbol ID"
     (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster))
 
   ;; set default LSP servers for all supported languages
-  (defvar eglot-server-programs)  ; make compiler happier
+  (defvar eglot-server-programs)        ; make compiler happier
   ;; python (pyright)
   (setf (alist-get '(python-mode python-ts-mode) eglot-server-programs
                    nil nil 'equal)
