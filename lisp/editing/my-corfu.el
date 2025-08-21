@@ -126,10 +126,11 @@
     ;; `my-capf-word' = `cape-dict' + `cape-dabbrev'
     (add-hook 'completion-at-point-functions 'my-capf-word     20 'local))
 
-  (defalias 'my-capf-word (cape-capf-silent
-                           (cape-capf-super
-                            #'cape-dict
-                            #'cape-dabbrev))
+  (setq dabbrev-upcase-means-case-search t)
+
+  (defalias 'my-capf-word  (cape-capf-silent
+                            (cape-capf-super #'cape-dict
+                                             :with #'cape-dabbrev))
     "Complete word from dictionary + some words in the opened buffers.
 
 It compose two functions from `cape': `cape-dict' and `cape-dabbrev', but here I
@@ -142,7 +143,8 @@ auto-completion popup with this capf")
 
   ;; Emacs have capf provided by `ispell' which is looks like `cape-dict', I
   ;; prefer a `cape' one, so disable `ispell'
-  (advice-add 'ispell-complete-word :override 'ignore))
+  (advice-add 'ispell-complete-word :override 'ignore)
+  (advice-add 'ispell-completion-at-point :override 'ignore))
 
 (leaf corfu-terminal
   :ensure (corfu-terminal
