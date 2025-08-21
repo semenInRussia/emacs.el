@@ -105,7 +105,13 @@
 (leaf avy
   :ensure t
   :bind ("C-;" . avy-goto-char)
-  :custom ((avy-keys . '(?a ?s ?d ?f ?l ?k ?j ?h ?g))))
+  :custom ((avy-keys . '(?a ?s ?d ?f ?l ?k ?j ?o ?e ?i ?w ?q ?x ?n ?m ?p ?u))
+           (avy-dispatch-alist .
+            '((?W . avy-action-copy)
+              (25 . avy-action-yank)        ; C-y
+              (?Y . avy-action-yank-line)
+              (?K . avy-action-kill)
+              (?T . avy-action-teleport)))))
 
 (delete-selection-mode 1)
 
