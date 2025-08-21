@@ -14,7 +14,7 @@
       use-file-dialog nil
       use-dialog-box nil)
 
-(defcustom my-layout-size '(85 . 23)
+(defcustom my-layout-size '(80 . 25)
   "Cons of width and height of editor window.
 
 These values added as width and height in `default-frame-alist' at Emacs start

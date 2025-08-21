@@ -10,7 +10,8 @@
 (defun my-load-small-init ()
   "Load my minimal small init.el without dependencies."
   (interactive)
-  (load (locate-user-emacs-file "small-init")))
+  (load (locate-user-emacs-file "small-init"))
+  (modify-all-frames-parameters initial-frame-alist))
 
 ;;; Performace hacks
 
@@ -200,6 +201,18 @@ Byte-compile every file of install and generate autoloads file"
                                  'full
                                  ".*\\.el$"))
     (byte-compile-file file)))
+
+(defun my-add-variable-command ()
+  "Add file-local or dir-local variable."
+  (interactive)
+  (command-execute
+   (intern
+    (completing-read "M-x:: "
+                     '(add-file-local-variable
+                       add-file-local-variable-prop-line
+                       add-dir-local-variable)))))
+
+(keymap-global-set "C-x RET RET" #'my-add-variable-command)
 
 (put 'narrow-to-region 'disabled nil)
 

@@ -38,8 +38,7 @@
     ;; Show the status, filename and icon (using the ‘nerd-icons’ package).
     ;; You have to explicitly install the ‘nerd-icons’ package, else this
     ;; function errors.
-    (eval-and-compile
-      (require 'magit))
+    (declare-function magit-format-file-nerd-icons "magit.el")
     (setopt magit-format-file-function #'magit-format-file-nerd-icons)))
 
 (leaf git-timemachine

@@ -1,7 +1,0 @@
-# -*- mode: snippet -*-
-# name: extern
-# key: ext
-# --
-export extern "$1" [
-  $0
-]

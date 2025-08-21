@@ -21,14 +21,19 @@
   ;; :global-minor-mode recentf-mode
   :hook (prog-mode-hook
          text-mode-hook)
-  :bind ("C-c r" . recentf)
+  ;; :bind ("C-c r" . recentf)
   :custom (;; by default, `recentf' load the list of recent file at
            ;; startup, it can eat our init time.
            ;;
            ;; NOTE: that because
            ;; auto cleanup is disabled, sometimes you must run
            ;; `recentf-cleanup'
-           (recentf-auto-cleanup . 'never))
+           (recentf-auto-cleanup . 'never)
+           (recentf-max-saved-items . 300) ; default is 20
+           (recentf-max-menu-items . 15)
+           (recentf-auto-cleanup . 'mode)
+           (recentf-exclude .
+                            '("^/\\(?:ssh\\|su\\|sudo\\)?:")))
   :bind (:embark-become-file+buffer-map
          :package embark
          ("r" . recentf))

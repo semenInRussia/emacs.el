@@ -5,6 +5,7 @@
 ;; My configuration for modeline
 
 ;;; Code:
+
 (require 'my-leaf)
 
 ;; I don't use `doom-modeline-env'
@@ -24,7 +25,7 @@ R."
 (leaf doom-modeline
   :ensure t
   :custom (;; it looks like more nice
-           (doom-modeline-height . 45)
+           (doom-modeline-height . 40)
            ;; just fun
            ;; (mode-line-right-align-edge . 'right-margin)
            ;; encoding not useful I think.

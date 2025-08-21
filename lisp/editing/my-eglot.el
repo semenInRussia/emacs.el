@@ -23,8 +23,8 @@ Rename variable which is symbol ID"
 
 (leaf eglot
   :ensure (eglot :type built-in)
-  :custom `(;; (eglot-sync-connect . 1)
-            (eglot-events-buffer-size . 0)
+  :custom `((eglot-sync-connect . 0)
+            (eglot-events-buffer-config . '(:size 0 :format short))
             (eglot-autoshutdown . t)
             (eglot-ignored-server-capabilities
              . '(;; disable code lens

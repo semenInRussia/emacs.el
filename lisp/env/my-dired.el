@@ -34,6 +34,9 @@
          ;; i'm the user of `meow' with hjkl, where "h" is right, so i press
          ;; right to go the "back" directory
          ("h" . dired-up-directory)
+         ;; "* . exe" - choose all .exe files
+         ;; C-k hide them
+         ("C-k" . dired-do-kill-lines)
          ("A" . agnifize-dwim))
   :defun dired-display-file
   :config

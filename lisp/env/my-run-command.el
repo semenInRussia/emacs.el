@@ -33,7 +33,8 @@
 (leaf compile
   :bind (("C-x `" . #'recompile)
          (:compilation-mode-map
-          ("t" . #'my-compilation-toggle-hide-details))))
+          ("t" . #'my-compilation-toggle-hide-details)))
+  :custom (compilation-ask-about-save . nil))
 
 (provide 'my-run-command)
 ;;; my-run-command.el ends here
