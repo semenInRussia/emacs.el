@@ -111,9 +111,20 @@
               (25 . avy-action-yank)        ; C-y
               (?Y . avy-action-yank-line)
               (?K . avy-action-kill)
-              (?T . avy-action-teleport)))))
+              (?T . avy-action-teleport))))
+  :config
+   (advice-remove 'avy-goto-char 'set-mark)
+   (advice-add 'avy-goto-char :before
+               (defun my-add-set-mark (&rest _args)
+                 (push-mark (point) :nomsg))))
 
 (delete-selection-mode 1)
+
+(keymap-global-set "C-x RET C-a" #'auto-fill-mode)
+(keymap-global-set "C-x RET a" #'auto-fill-mode)
+
+;; insert a template text after file is created
+(leaf autoinsert :global-minor-mode auto-insert-mode)
 
 (provide 'my-editing)
 ;;; my-editing.el ends here

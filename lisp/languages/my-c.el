@@ -28,7 +28,12 @@
   :config
   ;; debuger for C/C++
   (keymap-set c-mode-map "M-<f5>" 'gud-gdb)
-  (keymap-set c++-mode-map "M-<f5>" 'gud-gdb))
+  (keymap-set c++-mode-map "M-<f5>" 'gud-gdb)
+  ;; insert "// semenInRussia 2025" (or not 2025, what's the year now?)  to
+  ;; empty c/c++ file
+  (--each '(c-mode c++-mode)
+   (add-to-list 'auto-insert-alist
+                `(,it . (nil "// semenInRussia " (my-current-year) _)))))
 
 (prog1 'c-backends
   (defvar my-c-backend 'lsp
