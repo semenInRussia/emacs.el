@@ -35,13 +35,16 @@
            project-switch-commands)
   :bind ((:minibuffer-local-map
           ("M-s" . consult-history) ;; orig. next-matching-history-element
-          ("M-r" . consult-history))
+          )
          ("M-'" . consult-register-store)
          ("C-M-'" . consult-register)
-         ("M-g -" . consult-mark)
+         ("M-g -" . consult-global-mark)
+         ("M-g =" . consult-mark)
+         ("C-x '" . consult-theme)
          ("C-x C-b" . consult-buffer)
          ("M-g i" . consult-imenu)
          ("M-g I" . consult-imenu-multi)
+         ("M-y". consult-yank-from-kill-ring)
          (:meow-normal-state-keymap
           :package meow
           ("X" . consult-line)
