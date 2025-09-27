@@ -5,21 +5,10 @@
 ;; My configuration for the custom editing
 
 ;;; Code:
+
 (require 'dash)
 (require 'my-leaf)
 (require 's)
-
-(setq delete-selection-mode t)
-
-(defun open-line-saving-indent ()
-  "Inserting new line, saving position and inserting new line."
-  (interactive)
-  (newline)
-  (unless (s-blank-p (s-trim (thing-at-point 'line t)))
-    (indent-according-to-mode))
-  (forward-line -1)
-  (end-of-line)
-  (delete-horizontal-space t))
 
 (leaf yank-indent
   :ensure (yank-indent :repo "jimeh/yank-indent" :host github)
@@ -52,17 +41,6 @@
   (setq w32-apps-modifier 'hyper))
 
 
-(defun my-beginning-of-line-text-or-visual-line ()
-  "I think the command name explain everything."
-  (interactive)
-  (goto-char
-   (max (save-excursion
-          (beginning-of-line-text)
-          (point))
-        (save-excursion
-          (beginning-of-visual-line)
-          (point)))))
-
 ;; PERF,HACK: don't call `repeat-mode' and require it, cause it do
 ;;   extra work, require it only when the called command have
 ;;   repeat-map property
@@ -77,30 +55,45 @@
                       (get real-this-command 'repeat-map)))
              (repeat-post-hook))))
 
+;; Alt+{down,up} to transpose lines
+(leaf move-text
+  :ensure t
+  :bind (("M-S-<up>" . move-text-up)
+         ("M-S-<down>" . move-text-down)))
+
+(declare-function my-open-line-saving-indent "my-editing-funcs.el")
 (declare-function my-sport-copy-filename "my-sport-funcs")
 
 (--each
-    '(("M-y" . consult-yank-from-kill-ring)
-      ("C-a" . my-beginning-of-line-text-or-visual-line)
-      ("C-d" . delete-forward-char)
-      ("C-o" . open-line-saving-indent)
-      ("M-C" . my-sport-copy-filename) ; like in VSCode
-      ("C-x C-y" . duplicate-line))
+    '(("C-a". my-beginning-of-line-text-or-visual-line)
+      ("C-d". delete-forward-char)
+      ("C-o". my-open-line-saving-indent)
+      ("C-x C-y". duplicate-line)
+      ("M-D". duplicate-line)
+      ;; `auto-fill-mode': while you are typing symbols and line size increase any
+      ;; limit it inserts break
+      ("C-x a C-f" . auto-fill-mode)
+      ("C-x a f" . auto-fill-mode)
+      ("M-A" . auto-fill-mode)
+      ;; like in VSCode
+      ("M-C". my-sport-copy-filename))
   (keymap-global-set (car it) (cdr it)))
 
 (defvar-keymap my-dupliacte-map
   :repeat (:enter (duplicate-line))
-  "y" #'duplicate-line)
+  "y" #'duplicate-line
+  "d" #'duplicate-line)
 
 ;; disable tabs, sorry Richard
+(keymap-set prog-mode-map "RET" #'newline-and-indent)
 (setq-default indent-tabs-mode nil
               tab-width 2
               fill-column 80)
-(keymap-set prog-mode-map "RET" #'newline-and-indent)
 
 ;; delete trailing spaces, spaces at the ends of lines
 (leaf whitespace
-  :hook (write-file-functions . whitespace-write-file-hook))
+  :hook (before-save-hook . whitespace-cleanup)
+  :bind ("M-W" . whitespace-mode))
 
 (leaf avy
   :ensure t
@@ -118,10 +111,8 @@
                (defun my-add-set-mark (&rest _args)
                  (push-mark (point) :nomsg))))
 
+;; if you have selected region, type any symbol, it replace region with symbol
 (delete-selection-mode 1)
-
-(keymap-global-set "C-x RET C-a" #'auto-fill-mode)
-(keymap-global-set "C-x RET a" #'auto-fill-mode)
 
 ;; insert a template text after file is created
 (leaf autoinsert :global-minor-mode auto-insert-mode)
