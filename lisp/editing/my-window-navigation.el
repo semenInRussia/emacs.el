@@ -62,9 +62,17 @@
   "n" #'next-buffer
   "p" #'previous-buffer)
 
+(defun my-current-kill-cur-buf ()
+  "Kill the current active buffer."
+  (interactive)
+  (kill-buffer))
+
+(defvar-keymap my-current-kill-cur-buf-map
+  :repeat (:enter (my-current-kill-cur-buf))
+  "K" #'my-current-kill-cur-buf)
+
 (leaf-keys
- (("C-<tab>" . 'my-visit-last-opened-buffer)
-  ;; Fast select buffers
+ (;; Fast select buffers
   ("C-x C-p" . previous-buffer)
   ("C-x C-n" . next-buffer)
 
@@ -72,12 +80,14 @@
   ([remap split-window-right] . my-split-right) ;; C-x 3
   ([remap split-window-below] . my-split-below) ;; C-x 2
 
-  ;; Close window
-  ("M-0" . my-delete-window-frame)
-
+  ;; some useful keybinds
+  ("C-x B" . ibuffer)
+  ("C-x K" . my-current-kill-cur-buf)
+  ("M-K" . my-current-kill-cur-buf)
   ("C-x O" . ace-window-prefix)
 
-  ("C-x B" . ibuffer)))
+  ;; Close window
+  ("M-0" . my-delete-window-frame)))
 
 (keymap-global-set "M-`"
                    (defun my-switch-to-other-buffer (&optional _arg)
