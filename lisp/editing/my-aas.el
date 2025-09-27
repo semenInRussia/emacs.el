@@ -22,7 +22,9 @@
   :ensure t
   :hook LaTeX-mode-hook
   :defun ((aas-set-snippets . aas)
-          (texmathp . texmathp))
+          (texmathp . texmathp)
+          laas-wrap-previous-object
+          laas-object-on-left-condition)
   :config
   (aas-set-snippets 'laas-mode
     :cond #'texmathp
@@ -31,6 +33,7 @@
     ;; "Vs"  "\\mathrm{В}"
     ;; "Oms"  "\\mathrm{Ом}"
     "cls" "^\\circ C"
+    "oo" "\\circ"
 
     ;; Some Physics Sheet
     ;; "eqv" "\\mathrm{Экв.}"
@@ -39,7 +42,13 @@
     "trg" "\\triangle"
     "agl" "\\angle"
     "grd" "^\\circ"
-    "xor" "\\oplus"))
+    "xor" "\\oplus"
+    "ss" "\\subset"
+    "lor" "\\lor"
+    "land" "\\land"
+    "opp" "\\circ"
+    :cond #'laas-object-on-left-condition
+    "bb" (lambda () (interactive) (laas-wrap-previous-object "mathbb"))))
 
 (provide 'my-aas)
 ;;; my-aas.el ends here
