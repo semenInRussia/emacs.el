@@ -35,11 +35,8 @@
   :hook (LaTeX-mode-hook . turn-on-cdlatex)
   :bind (:cdlatex-mode-map
          ("<tab>" . cdlatex-tab)
-         ("C-'" . cdlatex-math-modify))
-  :custom ((cdlatex-math-modify-alist
-            . '((?q "\\sqrt" nil t nil nil)
-                (?u "\\breve" "\\uline" t nil nil)
-                (?v "\\vec" nil t nil nil)))))
+         ("C-'" . cdlatex-math-modify)
+         ("`") ("'")))
 
 (leaf my-latex-insert
   :bind (:latex-mode-map
