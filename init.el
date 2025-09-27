@@ -36,6 +36,8 @@
 
 ;; PERF: Line numbers are pretty slow all around. The performance boost of disabling
 ;; them outweighs the utility of always keeping them on.
+;; NOTE that if you need to display line numbers, change this variable to other
+;;   (like relative or absolute)
 (defvar display-line-numbers-type)
 (setq display-line-numbers-type nil)
 
@@ -45,8 +47,8 @@
 ;; not only when init.el inside ~/.emacs.d
 (eval-and-compile
   (setq user-emacs-directory
-	      (file-name-directory (or load-file-name
-				                         (buffer-file-name)
+        (file-name-directory (or load-file-name
+                                 (buffer-file-name)
                                  byte-compile-current-file))))
 
 ;;; Handle --local-projects flag (part 1)
