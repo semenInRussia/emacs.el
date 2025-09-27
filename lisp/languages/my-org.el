@@ -15,6 +15,8 @@
            (org-outline-path-complete-in-steps . nil)
            ;; `org' startup
            (org-fold-core-style . 'overlays)
+           ;; capture
+           (org-default-notes-file . "~/notes.org")
            ;; editing
            (org-special-ctrl-a/e . t)
            (org-special-ctrl-k . t)
@@ -30,16 +32,18 @@
            (org-indent-mode-turns-on-hiding-stars . nil)
            (org-pretty-entities . nil)
            (org-image-align . 'center)
-           (org-pretty-entities-include-sub-superscripts . t)
+           (org-pretty-entities-include-sub-superscripts . nil)
            (org-startup-indented . nil)
            (org-startup-with-inline-images . t)
            (org-auto-align-tags . nil))
   :hook ((org-mode-hook . org-toggle-pretty-entities)
          (org-mode-hook . org-indent-mode))
   :bind (("C-x C-," . org-capture)
+         ("C-x A" . org-agenda)
          (:org-mode-map
           ("C-c tab"   . org-refile)
           ("C-c C-j"   . org-id-get-create)))
+  :custom (org-agenda-files . '("~/homework.org"))
   :config
   (add-hook 'org-mode-hook 'visual-line-mode)
   (add-hook 'org-mode-hook 'aas-activate-for-major-mode))
@@ -61,12 +65,20 @@
                        :host github)
   :commands org-preview-mode)
 
+(leaf cdlatex
+  :ensure t
+  :hook (org-mode-hook . org-cdlatex-mode)
+  :bind (:org-cdlatex-mode-map
+         ("`" . nil)
+         ("'" . nil)
+         ("C-'" . cdlatex-math-modify)))
+
 (leaf xenops
   :ensure t
   :bind (:org-mode-map
          :package org
          ("C-c C-x C-l" . xenops-mode))
-  :custom (xenops-math-image-scale-factor . 2))
+  :custom (xenops-math-image-scale-factor . 1))
 
 (leaf laas
   :ensure t
