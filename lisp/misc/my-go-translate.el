@@ -14,7 +14,8 @@
 (declare-function google-translate-translate "google-translate")
 (defun my-google-translate (text)
   "Translate the TEXT which is one of `my-translate-languages' to other."
-  (if (string-match-p "[абвгдежзийклмнопрстуфхцшщьъыэюя]" text)  ;; russian text
+  (interactive "sA text: ")
+  (if (string-match-p "[абвгдежзийклмнопрстуфхцшщьъыэюя]" text) ;; russian text
       (google-translate-translate "ru" "en" text)
     (google-translate-translate "en" "ru" text)))
 
@@ -23,7 +24,8 @@
   :commands google-translate-translate
   :bind ((:embark-general-map
           :package embark
-          ("T" . my-google-translate))))
+          ("T" . my-google-translate))
+         ("C-x T" . my-google-translate)))
 
 (provide 'my-go-translate)
 ;;; my-go-translate.el ends here

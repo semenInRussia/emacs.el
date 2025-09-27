@@ -126,6 +126,7 @@
     ;; `my-capf-word' = `cape-dict' + `cape-dabbrev'
     (add-hook 'completion-at-point-functions 'my-capf-word     20 'local))
 
+  (defvar dabbrev-upcase-means-case-search)
   (setq dabbrev-upcase-means-case-search t)
 
   (defalias 'my-capf-word  (cape-capf-silent

@@ -27,7 +27,8 @@
   ;; don't use `yas-global-mode', prefer local minor modes
   ;; :global-minor-mode yas-global-mode
   :hook ((prog-mode-hook . yas-minor-mode)
-         (text-mode-hook . yas-minor-mode))
+         (text-mode-hook . yas-minor-mode)
+         (conf-mode-hook . yas-minor-mode))
   :defvar yas-snippet-dirs
   :custom (yas-wrap-around-region . t)
   :config

@@ -1,4 +1,4 @@
-;;; my-elisp.el --- My configuration of the elisp
+;;; my-elisp.el --- My configuration of the elisp -*- lexical-binding: t -*-
 ;; Copyright (C) 2022-2025 semenInRussia
 
 ;;; Commentary:

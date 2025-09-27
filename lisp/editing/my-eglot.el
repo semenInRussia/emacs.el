@@ -23,18 +23,18 @@ Rename variable which is symbol ID"
 
 (leaf eglot
   :ensure (eglot :type built-in)
-  :custom `((eglot-sync-connect . 0)
-            (eglot-events-buffer-config . '(:size 0 :format short))
-            (eglot-autoshutdown . t)
-            (eglot-ignored-server-capabilities
-             . '(;; disable code lens
-                 :codeLensProvider
-                 ;; disable inlay hints
-                 :inlayHintProvider
-                 ;; dont higlight symbol
-                 :documentHighlightProvider))
-            (eglot-events-buffer-config . 0)
-            (eglot-report-progress . nil))
+  :custom ((eglot-sync-connect . 0)
+           (eglot-events-buffer-config . '(:size 0 :format short))
+           (eglot-autoshutdown . t)
+           (eglot-ignored-server-capabilities
+            . '(;; disable code lens
+                :codeLensProvider
+                ;; disable inlay hints
+                :inlayHintProvider
+                ;; dont higlight symbol
+                :documentHighlightProvider))
+           (eglot-events-buffer-config . 0)
+           (eglot-report-progress . nil))
   :defun eglot-inlay-hints-mode eglot-code-actions jsonrpc--log-event
   :bind ((:eglot-mode-map
           ("C-c lr" . eglot-rename)

@@ -51,5 +51,19 @@ Use object DIAG which is captured with one of `embark-target-finders'"
                 'string)))
        res))))
 
+(declare-function flymake-goto-next-error "flymake.el")
+(declare-function flymake-goto-previous-error "flymake.el")
+
+(defvar-keymap my-flymake-next-error-repeat-map
+  :doc
+  "Keymap to repeat `flymake-goto-next-error' and `flymake-goto-previous-error'.
+
+Used in `repeat-mode'."
+  :repeat t
+  "n"   #'flymake-goto-next-error
+  "M-n" #'flymake-goto-next-error
+  "p"   #'flymake-goto-previous-error
+  "M-p" #'flymake-goto-previous-error)
+
 (provide 'my-flymake)
 ;;; my-flymake.el ends here

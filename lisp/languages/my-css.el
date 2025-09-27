@@ -1,4 +1,4 @@
-;;; my-css.el --- My configuration for `css'
+;;; my-css.el --- My configuration for `css' -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022-2025 semenInRussia
 

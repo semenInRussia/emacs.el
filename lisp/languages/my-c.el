@@ -25,6 +25,7 @@
          ("[" . nil) ("]" . nil)
          ("{" . nil) ("}" . nil))
   :defvar c-mode-map c++-mode-map
+  :hook (cc-mode-hook . c-toggle-comment-style)
   :config
   ;; debuger for C/C++
   (keymap-set c-mode-map "M-<f5>" 'gud-gdb)

@@ -14,7 +14,8 @@
 ;;; Code:
 (require 'my-leaf)
 
-(leaf savehist)
+(leaf savehist
+  :global-minor-mode t)
 
 (provide 'my-savehist)
 ;;; my-savehist.el ends here

@@ -17,6 +17,10 @@
       scroll-preserve-screen-position t
       next-screen-context-lines 3)
 
+;; If `scroll-conservatively' is set above 100, the window is never
+;; automatically recentered, which decreases the time spend recentering.
+(setq scroll-conservatively 101)
+
 ;;; Avoid backups or lockfiles
 (setq make-backup-files nil
       auto-save-list-file-name nil
@@ -47,15 +51,14 @@
 (setq use-short-answers t)
 (advice-add 'yes-or-no-p :override #'y-or-n-p)
 
-
 ;;; Russian input method
 ;;; ---
 ;;; now I can press `C-\\' and language I writing will be changed
-(with-eval-after-load 'my-modules
-  (setq-default default-input-method "russian-computer")
-  (setq default-file-name-coding-system 'utf-8)
-  (setq default-keyboard-coding-system 'utf-8)
-  (setq buffer-file-coding-system 'utf-8))
+(setq-default default-input-method "russian-computer")
+(setq-default default-file-name-coding-system 'utf-8)
+(setq-default default-keyboard-coding-system 'utf-8)
+(setq-default mm-coding-system-priorities '(utf-8))
+(setq-default buffer-file-coding-system 'utf-8)
 
 ;;; I try to decrease the Emacs startup time
 (defun my-display-startup-time ()
@@ -72,11 +75,15 @@
 
 ;;; UTF-8 coding
 (prefer-coding-system 'utf-8)
-(set-language-environment "UTF-8")
 (set-default-coding-systems 'utf-8)
+(if (eq system-type 'windows-nt)
+    (progn
+      (set-clipboard-coding-system 'utf-16-le)
+      (set-selection-coding-system 'utf-16-le))
+  (set-selection-coding-system 'utf-8))
 (set-terminal-coding-system 'utf-8)
-(set-selection-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
+(set-language-environment 'utf-8)
 
 ;;; sometimes i need to open only one file with sudo
 (leaf sudo-edit
@@ -119,6 +126,26 @@
 
 ;; Do not extend the cursor to fit wide characters
 (setq x-stretch-cursor nil)
+
+;;; global mark
+;; when you do some operations, like `imenu' you can jump to other place,
+;; edit some text and need to return back, in these cases some these
+;; commands push marks before jump to other place.  Emacs store these marks
+;; from all buffers in `global-mark-ring', which you can rotate using
+;; keybinding C-x C-<SPC>.  By default, this mark ring is limit by 16, but I
+;; think is too low, so better number here is 64.
+;;
+;; note that the same thing is done locally (only inside the current buffer)
+;; hitting C-u C-SPC
+(setq global-mark-ring-max 64) ; defaults to 16.
+(setq mark-ring-max 16) ; defaults to 16.
+
+;; also i feel convinient when I hit C-x SPC to jump the last global mark
+;; and next time I hit space while I didn't hit another symbol I will be
+;; jump the previous mark repetatively.
+(defvar-keymap my-pop-global-mark-map
+  :repeat (:enter (pop-global-mark))
+  "SPC" #'pop-global-mark)
 
 (provide 'my-init)
 ;;; my-init.el ends here

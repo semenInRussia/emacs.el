@@ -16,8 +16,7 @@
    (defun my-maybe-server-start ()
      "Run the Emacs server if servers haven't been started."
      (require 'server)
-     (unless (server-running-p)
-       (server-start)))))
+     (server-start))))
 
 (with-eval-after-load 'server
   (defvar server-mode-map)
