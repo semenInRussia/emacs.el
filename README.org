@@ -10,7 +10,7 @@
   - [[#requirements][Requirements]]
 
   A good (I think) configuration for [[https://emacs.org][Emacs]] which have a *BIG AMOUNT* of unique features.  This config 100% not for everyone Emacs user.  I think you must have any Emacs background to use it (but maybe not)
-    
+
   This config is *required in Emacs29 version* (or emacs30, but you can rebuild all emacs with =emacs --modules --install=), even better if Emacs is with native-compilation feature
 
   In this config you can find a big amount of new concepts for editor configs (I think).  One of the most interesting features is that you can install this config (not count installing fonts, [[https://github.com/AbiWord/enchant][enchant2]] (spell checker) and [[https://github.com/BurntSushi/ripgrep][ripgrep]]) very quickly, because all packages are built in zip archive (see releases or [[#Installation]] section).  I hope you can be inspired by this configuration.
@@ -20,8 +20,11 @@
   [[./doc/s1.png]]
   [[./doc/s8.png]]
 
+  #+CAPTION: org-mode with LaTeX formuls
+  [[./doc/s10.png]]
+
   You can see some other screenshots in [[file:doc/][doc/]]
-    
+
 ** Features
 
 
@@ -178,3 +181,4 @@ So you can test it without ~chemacs~ and other stupid things, you even not need 
   #+end_src
 
 - Fonts (better [[https://www.jetbrains.com/lp/mono/][JetBrains Mono]] and Symbols Nerd Font Mono : [[https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/NerdFontsSymbolsOnly.zip][link to zip archive]])
+- \(a_i + b_i = c_i^2\)
