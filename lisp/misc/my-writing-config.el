@@ -33,8 +33,14 @@
   "r" #'restart-emacs
   "R" #'my-restart-build
   "B" #'my-restart-build
+  ;; create new configuration file with template
   "n" #'my-new-config-module
-  "t" 'my-require-times)
+  ;; sometimes it's useful to check times that modules took time
+  "t" #'my-require-times
+  ;; pam (package manager)
+  "RET" #'pam-install-everything-mode
+  "p" #'pam-use-package)
+
 (global-set-key (kbd "C-c e") my-config-map)
 
 ;; settings of byte-compile remarks (warnings)
