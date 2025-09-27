@@ -13,8 +13,8 @@
 
 (leaf breadcrumb
   :ensure t
-  :disabled t
-  :hook (prog-mode-hook . breadcrumb-local-mode))
+  ;; :hook (prog-mode-hook . breadcrumb-local-mode)
+  :bind ("M-B" . breadcrumb-local-mode))
 
 (provide 'my-breadcrumb)
 ;;; my-breadcrumb.el ends here
