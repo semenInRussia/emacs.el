@@ -15,7 +15,6 @@
 
 (leaf project
   :ensure (project :type built-in)
-  :hook (after-init-hook . my-bind--project)
   :bind (:project-prefix-map
          ;; at start `project-dired' is bound with C-x p D, but
          ;; `dired-jump' (open `dired' in the current directory) is
@@ -35,8 +34,6 @@
          ("j" . project-dired)
          ("s" . consult-ripgrep)
          ("%" . project-query-replace-regexp))
-  :config (defun my-bind--project ()
-            (global-set-key (kbd "C-c p") project-prefix-map))
   :defvar project-switch-commands
   :config
   (remove-from-list! project-switch-commands
@@ -48,6 +45,18 @@
   ;; config for `consult' located inside `my-consult'
   ;; config of `magit' located inside `my-git' leaf `magit'
   )
+
+;; SPC p f => C-x p f, when use `meow'
+(with-eval-after-load 'meow-helpers
+  (declare-function meow-leader-define-key "meow-helpers")
+  (meow-leader-define-key (cons "p" project-prefix-map)))
+
+;; `embark': for file map `project-remember-projects-under'
+(with-eval-after-load 'embark
+  (keymap-set embark-file-map "p" #'project-remember-projects-under))
+
+(defvar project-vc-extra-root-markers nil)
+(add-to-list 'project-vc-extra-root-markers ".dir-locals.el")
 
 (provide 'my-project)
 ;;; my-project.el ends here
