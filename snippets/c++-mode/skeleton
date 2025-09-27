@@ -2,7 +2,7 @@
 # name: skeleton
 # key: !
 # --
-// semenInRussia 2024
+// semenInRussia `(my-current-year)`
 
 #include <iostream>
 
