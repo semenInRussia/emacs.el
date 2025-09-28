@@ -27,7 +27,6 @@
 
 ** Features
 
-
 My configuration have a big amount of interesting concepts which are unique ones.  And the biggest part of my config is opposite to Doom.  Things where my config is better on 100% I will tell #nodoom
 
 - a beautiful design.
@@ -41,15 +40,29 @@ My configuration have a big amount of interesting concepts which are unique ones
   + Small, but amazing padding around screen (#nodoom) ([[https://github.com/protesilaos/spacious-padding][spacious-padding]] by @protesilaos)
   + No to ~prettify-mode~
 
+- Some things for sport programming
+
+  + special recipes to compile and run C++ files
+  + Edit ~input.txt~ (add input samples), now you can press <kbd>f5</kbd> in C++ buffer, choose run with ~input.txt~
+  + in GDB debugger you can just insert whole ~input.txt~ content in one line (it's useful)
+  + a big amount of helpful snippets
+  + insert template with snippet ! and multitester with !!
+
+- Config to quick editing LaTeX equations (inspired by [[https://karthinks.com/software/latex-input-for-impatient-scholars/][this @karthinks article]])
+
+  (I use =org-mode= for abstracts)
+
 - Very (really very) fast start up. (#nodoom #nodoom)
 
   On my old computer ~doomemacs~ starts in 4+ seconds (it prints it after startup), but in fact it also wait for when themes, modeline and other things will be loaded.  My config on other side take only 2secs(sometimes even 0.9s) and almost don't take time after.
 
-- A big amount of packages (~200)
-
 - Reload the configuration Emacs lisp file after it saved.  Inspired by ~VSCode~ and ~NVChad~
 
 - More fast way to install
+
+- Some optimizations for Windows
+
+- A big amount of packages (~200)
 
 - [[https://github.com/meow-edit/meow][meow]] over ~evil~
 
@@ -63,17 +76,7 @@ My configuration have a big amount of interesting concepts which are unique ones
 
 - Use [[https://github.com/nex3/perspective-el][perspectives]] (virtual desktops/workspaces for Emacs) with intuitive way
 
-- Some optimizations for Windows
-
 - Big usage of [[https://github.com/oantolin/embark/][embark]] (just fun)
-
-- Some things for sport programming
-
-  + special recipes to compile and run C++ files
-  + Edit ~input.txt~ (add input samples), now you can press <kbd>f5</kbd> in C++ buffer, choose run with ~input.txt~
-  + in GDB debugger you can just insert whole ~input.txt~ content in one line (it's useful)
-  + a big amount of helpful snippets
-  + insert template with snippet ! and multitester with !!
 
 ** Extension (my config as framework)
 
