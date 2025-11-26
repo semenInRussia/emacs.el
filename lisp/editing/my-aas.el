@@ -47,6 +47,12 @@
     "lor" "\\lor"
     "land" "\\land"
     "opp" "\\circ"
+    "sum" "\\sum"
+    "prod" "\\prod"
+    "intt" "\\int"
+    "BB" (lambda () (interactive) (yas-expand-snippet "{$0 \\choose }"))
+    "^" (lambda () (interactive) (insert "^{}") (forward-char -1))
+    "mod" (lambda () (interactive) (insert "\\pmod{}") (forward-char -1))
     :cond #'laas-object-on-left-condition
     "bb" (lambda () (interactive) (laas-wrap-previous-object "mathbb"))))
 
