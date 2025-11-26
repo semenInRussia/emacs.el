@@ -36,6 +36,7 @@
   :bind (:cdlatex-mode-map
          ("<tab>" . cdlatex-tab)
          ("C-'" . cdlatex-math-modify)
+         ("^") ; use `laas' for this
          ("`") ("'")))
 
 (leaf my-latex-insert

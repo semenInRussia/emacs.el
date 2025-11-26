@@ -71,6 +71,7 @@
   :bind (:org-cdlatex-mode-map
          ("`" . nil)
          ("'" . nil)
+         ("^") ; use `laas' for this
          ("C-'" . cdlatex-math-modify)))
 
 (leaf xenops
