@@ -1,0 +1,21 @@
+# -*- mode: snippet -*-
+# name: point
+# key: point
+# --
+using T = long double;
+using P = complex<T>;
+
+#define X real()
+#define Y imag()
+
+T dot(P a, P b) { return (conj(a) * b).X; }
+T cross(P a, P b) { return (conj(a) * b).Y; }
+
+istream &operator>>(istream &in, P &v) {
+  T x, y;
+  in >> x >> y;
+  v = {x, y};
+  return in;
+}
+
+ostream &operator<<(ostream &out, P &v) { return out << v.X << ' ' << v.Y; }

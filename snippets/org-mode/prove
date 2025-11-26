@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: prove
+# key: Prove
+# --
+*Prove*: $0

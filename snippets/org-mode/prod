@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: prd
+# key: prd
+# --
+\prod_{$1}^{$2} $0
